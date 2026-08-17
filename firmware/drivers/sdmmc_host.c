@@ -466,6 +466,30 @@ static int sdmmc_host_cmd_send_csd(struct sdmmc_host *host)
     return rc;
 }
 
+static int sdmmc_host_cmd_send_scr(struct sdmmc_host *host)
+{
+    struct sdmmc_host_command cmd = {
+        .command   = SD_SEND_SCR,
+        .buffer    = sdmmc_host_get_dc_buffer(host),
+        .flags     = SDMMC_RESP_SHORT | SDMMC_DATA_READ,
+        .nr_blocks = 1,
+        .block_len = 8,
+    };
+
+    int rc = sdmmc_host_submit_app_cmd(host, &cmd, NULL);
+    if (rc)
+        return rc;
+
+    /*
+     * Card sends the most significant byte first so
+     * convert the data to native endian.
+     */
+    host->cardinfo.scr[0] = load_be32_aligned(cmd.buffer + 4);
+    host->cardinfo.scr[1] = load_be32_aligned(cmd.buffer + 0);
+
+    return rc;
+}
+
 static int sdmmc_host_cmd_select_card(struct sdmmc_host *host)
 {
     struct sdmmc_host_command cmd = {
@@ -662,6 +686,13 @@ static int sdmmc_host_device_init(struct sdmmc_host *host)
     else
     {
         sdmmc_host_set_controller_bus_clock(host, SDMMC_BUS_CLOCK_25MHZ);
+    }
+
+    rc = sdmmc_host_cmd_send_scr(host);
+    if (rc)
+    {
+        logf("sdmmc_host_cmd_send_scr: %d", rc);
+        return rc;
     }
 
     host->initialized = true;
