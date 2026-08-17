@@ -255,6 +255,33 @@ static bool sdmmc_host_medium_present(struct sdmmc_host *host)
 #endif
 }
 
+static void *sdmmc_host_get_dc_buffer(struct sdmmc_host *host)
+{
+    /*
+     * The disk cache should have a free buffer before the disk
+     * is mounted. We use the buffer during card initialization
+     * and release it before doing I/O so the allocation should
+     * always succeed.
+     */
+    if (!host->dc_buffer)
+    {
+        host->dc_buffer = dc_get_buffer();
+        if (!host->dc_buffer)
+            panicf("%s: OOM", __func__);
+    }
+
+    return host->dc_buffer;
+}
+
+static void sdmmc_host_release_dc_buffer(struct sdmmc_host *host)
+{
+    if (host->dc_buffer)
+    {
+        dc_release_buffer(host->dc_buffer);
+        host->dc_buffer = NULL;
+    }
+}
+
 /*
  * Submit one command to the host controller.
  */
@@ -484,6 +511,7 @@ static int sdmmc_host_cmd_switch_freq(struct sdmmc_host *host,
 {
     struct sdmmc_host_command cmd = {
         .command   = SD_SWITCH_FUNC,
+        .buffer    = sdmmc_host_get_dc_buffer(host),
         .flags     = SDMMC_RESP_SHORT | SDMMC_DATA_READ,
         .nr_blocks = 1,
         .block_len = 64,
@@ -496,19 +524,7 @@ static int sdmmc_host_cmd_switch_freq(struct sdmmc_host *host,
     else
         return SDMMC_STATUS_ERROR;
 
-    /*
-     * We'll just assume the disk cache will have a free buffer.
-     * Since the disk isn't mounted, we should have at least one
-     * free that would otherwise be used by the FAT filesystem.
-     */
-    cmd.buffer = dc_get_buffer();
-    if (!cmd.buffer)
-        panicf("%s: OOM", __func__);
-
-    int rc = sdmmc_host_submit_cmd(host, &cmd, NULL);
-
-    dc_release_buffer(cmd.buffer);
-    return rc;
+    return sdmmc_host_submit_cmd(host, &cmd, NULL);
 }
 
 static int sdmmc_host_cmd_set_block_len(struct sdmmc_host *host, int len)
@@ -676,6 +692,7 @@ static int sdmmc_host_transfer(struct sdmmc_host *host,
     if (!host->initialized)
     {
         rc = sdmmc_host_device_init(host);
+        sdmmc_host_release_dc_buffer(host);
         if (rc)
         {
             host->need_reset = true;

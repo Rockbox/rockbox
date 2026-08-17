@@ -232,6 +232,9 @@ struct sdmmc_host
      */
     struct mutex lock;
 
+    /* Temporary disk cache buffer */
+    void *dc_buffer;
+
     /* Bus & device state flags; must only be accessed with lock held */
     bool enabled     : 1;
     bool need_reset  : 1;
