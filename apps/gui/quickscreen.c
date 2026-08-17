@@ -58,6 +58,7 @@ struct quickscreen
     struct viewport vp_icons[NB_SCREENS];
     int button_enter;
     enum quickscreen_return result;
+    enum quickscreen_item volume_item;
 };
 
 static void quickscreen_fix_viewports(struct quickscreen *qs, enum screen_type screen)
@@ -438,10 +439,12 @@ static void quickscreen_run(struct quickscreen * qs)
         }
         else if (button == qs->button_enter)
             can_quit = true;
-        else if (button == ACTION_QS_VOLUP)
-            adjust_volume(1);
-        else if (button == ACTION_QS_VOLDOWN)
-            adjust_volume(-1);
+        else if (button == ACTION_QS_VOLUP || button == ACTION_QS_VOLDOWN)
+        {
+            adjust_volume(button == ACTION_QS_VOLUP ? 1 : -1);
+            if (qs->volume_item < QUICKSCREEN_ITEM_COUNT)
+                quickscreen_update(qs, qs->volume_item);
+        }
         else if (button == ACTION_STD_CONTEXT)
         {
             qs->result |= QUICKSCREEN_GOTO_SHORTCUTS_MENU;
@@ -467,6 +470,7 @@ int quick_screen_quick(int button_enter)
     struct quickscreen qs;
     qs.button_enter = button_enter;
     qs.result = QUICKSCREEN_OK;
+    qs.volume_item = QUICKSCREEN_ITEM_COUNT;
 
     for (int i = 0; i < 4; ++i)
     {
@@ -474,6 +478,9 @@ int quick_screen_quick(int button_enter)
 
         if (!is_setting_quickscreenable(qs.items[i]))
             qs.items[i] = NULL;
+
+        if (qs.items[i] && qs.items[i]->lang_id == LANG_VOLUME)
+            qs.volume_item = i;
     }
 
     quickscreen_run(&qs);
