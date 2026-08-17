@@ -34,6 +34,7 @@ typedef struct
     unsigned long ocr;              /* OCR register */
     unsigned long csd[4];           /* CSD register, 16 bytes */
     unsigned long cid[4];           /* CID register, 16 bytes */
+    unsigned long scr[2];           /* SCR register, 8 bytes */
     unsigned long speed;            /* bit/s */
     unsigned int nsac;              /* clock cycles */
     unsigned long taac;             /* n * 0.1 ns */
