@@ -67,10 +67,7 @@ void skin_backdrop_unload(int backdrop_id);
 #define BACKDROP_BUFFERNAME "#backdrop_buffer#"
 void skin_backdrop_set_buffer(int backdrop_id, struct skin_viewport *svp);
 
-/* do the button loop as often as required for the peak meters to update
- * with a good refresh rate.
- * gwps is really gwps[NB_SCREENS]! don't wrap this in FOR_NB_SCREENS()
- */
+/* Enter button loop updating peak meter at a high refresh rate */
 int skin_wait_for_action(enum skinnable_screens skin, int context, int timeout);
 
 struct gui_wps *skin_get_gwps(enum skinnable_screens skin, enum screen_type screen);
