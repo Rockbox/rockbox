@@ -196,6 +196,7 @@ static void sdmmc_host_bus_reset(struct sdmmc_host *host)
     host->need_reset = false;
     host->initialized = false;
     host->is_hcs_card = false;
+    host->use_cmd23 = false;
     memset(&host->cardinfo, 0, sizeof(host->cardinfo));
 }
 
@@ -487,6 +488,10 @@ static int sdmmc_host_cmd_send_scr(struct sdmmc_host *host)
     host->cardinfo.scr[0] = load_be32_aligned(cmd.buffer + 4);
     host->cardinfo.scr[1] = load_be32_aligned(cmd.buffer + 0);
 
+    /* Use CMD23 (SET_BLOCK_COUNT) if card reports support */
+    if (host->cardinfo.scr[1] & 0x2)
+        host->use_cmd23 = true;
+
     return rc;
 }
 
@@ -560,6 +565,28 @@ static int sdmmc_host_cmd_set_block_len(struct sdmmc_host *host, int len)
     };
 
     return sdmmc_host_submit_cmd(host, &cmd, NULL);
+}
+
+static int sdmmc_host_cmd_set_block_count(struct sdmmc_host *host, int count)
+{
+    struct sdmmc_host_response resp;
+    struct sdmmc_host_command cmd = {
+        .command   = SD_SET_BLOCK_COUNT,
+        .argument  = count,
+        .flags     = SDMMC_RESP_SHORT,
+    };
+
+    int rc = sdmmc_host_submit_cmd(host, &cmd, &resp);
+    if (rc)
+        return rc;
+
+    if (resp.data[0] & SD_R1_ILLEGAL_COMMAND)
+    {
+        logf("sdmmc: card claimed support for CMD23 but rejected it");
+        host->use_cmd23 = false;
+    }
+
+    return rc;
 }
 
 static void sdmmc_host_set_controller_bus_width(struct sdmmc_host *host, uint32_t width)
@@ -764,6 +791,18 @@ static int sdmmc_host_transfer(struct sdmmc_host *host,
                 cmd.command = SD_WRITE_MULTIPLE_BLOCK;
             else
                 cmd.command = SD_READ_MULTIPLE_BLOCK;
+
+            /*
+             * Note: if the card rejects the command the return code
+             * will be successful, but use_cmd23 is set to false, and
+             * CMD12 will be used to terminate the read/write instead.
+             */
+            if (host->use_cmd23)
+            {
+                rc = sdmmc_host_cmd_set_block_count(host, xfer_count);
+                if (rc)
+                    goto out;
+            }
         }
         else
         {
@@ -787,7 +826,7 @@ static int sdmmc_host_transfer(struct sdmmc_host *host,
          *       the end of a transfer, eg. X1000; it might be worth
          *       supporting that via a feature flag.
          */
-        if (xfer_count > 1)
+        if (xfer_count > 1 && !host->use_cmd23)
         {
             memset(&cmd, 0, sizeof(cmd));
             cmd.command = SD_STOP_TRANSMISSION;

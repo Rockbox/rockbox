@@ -241,6 +241,7 @@ struct sdmmc_host
     bool powered     : 1;
     bool initialized : 1;
     bool is_hcs_card : 1;
+    bool use_cmd23   : 1;
 
     /* Controller implemented by the target */
     const struct sdmmc_controller_ops *ops;
