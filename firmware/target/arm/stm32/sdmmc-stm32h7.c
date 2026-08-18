@@ -57,17 +57,6 @@
 #define BUSY_END_BITS \
     (BUSY_SUCCESS_BITS | DATA_ERROR_BITS)
 
-static size_t get_sdmmc_bus_freq(uint32_t clock)
-{
-    switch (clock)
-    {
-    case SDMMC_BUS_CLOCK_400KHZ: return 400000;
-    case SDMMC_BUS_CLOCK_25MHZ:  return 25000000;
-    case SDMMC_BUS_CLOCK_50MHZ:  return 50000000;
-    default:                     return 0;
-    }
-}
-
 static size_t abs_diff(size_t a, size_t b)
 {
     return a > b ? a - b : b - a;
@@ -208,7 +197,7 @@ void stm32h7_sdmmc_set_bus_clock(void *controller, uint32_t clock)
         return;
 
     size_t ker_freq = stm32_clock_get_frequency(ctl->clock);
-    size_t bus_freq = get_sdmmc_bus_freq(clock);
+    size_t bus_freq = sdmmc_host_get_bus_freq(clock);
     if (!bus_freq)
         panicf("%s", __func__);
 
