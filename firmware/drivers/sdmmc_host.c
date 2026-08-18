@@ -144,6 +144,17 @@ void sdmmc_host_set_medium_present(struct sdmmc_host *host, bool present)
 }
 #endif
 
+size_t sdmmc_host_get_bus_freq(uint32_t clock)
+{
+    switch (clock)
+    {
+    case SDMMC_BUS_CLOCK_400KHZ: return 400000;
+    case SDMMC_BUS_CLOCK_25MHZ:  return 25000000;
+    case SDMMC_BUS_CLOCK_50MHZ:  return 50000000;
+    default:                     return 0;
+    }
+}
+
 #ifdef CONFIG_STORAGE_MULTI
 static int sdmmc_host_count_drives(struct sdmmc_host **array,
                                    size_t array_size)

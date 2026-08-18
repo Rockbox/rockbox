@@ -291,4 +291,10 @@ void sdmmc_host_init_medium_present(struct sdmmc_host *host, bool present) INIT_
  */
 void sdmmc_host_set_medium_present(struct sdmmc_host *host, bool present);
 
+/**
+ * Returns clock frequency in Hz for an `SDMMC_BUS_CLOCK_*` constant.
+ * Returns zero if fed an invalid constant.
+ */
+size_t sdmmc_host_get_bus_freq(uint32_t clock);
+
 #endif /* __SDMMC_HOST_H__ */
