@@ -21,6 +21,7 @@
 #include "system.h"
 #include "storage.h"
 #include "disk_cache.h"
+#include "led.h"
 #include "debug.h"
 #include "panic.h"
 #include "logf.h"
@@ -47,6 +48,29 @@ static struct sdmmc_host *sdmmc_mmc_hosts[SDMMC_HOST_NUM_MMC_CONTROLLERS];
 DECLARE_FIRST_DRIVE(int sdmmc_mmc_first_drive);
 static volatile long sdmmc_mmc_last_activity;
 #endif
+
+static bool sdmmc_host_any_active(void)
+{
+#if CONFIG_STORAGE & STORAGE_SD
+    for (size_t i = 0; i < ARRAYLEN(sdmmc_sd_hosts); ++i)
+        if (sdmmc_sd_hosts[i]->led_active)
+            return true;
+#endif
+
+#if CONFIG_STORAGE & STORAGE_MMC
+    for (size_t i = 0; i < ARRAYLEN(sdmmc_mmc_hosts); ++i)
+        if (sdmmc_mmc_hosts[i]->led_active)
+            return true;
+#endif
+
+    return false;
+}
+
+static void sdmmc_host_set_led(struct sdmmc_host *host, bool on)
+{
+    host->led_active = on;
+    led(sdmmc_host_any_active());
+}
 
 static int sdmmc_host_get_logical_drive(struct sdmmc_host *host)
 {
@@ -734,6 +758,7 @@ static int sdmmc_host_transfer(struct sdmmc_host *host,
     int rc = -1;
 
     mutex_lock(&host->lock);
+    sdmmc_host_set_led(host, true);
 
     if (!host->enabled)
         goto out;
@@ -843,6 +868,7 @@ static int sdmmc_host_transfer(struct sdmmc_host *host,
     }
 
 out:
+    sdmmc_host_set_led(host, false);
     mutex_unlock(&host->lock);
     return rc;
 }
