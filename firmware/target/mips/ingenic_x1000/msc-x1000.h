@@ -17,168 +17,47 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-
 #ifndef __MSC_X1000_H__
 #define __MSC_X1000_H__
 
-#include "kernel.h"
-#include "sdmmc.h"
-#include <stdbool.h>
+#include "sdmmc_host.h"
 
-/* Number of MSC controllers */
-#define MSC_COUNT 2
+/* Must be allocated on a cacheline boundary */
+struct x1000_msc_dma_desc
+{
+    uint32_t nda;
+    uint32_t mem;
+    uint32_t len;
+    uint32_t cmd;
+};
 
-/* Media types */
-#define MSC_TYPE_SD  0
-#define MSC_TYPE_MMC 1
-#define MSC_TYPE_ATA 2
-#define MSC_TYPE_ANY 3
-
-/* Clock modes */
-#define MSC_CLK_MANUAL    0
-#define MSC_CLK_AUTOMATIC 1
-
-/* Clock status bits */
-#define MSC_CLKST_ENABLE (1 << 0)
-#define MSC_CLKST_AUTO   (1 << 1)
-
-/* Driver flags */
-#define MSC_DF_ERRSTATE (1 << 0)
-#define MSC_DF_READY    (1 << 1)
-#define MSC_DF_HCS_CARD (1 << 2)
-#define MSC_DF_V2_CARD  (1 << 3)
-#define MSC_DF_HAS_SBC  (1 << 4)
-
-/* Request status codes */
-#define MSC_REQ_SUCCESS     0
-#define MSC_REQ_CRC_ERR     1
-#define MSC_REQ_CARD_ERR    2
-#define MSC_REQ_TIMEOUT     3
-#define MSC_REQ_EXTRACTED   4
-#define MSC_REQ_LOCKUP      5
-#define MSC_REQ_ERROR       6
-#define MSC_REQ_INCOMPLETE  (-1)
-
-/* Response types */
-#define MSC_RESP_NONE   0
-#define MSC_RESP_BUSY   (1 << 7)
-#define MSC_RESP_R1     1
-#define MSC_RESP_R1B    (MSC_RESP_R1|MSC_RESP_BUSY)
-#define MSC_RESP_R2     2
-#define MSC_RESP_R3     3
-#define MSC_RESP_R6     6
-#define MSC_RESP_R7     7
-
-/* Request flags */
-#define MSC_RF_INIT         (1 << 0)
-#define MSC_RF_ERR_CMD12    (1 << 1)
-#define MSC_RF_AUTO_CMD12   (1 << 2)
-#define MSC_RF_PROG         (1 << 3)
-#define MSC_RF_DATA         (1 << 4)
-#define MSC_RF_WRITE        (1 << 5)
-#define MSC_RF_ABORT        (1 << 6)
-
-/* Clock speeds */
-#define MSC_SPEED_INIT  400000
-#define MSC_SPEED_FAST  25000000
-#define MSC_SPEED_HIGH  50000000
-
-typedef struct msc_config {
+struct x1000_msc_controller
+{
     int msc_nr;
-    int msc_type;
-    int bus_width;
-    const char* label;
-    int cd_gpio;
-    int cd_active_level;
-} msc_config;
+    uint32_t src_clk_freq;
+    struct x1000_msc_dma_desc *dma_desc;
 
-typedef struct msc_req {
-    /* Filled by caller */
-    int command;
-    unsigned argument;
-    int resptype;
-    int flags;
-    void* data;
-    unsigned nr_blocks;
-    unsigned block_len;
+    uint32_t bus_clock;
+    uint32_t cmdat_def;
+    uint32_t iflag_done;
+    int resp_len;
+    int err_code;
+    struct sdmmc_host_response *resp;
 
-    /* Filled by driver */
-    volatile unsigned response[4];
-    volatile int status;
-} msc_req;
+    struct semaphore sem;
+};
 
-struct sd_dma_desc {
-    unsigned nda;
-    unsigned mem;
-    unsigned len;
-    unsigned cmd;
-} __attribute__((aligned(16)));
+void x1000_msc_init(struct x1000_msc_controller* ctl,
+                    struct x1000_msc_dma_desc *dma_desc,
+                    int msc_nr, uint32_t src_clk_freq);
 
-typedef struct msc_drv {
-    int msc_nr;
-    int drive_nr;
-    const msc_config* config;
-
-    int driver_flags;
-    int clk_status;
-    unsigned cmdat_def;
-    msc_req* req;
-    unsigned iflag_done;
-
-    volatile int req_running;
-    volatile int card_present; /* Debounced status */
-    volatile int card_present_last; /* Status when we last polled it */
-
-    struct mutex lock;
-    struct semaphore cmd_done;
-    struct timeout cmd_tmo;
-    struct timeout cd_tmo;
-    struct sd_dma_desc dma_desc;
-
-    tCardInfo cardinfo;
-} msc_drv;
-
-/* Driver initialization, etc */
-extern void msc_init(void);
-extern msc_drv* msc_get(int type, int index);
-extern msc_drv* msc_get_by_drive(int drive_nr);
-
-extern void msc_lock(msc_drv* d);
-extern void msc_unlock(msc_drv* d);
-extern void msc_full_reset(msc_drv* d);
-extern bool msc_card_detect(msc_drv* d);
-
-extern void msc_led_trigger(void);
-
-/* Controller API */
-extern void msc_ctl_reset(msc_drv* d);
-extern void msc_set_clock_mode(msc_drv* d, int mode);
-extern void msc_enable_clock(msc_drv* d, bool enable);
-extern void msc_set_speed(msc_drv* d, int rate);
-extern void msc_set_width(msc_drv* d, int width);
-
-/* Request API */
-extern void msc_async_start(msc_drv* d, msc_req* r);
-extern void msc_async_abort(msc_drv* d, int status);
-extern int  msc_async_wait(msc_drv* d, int timeout);
-extern int  msc_request(msc_drv* d, msc_req* r);
-
-/* Command helpers; note these are written with SD in mind
- * and should be reviewed before using them for MMC / CE-ATA
- */
-extern int msc_cmd_exec(msc_drv* d, msc_req* r);
-extern int msc_app_cmd_exec(msc_drv* d, msc_req* r);
-extern int msc_cmd_go_idle_state(msc_drv* d);
-extern int msc_cmd_send_if_cond(msc_drv* d);
-extern int msc_cmd_app_op_cond(msc_drv* d);
-extern int msc_cmd_all_send_cid(msc_drv* d);
-extern int msc_cmd_send_rca(msc_drv* d);
-extern int msc_cmd_send_csd(msc_drv* d);
-extern int msc_cmd_select_card(msc_drv* d);
-extern int msc_cmd_set_bus_width(msc_drv* d, int width);
-extern int msc_cmd_set_clr_card_detect(msc_drv* d, int arg);
-extern int msc_cmd_switch_freq(msc_drv* d);
-extern int msc_cmd_send_status(msc_drv* d);
-extern int msc_cmd_set_block_len(msc_drv* d, unsigned len);
+void x1000_msc_set_power_enabled(void *controller, bool enabled);
+void x1000_msc_set_bus_width(void *controller, uint32_t width);
+void x1000_msc_set_bus_clock(void *controller, uint32_t clock);
+int x1000_msc_submit_command(void *controller,
+                             const struct sdmmc_host_command *cmd,
+                             struct sdmmc_host_response *resp);
+void x1000_msc_abort_command(void *controller);
+void x1000_msc_irq_handler(struct x1000_msc_controller *ctl);
 
 #endif /* __MSC_X1000_H__ */
