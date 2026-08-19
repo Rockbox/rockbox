@@ -18,16 +18,15 @@
  *
  ****************************************************************************/
 #include "sdmmc_host.h"
+#include "sdmmc_poll.h"
 #include "clock-echoplayer.h"
 #include "sdmmc-stm32h7.h"
 #include "gpio-stm32h7.h"
 #include "nvic-arm.h"
 #include "regs/stm32h743/sdmmc.h"
 
-/* 300ms poll interval */
-#define SDCARD_POLL_TICKS (300 * HZ / 1000)
-
 static struct sdmmc_host sdmmc1;
+static struct sdmmc_poll sdmmc1_poll;
 static struct stm32h7_sdmmc_controller sdmmc1_ctl;
 
 static const struct sdmmc_controller_ops sdmmc_ops = {
@@ -51,47 +50,10 @@ static const struct sdmmc_host_config sdmmc_config INITDATA_ATTR = {
     .is_removable = true,
 };
 
-/*
- * simple SD insertion poller
- */
-struct sdmmc_poll
-{
-    struct sdmmc_host *host;
-    bool is_inserted;
-
-    bool last_state;
-    bool curr_state;
-};
-
 static bool is_sdcard_inserted(void)
 {
     return gpio_get_level(GPIO_SDMMC_DETECT) == 0;
 }
-
-static int poll_sdcard_inserted(struct timeout *tmo)
-{
-    struct sdmmc_poll *poll = (void *)tmo->data;
-
-    poll->last_state = poll->curr_state;
-    poll->curr_state = is_sdcard_inserted();
-
-    if (!poll->curr_state && poll->is_inserted)
-    {
-        poll->is_inserted = false;
-        sdmmc_host_set_medium_present(poll->host, false);
-    }
-    else if (poll->curr_state && !poll->is_inserted &&
-             poll->curr_state == poll->last_state)
-    {
-        poll->is_inserted = true;
-        sdmmc_host_set_medium_present(poll->host, true);
-    }
-
-    return SDCARD_POLL_TICKS;
-}
-
-static struct timeout sdcard_poll_timeout;
-static struct sdmmc_poll sdcard_poll;
 
 void sdmmc_host_target_init(void)
 {
@@ -100,15 +62,13 @@ void sdmmc_host_target_init(void)
                        stm32h7_reset_sdmmc1, NULL);
     nvic_enable_irq(NVIC_IRQN_SDMMC1);
 
-    /* Initialize card detect polling */
-    sdcard_poll.host = &sdmmc1;
-    sdcard_poll.is_inserted = is_sdcard_inserted();
-    timeout_register(&sdcard_poll_timeout, poll_sdcard_inserted,
-                     SDCARD_POLL_TICKS, (intptr_t)&sdcard_poll);
-
     /* Initialize SD/MMC host driver */
     sdmmc_host_init(&sdmmc1, &sdmmc_config, &sdmmc_ops, &sdmmc1_ctl);
-    sdmmc_host_init_medium_present(&sdmmc1, sdcard_poll.is_inserted);
+    sdmmc_host_init_medium_present(&sdmmc1, is_sdcard_inserted());
+
+    /* Start insertion poller */
+    sdmmc_poll_init(&sdmmc1_poll, &sdmmc1, is_sdcard_inserted);
+    sdmmc_poll_start(&sdmmc1_poll);
 }
 
 void sdmmc1_irq_handler(void)

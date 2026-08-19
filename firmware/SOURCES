@@ -2106,6 +2106,7 @@ drivers/cw2015.c
 #endif
 #ifdef HAVE_SDMMC_HOST
 drivers/sdmmc_host.c
+drivers/sdmmc_poll.c
 #endif
 #endif
 
