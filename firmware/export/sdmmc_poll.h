@@ -32,6 +32,7 @@ struct sdmmc_poll
     bool (*check_inserted)(void);
 
     bool is_inserted;
+    bool is_polling;
     bool last_state;
     bool curr_state;
 };
@@ -42,7 +43,11 @@ struct sdmmc_poll
  * in insertion state is detected via the check_inserted()
  * callback.
  *
- * Call sdmmc_poll_start() to start the poll timer.
+ * Call sdmmc_poll_start() to start the poll timer if you
+ * use level triggered polling.
+ *
+ * To use edge triggered events call sdmmc_poll_event() if
+ * the return value of check_inserted() may have changed.
  *
  * Changes in the insertion state are debounced before they
  * are reported to the sdmmc_host.
@@ -52,5 +57,6 @@ void sdmmc_poll_init(struct sdmmc_poll *poll,
                      struct sdmmc_host *host,
                      bool (*check_inserted) (void));
 void sdmmc_poll_start(struct sdmmc_poll *poll);
+void sdmmc_poll_event(struct sdmmc_poll *poll);
 
 #endif /* __SDMMC_POLL_H__ */

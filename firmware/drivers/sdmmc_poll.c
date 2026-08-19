@@ -42,7 +42,10 @@ static int sdmmc_poll_timeout(struct timeout *tmo)
         sdmmc_host_set_medium_present(poll->host, true);
     }
 
-    return SDCARD_POLL_TICKS;
+    if (poll->is_polling || (poll->curr_state != poll->last_state))
+        return SDCARD_POLL_TICKS;
+
+    return 0;
 }
 
 void sdmmc_poll_init(struct sdmmc_poll *poll,
@@ -59,6 +62,14 @@ void sdmmc_poll_init(struct sdmmc_poll *poll,
 
 void sdmmc_poll_start(struct sdmmc_poll *poll)
 {
+    poll->is_polling = true;
     timeout_register(&poll->timeout, sdmmc_poll_timeout,
                      SDCARD_POLL_TICKS, (intptr_t)poll);
+}
+
+void sdmmc_poll_event(struct sdmmc_poll *poll)
+{
+    timeout_register(&poll->timeout, sdmmc_poll_timeout,
+                     SDCARD_POLL_TICKS, (intptr_t)poll);
+    sdmmc_poll_timeout(&poll->timeout);
 }
