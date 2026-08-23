@@ -19,6 +19,7 @@
  ****************************************************************************/
 
 #include "x1000bootloader.h"
+#include "ingenic/gui-ingenic.h"
 #include "kernel.h"
 #include "button.h"
 #include "installer-ingenic.h"

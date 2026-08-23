@@ -19,6 +19,7 @@
  ****************************************************************************/
 
 #include "x1000bootloader.h"
+#include "ingenic/gui-ingenic.h"
 #include "lcd.h"
 #include "font.h"
 #include "button.h"
@@ -148,12 +149,6 @@ static void recmenu_scroll(struct bl_list* list, int dir)
     }
 }
 
-static void put_help_line(int y, int line, const char* str1, const char* str2)
-{
-    y += line*SYSFONT_HEIGHT;
-    lcd_putsxy(0, y, str1);
-    lcd_putsxy(LCD_WIDTH - strlen(str2)*SYSFONT_WIDTH, y, str2);
-}
 
 void recovery_menu(void)
 {

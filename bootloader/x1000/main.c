@@ -19,6 +19,7 @@
  ****************************************************************************/
 
 #include "x1000bootloader.h"
+#include "ingenic/gui-ingenic.h"
 #include "system.h"
 #include "core_alloc.h"
 #include "kernel/kernel-internal.h"
@@ -32,15 +33,6 @@
 #include "boot-x1000.h"
 #include <stdbool.h>
 
-static int read_btn(void)
-{
-#ifdef HAVE_BUTTON_DATA
-    int bdata;
-    return button_read_device(&bdata);
-#else
-    return button_read_device();
-#endif
-}
 
 void main(uint32_t saved_cpm_scratch)
 {

@@ -19,6 +19,7 @@
  ****************************************************************************/
 
 #include "x1000bootloader.h"
+#include "ingenic/gui-ingenic.h"
 #include "core_alloc.h"
 #include "storage.h"
 #include "button.h"
@@ -31,13 +32,6 @@
 #include "screendump.h"
 #include "nand-ingenic.h"
 #include "sfc-x1000.h"
-
-/* Set to true if a SYS_USB_CONNECTED event is seen
- * Set to false if a SYS_USB_DISCONNECTED event is seen
- * Handled by the gui code since that's how events are delivered
- * TODO: this is an ugly kludge */
-bool is_usb_connected = false;
-intptr_t usb_connection_seqnum = 0;
 
 static bool screenshot_enabled = false;
 
