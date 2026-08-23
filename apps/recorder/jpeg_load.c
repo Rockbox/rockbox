@@ -927,7 +927,9 @@ static bool skip_bytes_read_buf(struct jpeg* p_jpeg)
     {
         int count = -p_jpeg->buf_left;
         fill_buf(p_jpeg);
-        if (p_jpeg->buf_left < 0)
+        /* nothing read is the end of the data, as in jpeg_getc(); asking
+           again would take the same turn forever */
+        if (p_jpeg->buf_left <= 0)
             return false;
         p_jpeg->buf_left -= count;
         p_jpeg->buf_index += count;
