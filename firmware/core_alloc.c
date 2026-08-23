@@ -61,7 +61,7 @@ void core_allocator_init(void)
 {
     unsigned char *start = ALIGN_UP(audiobuffer, sizeof(intptr_t));
 
-#if defined(IPOD_VIDEO) && !defined(BOOTLOADER) && !defined(SIMULATOR)
+#if !defined(__PCTOOL__) && defined(IPOD_VIDEO) && !defined(BOOTLOADER) && !defined(SIMULATOR)
     audiobufend=(unsigned char *)audiobufend_lds;
     if(MEMORYSIZE==64 && probed_ramsize!=64)
     {
