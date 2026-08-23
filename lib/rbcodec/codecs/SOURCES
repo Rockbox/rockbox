@@ -47,7 +47,8 @@ kss.c
 #endif
 aac_bsf.c
 
-#ifdef HAVE_RECORDING
+/* warble is decoder-only */
+#if defined(HAVE_RECORDING) && !defined(WARBLE)
 
 /* encoders */
 
@@ -56,4 +57,4 @@ mp3_enc.c
 wav_enc.c
 wavpack_enc.c
 
-#endif /* HAVE_RECORDING */
+#endif /* HAVE_RECORDING && !WARBLE */
