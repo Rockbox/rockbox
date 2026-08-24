@@ -185,14 +185,14 @@ static void quickscreen_fix_viewports(struct quickscreen *qs, enum screen_type s
     vps[QUICKSCREEN_RIGHT].flags  |= VP_FLAG_ALIGN_RIGHT;
 }
 
-/* Draw QS item into current viewport */
-static void quickscreen_draw_item(struct quickscreen *qs, struct screen *display,
-                                  enum quickscreen_item i, bool single_line)
+/* Draw settings item into current viewport */
+static void quickscreen_draw_setting(const struct settings_list *item,
+                                     struct screen *display, bool single_line)
 {
     char buf[MAX_PATH];
-    const char *title = P2STR(ID2P(qs->items[i]->lang_id));
-    const char *value = option_get_valuestring(qs->items[i], buf, sizeof buf,
-                                               option_value_as_int(qs->items[i]));
+    const char *title = P2STR(ID2P(item->lang_id));
+    const char *value = option_get_valuestring(item, buf, sizeof buf,
+                                               option_value_as_int(item));
     if (single_line)
     {
         char text[MAX_PATH];
@@ -222,7 +222,8 @@ static void quickscreen_update(struct quickscreen *qs, enum quickscreen_item sel
             {
                 struct viewport *last_vp = display->set_viewport(&vps[i]);
                 display->clear_viewport();
-                quickscreen_draw_item(qs, display, i, viewport_get_nb_lines(&vps[i]) < 2);
+                quickscreen_draw_setting(qs->items[i], display,
+                                         viewport_get_nb_lines(&vps[i]) < 2);
                 display->set_viewport(last_vp);
             }
 
@@ -244,7 +245,8 @@ static void quickscreen_draw(struct quickscreen *qs, enum screen_type screen)
         if (qs->items[i])
         {
             display->set_viewport(&vps[i]);
-            quickscreen_draw_item(qs, display, i, viewport_get_nb_lines(&vps[i]) < 2);
+            quickscreen_draw_setting(qs->items[i], display,
+                                     viewport_get_nb_lines(&vps[i]) < 2);
         }
 
     /* icons */
@@ -389,13 +391,9 @@ static void cleanup(void *parameter)
         if (!qs_skinned[i])
             FOR_QS_ITEMS(j)
                 screens[i].scroll_stop_viewport(&qs->vps[i][j]);
-        viewportmanager_theme_undo(i, !(qs->result & QUICKSCREEN_GOTO_SHORTCUTS_MENU));
+        viewportmanager_theme_undo(i, true);
     }
-    /* Eliminate flashing of parent during transition to Shortcuts */
-    if (qs->result & QUICKSCREEN_GOTO_SHORTCUTS_MENU)
-        pop_current_activity_without_refresh();
-    else
-        pop_current_activity();
+    pop_current_activity();
 }
 
 /* Set up activity, viewport, and event listener. Draw initial Quickscreen. */
