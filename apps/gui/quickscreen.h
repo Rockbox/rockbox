@@ -44,7 +44,7 @@ enum quickscreen_return {
     QUICKSCREEN_CHANGED = 0x4,
 };
 
-extern int quick_screen_quick(int button_enter);
+int quickscreen_show(int button_enter);
 void quickscreen_set_skinned(enum screen_type screen, bool skinned);
 bool is_setting_quickscreenable(const struct settings_list *setting);
 

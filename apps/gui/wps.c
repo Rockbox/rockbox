@@ -982,7 +982,7 @@ long gui_wps_show(void)
                 bool enter_shortcuts_menu = global_settings.shortcuts_replaces_qs;
                 if (!enter_shortcuts_menu)
                 {
-                    int ret = quick_screen_quick(button);
+                    int ret = quickscreen_show(button);
                     if (ret == QUICKSCREEN_IN_USB)
                         return GO_TO_ROOT;
                     else if (ret == QUICKSCREEN_GOTO_SHORTCUTS_MENU)

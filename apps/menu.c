@@ -472,7 +472,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
         else if (action == ACTION_STD_QUICKSCREEN)
         {
             if (global_settings.shortcuts_replaces_qs ||
-                quick_screen_quick(action) == QUICKSCREEN_GOTO_SHORTCUTS_MENU)
+                quickscreen_show(action) == QUICKSCREEN_GOTO_SHORTCUTS_MENU)
             {
                 int last_screen = global_status.last_screen;
                 global_status.last_screen = GO_TO_SHORTCUTMENU;

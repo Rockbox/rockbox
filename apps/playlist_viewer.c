@@ -1153,7 +1153,7 @@ enum playlist_viewer_result playlist_viewer_ex(const char* filename,
             case ACTION_STD_QUICKSCREEN:
                     if (!global_settings.shortcuts_replaces_qs)
                     {
-                        if (quick_screen_quick(button) ==
+                        if (quickscreen_show(button) ==
                             QUICKSCREEN_GOTO_SHORTCUTS_MENU) /* currently disabled */
                         {
                             /* QuickScreen defers skin updates when popping its activity

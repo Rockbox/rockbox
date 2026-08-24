@@ -18,37 +18,32 @@
  *
  ****************************************************************************/
 
-#include <stdio.h>
 #include "config.h"
-#include "system.h"
 #include "icons.h"
 #include "font.h"
-#include "kernel.h"
 #include "misc.h"
-#include "sound.h"
 #include "action.h"
 #include "settings_list.h"
 #include "lang.h"
-#include "playlist.h"
 #include "viewport.h"
-#include "audio.h"
 #include "quickscreen.h"
 #include "talk.h"
-#include "list.h"
 #include "option_select.h"
-#include "debug.h"
-#include "shortcuts.h"
 #include "appevents.h"
 #include "statusbar-skinned.h"
 
- /* 2 lines for each of the three vertical sections (top/middle/bottom).
-    If less space is available, the top and bottom each lose a line. */
+ /* 2 lines each for the top, middle, and bottom section = 6 in total.
+    With less space, top and bottom sections lose a line = 4 in total. */
 #define MIN_LINES (3*2)
+
 #define MAX_NEEDED_LINES 10
- /* pixels between the 2 center items minimum or between text and icons,
-  * and between text and parent boundaries */
+
+ /* Minimum number of pixels between the 2 center items, between
+    text and icons, or between text and parent boundaries. */
 #define MARGIN 10
-#define CENTER_ICONAREA_SIZE (MARGIN+8*2)
+#define CENTER_ICONAREA_SIZE (MARGIN + 8*2)
+
+#define FOR_QS_ITEMS(i) for (int i = 0; i < QUICKSCREEN_ITEM_COUNT; i++)
 
 struct quickscreen
 {
@@ -73,39 +68,34 @@ void quickscreen_set_skinned(enum screen_type screen, bool skinned)
 
 static void quickscreen_fix_viewports(struct quickscreen *qs, enum screen_type screen)
 {
-    int char_height, width, pad = 0;
-    int left_width = 0, right_width = 0, vert_lines;
-    unsigned char *s;
+    int line_height, width, pad = 0;
+    int left_width = 0, right_width = 0;
+    unsigned char *str;
     struct screen *display = &screens[screen];
     struct viewport *parent = &qs->parent[screen];
     struct viewport *vps = qs->vps[screen];
     struct viewport *vp_icons = &qs->vp_icons[screen];
+
+    /* How many un-cropped lines can be displayed in the UI vp */
     int nb_lines = viewport_get_nb_lines(parent);
-
-    /* nb_lines only returns the number of fully visible lines, small screens
-        or really large fonts could cause problems with the calculation below.
-     */
     if (nb_lines == 0)
-        nb_lines++;
+        nb_lines = 1; /* cropped single line */
 
-    char_height = parent->height/nb_lines;
+    line_height = parent->height/nb_lines;
 
     /* center the icons VP first */
     *vp_icons = *parent;
-    vp_icons->width = CENTER_ICONAREA_SIZE; /* abosulte smallest allowed */
+    vp_icons->width = CENTER_ICONAREA_SIZE; /* absolute smallest allowed */
     vp_icons->x = parent->x;
-    vp_icons->x += (parent->width-CENTER_ICONAREA_SIZE)/2;
+    vp_icons->x += (parent->width - CENTER_ICONAREA_SIZE)/2;
 
     vps[QUICKSCREEN_BOTTOM] = *parent;
     vps[QUICKSCREEN_TOP] = *parent;
-    /* depending on the space the top/buttom items use 1 or 2 lines */
-    if (nb_lines < MIN_LINES)
-        vert_lines = 1;
-    else
-        vert_lines = 2;
     vps[QUICKSCREEN_TOP].y = parent->y;
+
+    /* Top and bottom use 2 lines each, unless there's insufficient space */
     vps[QUICKSCREEN_TOP].height = vps[QUICKSCREEN_BOTTOM].height
-            = vert_lines*char_height;
+            = (nb_lines < MIN_LINES ? 1 : 2)*line_height;
     vps[QUICKSCREEN_BOTTOM].y
             = parent->y + parent->height - vps[QUICKSCREEN_BOTTOM].height;
 
@@ -116,29 +106,38 @@ static void quickscreen_fix_viewports(struct quickscreen *qs, enum screen_type s
         vps[QUICKSCREEN_BOTTOM].y -= MARGIN;
     }
 
-    vp_icons->y = vps[QUICKSCREEN_TOP].y
-            + vps[QUICKSCREEN_TOP].height;
+    vp_icons->y = vps[QUICKSCREEN_TOP].y + vps[QUICKSCREEN_TOP].height;
     vp_icons->height = vps[QUICKSCREEN_BOTTOM].y - vp_icons->y;
 
     /* adjust the left/right items widths to fit the screen nicely */
     if (qs->items[QUICKSCREEN_LEFT])
     {
-        s = P2STR(ID2P(qs->items[QUICKSCREEN_LEFT]->lang_id));
-        left_width = display->getstringsize(s, NULL, NULL);
+        str = P2STR(ID2P(qs->items[QUICKSCREEN_LEFT]->lang_id));
+        left_width = display->getstringsize(str, NULL, NULL);
     }
     if (qs->items[QUICKSCREEN_RIGHT])
     {
-        s = P2STR(ID2P(qs->items[QUICKSCREEN_RIGHT]->lang_id));
-        right_width = display->getstringsize(s, NULL, NULL);
+        str = P2STR(ID2P(qs->items[QUICKSCREEN_RIGHT]->lang_id));
+        right_width = display->getstringsize(str, NULL, NULL);
     }
 
     width = MAX(left_width, right_width);
+
+    /* crop text vp, if necessary */
     if (width*2 + vp_icons->width > parent->width)
-    {   /* crop text viewports */
-        width = (parent->width - vp_icons->width)/2;
+    {
+        width = parent->width;
+        if (width > vp_icons->width) /* check if icons fit */
+            width -=  vp_icons->width;
+        else if (width > MARGIN) /* margin without icons */
+            width -= MARGIN;
+
+        if (width >= 2)
+            width /= 2;
     }
+    /* space for lager gap between between icons */
     else
-    {   /* add more gap in icons vp */
+    {
         int excess = parent->width - vp_icons->width - width*2;
         if (excess > MARGIN*4)
         {
@@ -157,11 +156,13 @@ static void quickscreen_fix_viewports(struct quickscreen *qs, enum screen_type s
     vps[QUICKSCREEN_RIGHT].x = parent->x + parent->width - width - pad;
     vps[QUICKSCREEN_RIGHT].width = width;
 
-    vps[QUICKSCREEN_LEFT].height = vps[QUICKSCREEN_RIGHT].height
-            = 2*char_height;
-
-    vps[QUICKSCREEN_LEFT].y = vps[QUICKSCREEN_RIGHT].y
-            = parent->y + (parent->height/2) - char_height;
+    if (nb_lines >= 2) /* otherwise, use parent height and y position  */
+    {
+        vps[QUICKSCREEN_LEFT].height = vps[QUICKSCREEN_RIGHT].height
+            = 2*line_height;
+        vps[QUICKSCREEN_LEFT].y = vps[QUICKSCREEN_RIGHT].y
+            = parent->y + (parent->height/2) - line_height;
+    }
 
     /* shrink the icons vp by a few pixels if there is room so the arrows
        aren't drawn right next to the text */
@@ -177,10 +178,10 @@ static void quickscreen_fix_viewports(struct quickscreen *qs, enum screen_type s
     }
 
     /* text alignment */
-    vps[QUICKSCREEN_LEFT].flags &= ~VP_FLAG_ALIGNMENT_MASK; /* left-aligned */
-    vps[QUICKSCREEN_TOP].flags    |= VP_FLAG_ALIGN_CENTER;  /* centered */
-    vps[QUICKSCREEN_BOTTOM].flags |= VP_FLAG_ALIGN_CENTER;  /* centered */
-    vps[QUICKSCREEN_RIGHT].flags  &= ~VP_FLAG_ALIGNMENT_MASK;/* right aligned*/
+    vps[QUICKSCREEN_LEFT].flags &= ~VP_FLAG_ALIGNMENT_MASK;   /* left-aligned  */
+    vps[QUICKSCREEN_TOP].flags    |= VP_FLAG_ALIGN_CENTER;    /* centered      */
+    vps[QUICKSCREEN_BOTTOM].flags |= VP_FLAG_ALIGN_CENTER;    /* centered      */
+    vps[QUICKSCREEN_RIGHT].flags  &= ~VP_FLAG_ALIGNMENT_MASK; /* right-aligned */
     vps[QUICKSCREEN_RIGHT].flags  |= VP_FLAG_ALIGN_RIGHT;
 }
 
@@ -189,13 +190,9 @@ static void quickscreen_draw_item(struct quickscreen *qs, struct screen *display
                                   enum quickscreen_item i, bool single_line)
 {
     char buf[MAX_PATH];
-    int int_value;
-    unsigned const char *title, *value;
-
-    title = P2STR(ID2P(qs->items[i]->lang_id));
-    int_value = option_value_as_int(qs->items[i]);
-    value = option_get_valuestring(qs->items[i], buf, sizeof buf, int_value);
-
+    const char *title = P2STR(ID2P(qs->items[i]->lang_id));
+    const char *value = option_get_valuestring(qs->items[i], buf, sizeof buf,
+                                               option_value_as_int(qs->items[i]));
     if (single_line)
     {
         char text[MAX_PATH];
@@ -214,13 +211,13 @@ static void quickscreen_update(struct quickscreen *qs, enum quickscreen_item sel
 {
     FOR_NB_SCREENS(screen)
     {
-        struct screen *display = &screens[screen];
-        struct viewport *vps = qs->vps[screen];
-
         if (qs_skinned[screen])
             continue;
 
-        for (int i = 0; i < QUICKSCREEN_ITEM_COUNT; i++)
+        struct screen *display = &screens[screen];
+        struct viewport *vps = qs->vps[screen];
+
+        FOR_QS_ITEMS(i)
             if (qs->items[i] == qs->items[selected])
             {
                 struct viewport *last_vp = display->set_viewport(&vps[i]);
@@ -243,8 +240,7 @@ static void quickscreen_draw(struct quickscreen *qs, enum screen_type screen)
     struct viewport *last_vp = display->set_viewport(parent);
     display->clear_viewport();
 
-    /* items */
-    for (int i = 0; i < QUICKSCREEN_ITEM_COUNT; i++)
+    FOR_QS_ITEMS(i)
         if (qs->items[i])
         {
             display->set_viewport(&vps[i]);
@@ -252,22 +248,25 @@ static void quickscreen_draw(struct quickscreen *qs, enum screen_type screen)
         }
 
     /* icons */
-    display->set_viewport(vp_icons);
-    if (qs->items[QUICKSCREEN_TOP])
-        display->mono_bitmap(bitmap_icons_7x8[Icon_UpArrow],
-                             (vp_icons->width/2) - 4, 0, 7, 8);
+    if (parent->width > CENTER_ICONAREA_SIZE && vp_icons->height >= 8)
+    {
+        display->set_viewport(vp_icons);
+        if (qs->items[QUICKSCREEN_TOP])
+            display->mono_bitmap(bitmap_icons_7x8[Icon_UpArrow],
+                                 (vp_icons->width/2) - 4, 0, 7, 8);
 
-    if (qs->items[QUICKSCREEN_RIGHT])
-        display->mono_bitmap(bitmap_icons_7x8[Icon_FastForward],
-                             vp_icons->width - 8, (vp_icons->height/2) - 4, 7, 8);
+        if (qs->items[QUICKSCREEN_RIGHT])
+            display->mono_bitmap(bitmap_icons_7x8[Icon_FastForward],
+                                 vp_icons->width - 8, (vp_icons->height/2) - 4, 7, 8);
 
-    if (qs->items[QUICKSCREEN_LEFT])
-        display->mono_bitmap(bitmap_icons_7x8[Icon_FastBackward],
-                             0, (vp_icons->height/2) - 4, 7, 8);
+        if (qs->items[QUICKSCREEN_LEFT])
+            display->mono_bitmap(bitmap_icons_7x8[Icon_FastBackward],
+                                 0, (vp_icons->height/2) - 4, 7, 8);
 
-    if (qs->items[QUICKSCREEN_BOTTOM])
-        display->mono_bitmap(bitmap_icons_7x8[Icon_DownArrow],
-                             (vp_icons->width/2) - 4, vp_icons->height - 8, 7, 8);
+        if (qs->items[QUICKSCREEN_BOTTOM])
+            display->mono_bitmap(bitmap_icons_7x8[Icon_DownArrow],
+                                 (vp_icons->width/2) - 4, vp_icons->height - 8, 7, 8);
+    }
 
     skin_mark_dirty(screen);
     display->set_viewport(last_vp);
@@ -379,6 +378,7 @@ static int quickscreen_touchscreen_button(void)
 }
 #endif
 
+/* Undo activity, viewport, and event listener setup. */
 static void cleanup(void *parameter)
 {
     struct quickscreen *qs = (struct quickscreen *) parameter;
@@ -387,7 +387,7 @@ static void cleanup(void *parameter)
     FOR_NB_SCREENS(i)
     {
         if (!qs_skinned[i])
-            for (int j = 0; j < QUICKSCREEN_ITEM_COUNT; j++)
+            FOR_QS_ITEMS(j)
                 screens[i].scroll_stop_viewport(&qs->vps[i][j]);
         viewportmanager_theme_undo(i, !(qs->result & QUICKSCREEN_GOTO_SHORTCUTS_MENU));
     }
@@ -398,16 +398,9 @@ static void cleanup(void *parameter)
         pop_current_activity();
 }
 
-static void quickscreen_run(struct quickscreen * qs)
+/* Set up activity, viewport, and event listener. Draw initial Quickscreen. */
+static inline void setup(struct quickscreen *qs)
 {
-    int button;
-    enum quickscreen_item item;
-    /* To quit we need either :
-     *  - a second press on the button that made us enter
-     *  - an action taken while pressing the enter button,
-     *    then release the enter button*/
-    bool can_quit = false;
-
     push_current_activity(ACTIVITY_QUICKSCREEN);
 
     FOR_NB_SCREENS(i)
@@ -421,6 +414,21 @@ static void quickscreen_run(struct quickscreen * qs)
             quickscreen_draw(qs, i);
         }
     }
+    add_event_ex(GUI_EVENT_NEED_UI_UPDATE, false, quickscreen_draw_cb, qs);
+}
+
+static void quickscreen_main(struct quickscreen * qs)
+{
+     /* To quit we need either :
+     *  - a second press on the button that made us enter
+     *  - an action taken while pressing the enter button,
+     *    then release the enter button */
+    bool can_quit = false;
+    int button;
+    enum quickscreen_item item;
+
+    setup(qs);
+
     /* Announce current selection on entering this screen. This is all
        queued up, but can be interrupted as soon as a setting is
        changed. */
@@ -435,7 +443,6 @@ static void quickscreen_run(struct quickscreen * qs)
 #ifdef HAVE_TOUCHSCREEN
     action_gesture_reset();
 #endif
-    add_event_ex(GUI_EVENT_NEED_UI_UPDATE, false, quickscreen_draw_cb, qs);
     while (true)
     {
         button = get_action(CONTEXT_QUICKSCREEN, HZ/5);
@@ -480,17 +487,19 @@ static void quickscreen_run(struct quickscreen * qs)
     }
     /* Notify that we're exiting this screen */
     cond_talk_ids_fq(VOICE_OK);
+
     cleanup(qs);
 }
 
-int quick_screen_quick(int button_enter)
+/* Entry point for external callers */
+int quickscreen_show(int button_enter)
 {
     struct quickscreen qs;
     qs.button_enter = button_enter;
     qs.result = QUICKSCREEN_OK;
     qs.volume_item = QUICKSCREEN_ITEM_COUNT;
 
-    for (int i = 0; i < 4; ++i)
+    FOR_QS_ITEMS(i)
     {
         qs.items[i] = global_settings.qs_items[i];
 
@@ -501,7 +510,7 @@ int quick_screen_quick(int button_enter)
             qs.volume_item = i;
     }
 
-    quickscreen_run(&qs);
+    quickscreen_main(&qs);
 
     if (qs.result & QUICKSCREEN_CHANGED)
         settings_save();
