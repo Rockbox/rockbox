@@ -37,21 +37,13 @@
 
 void paths_init(void)
 {
-    /* is this needed in 3DS? */
-#if 0
-    char config_dir[MAX_PATH];
-
-    const char *home = "/3ds";
-    mkdir("/3ds/.rockbox" __MKDIR_MODE_ARG);
-
-    snprintf(config_dir, sizeof(config_dir), "%s/.config", home);
-    mkdir(config_dir __MKDIR_MODE_ARG);
-    snprintf(config_dir, sizeof(config_dir), "%s/.config/rockbox.org", home);
-    mkdir(config_dir __MKDIR_MODE_ARG);
-    /* Plugin data directory */
-    snprintf(config_dir, sizeof(config_dir), "%s/.config/rockbox.org/rocks.data", home);
-    mkdir(config_dir __MKDIR_MODE_ARG);
-#endif
+    mkdir(ROCKBOX_DIR __MKDIR_MODE_ARG);
+    mkdir(ROCKBOX_DIR "/backdrops" __MKDIR_MODE_ARG);
+    mkdir(ROCKBOX_DIR "/eqs" __MKDIR_MODE_ARG);
+    mkdir(ROCKBOX_DIR "/icons" __MKDIR_MODE_ARG);
+    mkdir(ROCKBOX_DIR "/rocks.data" __MKDIR_MODE_ARG);
+    mkdir(ROCKBOX_DIR "/themes" __MKDIR_MODE_ARG);
+    mkdir(ROCKBOX_DIR "/wps" __MKDIR_MODE_ARG);
 }
 
 /* only sdcard volume is accesible to the user  */
