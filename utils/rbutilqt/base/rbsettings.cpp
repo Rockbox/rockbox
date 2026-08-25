@@ -77,6 +77,7 @@ const static struct {
     { RbSettings::EncoderNarrowBand,    ":encoder:/narrowband", "false" },
     { RbSettings::WavtrimThreshold,     "wavtrimthreshold",     "500"},
     { RbSettings::TtsSpeed,             ":tts:/speed",          "175" },
+    { RbSettings::TtsVolume,            ":tts:/volume",         "100" },
     { RbSettings::EncoderComplexity,    ":encoder:/complexity", "10" },
     { RbSettings::EncoderQuality,       ":encoder:/quality",    "-1.0" },
     { RbSettings::EncoderVolume,        ":encoder:/volume",     "1.0" },

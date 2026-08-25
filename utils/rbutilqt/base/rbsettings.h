@@ -69,6 +69,7 @@ class RbSettings : public QObject
             WavtrimThreshold,
             EncoderComplexity,
             TtsSpeed,
+            TtsVolume,
             CacheDisabled,
             EncoderNarrowBand,
             EncoderQuality,

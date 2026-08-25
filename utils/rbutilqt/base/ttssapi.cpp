@@ -29,6 +29,7 @@ TTSSapi::TTSSapi(QObject* parent) : TTSBase(parent)
     m_TTSTemplate << "/language:%lang";
     m_TTSTemplate << "/voice:%voice";
     m_TTSTemplate << "/speed:%speed";
+    m_TTSTemplate << "/volume:%volume";
     m_TTSTemplate << "%options";
 
     m_TTSVoiceTemplate << "//nologo";
@@ -74,6 +75,12 @@ void TTSSapi::generateSettings()
         speed = 0;
     insertSetting(eSPEED, new EncTtsSetting(this,
                 EncTtsSetting::eINT, tr("Speed:"), speed, -10, 10));
+    // volume
+    int volume = RbSettings::subValue(m_TTSType, RbSettings::TtsVolume).toInt();
+    if(volume > 100 || volume < 0)
+        volume = 100;
+    insertSetting(eVOLUME, new EncTtsSetting(this,
+                EncTtsSetting::eINT, tr("Volume:"), volume, 0, 100));
     // options
     insertSetting(eOPTIONS, new EncTtsSetting(this,
                 EncTtsSetting::eSTRING, tr("Options:"),
@@ -90,6 +97,8 @@ void TTSSapi::saveSettings()
             getSetting(eVOICE)->current().toString());
     RbSettings::setSubValue(m_TTSType, RbSettings::TtsSpeed,
             getSetting(eSPEED)->current().toInt());
+    RbSettings::setSubValue(m_TTSType, RbSettings::TtsVolume,
+            getSetting(eVOLUME)->current().toInt());
     RbSettings::setSubValue(m_TTSType, RbSettings::TtsOptions,
             getSetting(eOPTIONS)->current().toString());
 
@@ -112,6 +121,7 @@ bool TTSSapi::start(QString *errStr)
     m_TTSLanguage =RbSettings::subValue(m_TTSType, RbSettings::TtsLanguage).toString();
     m_TTSVoice=RbSettings::subValue(m_TTSType, RbSettings::TtsVoice).toString();
     m_TTSSpeed=RbSettings::subValue(m_TTSType, RbSettings::TtsSpeed).toString();
+    m_TTSVolume=RbSettings::subValue(m_TTSType, RbSettings::TtsVolume).toString();
 
     QFile::remove(QDir::tempPath() +"/sapi_voice.vbs");
     QFile::copy(":/builtin/sapi_voice.vbs",QDir::tempPath() + "/sapi_voice.vbs");
@@ -130,6 +140,7 @@ bool TTSSapi::start(QString *errStr)
     exec.replaceInStrings("%lang",m_TTSLanguage);
     exec.replaceInStrings("%voice",m_TTSVoice);
     exec.replaceInStrings("%speed",m_TTSSpeed);
+    exec.replaceInStrings("%volume",m_TTSVolume);
 
     LOG_INFO() << "Start: cscript " << exec;
     voicescript = new QProcess(nullptr);

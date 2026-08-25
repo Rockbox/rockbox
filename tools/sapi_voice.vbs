@@ -39,7 +39,7 @@ Dim oShell, oArgs, oEnv
 Dim oFSO, oStdIn, oStdOut
 Dim bVerbose, bList
 Dim bMSSP
-Dim sLanguage, sVoice, sSpeed, sName, sVendor
+Dim sLanguage, sVoice, sSpeed, sVolume, sName, sVendor
 
 Dim oSpVoice, oSpFS ' SAPI5 voice and filestream
 Dim oVoice ' for traversing the list of voices
@@ -64,6 +64,7 @@ bList = oArgs.Exists("listvoices")
 sLanguage = oArgs.Item("language")
 sVoice = oArgs.Item("voice")
 sSpeed = oArgs.Item("speed")
+sVolume = oArgs.Item("volume")
 
 ' Create SAPI5 object
 If bMSSP Then
@@ -116,6 +117,8 @@ End If
 
 ' Speed selection
 If sSpeed <> "" Then oSpVoice.Rate = sSpeed
+' Volume selection
+If sVolume <> "" Then oSpVoice.Volume = sVolume
 ' Get vendor information, protect from missing attribute
 sVendor = oSpVoice.Voice.GetAttribute("Vendor")
 If Err.Number <> 0 Then
