@@ -37,6 +37,9 @@
 #include "dma-s5l8702.h"
 #include "lcd-s5l8702.h"
 #include "lcd-target.h"
+#if defined(HAVE_COMPOSITE_VIDEO_OUT) && !defined(BOOTLOADER)
+#include "videoout.h"
+#endif
 
 
 // TODO TODO TODO: HAVE_LCD_ENABLE
@@ -185,6 +188,10 @@ static struct dmac_ch_cfg lcd_dma_ch_cfg =
 
 /*** clocks ***/
 
+#if defined(HAVE_COMPOSITE_VIDEO_OUT) && !defined(BOOTLOADER)
+static bool lcd_clocks_requested = true;
+#endif
+
 // TODO: In mks5lboot --mkraw put a command to specify the address of the binary,
 // for example --address 0x6000, it must be greater than 0x310 which would be the default address,
 // pass this address (0x310..128Kb) in the dfu_options flag
@@ -192,11 +199,33 @@ static struct dmac_ch_cfg lcd_dma_ch_cfg =
 // TODO: to lcd-target.c
 static void lcd_target_enable_clocks(bool enable)
 {
+#if defined(HAVE_COMPOSITE_VIDEO_OUT) && !defined(BOOTLOADER)
+    lcd_clocks_requested = enable;
+
+    /* The composite mixer shares this LCD AHB gate. Keep the controller
+     * clocked while video output is scanning even if the backlight sleeps. */
+    if (!enable && videoout_lcd_clock_required())
+        return;
+#endif
+
     clockgate_enable(CLOCKGATE_LCD, enable);
 #ifdef IPOD_NANO4G
     clockgate_enable(CLOCKGATE_LCD_2, enable);
 #endif
 }
+
+#if defined(HAVE_COMPOSITE_VIDEO_OUT) && !defined(BOOTLOADER)
+void lcd_videoout_clock_acquire(void)
+{
+    clockgate_enable(CLOCKGATE_LCD, true);
+}
+
+void lcd_videoout_clock_release(void)
+{
+    if (!lcd_clocks_requested)
+        clockgate_enable(CLOCKGATE_LCD, false);
+}
+#endif
 
 
 /*** LCD controller - low level functions ***/
@@ -381,6 +410,9 @@ void lcd_update_rect(int, int, int, int) ICODE_ATTR;
 void lcd_update_rect(int x, int y, int width, int height)
 {
     int pixels = width * height;
+#if defined(HAVE_COMPOSITE_VIDEO_OUT) && !defined(BOOTLOADER)
+    int original_height = height;
+#endif
     fb_data* p = FBADDR(x,y);
     uint16_t* out = lcd_dblbuf[0];
 
@@ -411,6 +443,10 @@ void lcd_update_rect(int x, int y, int width, int height)
             } while (--height);
         }
 
+#if defined(HAVE_COMPOSITE_VIDEO_OUT) && !defined(BOOTLOADER)
+        videoout_mirror_rgb565(lcd_dblbuf[0], x, y, width,
+                                      original_height, width);
+#endif
         displaylcd_dma(pixels);
     }
     mutex_unlock(&lcd_mutex);
@@ -435,8 +471,14 @@ void lcd_blit_yuv(unsigned char * const src[3],
 
     width = (width + 1) & ~1;       /* ensure width is even */
 
+#if defined(HAVE_COMPOSITE_VIDEO_OUT) && !defined(BOOTLOADER)
+    int original_height = height;
+#endif
     int pixels = width * height;
     uint16_t* out = lcd_dblbuf[0];
+#if defined(HAVE_COMPOSITE_VIDEO_OUT) && !defined(BOOTLOADER)
+    bool videoout_yuv_mirrored = false;
+#endif
 
     z = stride * src_y;
     yuv_src[0] = src[0] + z + src_x;
@@ -449,6 +491,14 @@ void lcd_blit_yuv(unsigned char * const src[3],
     {
         displaylcd_wait_dma();
 
+#if defined(HAVE_COMPOSITE_VIDEO_OUT) && !defined(BOOTLOADER)
+        /* MPEG playback already supplies planar YUV420. Send those planes
+         * directly to the qualified VP path instead of converting twice. */
+        videoout_yuv_mirrored = videoout_mirror_yuv420(
+            yuv_src[0], yuv_src[1], yuv_src[2], 0, 0, stride,
+            x, y, width, height);
+#endif
+
         displaylcd_setup(x, y, width, height);
 
         height >>= 1;
@@ -460,6 +510,12 @@ void lcd_blit_yuv(unsigned char * const src[3],
             yuv_src[2] += stride >> 1;
             out += width << 1;
         } while (--height);
+
+#if defined(HAVE_COMPOSITE_VIDEO_OUT) && !defined(BOOTLOADER)
+        if (!videoout_yuv_mirrored)
+            videoout_mirror_rgb565(lcd_dblbuf[0], x, y, width,
+                                          original_height, width);
+#endif
 
         displaylcd_dma(pixels);
     }
@@ -525,6 +581,10 @@ void lcd_shutdown(void)
 #ifdef HAVE_LCD_SLEEP
 void lcd_sleep(void)
 {
+#if defined(HAVE_COMPOSITE_VIDEO_OUT) && !defined(BOOTLOADER)
+    if (videoout_lcd_clock_required())
+        return;
+#endif
     lcd_powersave();
 }
 

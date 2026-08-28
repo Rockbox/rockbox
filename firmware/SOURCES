@@ -1670,6 +1670,9 @@ target/arm/s5l8702/ipodnano4g/cscodec-nano4g.c
 
 #ifdef IPOD_6G
 target/arm/s5l8702/ipod6g/lcd-6g.c
+#if defined(HAVE_COMPOSITE_VIDEO_OUT) && !defined(BOOTLOADER)
+target/arm/s5l8702/ipod6g/videoout-6g.c
+#endif
 target/arm/s5l8702/ipod6g/backlight-6g.c
 target/arm/s5l8702/ipod6g/piezo-6g.c
 target/arm/s5l8702/ipod6g/pmu-6g.c

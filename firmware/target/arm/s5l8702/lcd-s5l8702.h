@@ -81,6 +81,11 @@ struct lcd_info_rec {
 
 void lcd_awake(void);
 
+#if defined(HAVE_COMPOSITE_VIDEO_OUT) && !defined(BOOTLOADER)
+void lcd_videoout_clock_acquire(void);
+void lcd_videoout_clock_release(void);
+#endif
+
 #ifdef S5L_LCD_WITH_READID
 void lcd_read_display_id(int mupiface, uint8_t *lcd_id);
 #endif

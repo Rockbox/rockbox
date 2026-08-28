@@ -90,6 +90,11 @@
 /* Define this if your LCD can be enabled/disabled */
 #define HAVE_LCD_ENABLE
 
+/* Define this if the target supports composite video output. */
+#ifndef SIMULATOR
+#define HAVE_COMPOSITE_VIDEO_OUT
+#endif
+
 /* Define this if your LCD can be put to sleep. HAVE_LCD_ENABLE
    should be defined as well. */
 #ifndef BOOTLOADER

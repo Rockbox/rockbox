@@ -106,6 +106,9 @@ void serial_setup(void)
 #include "kernel.h"
 #include "pmu-target.h"
 #include "iap.h"
+#ifndef BOOTLOADER
+#include "videoout.h"
+#endif
 
 static enum {
     ABR_STATUS_LAUNCHED,    /* ST_SYNC */
@@ -115,13 +118,58 @@ static enum {
 
 static int bitrate = 0;
 static bool acc_plugged = false;
+static unsigned int acc_absent_ticks;
+#ifndef BOOTLOADER
+static long videoout_identify_tick;
+static bool videoout_identified;
+static enum videoout_accessory videoout_accessory =
+    VIDEOOUT_ACCESSORY_NONE;
+
+/* The Philips is a silent legacy dock.  Do not request identification during
+ * the connector and iAP startup window: the physically qualified downstream
+ * build gives silent docks ten seconds before enabling video. */
+#define VIDEOOUT_IDENTIFY_TICKS (10 * HZ)
+
+static void serial_videoout_publish(enum videoout_accessory accessory)
+{
+    if (videoout_accessory != accessory)
+    {
+        videoout_accessory = accessory;
+        videoout_accessory_state(accessory);
+    }
+}
+#endif
+
+/* A seated 30-pin accessory can briefly lose its presence contact without
+ * leaving the connector.  Requiring 250 ms of continuous absence avoids
+ * tearing down and immediately reopening the serial/video session on contact
+ * bounce while adding only a bounded delay to a real unplug. */
+#define ACCESSORY_REMOVE_DEBOUNCE_TICKS MAX(1, (HZ + 3) / 4)
 
 static void serial_acc_tick(void)
 {
     bool plugged = pmu_accessory_present();
+
+    if (acc_plugged && !plugged)
+    {
+        if (++acc_absent_ticks < ACCESSORY_REMOVE_DEBOUNCE_TICKS)
+            return;
+    }
+    else
+    {
+        acc_absent_ticks = 0;
+    }
+
     if (acc_plugged != plugged)
     {
         acc_plugged = plugged;
+#ifndef BOOTLOADER
+        videoout_identify_tick = current_tick;
+        videoout_identified = false;
+        serial_videoout_publish(acc_plugged ?
+            VIDEOOUT_ACCESSORY_PENDING :
+            VIDEOOUT_ACCESSORY_NONE);
+#endif
         if (acc_plugged)
         {
             uartc_open(ser_port.uartc);
@@ -139,6 +187,19 @@ static void serial_acc_tick(void)
             uartc_close(ser_port.uartc);
         }
     }
+
+#ifndef BOOTLOADER
+    if (acc_plugged && !videoout_identified &&
+        !TIME_BEFORE(current_tick,
+                     videoout_identify_tick + VIDEOOUT_IDENTIFY_TICKS))
+    {
+        videoout_identified = true;
+        /* A tick task runs in the timer interrupt.  The actual ADC read takes
+         * a mutex and sleeps for its bias-settle interval, so it must be
+         * deferred to the normal LCD/settings context. */
+        videoout_request_accessory_identification();
+    }
+#endif
 }
 
 void serial_setup(void)
