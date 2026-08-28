@@ -34,6 +34,9 @@
 #include "crc32.h"
 #include "sound.h"
 #include "settings.h"
+#ifdef HAVE_COMPOSITE_VIDEO_OUT
+#include "videoout.h"
+#endif
 #include "debug.h"
 #include "usb.h"
 #include "backlight.h"
@@ -873,6 +876,18 @@ void sound_settings_apply(void)
 #endif
 }
 
+#ifdef HAVE_COMPOSITE_VIDEO_OUT
+void settings_apply_videoout(int mode)
+{
+    if (mode < VIDEOOUT_OFF || mode > VIDEOOUT_ON)
+        mode = VIDEOOUT_OFF;
+
+    global_settings.composite_video_output = mode;
+    videoout_set_mode((enum videoout_mode)mode, FBADDR(0, 0),
+                      LCD_WIDTH, LCD_HEIGHT);
+}
+#endif
+
 void settings_apply(bool read_disk)
 {
     logf("%s", __func__);
@@ -1100,6 +1115,10 @@ void settings_apply(bool read_disk)
     lcd_set_sleep_after_backlight_off(global_settings.lcd_sleep_after_backlight_off);
 #endif
 #endif /* HAVE_BACKLIGHT */
+
+#ifdef HAVE_COMPOSITE_VIDEO_OUT
+    settings_apply_videoout(global_settings.composite_video_output);
+#endif
 
 #ifndef HAS_BUTTON_HOLD
     set_selective_softlock_actions(

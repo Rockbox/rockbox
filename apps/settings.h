@@ -291,6 +291,9 @@ void settings_apply_skins(void);
 
 void settings_apply(bool read_disk);
 void settings_apply_pm_range(void);
+#ifdef HAVE_COMPOSITE_VIDEO_OUT
+void settings_apply_videoout(int mode);
+#endif
 void settings_display(void);
 
 enum optiontype { RB_INT, RB_BOOL };
@@ -747,6 +750,9 @@ struct user_settings
 #endif
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
     int brightness;
+#endif
+#ifdef HAVE_COMPOSITE_VIDEO_OUT
+    int composite_video_output;
 #endif
 
 #ifdef HAVE_REMOTE_LCD

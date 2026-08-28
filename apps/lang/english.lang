@@ -17197,3 +17197,17 @@
     *: "Filter Type"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_COMPOSITE_VIDEO_OUTPUT
+  desc: Enables composite video framebuffer mirroring on supported targets
+  user: core
+  <source>
+    *: "Composite Video Output"
+  </source>
+  <dest>
+    *: "Composite Video Output"
+  </dest>
+  <voice>
+    *: "Composite Video Output"
+  </voice>
+</phrase>
