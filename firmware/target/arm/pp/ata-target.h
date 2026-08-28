@@ -68,9 +68,9 @@
  * UDMA 2 is stable at 30 Mhz.
  * UDMA 1 is stable at 24 Mhz.
  *
- * A slower mode is used on iPod 4Gs due to reported instabilities.
+ * A slower mode is used on iPod 4G & color due to reported instabilities.
  */
-#if CPUFREQ_NORMAL >= 30000000 && !defined(IPOD_4G)
+#if CPUFREQ_NORMAL >= 30000000 && !defined(IPOD_4G) && !defined(IPOD_COLOR)
 #define ATA_MAX_UDMA 2
 #elif CPUFREQ_NORMAL >= 24000000
 #define ATA_MAX_UDMA 1
