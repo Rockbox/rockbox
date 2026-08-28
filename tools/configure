@@ -4477,7 +4477,10 @@ fi
 gccver=`$CC -dumpversion`;
 
 # figure out the binutil version too
-if [ "yes" = "$simulator" ] || [ "yes" = "$application" ] && [ $uname = "Darwin" ]; then
+if [ $uname = "Darwin" ] && \
+   [ "$app_type" = "sdl-sim" -o \
+     "$app_type" = "sdl-app" -o \
+     "$app_type" = "checkwps" ]; then
  ldnum=0
 else
  ldnum=`$LD --version | sed -n '1p' | sed -e 's/.* \([0-9]*\)\.\([0-9]*\).*/\1\2/'`
