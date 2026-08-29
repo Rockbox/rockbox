@@ -221,6 +221,7 @@ static void sdmmc_host_bus_reset(struct sdmmc_host *host)
     host->initialized = false;
     host->is_hcs_card = false;
     host->use_cmd23 = false;
+    host->quirk_rdwrsingleblock_delay = false;
     memset(&host->cardinfo, 0, sizeof(host->cardinfo));
 }
 
@@ -841,6 +842,9 @@ static int sdmmc_host_transfer(struct sdmmc_host *host,
                 cmd.command = SD_WRITE_BLOCK;
             else
                 cmd.command = SD_READ_SINGLE_BLOCK;
+
+            if (host->quirk_rdwrsingleblock_delay)
+                udelay(50);
         }
 
         if (host->cardinfo.sd2plus)
@@ -849,6 +853,23 @@ static int sdmmc_host_transfer(struct sdmmc_host *host,
             cmd.argument = start * SD_BLOCK_SIZE;
 
         rc = sdmmc_host_submit_cmd(host, &cmd, NULL);
+
+        if (rc == SDMMC_STATUS_TIMEOUT &&
+            !host->quirk_rdwrsingleblock_delay &&
+            (cmd.command == SD_WRITE_BLOCK ||
+             cmd.command == SD_READ_SINGLE_BLOCK))
+        {
+            logf("sdmmc_host: enabling quirk_rdwrsingleblock_delay");
+
+            sdmmc_host_bus_reset(host);
+            rc = sdmmc_host_device_init(host);
+            if (rc)
+                goto out;
+
+            host->quirk_rdwrsingleblock_delay = true;
+            continue;
+        }
+
         if (rc)
             goto out;
 

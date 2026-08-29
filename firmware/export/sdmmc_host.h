@@ -244,6 +244,17 @@ struct sdmmc_host
     bool use_cmd23   : 1;
     bool led_active  : 1; /* LED active may be read without lock */
 
+    /*
+     * Some 512G Samsung cards (and possibly other cards) seem to
+     * have problems with repeated single block read commands and
+     * sometimes just time out without ever sending the data. The
+     * card response is OK but no data is received.
+     *
+     * Adding a delay of a few tens of milliseconds before each
+     * read/write single block command appears to fix the problem.
+     */
+    bool quirk_rdwrsingleblock_delay : 1;
+
     /* Controller implemented by the target */
     const struct sdmmc_controller_ops *ops;
     void *controller;
