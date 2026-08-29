@@ -650,56 +650,56 @@ static int sdmmc_host_device_init(struct sdmmc_host *host)
     if (rc)
     {
         logf("sdmmc_host_cmd_go_idle_state: %d", rc);
-        return rc;
+        goto out;
     }
 
     rc = sdmmc_host_cmd_send_if_cond(host);
     if (rc)
     {
         logf("sdmmc_host_cmd_send_if_cond: %d", rc);
-        return rc;
+        goto out;
     }
 
     rc = sdmmc_host_cmd_send_app_op_cond(host);
     if (rc)
     {
         logf("sdmmc_host_cmd_send_app_op_cond: %d", rc);
-        return rc;
+        goto out;
     }
 
     rc = sdmmc_host_cmd_all_send_cid(host);
     if (rc)
     {
         logf("sdmmc_host_cmd_all_send_cid: %d", rc);
-        return rc;
+        goto out;
     }
 
     rc = sdmmc_host_cmd_send_rca(host);
     if (rc)
     {
         logf("sdmmc_host_cmd_send_rca: %d", rc);
-        return rc;
+        goto out;
     }
 
     rc = sdmmc_host_cmd_send_csd(host);
     if (rc)
     {
         logf("sdmmc_host_cmd_send_csd: %d", rc);
-        return rc;
+        goto out;
     }
 
     rc = sdmmc_host_cmd_select_card(host);
     if (rc)
     {
         logf("sdmmc_host_cmd_select_card: %d", rc);
-        return rc;
+        goto out;
     }
 
     rc = sdmmc_host_cmd_clr_card_detect(host);
     if (rc)
     {
         logf("sdmmc_host_cmd_select_card: %d", rc);
-        return rc;
+        goto out;
     }
 
     /*
@@ -712,7 +712,7 @@ static int sdmmc_host_device_init(struct sdmmc_host *host)
         if (rc)
         {
             logf("sdmmc_host_cmd_set_bus_width: %d", rc);
-            return rc;
+            goto out;
         }
 
         sdmmc_host_set_controller_bus_width(host, SDMMC_BUS_WIDTH_4BIT);
@@ -729,7 +729,7 @@ static int sdmmc_host_device_init(struct sdmmc_host *host)
         if (rc)
         {
             logf("sdmmc_host_cmd_switch_freq: %d", rc);
-            return rc;
+            goto out;
         }
 
         sdmmc_host_set_controller_bus_clock(host, SDMMC_BUS_CLOCK_50MHZ);
@@ -743,12 +743,22 @@ static int sdmmc_host_device_init(struct sdmmc_host *host)
     if (rc)
     {
         logf("sdmmc_host_cmd_send_scr: %d", rc);
-        return rc;
+        goto out;
     }
 
-    host->initialized = true;
-    host->cardinfo.initialized = true;
-    return 0;
+out:
+    if (rc)
+    {
+        host->need_reset = true;
+    }
+    else
+    {
+        host->initialized = true;
+        host->cardinfo.initialized = true;
+    }
+
+    sdmmc_host_release_dc_buffer(host);
+    return rc;
 }
 
 static int sdmmc_host_transfer(struct sdmmc_host *host,
@@ -775,12 +785,8 @@ static int sdmmc_host_transfer(struct sdmmc_host *host,
     if (!host->initialized)
     {
         rc = sdmmc_host_device_init(host);
-        sdmmc_host_release_dc_buffer(host);
         if (rc)
-        {
-            host->need_reset = true;
             goto out;
-        }
     }
 
     if (count < 1)
