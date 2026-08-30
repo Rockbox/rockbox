@@ -160,7 +160,7 @@ of before installing.
   \item[Firewire connection.]
 }
   To transfer Rockbox to your \dap{} you need to
-  connect it to your computer.\nopt{rgnano}{For manual installation/uninstallation, or
+  connect it to your computer. \nopt{rgnano}{For manual installation/uninstallation, or
   should autodetection fail during automatic installation, you need to know
   where to access the \dap{}.} On Windows this means you need to know
   the drive letter associated with the \dap{}. On Linux you need to know
@@ -274,26 +274,26 @@ of before installing.
 }
 
 \opt{disk_storage}{
-Rockbox supports very large drive capacities when used with GPT partitioning on devices that utilize ATA storage, but due to the limitations of the FAT32 filesystem, individual paritions cannot exceed 2TiB. Additionally, there may be underlying platform limitations that make it difficult, if not impossible, utilize a drive larger than some arbitrary size or boot from a drive using GPT partitioning.
+Rockbox supports very large drive capacities when used with GPT partitioning on devices that utilize ATA storage, but due to the limitations of the FAT32 filesystem, individual paritions cannot exceed 2\,TiB. Additionally, there may be underlying platform limitations that make it difficult, if not impossible, utilize a drive larger than some arbitrary size or boot from a drive using GPT partitioning.
 
 \opt{ipod6g}{
-For example, the stock Apple firmware on earlier 6th generation iPod Classic models\footnote{MB029, MB145, MB147, MB150} is limited to drives no larger than 128GiB, and booting into the Apple firmware firmware with larger drive sizes will result in massive data corruption.  Later 6th generation iPod Classic models\footnote{MB562, MB565, MC293, MC297} (sometimes referred to as ``7th gen'') do not have this issue.  Rockbox itself will function correctly on all 6th/7th generation iPod Classic models.
+For example, the stock Apple firmware on earlier 6th generation iPod Classic models\footnote{MB029, MB145, MB147, MB150} is limited to drives no larger than 128\,GiB, and booting into the Apple firmware firmware with larger drive sizes will result in massive data corruption.  Later 6th generation iPod Classic models\footnote{MB562, MB565, MC293, MC297} (sometimes referred to as ``7th gen'') do not have this issue.  Rockbox itself will function correctly on all 6th/7th generation iPod Classic models.
 }
 
-\note{In practice, no Rockbox-capable device can currently handle total drive capacities exceeding 2TiB.}
+\note{In practice, no Rockbox-capable device can currently handle total drive capacities exceeding 2\,TiB.}
 }
 
 \opt{sd_storage}{
-  Rockbox does not currently support SDUC cards, ie those with capacities
-  exceeding 2TiB.  However, this is purely a software limitation with
+  Rockbox does not currently support SDUC cards, i.e. those with capacities
+  exceeding 2\,TiB.  However, this is purely a software limitation with
   Rockbox's SD card drivers, and will be addressed in a future release.
 
-  \note{SD cards exceeding 32GiB are pre-formated using the exFAT filesystem with GPT paritioning.
+  \note{SD cards exceeding 32\,GiB are pre-formated using the exFAT filesystem with GPT partitioning.
     Before they can be used with Rockbox, they must be reformatted with FAT32.}
 }
 
 \opt{disk_storage,sd_storage}{
-\note{The disk format utility included with all versions Microsoft Windows released to date will refuse to create/format FAT32 partitons exceeding 32GiB, so users of larger storage devices will need an alternative tool. Options include GParted Live\footnote{\url{https://gparted.org/}}\opt{ipod}{ or performing a restore using iTunes on Windows}. \opt{sd_storage}{Addtionally, devices that support removable storage typically have a built-in format tool that can be used.}}
+\note{The disk format utility included with all versions Microsoft Windows released to date will refuse to create/format FAT32 partitons exceeding 32\,GiB, so users of larger storage devices will need an alternative tool. Options include GParted Live\footnote{\url{https://gparted.org/}}\opt{ipod}{ or performing a restore using iTunes on Windows}. \opt{sd_storage}{Additionally, devices that support removable storage typically have a built-in format tool that can be used.}}
 }
 
 \opt{disk_storage}{
@@ -307,16 +307,16 @@ For example, the stock Apple firmware on earlier 6th generation iPod Classic mod
   advanced power management and the \emph{removeable} attribute. They are performant, reliable, and physically
   robust, but tend to be expensive and not available in larger sizes.
 \item[SATA.] These are fast, reliable, and available in high capacities, but are typically optimized for high performance
-  at the expense of power consumption.. However, as they implement the full ATA command set, we are able
+  at the expense of power consumption. However, as they implement the full ATA command set, we are able
   to minimize their power consumption and power them down when not being actively used.
 \item[Single Secure Digital (SD).] While these adapters come in different form factors from multiple vendors,
   they are all based on the same basic design. The ATA command set is incompletely emulated, notably lacking
   support for \emph{mandatory} ATA power management commands that Rockbox uses to safely
   transition the device in and out of low power states.  Additionally, SD cards vary widely in quality
   and power consumption with the resultant effects on data longevity and battery life. Finally, these SD adapters
-  do not support 2TiB or larger SDUC cards.
+  do not support 2\,TiB or larger SDUC cards.
 \item[Dual/Quad SD.]  These are similar to the above, only allowing use of mulitiple SD cards to
-  increase the overall storage capacity. While typically described as JBOD\footnote{Just a Bunch Of Disks}, this is not accurate as each card is not individually accessable.  Instead, the adapter claims to be to be a single logical drive of the combined capacity of the individual cards in a RAID0-like manner. Consquently, if any one card fails, all data on all other cards may be rendered inacessible.  Given the quality concerns mentioned earlier, this means use of multiple SD cards in one of these adapters is the least reliable/robust of the various SSD mods.  Finally, in another violation of the ATA specification, these ATA-SD adapters fail to properly support LBA48 addressing, meaning that no matter what combination of cards is used, if their combined capacity exceeds 2TiB, the extra capacity will not be usable, and the device may even present as having (considerably) less space.
+  increase the overall storage capacity. While typically described as JBOD\footnote{Just a Bunch Of Disks}, this is not accurate as each card is not individually accessable.  Instead, the adapter claims to be a single logical drive of the combined capacity of the individual cards in a RAID0-like manner. Consquently, if any one card fails, all data on all other cards may be rendered inacessible.  Given the quality concerns mentioned earlier, this means use of multiple SD cards in one of these adapters is the least reliable/robust of the various SSD mods.  Finally, in another violation of the ATA specification, these ATA-SD adapters fail to properly support LBA48 addressing, meaning that no matter what combination of cards is used, if their combined capacity exceeds 2\,TiB, the extra capacity will not be usable, and the device may even present as having (considerably) less space.
 \end{description}
 
 \note{All of these flash/SSD mods take up less physical space in the device enclosure than the original hard drive, so care must be taken to ensure they are securely mounted and resistant to the vibration and impacts that typically occur in portable devices.  Ribbon cables are particularly vulnerable.}
