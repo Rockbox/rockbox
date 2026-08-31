@@ -44,7 +44,7 @@
     seek acceleration & very fast, fast, normal, slow, very slow & N/A\\
     antiskip        & 5s, 15s, 30s, 1min, 2min, 3min, 5min, 10min & N/A\\
     volume fade     & on, off           & N/A\\
-    root menu order & - (i.e. a hyphen to reset to default) or a
+    root menu order & $-$ (i.e. a hyphen to reset to default) or a
                     comma-separated list of (a subset of) the following words,
                     with no spaces around the commas: bookmarks, files, database, wps,
                     settings, playlists, plugins, system\_menu, shortcuts & N/A\\
@@ -226,16 +226,26 @@
 %
       eq enabled    & on, off           & N/A\\
       eq precut     & 0 to 240          & 0.1~dB\\
-      eq low shelf filter & cutoff (in Hz), q (0 to 64), gain ($-240$ to 240)\\
-      eq peak filter 1 & cutoff (in Hz), q (0 to 64), gain ($-240$ to 240)\\
-      eq peak filter 2 & cutoff (in Hz), q (0 to 64), gain ($-240$ to 240)\\
-      eq peak filter 3 & cutoff (in Hz), q (0 to 64), gain ($-240$ to 240)\\
-      eq peak filter 4 & cutoff (in Hz), q (0 to 64), gain ($-240$ to 240)\\
-      eq peak filter 5 & cutoff (in Hz), q (0 to 64), gain ($-240$ to 240)\\
-      eq peak filter 6 & cutoff (in Hz), q (0 to 64), gain ($-240$ to 240)\\
-      eq peak filter 7 & cutoff (in Hz), q (0 to 64), gain ($-240$ to 240)\\
-      eq peak filter 8 & cutoff (in Hz), q (0 to 64), gain ($-240$ to 240)\\
-      eq high shelf filter & cutoff (in Hz), q (0 to 64), gain ($-240$ to 240 (0.1~dB))\\
+      eq low shelf filter & cutoff frequency, q (0 to 64), gain ($-240$ to 240)
+                                                          & Hz, N/A, 0.1~dB \\
+      eq peak filter 1 & center frequency, q (0 to 64), gain ($-240$ to 240)
+                                                          & Hz, N/A, 0.1~dB \\
+      eq peak filter 2 & center frequency, q (0 to 64), gain ($-240$ to 240)
+                                                          & Hz, N/A, 0.1~dB \\
+      eq peak filter 3 & center frequency, q (0 to 64), gain ($-240$ to 240)
+                                                          & Hz, N/A, 0.1~dB \\
+      eq peak filter 4 & center frequency, q (0 to 64), gain ($-240$ to 240)
+                                                          & Hz, N/A, 0.1~dB \\
+      eq peak filter 5 & center frequency, q (0 to 64), gain ($-240$ to 240)
+                                                          & Hz, N/A, 0.1~dB \\
+      eq peak filter 6 & center frequency, q (0 to 64), gain ($-240$ to 240)
+                                                          & Hz, N/A, 0.1~dB \\
+      eq peak filter 7 & center frequency, q (0 to 64), gain ($-240$ to 240)
+                                                          & Hz, N/A, 0.1~dB \\
+      eq peak filter 8 & center frequency, q (0 to 64), gain ($-240$ to 240)
+                                                          & Hz, N/A, 0.1~dB \\
+      eq high shelf filter & cutoff frequency, q (0 to 64), gain ($-240$ to 240)
+                                                          & Hz, N/A, 0.1~dB \\
 %
       dithering enabled & on, off       & N/A\\
 %
@@ -301,8 +311,8 @@
       \opt{lcd_flip}{
         flip display  & on, off           & N/A\\
       }
-      selector type   & pointer, bar (inverse)
-        \opt{lcd_color}{, bar (color), bar (gradient)} & N/A\\
+      selector type   & pointer, bar (inverse)%
+        \opt{lcd_color}{, bar (colour), bar (gradient)} & N/A\\
       show icons    & on, off           & N/A\\
       iconset       & /path/filename.bmp & N/A\\
       viewers iconset & /path/filename.bmp & N/A\\
