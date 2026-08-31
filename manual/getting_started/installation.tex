@@ -16,14 +16,14 @@ follow the instructions at
     \opt{ipodnano,ipodnano2g}{
     The \playertype{} is available in multiple versions, not
     all of which run Rockbox.  Rockbox presently runs only on
-    the first and second generation Ipod Nano. Rockbox does
-    \emph{not} run on the third, fourth or fifth generation Ipod Nano.
-    For information on identifying which Ipod you own, see this page on
+    the first and second generation iPod Nano. Rockbox does
+    \emph{not} run on the third, fourth or fifth generation iPod Nano.
+    For information on identifying which iPod you own, see this page on
     Apple's website: \url{http://www.info.apple.com/kbnum/n61688}.
   }
   \opt{ipodvideo}{
     The \playertype{} is the 5th/5.5th generation \playerman{} only.
-    For information on identifying which Ipod you own, see this page on Apple's
+    For information on identifying which iPod you own, see this page on Apple's
     website: \url{http://www.info.apple.com/kbnum/n61688}.
   }
   \opt{ipod6g}{
@@ -168,10 +168,10 @@ of before installing.
   name of your \dap{}.
 
   \opt{ipod}{
-    If you have Itunes installed and it is configured to open automatically
+    If you have iTunes installed and it is configured to open automatically
     when your \dap{} is attached (the default behaviour), then wait for it to
     open and then quit it. You also need to ensure the ``Enable use as disk''
-    option is enabled for your \dap{} in Itunes. Your \dap{} should then enter
+    option is enabled for your \dap{} in iTunes. Your \dap{} should then enter
     disk mode automatically when connected to a computer via
     \nopt{ipod1g2g}{USB.}\opt{ipod1g2g}{Firewire.} If your computer does not
     recognise your \dap{}, you may need to enter disk mode manually. Disconnect
@@ -258,14 +258,14 @@ of before installing.
 
 \opt{ipod}{
 \begin{description}
-  \item[File system format.] Rockbox only works on Ipods formatted with
-  the FAT32 filesystem (i.e. Ipods initialised by Itunes
-  for Windows). It does not work with the HFS+ filesystem (i.e. Ipods
-  initialised by Itunes for the Mac). More information and instructions for
-  converting an Ipod to FAT32 can be found on the
+  \item[File system format.] Rockbox only works on iPods formatted with
+  the FAT32 filesystem (i.e. iPods initialised by iTunes
+  for Windows). It does not work with the HFS+ filesystem (i.e. iPods
+  initialised by iTunes for the Mac). More information and instructions for
+  converting an iPod to FAT32 can be found on the
   \wikilink{IpodConversionToFAT32} wiki
   page on the Rockbox website. Note that after conversion, you can still use
-  a FAT32 Ipod with a Mac.
+  a FAT32 iPod with a Mac.
 \end{description}
 }
 
@@ -274,19 +274,19 @@ of before installing.
 }
 
 \opt{disk_storage}{
-Rockbox supports very large drive capacities when used with GPT partitioning on devices that utilize ATA storage, but due to the limitations of the FAT32 filesystem, individual paritions cannot exceed 2\,TiB. Additionally, there may be underlying platform limitations that make it difficult, if not impossible, utilize a drive larger than some arbitrary size or boot from a drive using GPT partitioning.
+Rockbox supports very large drive (over 2\,TiB) capacities when used with GPT partitioning on \dap{}s that utilize ATA storage, but due to the limitations of the FAT32 filesystem, individual paritions cannot exceed 2\,TiB. Additionally, there may be underlying platform limitations that make it difficult, if not impossible, utilize a drive larger than some arbitrary size or boot from a drive using GPT partitioning.
 
 \opt{ipod6g}{
 For example, the stock Apple firmware on earlier 6th generation iPod Classic models\footnote{MB029, MB145, MB147, MB150} is limited to drives no larger than 128\,GiB, and booting into the Apple firmware firmware with larger drive sizes will result in massive data corruption.  Later 6th generation iPod Classic models\footnote{MB562, MB565, MC293, MC297} (sometimes referred to as ``7th gen'') do not have this issue.  Rockbox itself will function correctly on all 6th/7th generation iPod Classic models.
 }
 
-\note{In practice, no Rockbox-capable device can currently handle total drive capacities exceeding 2\,TiB.}
+\note{In practice, no Rockbox-capable \dap{} can currently handle total drive capacities exceeding 2\,TiB.}
 }
 
 \opt{sd_storage}{
   Rockbox does not currently support SDUC cards, i.e. those with capacities
   exceeding 2\,TiB.  However, this is purely a software limitation with
-  Rockbox's SD card drivers, and will be addressed in a future release.
+  Rockbox's SD controller drivers, and will be addressed in a future release.
 
   \note{SD cards exceeding 32\,GiB are pre-formated using the exFAT filesystem with GPT partitioning.
     Before they can be used with Rockbox, they must be reformatted with FAT32.}
@@ -311,17 +311,17 @@ For example, the stock Apple firmware on earlier 6th generation iPod Classic mod
   to minimize their power consumption and power them down when not being actively used.
 \item[Single Secure Digital (SD).] While these adapters come in different form factors from multiple vendors,
   they are all based on the same basic design. The ATA command set is incompletely emulated, notably lacking
-  support for \emph{mandatory} ATA power management commands that Rockbox uses to safely
+  support for several \emph{mandatory} ATA power management commands that Rockbox uses to safely
   transition the device in and out of low power states.  Additionally, SD cards vary widely in quality
-  and power consumption with the resultant effects on data longevity and battery life. Finally, these SD adapters
-  do not support 2\,TiB or larger SDUC cards.
+  and power consumption with the resultant effects on data longevity and battery life. Finally, to date, none
+  of these SD adapters support 2\,TiB or larger SDUC cards.
 \item[Dual/Quad SD.]  These are similar to the above, only allowing use of mulitiple SD cards to
   increase the overall storage capacity. While typically described as JBOD\footnote{Just a Bunch Of Disks}, this is not accurate as each card is not individually accessable.  Instead, the adapter claims to be a single logical drive of the combined capacity of the individual cards in a RAID0-like manner. Consquently, if any one card fails, all data on all other cards may be rendered inacessible.  Given the quality concerns mentioned earlier, this means use of multiple SD cards in one of these adapters is the least reliable/robust of the various SSD mods.  Finally, in another violation of the ATA specification, these ATA-SD adapters fail to properly support LBA48 addressing, meaning that no matter what combination of cards is used, if their combined capacity exceeds 2\,TiB, the extra capacity will not be usable, and the device may even present as having (considerably) less space.
 \end{description}
 
 \note{All of these flash/SSD mods take up less physical space in the device enclosure than the original hard drive, so care must be taken to ensure they are securely mounted and resistant to the vibration and impacts that typically occur in portable devices.  Ribbon cables are particularly vulnerable.}
 
-It is also worth noting that you will not likely see improved data transfer rates when using solid-state storage; the underlying \dap{} hardware is simply too slow to materially benefit. However, the improved access times should help the \dap{} to feel much more responsive.
+It is also worth noting that data transfer rates are not likely to be improved when using solid-state storage; the underlying \dap{} hardware is simply too slow to materially benefit. However, the improved access times should help the \dap{} to feel much more responsive.
 }
 
 \section{Installing Rockbox}\label{sec:installing_rockbox}\index{Installation}
@@ -809,7 +809,7 @@ to speak file and folder names.
 \section{Running Rockbox}
 \nopt{ipod,gigabeats,cowond2,rgnano}{When
 you turn the unit on, Rockbox should load.}
-\opt{ipod}{Hard reset the Ipod by holding
+\opt{ipod}{Hard reset the iPod by holding
   \opt{IPOD_4G_PAD}{\ButtonMenu{} and \ButtonSelect{} simultaneously}%
   \opt{IPOD_3G_PAD}{\ButtonMenu{} and \ButtonPlay{} simultaneously}
   for a couple of seconds until the \dap{} resets. Now Rockbox should load.
@@ -837,11 +837,11 @@ you turn the unit on, Rockbox should load.}
 
 \opt{ipod}{
   \note{
-    If you have loaded music onto your \dap{} using Itunes,
+    If you have loaded music onto your \dap{} using iTunes,
     you will not be able to see your music properly in the \setting{File Browser}.
-    This is because Itunes changes your files' names and hides them in
+    This is because iTunes changes your files' names and hides them in
     directories in the \fname{Ipod\_Control} directory. Files placed on your
-    \dap{} using Itunes can be viewed by initialising and using Rockbox's database.
+    \dap{} using iTunes can be viewed by initialising and using Rockbox's database.
     See \reference{ref:database} for more information.
   }
 }
@@ -934,7 +934,7 @@ completely follow the manual uninstallation instructions below.}}
 }
 
 \optv{ipod}{
-  To uninstall Rockbox and go back to using just the original Ipod software, connect
+  To uninstall Rockbox and go back to using just the original iPod software, connect
   the \dap{} to your computer and follow the instructions to install
   the bootloader but, when prompted by ipodpatcher, enter \texttt{u} for uninstall
   instead of \texttt{i} for install.
