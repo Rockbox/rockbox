@@ -28,6 +28,8 @@
 #include "httpget.h"
 #include "Logger.h"
 
+class ZipInstallThread;
+
 /** Install a file or zip.
  *  Downloads file(s) from a given URL, and installs by either extracting or
  *  copying it to the target path set by setMountpoint().
@@ -37,6 +39,7 @@ class ZipInstaller : public QObject
     Q_OBJECT
 public:
     ZipInstaller(QObject* parent);
+    ~ZipInstaller();
     void install(void);
     void setMountPoint(QString& mountpoint) {m_mountpoint = mountpoint;}
     void setUrl(QString& url){m_urllist = QStringList(url);}
@@ -59,6 +62,7 @@ public slots:
 
 private slots:
     void downloadDone(QNetworkReply::NetworkError error);
+    void installFinished(void);
     void installStart(void);
     void installContinue(void);
 
@@ -79,6 +83,7 @@ private:
 
     HttpGet *m_getter;
     QTemporaryFile *m_downloadFile;
+    ZipInstallThread *m_installThread;
 };
 
 

@@ -23,10 +23,115 @@
 #include "ziputil.h"
 #include "Logger.h"
 
+class ZipInstallThread : public QThread
+{
+public:
+    enum Result {
+        Success,
+        OpenFailed,
+        NotEnoughSpace,
+        ExtractionFailed,
+        CopyFailed
+    };
+
+    explicit ZipInstallThread(ZipInstaller *owner)
+        : QThread(owner), m_owner(owner), m_unzip(true),
+          m_result(OpenFailed), m_requiredSpace(0)
+    {
+    }
+
+    void setArchive(const QString& file, const QString& mountpoint)
+    {
+        m_file = file;
+        m_mountpoint = mountpoint;
+        m_unzip = true;
+    }
+
+    void setCopy(const QString& file, const QString& mountpoint,
+                 const QString& target)
+    {
+        m_file = file;
+        m_mountpoint = mountpoint;
+        m_target = target;
+        m_unzip = false;
+    }
+
+    Result result(void) const { return m_result; }
+    QStringList installedFiles(void) const { return m_installedFiles; }
+protected:
+    void run(void) override
+    {
+        if(m_unzip) {
+            ZipUtil zip(nullptr);
+            connect(&zip, &ZipUtil::logProgress,
+                    m_owner, &ZipInstaller::logProgress);
+            connect(&zip, &ZipUtil::logItem,
+                    m_owner, &ZipInstaller::logItem);
+
+            if(!zip.open(m_file, QuaZip::mdUnzip)) {
+                m_result = OpenFailed;
+                return;
+            }
+
+            m_requiredSpace = zip.totalUncompressedSize(
+                    Utils::filesystemClusterSize(m_mountpoint));
+            if((qint64)Utils::filesystemFree(m_mountpoint)
+                    < m_requiredSpace + 1000000) {
+                zip.close();
+                m_result = NotEnoughSpace;
+                return;
+            }
+
+            m_installedFiles = zip.files();
+            if(!zip.extractArchive(m_mountpoint)) {
+                m_result = ExtractionFailed;
+                zip.close();
+                return;
+            }
+            zip.close();
+        }
+        else {
+            QString destfile = m_mountpoint + "/" + m_target;
+            QString path = QFileInfo(destfile).absolutePath();
+            if(!QDir().mkpath(path)) {
+                m_result = CopyFailed;
+                return;
+            }
+            QFile(destfile).remove();
+            if(!QFile::copy(m_file, destfile)) {
+                m_result = CopyFailed;
+                return;
+            }
+            m_installedFiles.append(m_target);
+        }
+
+        m_result = Success;
+    }
+
+private:
+    ZipInstaller *m_owner;
+    QString m_file;
+    QString m_mountpoint;
+    QString m_target;
+    QStringList m_installedFiles;
+    bool m_unzip;
+    Result m_result;
+    qint64 m_requiredSpace;
+};
+
 ZipInstaller::ZipInstaller(QObject* parent) :
     QObject(parent),
-    m_unzip(true), m_usecache(false), m_getter(nullptr)
+    m_unzip(true), m_usecache(false), m_getter(nullptr),
+    m_installThread(nullptr)
 {
+}
+
+
+ZipInstaller::~ZipInstaller()
+{
+    if(m_installThread && m_installThread->isRunning()) {
+        m_installThread->wait();
+    }
 }
 
 
@@ -106,7 +211,6 @@ void ZipInstaller::installStart()
 void ZipInstaller::downloadDone(QNetworkReply::NetworkError error)
 {
     LOG_INFO() << "download done, error:" << error;
-    QStringList zipContents; // needed later
      // update progress bar
 
     emit logProgress(1, 1);
@@ -128,64 +232,57 @@ void ZipInstaller::downloadDone(QNetworkReply::NetworkError error)
     else {
         emit logItem(tr("Download finished."),LOGOK);
     }
-    QCoreApplication::processEvents();
     if(m_unzip) {
-        // unzip downloaded file
         LOG_INFO() << "about to unzip" << m_file << "to" << m_mountpoint;
-
         emit logItem(tr("Extracting file."), LOGINFO);
-        QCoreApplication::processEvents();
-
-        ZipUtil zip(this);
-        connect(&zip, &ZipUtil::logProgress, this, &ZipInstaller::logProgress);
-        connect(&zip, &ZipUtil::logItem, this, &ZipInstaller::logItem);
-        zip.open(m_file, QuaZip::mdUnzip);
-        // check for free space. Make sure after installation will still be
-        // some room for operating (also includes calculation mistakes due to
-        // cluster sizes on the player).
-        if((qint64)Utils::filesystemFree(m_mountpoint)
-                < (zip.totalUncompressedSize(
-                       Utils::filesystemClusterSize(m_mountpoint))
-                        + 1000000)) {
-            emit logItem(tr("Not enough disk space! Aborting."), LOGERROR);
-            emit logProgress(1, 1);
-            emit done(true);
-            return;
-        }
-        zipContents = zip.files();
-        if(!zip.extractArchive(m_mountpoint)) {
-            emit logItem(tr("Extraction failed!"), LOGERROR);
-            emit logProgress(1, 1);
-            emit done(true);
-            return;
-        }
-        zip.close();
+        m_installThread = new ZipInstallThread(this);
+        m_installThread->setArchive(m_file, m_mountpoint);
     }
     else {
         if (m_target.isEmpty())
             m_target = QUrl(m_url).fileName();
         QString destfile = m_mountpoint + "/" + m_target;
-        // only copy the downloaded file to the output location / name
         emit logItem(tr("Installing file."), LOGINFO);
         LOG_INFO() << "saving downloaded file (no extraction) to" << destfile;
+        // Keep the temporary file materialized while the worker copies it.
+        m_downloadFile->open();
+        m_installThread = new ZipInstallThread(this);
+        m_installThread->setCopy(m_file, m_mountpoint, m_target);
+    }
 
-        m_downloadFile->open(); // copy fails if file is not opened (filename issue?)
-        // make sure the required path is existing
-        QString path = QFileInfo(destfile).absolutePath();
-        QDir p;
-        p.mkpath(path);
-        // QFile::copy() doesn't overwrite files, so remove old one first
-        // TODO: compare old and new file and fail if those are different.
-        QFile(destfile).remove();
-        if(!m_downloadFile->copy(destfile)) {
+    connect(m_installThread, &QThread::finished,
+            this, &ZipInstaller::installFinished);
+    m_installThread->start(QThread::LowPriority);
+}
+
+
+void ZipInstaller::installFinished()
+{
+    ZipInstallThread *thread = m_installThread;
+    m_installThread = nullptr;
+    ZipInstallThread::Result result = thread->result();
+    QStringList zipContents = thread->installedFiles();
+    thread->deleteLater();
+
+    emit logProgress(1, 1);
+    switch(result) {
+        case ZipInstallThread::Success:
+            break;
+        case ZipInstallThread::NotEnoughSpace:
+            emit logItem(tr("Not enough disk space! Aborting."), LOGERROR);
+            emit done(true);
+            return;
+        case ZipInstallThread::CopyFailed:
             emit logItem(tr("Installing file failed."), LOGERROR);
             emit done(true);
             return;
-        }
-
-        // add file to log
-        zipContents.append(m_target);
+        case ZipInstallThread::OpenFailed:
+        case ZipInstallThread::ExtractionFailed:
+            emit logItem(tr("Extraction failed!"), LOGERROR);
+            emit done(true);
+            return;
     }
+
     if(m_logver.isEmpty()) {
         // if no version info is set use the timestamp of the server file.
         m_logver = m_getter->timestamp().toString(Qt::ISODate);
