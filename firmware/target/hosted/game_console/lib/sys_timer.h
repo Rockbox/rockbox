@@ -21,7 +21,6 @@
 #ifndef __SYSTIMER_H__
 #define __SYSTIMER_H__
 
-#include <3ds/svc.h>
 #include "sys_thread.h"
 
 typedef u32 (* timer_callback_ptr) (u32 interval, void *param);

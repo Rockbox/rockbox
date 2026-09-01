@@ -23,8 +23,6 @@
 #include <stdbool.h>
 #include <stdbool.h>
 
-#include <3ds/types.h>
-#include <3ds/svc.h>
 #include "sys_timer.h"
 #ifdef BIT
 #undef BIT
