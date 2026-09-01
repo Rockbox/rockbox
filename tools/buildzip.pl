@@ -424,7 +424,7 @@ sub buildzip {
         glob_copy("$ROOT/firmware/drivers/libertas/firmware/*", "$temp_dir/libertas/");
     }
     # add hbmenu shortcut's icon and 3dsx executable
-    if ($modelname =~ /ctru/) {
+    if ($modelname =~ /3ds/) {
         glob_copy("icon.icn", "$temp_dir/");
         glob_copy("rockbox.3dsx", "$temp_dir/");
     }
@@ -755,12 +755,12 @@ sub runone {
         }
 
         # add hbmenu shortcut and cia file to zip file
-        if ($modelname =~ /ctru/) {
+        if ($modelname =~ /3ds/) {
             copy("rockbox.cia", "3ds");
-            copy("$ROOT/packaging/ctru/rockbox.xml", "3ds");
+            copy("$ROOT/packaging/3ds/rockbox.xml", "3ds");
 
             system("$ziptool -u $output 3ds/rockbox.xml $target >/dev/null");
-            print "$ziptool $output $ROOT/packaging/ctru/rockbox.xml $target >/dev/null\n" if $verbose;
+            print "$ziptool $output $ROOT/packaging/3ds/rockbox.xml $target >/dev/null\n" if $verbose;
             system("$ziptool -u $output 3ds/rockbox.cia $target >/dev/null");
             print "$ziptool $output rockbox.cia $target >/dev/null\n" if $verbose;
         }

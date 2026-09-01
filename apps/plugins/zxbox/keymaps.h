@@ -301,7 +301,7 @@
 #define ZX_SELECT       BUTTON_A
 #define ZX_MENU         BUTTON_START
 
-#elif CONFIG_KEYPAD == CTRU_PAD
+#elif CONFIG_KEYPAD == N3DS_PAD
 
 #define ZX_UP           BUTTON_UP
 #define ZX_DOWN         BUTTON_DOWN

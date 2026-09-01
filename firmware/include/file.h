@@ -39,8 +39,8 @@ enum relate_result
     RELATE_PREFIX,        /* the path2 contains path1 as a prefix */
 };
 
-#if defined(CTRU) && !defined(SIMULATOR)
-#include "filesystem-ctru.h"
+#if (CONFIG_PLATFORM & PLATFORM_GAME_CONSOLE) && !defined(SIMULATOR)
+#include "filesystem-console.h"
 #elif defined(APPLICATION) || defined(CHECKWPS)
 #include "filesystem-app.h"
 #elif defined(SIMULATOR) || defined(DBTOOL)

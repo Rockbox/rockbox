@@ -88,7 +88,7 @@ struct thread_entry;
  *
  * simulator (possibly) doesn't simulate stack usage anyway but well ... */
 
-#if defined(HAVE_SDL_THREADS) || defined(__PCTOOL__) || defined(CTRU)
+#if defined(HAVE_SDL_THREADS) || defined(__PCTOOL__) || defined(N3DS)
 #define DEFAULT_STACK_SIZE 0x100 /* tiny, ignored anyway */
 #else
 #include "asm/thread.h"

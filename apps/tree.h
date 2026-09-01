@@ -127,7 +127,7 @@ void tree_unlock_cache(struct tree_context *t);
 #else
 #define getcwd_size_t size_t
 #endif
-#ifdef CTRU
+#ifdef N3DS
 /* devkitarm already defines getcwd */
 char *__wrap_getcwd(char *buf, getcwd_size_t size);
 #else

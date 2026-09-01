@@ -176,8 +176,8 @@ else # core
    include $(ROOTDIR)/packaging/rgnano/rgnano.make
   endif
 
-  ifneq (,$(findstring ctru, $(APP_TYPE)))
-    include $(ROOTDIR)/packaging/ctru/ctru.make
+  ifneq (,$(findstring 3ds-homebrew, $(APP_TYPE)))
+    include $(ROOTDIR)/packaging/3ds/3ds.make
   endif
 
 endif # bootloader

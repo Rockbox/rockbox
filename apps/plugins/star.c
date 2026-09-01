@@ -687,7 +687,7 @@
 #define STAR_LEVEL_DOWN_NAME "L"
 #define STAR_LEVEL_REPEAT_NAME "B"
 
-#elif CONFIG_KEYPAD == CTRU_PAD
+#elif CONFIG_KEYPAD == N3DS_PAD
 
 #define STAR_QUIT           BUTTON_BACK
 #define STAR_LEFT           BUTTON_LEFT

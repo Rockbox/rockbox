@@ -570,7 +570,7 @@ void resume_directory(const char *dir)
 
 /* Returns the current working directory and also writes cwd to buf if
    non-NULL.  In case of error, returns NULL. */
-#ifdef CTRU
+#ifdef N3DS
 char *__wrap_getcwd(char *buf, getcwd_size_t size)
 #else
 char *getcwd(char *buf, getcwd_size_t size)

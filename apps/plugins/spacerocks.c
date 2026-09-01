@@ -383,7 +383,7 @@
 #define AST_RIGHT       BUTTON_RIGHT
 #define AST_FIRE        BUTTON_A
 
-#elif CONFIG_KEYPAD == CTRU_PAD
+#elif CONFIG_KEYPAD == N3DS_PAD
 #define AST_PAUSE       BUTTON_MENU
 #define AST_QUIT        BUTTON_BACK
 #define AST_THRUST      BUTTON_UP

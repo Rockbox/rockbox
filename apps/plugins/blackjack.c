@@ -611,7 +611,7 @@ enum {
 #define BJACK_RIGHT         BUTTON_RIGHT
 #define BJACK_LEFT          BUTTON_LEFT
 
-#elif CONFIG_KEYPAD == CTRU_PAD
+#elif CONFIG_KEYPAD == N3DS_PAD
 #define BJACK_SELECT_NAME   "A"
 #define BJACK_STAY_NAME     "X"
 #define BJACK_QUIT_NAME     "B"

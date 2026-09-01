@@ -258,7 +258,7 @@ struct battery_tables_t {
 #define BATTERY_ON_TXT  "A"
 #define BATTERY_OFF_TXT "X"
 
-#elif CONFIG_KEYPAD == CTRU_PAD
+#elif CONFIG_KEYPAD == N3DS_PAD
 #define BATTERY_ON      BUTTON_SELECT
 #define BATTERY_OFF     BUTTON_BACK
 #define BATTERY_ON_TXT  "A - start"

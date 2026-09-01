@@ -24,7 +24,7 @@
 
 PLUGIN_HEADER
 
-#ifdef CTRU
+#ifdef N3DS
 /* dummy undefined symbols to build plugins for ctru */
 void __aeabi_unwind_cpp_pr0(void) {}
 struct _reent * _EXFUN(__getreent, (void)) { return NULL; }

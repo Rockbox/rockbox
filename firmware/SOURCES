@@ -25,7 +25,7 @@ target/hosted/rtc.c
 
 #if (CONFIG_PLATFORM & PLATFORM_ANDROID) == 0 && \
     !defined(DX50) && !defined(DX90) && \
-    (defined(DEBUG) || defined(SIMULATOR) || defined(CTRU)) /* sim should define DEBUG instead */
+    (defined(DEBUG) || defined(SIMULATOR) || defined(N3DS)) /* sim should define DEBUG instead */
 target/hosted/debug-hosted.c
 #endif
 
@@ -101,14 +101,14 @@ target/hosted/sdl/app/button-application.c
 #ifdef WIN32
 target/hosted/filesystem-win32.c
 #else /* !WIN32 */
-#ifndef CTRU
+#if !(CONFIG_PLATFORM & PLATFORM_GAME_CONSOLE)
 target/hosted/filesystem-unix.c
-#endif /* CTRU */
+#endif /* PLATFORM_GAME_CONSOLE */
 #endif /* WIN32 */
 #endif /* APPLICATION */
 #endif /* HAVE_SDL */
 
-#if defined(APPLICATION) && !defined(CTRU)
+#if defined(APPLICATION) && !(CONFIG_PLATFORM & PLATFORM_GAME_CONSOLE)
 target/hosted/filesystem-app.c
 #endif /* APPLICATION */
 
@@ -624,8 +624,8 @@ target/hosted/sdl/pcm-sdl.c
 drivers/audio/as3514.c
 #elif defined(SAMSUNG_YPR1) && defined(HAVE_WM8978)
 drivers/audio/wm8978.c
-#elif defined(CTRU)
-drivers/audio/ctru.c
+#elif defined(N3DS)
+drivers/audio/3ds.c
 #endif
 #endif /* (CONFIG_PLATFORM & PLATFORM_NATIVE) */
 #endif /* !defined(BOOTLOADER) */
@@ -2046,26 +2046,35 @@ target/hosted/tinyalsa/mixer.c
 target/hosted/tinyalsa/pcm.c
 #endif
 
-#if (CONFIG_PLATFORM & PLATFORM_CTRU)
+#if (CONFIG_PLATFORM & PLATFORM_GAME_CONSOLE)
+#ifdef CPU_ARM
 asm/arm/lcd-as-memframe.S
-target/hosted/ctru/backlight-ctru.c
-target/hosted/ctru/button-ctru.c
-target/hosted/ctru/kernel-ctru.c
-target/hosted/ctru/thread-ctru.c
-target/hosted/ctru/lcd-bitmap.c
-target/hosted/ctru/luminance-ctru.c
-target/hosted/ctru/system-ctru.c
-target/hosted/ctru/filesystem-ctru.c
-target/hosted/ctru/lc-ctru.c
-target/hosted/ctru/lc-program-resolver.c
-target/hosted/ctru/powermgmt-ctru.c
-target/hosted/ctru/timer-ctru.c
-target/hosted/ctru/pcm-ctru.c
-target/hosted/ctru/lib/sys_file.c
-target/hosted/ctru/lib/sys_dir.c
-target/hosted/ctru/lib/sys_thread.c
-target/hosted/ctru/lib/sys_timer.c
-target/hosted/ctru/lib/bfile/bfile.c
+#endif
+target/hosted/game_console/kernel-console.c
+target/hosted/game_console/thread-console.c
+target/hosted/game_console/timer-console.c
+target/hosted/game_console/lib/sys_atomic.c
+target/hosted/game_console/lib/sys_file_common.c
+target/hosted/game_console/lib/sys_timer_common.c
+target/hosted/game_console/lib/bfile/bfile-rwmutex.c
+target/hosted/game_console/lib/sys_cond_generic.c
+#ifdef N3DS
+target/hosted/game_console/lib/sys_file_3ds.c
+target/hosted/game_console/lib/sys_dir_3ds.c
+target/hosted/game_console/lib/sys_thread_3ds.c
+target/hosted/game_console/lib/sys_timer_3ds.c
+target/hosted/game_console/lib/bfile/bfile-3ds.c
+target/hosted/game_console/3ds/backlight-3ds.c
+target/hosted/game_console/3ds/button-3ds.c
+target/hosted/game_console/3ds/filesystem-3ds.c
+target/hosted/game_console/3ds/lc-3ds.c
+target/hosted/game_console/3ds/lcd-bitmap-3ds.c
+target/hosted/game_console/3ds/lc-program-resolver.c
+target/hosted/game_console/3ds/luminance-3ds.c
+target/hosted/game_console/3ds/pcm-3ds.c
+target/hosted/game_console/3ds/powermgmt-3ds.c
+target/hosted/game_console/3ds/system-3ds.c
+#endif /* N3DS */
 #endif
 
 #else /* defined(SIMULATOR) */
@@ -2122,7 +2131,7 @@ kernel/semaphore.c
 #endif
 #ifdef HAVE_SDL_THREADS
 target/hosted/sdl/thread-sdl.c
-#elif !defined(CTRU)
+#elif !(CONFIG_PLATFORM & PLATFORM_GAME_CONSOLE)
 kernel/thread.c
 #endif
 kernel/thread-common.c

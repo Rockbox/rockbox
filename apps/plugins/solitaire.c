@@ -742,7 +742,7 @@ CONFIG_KEYPAD == MROBE500_PAD
 #   define HK_CUR2STACK      "B"
 #   define HK_REM2STACK      "R"
 
-#elif (CONFIG_KEYPAD == CTRU_PAD)
+#elif (CONFIG_KEYPAD == N3DS_PAD)
 #   define SOL_QUIT         BUTTON_BACK
 #   define SOL_UP           BUTTON_UP
 #   define SOL_DOWN         BUTTON_DOWN

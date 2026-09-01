@@ -230,7 +230,7 @@ void format_thread_name(char *buf, size_t bufsize,
     snprintf(buf, bufsize, fmt, name, thread->id);
 }
 
-#if !defined(HAVE_SDL_THREADS) && !defined(CTRU)
+#if !defined(HAVE_SDL_THREADS) && !(CONFIG_PLATFORM & PLATFORM_GAME_CONSOLE)
 /*---------------------------------------------------------------------------
  * Returns the maximum percentage of the stack ever used during runtime.
  *---------------------------------------------------------------------------
@@ -251,7 +251,7 @@ static unsigned int stack_usage(uintptr_t *stackptr, size_t stack_size)
 
     return usage;
 }
-#endif /* !defined(HAVE_SDL_THREADS) && !defined(CTRU) */
+#endif /* !defined(HAVE_SDL_THREADS) && !(CONFIG_PLATFORM & PLATFORM_GAME_CONSOLE) */
 
 #if NUM_CORES > 1
 int core_get_debug_info(unsigned int core, struct core_debug_info *infop)
@@ -303,7 +303,7 @@ int thread_get_debug_info(unsigned int thread_id,
 #ifdef HAVE_SCHEDULER_BOOSTCTRL
         cpu_boost = thread->cpu_boost;
 #endif
-#if !defined(HAVE_SDL_THREADS) && !defined(CTRU)
+#if !defined(HAVE_SDL_THREADS) && !(CONFIG_PLATFORM & PLATFORM_GAME_CONSOLE)
         infop->stack_usage = stack_usage(thread->stack, thread->stack_size);
 
         size_t stack_used_current =

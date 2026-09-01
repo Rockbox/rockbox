@@ -30,7 +30,7 @@ extern unsigned char plugin_end_addr[];
  * avoid warning with certain compilers */
 int _start(void) {return 0;}
 
-#ifdef CTRU
+#ifdef N3DS
 /* dummy undefined symbols */
 void __aeabi_unwind_cpp_pr0(void) {}
 struct _reent * _EXFUN(__getreent, (void)) { return NULL; }
