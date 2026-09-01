@@ -142,7 +142,7 @@
 #include "iap.h"
 #endif
 
-#ifdef HIBY_LINUX
+#if defined(HIBY_LINUX) && !defined(SIMULATOR)
 #include <sys/sysinfo.h>
 #endif
 
@@ -2808,7 +2808,7 @@ static bool dbg_bootflash_dump(void) {
 }
 #endif
 
-#ifdef HIBY_LINUX
+#if defined(HIBY_LINUX) && !defined(SIMULATOR)
 static bool view_ram_info(void)
 {
     struct simplelist_info info;
@@ -2896,7 +2896,7 @@ static const struct {
 #ifdef __linux__
         { "View CPU stats", dbg_cpuinfo },
 #endif
-#ifdef HIBY_LINUX
+#if defined(HIBY_LINUX) && !defined(SIMULATOR)
         { "View RAM info", view_ram_info },
 #endif
 #if (CONFIG_BATTERY_MEASURE != 0) && !defined(SIMULATOR)
