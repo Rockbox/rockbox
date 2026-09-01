@@ -1006,10 +1006,10 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: "Peak Filter %d"
+    *: "Peak Filter"
   </source>
   <dest>
-    *: "~Peak Filter %d"
+    *: "~Peak Filter"
   </dest>
   <voice>
     *: "~Peak filter"
@@ -14689,7 +14689,7 @@
   user: core
   <source>
     *: "Press LEFT to cancel."
-    android,hifietma*,zenvision: "Press BACK to cancel."
+    android,hifietma*: "Press BACK to cancel."
     cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Press POWER to cancel."
     ihifi760,ihifi960: "Double tap RETURN to cancel."
     ihifi770,ihifi770c,ihifi800: "Press HOME to cancel."
@@ -14704,7 +14704,7 @@
   </source>
   <dest>
     *: "Nhấn LEFT để hủy."
-    android,hifietma*,zenvision: "Nhấn BACK để hủy."
+    android,hifietma*: "Nhấn BACK để hủy."
     cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Nhấn POWER để hủy."
     ihifi760,ihifi960: "Nhấn đúp RETURN để hủy."
     ihifi770,ihifi770c,ihifi800: "Nhấn HOME để hủy."
@@ -14719,7 +14719,7 @@
   </dest>
   <voice>
     *: "Nhấn LEFT để hủy."
-    android,hifietma*,zenvision: "Nhấn BACK để hủy."
+    android,hifietma*: "Nhấn BACK để hủy."
     cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Nhấn POWER để hủy."
     ihifi760,ihifi960: "Nhấn đúp RETURN để hủy."
     ihifi770,ihifi770c,ihifi800: "Nhấn HOME để hủy."
@@ -14958,20 +14958,6 @@
   </dest>
   <voice>
     *: "Không phải là plugin"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_OPEN_PLUGIN_SET_WPS_CONTEXT_PLUGIN
-  desc: open plugin module
-  user: core
-  <source>
-    *: "Set WPS Context Plugin"
-  </source>
-  <dest>
-    *: "Đặt ngữ cảnh Wps của Plugin"
-  </dest>
-  <voice>
-    *: "Đặt ngữ cảnh WPS của Plugin"
   </voice>
 </phrase>
 <phrase>
@@ -15214,7 +15200,7 @@
 </phrase>
 <phrase>
   id: LANG_VOICED_DATE_FORMAT
-  desc: format string for how dates will be read back. Y == 4-digit year, A == month name, m == numeric month, d == numeric day. For example, "AdY" will read "January 21 2021"
+  desc: format string for how dates will be read back. Y == 4-digit year (grouped), y == 4-digit year (numeric), A == month name, m == numeric month, d == numeric day. For example, for 2021-01-05, "AdY" will be voiced as "January 5 twenty twenty-one" and "dmy" will be voiced as "5 1 two thousand twenty one
   user: core
   <source>
     *: "dAY"
@@ -15823,16 +15809,16 @@
 </phrase>
 <phrase>
   id: LANG_DEFAULT_BROWSER
-  desc: in Settings
+  desc: deprecated
   user: core
   <source>
-    *: "Default Browser"
+    *: ""
   </source>
   <dest>
-    *: "Trình duyệt mặc định"
+    *: ""
   </dest>
   <voice>
-    *: "Trình duyệt mặc định"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -16969,5 +16955,173 @@
   </dest>
   <voice>
     *: "~U S B"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_CONTEXT_ITEM
+  desc: WPS context item
+  user: core
+  <source>
+    *: "Set Context Item"
+  </source>
+  <dest>
+    *: "Đặt Vật phẩm Bối cảnh"
+  </dest>
+  <voice>
+    *: "Đặt Vật phẩm Bối cảnh"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEEP_DIRECTORY
+  desc: file browser setting
+  user: core
+  <source>
+    *: "Always remember last folder"
+  </source>
+  <dest>
+    *: "Luôn ghi nhớ thư mục lần trước"
+  </dest>
+  <voice>
+    *: "Luôn ghi nhớ thư mục lần trước"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILE_NOT_FOUND
+  desc: When file does not exist
+  user: core
+  <source>
+    *: "File not found"
+  </source>
+  <dest>
+    *: "Không tìm thấy tập tin"
+  </dest>
+  <voice>
+    *: "Không tìm thấy tập tin"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_IN_FILES
+  desc: Reveal item in File Browser
+  user: core
+  <source>
+    *: "Show in Files"
+  </source>
+  <dest>
+    *: "Hiển thị trong Tập Tin"
+  </dest>
+  <voice>
+    *: "Hiển thị trong Tập Tin"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANNEL_SWAP
+  desc: in sound_settings
+  user: core
+  <source>
+    *: "Swap Left & Right"
+  </source>
+  <dest>
+    *: "Hoán đổi Trái & Phảii"
+  </dest>
+  <voice>
+    *: "Hoán đổi Trái & Phảii"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COUNTDOWN_TIMER_SET
+  desc: countdown_timer plugin - header shown on the setup screen where the user enters the countdown duration
+  user: core
+  <source>
+    *: "SET TIMER"
+  </source>
+  <dest>
+    *: "ĐẶT KHOẢNG THỜI GIAN"
+  </dest>
+  <voice>
+    *: "Đặt khoảng thời gian"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COUNTDOWN_TIMER_RUNNING
+  desc: countdown_timer plugin - status label shown while the countdown is active
+  user: core
+  <source>
+    *: "RUNNING"
+  </source>
+  <dest>
+    *: "ĐANG CHẠY"
+  </dest>
+  <voice>
+    *: "Đang chạy"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COUNTDOWN_TIMER_PAUSED
+  desc: countdown_timer plugin - status label shown while the countdown is paused
+  user: core
+  <source>
+    *: "PAUSED"
+  </source>
+  <dest>
+    *: "Tạm dừng"
+  </dest>
+  <voice>
+    *: "Tạm dừng"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COUNTDOWN_TIMER_OVERTIME
+  desc: countdown_timer plugin - status label shown when the countdown has passed zero and is counting up
+  user: core
+  <source>
+    *: "OVERTIME"
+  </source>
+  <dest>
+    *: "QUÁ GIỜ"
+  </dest>
+  <voice>
+    *: "Quá giờ"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COUNTDOWN_TIMER_FINISHED
+  desc: countdown_timer plugin - status label shown at the moment the countdown expires
+  user: core
+  <source>
+    *: "FINISHED"
+  </source>
+  <dest>
+    *: "HOÀN THÀNH"
+  </dest>
+  <voice>
+    *: "Hoàn thành"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BAND
+  desc: in the equalizer settings menu
+  user: core
+  <source>
+    *: "Filter %d"
+  </source>
+  <dest>
+    *: "Bộ lọc %d"
+  </dest>
+  <voice>
+    *: "Bộ lọc"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_FILTER_TYPE
+  desc: in the equalizer settings menu
+  user: core
+  <source>
+    *: "Filter Type"
+  </source>
+  <dest>
+    *: "Kiểu Bộ lọc"
+  </dest>
+  <voice>
+    *: "Kiểu bộ lọc"
   </voice>
 </phrase>
