@@ -43,6 +43,7 @@ extern const char *strpbrk_n(const char *s, int smax, const char *accept);
 int errno = 0;
 #endif
 
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE) /* hosted platforms supply these */
 char *strerror(int errnum)
 {
     (void) errnum;
@@ -51,6 +52,7 @@ char *strerror(int errnum)
 
     return NULL;
 }
+#endif
 
 /* splash string and allow user to scroll around
  * provides rudimentary text reflow
@@ -239,10 +241,12 @@ long rb_pow(long x, long n)
     return pow;
 }
 
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE) /* hosted platforms supply these */
 int strcoll(const char * str1, const char * str2)
 {
     return strcmp(str1, str2);
 }
+#endif
 
 #if 0 //ndef _WIN32  /* supplied by strfrtime.lua*/
 struct tm * gmtime(const time_t *timep)
