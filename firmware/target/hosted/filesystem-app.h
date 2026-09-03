@@ -86,7 +86,7 @@ ssize_t app_write(int fildes, const void *buf, size_t nbyte);
 int     app_remove(const char *path);
 int     app_rename(const char *old, const char *new);
 #define app_modtime     os_modtime
-#define app_filesize    os_filesize
+#define app_ffilesize   os_ffilesize
 #define app_fsamefile   os_fsamefile
 int     app_relate(const char *path1, const char *path2);
 bool    app_file_exists(const char *path);
@@ -115,6 +115,8 @@ int   app_mkdir(const char *path);
 int   app_rmdir(const char *path);
 int   app_samedir(DIR *dirp1, DIR *dirp2);
 bool  app_dir_exists(const char *dirname);
+struct dirinfo app_dir_get_info(DIR *dirp, struct dirent *entry);
+const char *   app_root_realpath(void);
 #endif /* DIRFUNCTIONS_DECLARED */
 
 #endif /* _FILESYSTEM_APP__DIR_H_ */

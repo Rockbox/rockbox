@@ -87,8 +87,8 @@ int fdprintf(int fildes, const char *fmt, ...) ATTRIBUTE_PRINTF(2, 3);
 #ifndef modtime
 #define modtime         FS_PREFIX(modtime)
 #endif
-#ifndef filesize
-#define filesize        FS_PREFIX(filesize)
+#ifndef ffilesize
+#define ffilesize       FS_PREFIX(ffilesize)
 #endif
 #ifndef fsamefile
 #define fsamefile       FS_PREFIX(fsamefile)

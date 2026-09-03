@@ -70,7 +70,7 @@ bool get_a52_metadata(int fd, struct mp3entry *id3)
 
     id3->bitrate = a52_bitrates[i >> 1];
     id3->vbr = false;
-    id3->filesize = filesize(fd);
+    id3->filesize = ffilesize(fd);
 
     switch (buf[4] & 0xc0)
     {

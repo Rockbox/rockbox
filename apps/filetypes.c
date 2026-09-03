@@ -382,7 +382,7 @@ static void read_viewers_config_init(void)
     if(fd < 0)
         return;
 
-    off_t filesz = filesize(fd);
+    off_t filesz = ffilesize(fd);
     if(filesz <= 0)
         goto out;
 

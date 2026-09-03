@@ -144,7 +144,7 @@ static int tv_change_preferences(const struct tv_preferences *oldp)
         if (fd < 0)
             return TV_CALLBACK_ERROR;
 
-        file_size = rb->filesize(fd);
+        file_size = rb->ffilesize(fd);
         change_file = true;
     }
 

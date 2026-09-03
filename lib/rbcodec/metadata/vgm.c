@@ -153,7 +153,7 @@ bool get_vgm_metadata(int fd, struct mp3entry* id3)
     }
 
     id3->vbr = false;
-    id3->filesize = filesize(fd);
+    id3->filesize = ffilesize(fd);
 
     id3->bitrate = 1411;
     id3->frequency = 44100;

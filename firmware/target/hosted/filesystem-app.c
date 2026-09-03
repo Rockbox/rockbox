@@ -504,7 +504,7 @@ bool app_dir_exists(const char *dirname)
     return true;
 }
 
-struct dirinfo dir_get_info(DIR *dirp, struct dirent *entry)
+struct dirinfo app_dir_get_info(DIR *dirp, struct dirent *entry)
 {
     struct __dir *this = (struct __dir *)dirp;
     struct dirinfo ret = { .attribute = 0,

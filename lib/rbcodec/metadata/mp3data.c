@@ -608,7 +608,7 @@ int get_mp3file_info(int fd, struct mp3info *info)
         if(result)
             return result;
 
-        info->byte_count = filesize(fd) - getid3v1len(fd) - offset - bytecount;
+        info->byte_count = ffilesize(fd) - getid3v1len(fd) - offset - bytecount;
     }
 
     return bytecount;

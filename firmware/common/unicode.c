@@ -221,7 +221,7 @@ static int alloc_and_load_cp_table(int cp, void *buf)
     if (fd < 0)
         return -1;
 
-    off_t size = filesize(fd);
+    off_t size = ffilesize(fd);
 
     if (size > 0 && size <= MAX_CP_TABLE_SIZE*2 &&
         !(size % (off_t)sizeof (uint16_t))) {

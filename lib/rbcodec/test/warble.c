@@ -88,7 +88,7 @@ int find_first_set_bit(uint32_t value)
     return __builtin_ctz(value);
 }
 
-off_t filesize(int fd)
+off_t ffilesize(int fd)
 {
     struct stat st;
     fstat(fd, &st);
@@ -844,7 +844,7 @@ static void decode_file(const char *input_fn)
         exit(1);
     }
     print_mp3entry(&id3, stderr);
-    ci.filesize = filesize(input_fd);
+    ci.filesize = ffilesize(input_fd);
     ci.id3 = &id3;
     if (use_dsp) {
         ci.dsp = dsp_get_config(CODEC_IDX_AUDIO);

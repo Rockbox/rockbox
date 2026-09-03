@@ -46,8 +46,8 @@
 #define read(a,b,c)		rb->read(a,b,c)
 #undef write
 #define write(a,b,c)	rb->write(a,b,c)
-#undef filesize
-#define filesize(a)		rb->filesize(a)
+#undef ffilesize
+#define ffilesize(a)		rb->ffilesize(a)
 #endif
 
 #define malloc(x)		tlsf_malloc(x)

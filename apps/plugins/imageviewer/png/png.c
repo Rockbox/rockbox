@@ -120,7 +120,7 @@ static int load_image(char *filename, struct image_info *info,
     }
     else
     {
-        file_size = rb->filesize(fd);
+        file_size = rb->ffilesize(fd);
     }
 
     DEBUGF("reading file '%s'\n", filename);

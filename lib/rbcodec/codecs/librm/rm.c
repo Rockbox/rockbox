@@ -32,7 +32,7 @@
 #include "inttypes.h"
 #include <sys/stat.h>
 
-int filesize(int fd)
+int ffilesize(int fd)
 {
   struct stat buf;
 

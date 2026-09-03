@@ -2085,7 +2085,7 @@ int clip_jpeg_fd(int fd, int flags,
 #else
     p_jpeg->fd = fd;
     if (p_jpeg->len == 0)
-        p_jpeg->len = filesize(p_jpeg->fd);
+        p_jpeg->len = ffilesize(p_jpeg->fd);
 
     p_jpeg->read_buf = read_buf;
     p_jpeg->skip_bytes_seek = skip_bytes_seek;

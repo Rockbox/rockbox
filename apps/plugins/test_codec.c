@@ -181,7 +181,7 @@ void init_wav(char* filename)
 
 void close_wav(void)
 {
-    int filesize = rb->filesize(wavinfo.fd);
+    int filesize = rb->ffilesize(wavinfo.fd);
     int channels = (wavinfo.stereomode == STEREO_MONO) ? 1 : 2;
     int bps = 16; /* TODO */
 
@@ -658,7 +658,7 @@ static enum plugin_status test_track(const char* filename)
         goto exit;
     }
 
-    track.filesize = rb->filesize(fd);
+    track.filesize = rb->ffilesize(fd);
 
     /* Clear the id3 struct */
     rb->memset(&track.id3, 0, sizeof(struct mp3entry));

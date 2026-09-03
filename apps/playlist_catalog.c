@@ -325,7 +325,7 @@ int catalog_insert_into(const char* playlist, bool new_playlist,
             goto exit;
 
         i = lseek(f, 0, SEEK_CUR);
-        fs = filesize(f);
+        fs = ffilesize(f);
         while (i < fs)
         {
             int n;

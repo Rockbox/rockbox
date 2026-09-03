@@ -74,7 +74,7 @@ static void setoptions (void)
     int optionssize = sizeof(options);
     int filesize = 0;
     if(fd >= 0)
-        filesize = rb->filesize(fd);
+        filesize = rb->ffilesize(fd);
 
     /* don't read the option file if the size
      * is not as expected to avoid crash */

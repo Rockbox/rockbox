@@ -53,7 +53,7 @@ int os_modtime(const char *path, time_t modtime)
     return utime(path, &times);
 }
 
-off_t os_filesize(int osfd)
+off_t os_ffilesize(int osfd)
 {
     struct stat sb;
 

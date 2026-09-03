@@ -41,7 +41,7 @@ static bool get_shn_metadata(int fd, struct mp3entry *id3)
 {
     /* TODO: read the id3v2 header if it exists */
     id3->vbr = true;
-    id3->filesize = filesize(fd);
+    id3->filesize = ffilesize(fd);
     return skip_id3v2(fd, id3);
 }
 
@@ -50,7 +50,7 @@ static bool get_other_asap_metadata(int fd, struct mp3entry *id3)
     id3->bitrate = 706;
     id3->frequency = 44100;
     id3->vbr = false;
-    id3->filesize = filesize(fd);
+    id3->filesize = ffilesize(fd);
     id3->genre_string = id3_get_num_genre(36); /* GAME */
     return true;
 }

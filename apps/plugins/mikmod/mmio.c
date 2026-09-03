@@ -133,7 +133,7 @@ typedef struct MFILEREADER {
 static int _mm_FileReader_Eof(MREADER* reader)
 {
 	//return feof(((MFILEREADER*)reader)->file);
-	int size   = filesize(((MFILEREADER*)reader)->file);
+	int size   = ffilesize(((MFILEREADER*)reader)->file);
 	int offset = lseek(((MFILEREADER*)reader)->file, 0, SEEK_CUR);
 	return (size <= 0 || offset < 0 || offset >= size) ? 1 : 0;
 }

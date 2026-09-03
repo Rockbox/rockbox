@@ -875,7 +875,7 @@ int disk_buf_open(const char *filename)
 
     if (fd >= 0)
     {
-        ssize_t filesize = rb->filesize(fd);
+        ssize_t filesize = rb->ffilesize(fd);
 
         if (filesize <= 0)
         {

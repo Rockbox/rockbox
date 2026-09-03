@@ -3096,7 +3096,7 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
          */
         masterfd_pos = lseek(masterfd, tcmh.tch.entry_count * sizeof(struct index_entry),
             SEEK_CUR);
-        if (masterfd_pos == filesize(masterfd))
+        if (masterfd_pos == ffilesize(masterfd))
         {
             logf("appending...");
             init = true;

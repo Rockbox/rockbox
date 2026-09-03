@@ -82,7 +82,7 @@ bool get_sid_metadata(int fd, struct mp3entry* id3)
     */
     id3->length = (buf[0xf]-1)*1000;
     id3->vbr = false;
-    id3->filesize = filesize(fd);
+    id3->filesize = ffilesize(fd);
 
     return true;
 }

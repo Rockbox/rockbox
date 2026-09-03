@@ -37,7 +37,7 @@ static int open_key_remap(const char *filename, int *countp)
     if (fd < 0)
         return fd;
 
-    size_t fsize = filesize(fd);
+    size_t fsize = ffilesize(fd);
     int count = fsize / sizeof(struct button_mapping);
     if (count == 0 || (size_t)(count * sizeof(struct button_mapping)) != fsize)
     {

@@ -27,7 +27,7 @@
 #define DIRFUNCTIONS_DEFINED
 #endif /* PLUGIN || CODEC */
 
-#define FS_PREFIX(_x_) _x_
+#define FS_PREFIX(_x_) rbfs_ ## _x_
 #endif /* _FILESYSTEM_NATIVE_H_ */
 
 #ifdef _FILE_H_
@@ -44,26 +44,26 @@
 
 #include <time.h>
 
-int     open(const char *name, int oflag);
-int     creat(const char *name);
-int     close(int fildes);
-int     ftruncate(int fildes, off_t length);
-int     fsync(int fildes);
-off_t   lseek(int fildes, off_t offset, int whence);
-ssize_t read(int fildes, void *buf, size_t nbyte);
-ssize_t write(int fildes, const void *buf, size_t nbyte);
-int     remove(const char *path);
-int     rename(const char *old, const char *new);
-int     modtime(const char *path, time_t modtime);
-off_t   filesize(int fildes);
-int     fsamefile(int fildes1, int fildes2);
-int     relate(const char *path1, const char *path2);
-bool    file_exists(const char *path);
+int     rbfs_open(const char *name, int oflag);
+int     rbfs_creat(const char *name);
+int     rbfs_close(int fildes);
+int     rbfs_ftruncate(int fildes, off_t length);
+int     rbfs_fsync(int fildes);
+off_t   rbfs_lseek(int fildes, off_t offset, int whence);
+ssize_t rbfs_read(int fildes, void *buf, size_t nbyte);
+ssize_t rbfs_write(int fildes, const void *buf, size_t nbyte);
+int     rbfs_remove(const char *path);
+int     rbfs_rename(const char *old, const char *new);
+int     rbfs_modtime(const char *path, time_t modtime);
+off_t   rbfs_ffilesize(int fildes);
+int     rbfs_fsamefile(int fildes1, int fildes2);
+int     rbfs_relate(const char *path1, const char *path2);
+bool    rbfs_file_exists(const char *path);
 #endif /* !FILEFUNCTIONS_DECLARED */
 
 #if !defined(RB_FILESYSTEM_OS) && !defined (FILEFUNCTIONS_DEFINED)
-#define open(path, oflag, ...) open(path, oflag)
-#define creat(path, mode)      creat(path)
+#define rbfs_open(path, oflag, ...) rbfs_open(path, oflag)
+#define rbfs_creat(path, mode)      rbfs_creat(path)
 #endif /* FILEFUNCTIONS_DEFINED */
 
 #endif /* _FILESYSTEM_NATIVE__FILE_H_ */
@@ -93,16 +93,19 @@ typedef struct {} DIR;
 #define DIRFUNCTIONS_DEFINED
 #endif
 
-DIR *  opendir(const char *dirname);
-struct dirent * readdir(DIR *dirp);
-int    readdir_r(DIR *dirp, struct dirent *entry,
-                 struct dirent **result);
-void   rewinddir(DIR *dirp);
-int    closedir(DIR *dirp);
-int    mkdir(const char *path);
-int    rmdir(const char *path);
-int    samedir(DIR *dirp1, DIR *dirp2);
-bool   dir_exists(const char *dirname);
+DIR *  rbfs_opendir(const char *dirname);
+struct dirent * rbfs_readdir(DIR *dirp);
+int    rbfs_readdir_r(DIR *dirp, struct dirent *entry,
+                      struct dirent **result);
+void   rbfs_rewinddir(DIR *dirp);
+int    rbfs_closedir(DIR *dirp);
+int    rbfs_mkdir(const char *path);
+int    rbfs_rmdir(const char *path);
+int    rbfs_samedir(DIR *dirp1, DIR *dirp2);
+bool   rbfs_dir_exists(const char *dirname);
+
+struct dirinfo rbfs_dir_get_info(DIR *dirp, struct DIRENT *entry);
+const char *   rbfs_root_realpath(void);
 #endif /* !DIRFUNCTIONS_DECLARED */
 
 #endif /* _FILESYSTEM_NATIVE__DIR_H_ */

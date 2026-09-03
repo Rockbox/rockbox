@@ -498,7 +498,7 @@ struct plugin_api {
     int (*remove)(const char *path);
     int (*rename)(const char *old, const char *new);
     int (*ftruncate)(int fildes, off_t length);
-    off_t (*filesize)(int fildes);
+    off_t (*ffilesize)(int fildes);
     int (*fdprintf)(int fildes, const char *fmt, ...) ATTRIBUTE_PRINTF(2, 3);
     int (*read_line)(int fd, char* buffer, int buffer_size);
     bool (*settings_parseline)(char* line, char** name, char** value);

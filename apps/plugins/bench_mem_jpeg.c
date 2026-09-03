@@ -89,7 +89,7 @@ enum plugin_status plugin_start(const void* parameter)
         lcd_printf("file open failed: %d", fd);
         goto wait;
     }
-    unsigned long filesize = rb->filesize(fd);
+    unsigned long filesize = rb->ffilesize(fd);
     if (filesize > plugin_buf_len)
     {
         lcd_printf("file too large");

@@ -507,7 +507,7 @@ static int open_internal_inner1(const char *path, int oflag,
 
 file_error:
     if (fildes >= 0)
-        close(fildes);
+        rbfs_close(fildes);
     return rc;
 }
 
@@ -817,21 +817,21 @@ void force_close_writer_internal(struct filestr_base *stream)
 /** POSIX **/
 
 /* open a file */
-int open(const char *path, int oflag)
+int rbfs_open(const char *path, int oflag)
 {
     DEBUGF("open(path=\"%s\",oflag=%X)\n", path, (unsigned)oflag);
     return open_internal_locked(path, oflag, FF_ANYTYPE);
 }
 
 /* create a new file or rewrite an existing one */
-int creat(const char *path)
+int rbfs_creat(const char *path)
 {
     DEBUGF("creat(path=\"%s\")\n", path);
     return open_internal_locked(path, O_WRONLY|O_CREAT|O_TRUNC, FF_ANYTYPE);
 }
 
 /* close a file descriptor */
-int close(int fildes)
+int rbfs_close(int fildes)
 {
     DEBUGF("close(fd=%d)\n", fildes);
 
@@ -857,7 +857,7 @@ file_error:
 }
 
 /* truncate a file to a specified length */
-int ftruncate(int fildes, off_t length)
+int rbfs_ftruncate(int fildes, off_t length)
 {
     DEBUGF("ftruncate(fd=%d,len=%ld)\n", fildes, (long)length);
 
@@ -889,7 +889,7 @@ file_error:
 }
 
 /* synchronize changes to a file */
-int fsync(int fildes)
+int rbfs_fsync(int fildes)
 {
     DEBUGF("fsync(fd=%d)\n", fildes);
 
@@ -915,7 +915,7 @@ file_error:
 }
 
 /* move the read/write file offset */
-off_t lseek(int fildes, off_t offset, int whence)
+off_t rbfs_lseek(int fildes, off_t offset, int whence)
 {
 #ifndef LOGF_ENABLE /* wipes out log before you can save it */
     DEBUGF("lseek(fd=%d,ofs=%ld,wh=%d)\n", fildes, (long)offset, whence);
@@ -934,7 +934,7 @@ file_error:
 }
 
 /* read from a file */
-ssize_t read(int fildes, void *buf, size_t nbyte)
+ssize_t rbfs_read(int fildes, void *buf, size_t nbyte)
 {
     struct filestr_desc * const file = GET_FILESTR(READER, fildes);
     if (!file)
@@ -960,7 +960,7 @@ file_error:
 }
 
 /* write on a file */
-ssize_t write(int fildes, const void *buf, size_t nbyte)
+ssize_t rbfs_write(int fildes, const void *buf, size_t nbyte)
 {
     struct filestr_desc * const file = GET_FILESTR(READER, fildes);
     if (!file)
@@ -986,7 +986,7 @@ file_error:
 }
 
 /* remove a file */
-int remove(const char *path)
+int rbfs_remove(const char *path)
 {
     DEBUGF("remove(path=\"%s\")\n", path);
 
@@ -997,7 +997,7 @@ int remove(const char *path)
 }
 
 /* rename a file */
-int rename(const char *old, const char *new)
+int rbfs_rename(const char *old, const char *new)
 {
     DEBUGF("rename(old=\"%s\",new=\"%s\")\n", old, new);
 
@@ -1144,7 +1144,7 @@ file_error:
 
 /** Extensions **/
 
-int modtime(const char *path, time_t modtime)
+int rbfs_modtime(const char *path, time_t modtime)
 {
     DEBUGF("modtime(path=\"%s\",modtime=%d)\n", path, (int) modtime);
 
@@ -1181,7 +1181,7 @@ file_error:
 }
 
 /* get the binary size of a file (in bytes) */
-off_t filesize(int fildes)
+off_t rbfs_ffilesize(int fildes)
 {
     struct filestr_desc * const file = GET_FILESTR(READER, fildes);
     if (!file)
@@ -1200,7 +1200,7 @@ file_error:
 }
 
 /* test if two file descriptors refer to the same file */
-int fsamefile(int fildes1, int fildes2)
+int rbfs_fsamefile(int fildes1, int fildes2)
 {
     struct filestr_desc * const file1 = GET_FILESTR(WRITER, fildes1);
     if (!file1)
@@ -1217,7 +1217,7 @@ int fsamefile(int fildes1, int fildes2)
 }
 
 /* tell the relationship of path1 to path2 */
-int relate(const char *path1, const char *path2)
+int rbfs_relate(const char *path1, const char *path2)
 {
     /* this is basically what rename() does but reduced to the relationship
        determination */
@@ -1277,7 +1277,7 @@ file_error:
 }
 
 /* test file or directory existence */
-bool file_exists(const char *path)
+bool rbfs_file_exists(const char *path)
 {
     file_internal_lock_WRITER();
     bool rc = test_stream_exists_internal(path, FF_ANYTYPE) > 0;

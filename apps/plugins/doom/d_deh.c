@@ -106,7 +106,7 @@ int dehfeof(DEHFILE *fp)
 {
    if (fp->fd >= 0)
    {
-      off_t size   = filesize(fp->fd);
+      off_t size   = ffilesize(fp->fd);
       off_t offset = lseek(fp->fd, 0, SEEK_CUR);
       return (size <= 0 || offset < 0 || offset >= size) ? 1 : 0;
    }

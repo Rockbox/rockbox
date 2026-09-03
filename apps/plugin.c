@@ -430,7 +430,7 @@ static const struct plugin_api rockbox_api = {
     FS_PREFIX(remove),
     FS_PREFIX(rename),
     FS_PREFIX(ftruncate),
-    FS_PREFIX(filesize),
+    FS_PREFIX(ffilesize),
     fdprintf,
     read_line,
     settings_parseline,
@@ -460,7 +460,7 @@ static const struct plugin_api rockbox_api = {
     FS_PREFIX(mkdir),
     FS_PREFIX(rmdir),
     FS_PREFIX(dir_exists),
-    dir_get_info,
+    FS_PREFIX(dir_get_info),
 
     /* browsing */
     rockbox_browse,

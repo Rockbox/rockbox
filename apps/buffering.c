@@ -982,7 +982,7 @@ int bufopen(const char *file, off_t offset, enum data_type type,
 #endif /* HAVE_ALBUMART */
 
     if (size == 0)
-        size = filesize(fd);
+        size = ffilesize(fd);
 
     unsigned int hflags = 0;
     if (type == TYPE_PACKET_AUDIO || type == TYPE_CODEC)

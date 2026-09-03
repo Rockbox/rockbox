@@ -72,7 +72,7 @@ bool get_aac_metadata(int fd, struct mp3entry *entry)
     entry->id3v1len = 0;
     entry->id3v2len = getid3v2len(fd);
     entry->first_frame_offset = entry->id3v2len;
-    entry->filesize = filesize(fd) - entry->first_frame_offset;
+    entry->filesize = ffilesize(fd) - entry->first_frame_offset;
     entry->needs_upsampling_correction = false;
 
     if (entry->id3v2len)

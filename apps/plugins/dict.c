@@ -102,7 +102,7 @@ enum plugin_status plugin_start(const void* parameter)
         return PLUGIN_ERROR;
     }
 
-    filesize = rb->filesize(fIndex); /* get filesize */
+    filesize = rb->ffilesize(fIndex); /* get filesize */
 
     DEBUGF("Filesize: %d bytes = %d words \n", filesize,
            (filesize / (int)sizeof(struct stWord)));

@@ -53,7 +53,7 @@ static int load_firmware_filename(unsigned char* buf,
     if (fd < 0)
         return EFILE_NOT_FOUND;
 
-    len = filesize(fd) - 8;
+    len = ffilesize(fd) - 8;
 
     if (len > buffer_size)
     {

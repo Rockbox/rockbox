@@ -200,7 +200,7 @@ static size_t file_open(const char *filename, int *fd)
         *fd = rb->open(filename, O_RDONLY);
         if (*fd >= 0)
         {
-            fsize = rb->filesize(*fd);
+            fsize = rb->ffilesize(*fd);
         }
     }
     return fsize;

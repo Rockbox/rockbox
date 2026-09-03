@@ -63,7 +63,7 @@ ssize_t console_write(int fildes, const void *buf, size_t nbyte);
 int     console_remove(const char *path);
 int     console_rename(const char *old, const char *new);
 int     console_modtime(const char *path, time_t modtime);
-off_t   console_filesize(int fildes);
+off_t   console_ffilesize(int fildes);
 int     console_fsamefile(int fildes1, int fildes2);
 int     console_relate(const char *path1, const char *path2);
 bool    console_file_exists(const char *path);
@@ -109,6 +109,9 @@ int    console_mkdir(const char *path);
 int    console_rmdir(const char *path);
 int    console_samedir(DIR *dirp1, DIR *dirp2);
 bool   console_dir_exists(const char *dirname);
+
+struct dirinfo console_dir_get_info(DIR *dirp, struct dirent *entry);
+const char* console_root_realpath(void);
 #endif /* !DIRFUNCTIONS_DECLARED */
 
 #endif /* _FILESYSTEM_CONSOLE__DIR_H_ */

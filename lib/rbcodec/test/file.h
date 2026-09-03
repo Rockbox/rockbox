@@ -3,4 +3,4 @@
 #include <unistd.h>
 #include <fcntl.h>
 
-off_t filesize(int fd);
+off_t ffilesize(int fd);

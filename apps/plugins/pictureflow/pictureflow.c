@@ -1584,7 +1584,7 @@ static int load_album_index(void){
     int album_idx, artist_idx;
 
     if (fr >= 0){
-        const unsigned long filesize = rb->filesize(fr);
+        const unsigned long filesize = rb->ffilesize(fr);
         if (filesize > sizeof(data))
         {
             if (rb->read(fr, &data, sizeof(data)) == sizeof(data) &&

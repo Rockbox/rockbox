@@ -50,7 +50,7 @@
 #endif
 
 /* filesize */
-off_t filesize(int fd);
+off_t ffilesize(int fd);
 
 /* snprintf */
 #include <stdio.h>

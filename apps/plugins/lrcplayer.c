@@ -1944,7 +1944,7 @@ static void save_changes(void)
             rb->write(fd, BOM, BOM_SIZE);
         }
         else
-            size = rb->filesize(fe);
+            size = rb->ffilesize(fe);
         while (curr < size)
         {
             /* find offset of next tag */

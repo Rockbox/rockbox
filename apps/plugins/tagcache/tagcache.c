@@ -54,7 +54,7 @@ static bool logdump(bool append);
 
 #define vsnprintf    rb->vsnprintf
 #define mkdir        rb->mkdir
-#define filesize     rb->filesize
+#define ffilesize    rb->ffilesize
 
 #define strtok_r     rb->strtok_r
 #define strncasecmp  rb->strncasecmp

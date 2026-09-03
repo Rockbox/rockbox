@@ -68,7 +68,7 @@ ssize_t sim_write(int fildes, const void *buf, size_t nbyte);
 int     sim_remove(const char *path);
 int     sim_rename(const char *old, const char *new);
 int     sim_modtime(const char *path, time_t modtime);
-off_t   sim_filesize(int fildes);
+off_t   sim_ffilesize(int fildes);
 int     sim_fsamefile(int fildes1, int fildes2);
 int     sim_relate(const char *path1, const char *path2);
 bool    sim_file_exists(const char *path);
@@ -102,6 +102,9 @@ int   sim_mkdir(const char *path);
 int   sim_rmdir(const char *path);
 int   sim_samedir(DIR *dirp1, DIR *dirp2);
 bool  sim_dir_exists(const char *dirname);
+
+struct dirinfo sim_dir_get_info(DIR *dirp, struct sim_dirent *entry);
+const char* sim_root_realpath(void);
 #endif /* !DIRFUNCTIONS_DECLARED */
 
 #endif /* _FILESYSTEM_SIM_H__DIR_H_ */

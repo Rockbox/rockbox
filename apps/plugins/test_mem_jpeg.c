@@ -66,7 +66,7 @@ enum plugin_status plugin_start(const void* parameter)
     int fd = rb->open(filename, O_RDONLY);
     if (fd < 0)
         return PLUGIN_ERROR;
-    unsigned long filesize = rb->filesize(fd);
+    unsigned long filesize = rb->ffilesize(fd);
     if (filesize > plugin_buf_len)
         return PLUGIN_ERROR;
     plugin_buf_len -= filesize;

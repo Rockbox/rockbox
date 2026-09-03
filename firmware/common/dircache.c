@@ -3060,7 +3060,7 @@ int INIT_ATTR dircache_load(void)
     if (maindata.dircache.size !=
             maindata.dircache.sizeentries + maindata.dircache.sizenames ||
         ALIGN_DOWN(maindata.dircache.size, ENTRYSIZE) != maindata.dircache.size ||
-        filesize(fd) - sizeof (maindata) != maindata.dircache.size)
+        ffilesize(fd) - sizeof (maindata) != maindata.dircache.size)
     {
         logf("dircache: file header error");
         goto error_nolock;

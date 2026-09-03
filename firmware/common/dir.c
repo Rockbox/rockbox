@@ -104,7 +104,7 @@ static struct dirstr_desc * alloc_dirstr(void)
 /** POSIX interface **/
 
 /* open a directory */
-DIR * opendir(const char *dirname)
+DIR * rbfs_opendir(const char *dirname)
 {
     DEBUGF("opendir(dirname=\"%s\"\n", dirname);
 
@@ -132,7 +132,7 @@ file_error:
 }
 
 /* close a directory stream */
-int closedir(DIR *dirp)
+int rbfs_closedir(DIR *dirp)
 {
     int rc;
 
@@ -159,7 +159,7 @@ file_error:
 }
 
 /* read a directory */
-struct dirent * readdir(DIR *dirp)
+struct dirent * rbfs_readdir(DIR *dirp)
 {
     struct dirstr_desc * const dir = GET_DIRSTR(READER, dirp);
     if (!dir)
@@ -184,7 +184,7 @@ file_error:
 
 #if 0 /* not included now but probably should be */
 /* read a directory (reentrant) */
-int readdir_r(DIR *dirp, struct dirent *entry, struct dirent **result)
+int rbfs_readdir_r(DIR *dirp, struct dirent *entry, struct dirent **result)
 {
     if (!result)
         FILE_ERROR_RETURN(EFAULT, -2);
@@ -218,7 +218,7 @@ file_error:
 }
 
 /* reset the position of a directory stream to the beginning of a directory */
-void rewinddir(DIR *dirp)
+void rbfs_rewinddir(DIR *dirp)
 {
     struct dirstr_desc * const dir = GET_DIRSTR(READER, dirp);
     if (!dir)
@@ -232,7 +232,7 @@ void rewinddir(DIR *dirp)
 #endif /* 0 */
 
 /* make a directory */
-int mkdir(const char *path)
+int rbfs_mkdir(const char *path)
 {
     DEBUGF("mkdir(path=\"%s\")\n", path);
 
@@ -269,7 +269,7 @@ file_error:
 }
 
 /* remove a directory */
-int rmdir(const char *name)
+int rbfs_rmdir(const char *name)
 {
     DEBUGF("rmdir(name=\"%s\")\n", name);
 
@@ -295,7 +295,7 @@ int rmdir(const char *name)
 /** Extended interface **/
 
 /* return if two directory streams refer to the same directory */
-int samedir(DIR *dirp1, DIR *dirp2)
+int rbfs_samedir(DIR *dirp1, DIR *dirp2)
 {
     struct dirstr_desc * const dir1 = GET_DIRSTR(WRITER, dirp1);
     if (!dir1)
@@ -312,7 +312,7 @@ int samedir(DIR *dirp1, DIR *dirp2)
 }
 
 /* test directory existence (returns 'false' if a file) */
-bool dir_exists(const char *dirname)
+bool rbfs_dir_exists(const char *dirname)
 {
     file_internal_lock_WRITER();
     bool rc = test_stream_exists_internal(dirname, FF_DIR) > 0;
@@ -321,7 +321,7 @@ bool dir_exists(const char *dirname)
 }
 
 /* get the portable info from the native entry */
-struct dirinfo dir_get_info(DIR *dirp, struct dirent *entry)
+struct dirinfo rbfs_dir_get_info(DIR *dirp, struct dirent *entry)
 {
     int rc;
     if (!dirp || !entry)
@@ -344,7 +344,7 @@ file_error:
     return (struct dirinfo){ .attribute = 0 };
 }
 
-const char* root_realpath(void)
+const char* rbfs_root_realpath(void)
 {
     /* Native only, for APP and SIM see respective filesystem-.c files */
     return root_get_realpath(); /* rb_namespace.c */

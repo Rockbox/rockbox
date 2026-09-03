@@ -413,7 +413,7 @@ enum plugin_status plugin_start(const void* parameter)
         if (c && !rb->strcmp(c, ".colours"))
             edit_colors_file = true;
 #endif
-        if (buffer_size <= (size_t)rb->filesize(fd) + 0x400)
+        if (buffer_size <= (size_t)rb->ffilesize(fd) + 0x400)
         {
             buffer = rb->plugin_get_audio_buffer(&buffer_size);
             audio_buf = true;

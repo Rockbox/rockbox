@@ -60,7 +60,7 @@ void * lc_open(const char *filename, unsigned char *buf, size_t buf_size)
     /* hdr.end_addr points to the end of the bss section,
      * but there might be idata/icode behind that so the bytes to copy
      * can be larger */
-    copy_size = MAX(filesize(fd), hdr.end_addr - hdr.load_addr);
+    copy_size = MAX(ffilesize(fd), hdr.end_addr - hdr.load_addr);
 
     if (hdr.load_addr < buf || (hdr.load_addr+copy_size) > buf_end)
     {

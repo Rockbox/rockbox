@@ -467,7 +467,7 @@ int sim_ftruncate(int fildes, off_t length)
     if (!filestr)
         return -1;
 
-    off_t size = os_filesize(filestr->osfd);
+    off_t size = os_ffilesize(filestr->osfd);
     if (size < 0)
         return -1;
 
@@ -582,13 +582,13 @@ int sim_modtime(const char *path, time_t modtime)
     return os_modtime(ospath, modtime);
 }
 
-off_t sim_filesize(int fildes)
+off_t sim_ffilesize(int fildes)
 {
     struct filestr_desc *filestr = get_filestr(fildes);
     if (!filestr)
         return -1;
 
-    return os_filesize(filestr->osfd);
+    return os_ffilesize(filestr->osfd);
 }
 
 int sim_fsamefile(int fildes1, int fildes2)
@@ -764,7 +764,7 @@ bool sim_dir_exists(const char *dirname)
     return true;
 }
 
-struct dirinfo dir_get_info(DIR *dirp, struct sim_dirent *entry)
+struct dirinfo sim_dir_get_info(DIR *dirp, struct sim_dirent *entry)
 {
     int rc;
     struct dirstr_desc *dirstr = get_dirstr(dirp);

@@ -102,7 +102,7 @@ bool get_vtx_metadata(int fd, struct mp3entry* id3)
     if (lseek(fd, 0, SEEK_SET) < 0)
         goto exit_bad;
 
-    if (filesize(fd) < 20)
+    if (ffilesize(fd) < 20)
         goto exit_bad;
 
     uint hdr = Reader_ReadWord(fd);
@@ -142,7 +142,7 @@ bool get_vtx_metadata(int fd, struct mp3entry* id3)
     id3->bitrate = 706;
     id3->frequency = 44100; // XXX allow this to be configured?
 
-    id3->filesize = filesize(fd);
+    id3->filesize = ffilesize(fd);
     id3->length = info.frames * 1000 / info.playerfreq;
 
     return true;

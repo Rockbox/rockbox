@@ -69,7 +69,7 @@ bool get_adx_metadata(int fd, struct mp3entry* id3)
     id3->bitrate = id3->frequency * channels * 18 * 8 / 32 / 1000;
     id3->length = get_long_be(&buf[12]) / id3->frequency * 1000;
     id3->vbr = false;
-    id3->filesize = filesize(fd);
+    id3->filesize = ffilesize(fd);
     
     /* get loop info */
     if (!memcmp(buf+0x10,"\x01\xF4\x03",3)) {

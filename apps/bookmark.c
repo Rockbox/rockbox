@@ -692,7 +692,7 @@ static int buffer_bookmarks(struct bookmark_list* bookmarks, int first_line)
         return -1;
     }
 
-    if ((first_line != 0) && ((size_t) filesize(file) < bookmarks->buffer_size
+    if ((first_line != 0) && ((size_t) ffilesize(file) < bookmarks->buffer_size
             - sizeof(*bookmarks) - (sizeof(char*) * bookmarks->total_count)))
     {
         /* Entire file fits in buffer */

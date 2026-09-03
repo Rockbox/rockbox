@@ -91,11 +91,11 @@ bool get_mod_metadata(int fd, struct mp3entry* id3)
         return false;
 
     id3->title = id3->id3v2buf; /* Point title to previous read ID3 buffer. */
-    id3->bitrate = filesize(fd)/1024; /* size in kb */
     id3->frequency = 44100;
     id3->length = 120*1000;
     id3->vbr = false;
-    id3->filesize = filesize(fd);
+    id3->filesize = ffilesize(fd);
+    id3->bitrate = id3->filesize / 1024; /* size in kb */
         
     return true;
 }

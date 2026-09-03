@@ -290,7 +290,7 @@ void wps_playlist_percent_prepare(void)
         if (fd >= 0)
         {
             unsigned int afmt = probe_file_format(info.filename);
-            off_t size = filesize(fd);
+            off_t size = ffilesize(fd);
 
             if (size > 0)
             {

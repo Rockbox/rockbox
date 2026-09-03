@@ -127,7 +127,7 @@ int M_ReadFile(char const* name,byte** buffer)
    if ((handle < 0))
       I_Error ("M_ReadFile: Couldn't read file %s", name);
 
-   length = filesize(handle);
+   length = ffilesize(handle);
    buf = Z_Malloc (length, PU_STATIC, NULL);
    count = read (handle, buf, length);
    close (handle);

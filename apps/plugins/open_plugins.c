@@ -191,7 +191,7 @@ static int op_entry_read_opx(const char *path)
         fd_opx = rb->open(path, O_RDONLY);
         if (fd_opx >= 0)
         {
-            filesize = rb->filesize(fd_opx);
+            filesize = rb->ffilesize(fd_opx);
             ret = filesize;
             if (filesize == op_entry_sz && !op_entry_read(fd_opx, 0, op_entry_sz))
                 ret = 0;

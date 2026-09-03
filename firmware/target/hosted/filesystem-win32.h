@@ -49,12 +49,12 @@ size_t strlcpy_utf16utf8(char *buffer, const unsigned short *utf16,
 
 #ifndef OSFUNCTIONS_DECLARED
 /* Wrap for off_t <=> long conversions */
-static inline off_t os_filesize_(int osfd)
+static inline off_t os_ffilesize_(int osfd)
     { return _filelength(osfd); }
 static inline int os_ftruncate_(int osfd, off_t length)
     { return _chsize(osfd, length); }
 
-#define os_filesize     os_filesize_
+#define os_ffilesize    os_ffilesize_
 #define os_ftruncate    os_ftruncate_
 #define os_fsync        _commit
 #define os_fstat        _fstat

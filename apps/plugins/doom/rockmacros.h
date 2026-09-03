@@ -52,7 +52,7 @@ int my_close(int id);
 #endif
 
 #define lseek(a,b,c)       rb->lseek((a),(b),(c))
-#define filesize(a)        rb->filesize((a))
+#define ffilesize(a)       rb->ffilesize((a))
 #define read(a,b,c)        rb->read((a),(b),(c))
 #define write(a,b,c)       rb->write((a),(b),(c))
 #undef  strtok

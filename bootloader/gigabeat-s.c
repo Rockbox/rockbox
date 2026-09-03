@@ -151,7 +151,7 @@ static void untar(int tar_fd)
     char path[102];
     int fd, i;
     int ret;
-    size_t size = filesize(tar_fd);
+    size_t size = ffilesize(tar_fd);
 
     if (size > tarbuf_size)
     {
@@ -159,7 +159,7 @@ static void untar(int tar_fd)
         return;
     }
 
-    ret = read(tar_fd, tarbuf, filesize(tar_fd));
+    ret = read(tar_fd, tarbuf, ffilesize(tar_fd));
     if (ret < 0)
     {
         printf("couldn't read tar file (%d)", ret);

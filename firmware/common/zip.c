@@ -524,7 +524,7 @@ static off_t zip_file_seek(struct zip* zh, off_t offset, int whence) {
 static off_t zip_file_size(struct zip* zh) {
     struct zip_file* z = (struct zip_file*) zh;
 
-    return filesize(z->file);
+    return ffilesize(z->file);
 }
 
 static void zip_file_close(struct zip* zh) {
@@ -721,7 +721,7 @@ struct zip* zip_open(const char* name, bool try_mem) {
     if ((file = open(name, O_RDONLY)) < 0)
         goto bail;
 
-    if (try_mem && (mem_handle = zip_core_alloc(mem_size = filesize(file))) >= 0) {
+    if (try_mem && (mem_handle = zip_core_alloc(mem_size = ffilesize(file))) >= 0) {
         if ((zip_handle = zip_core_alloc(sizeof(struct zip_mem))) < 0)
             goto bail;
 

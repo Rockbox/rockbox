@@ -305,7 +305,7 @@ static bool read_header(int fd, struct mp3entry* id3, const unsigned char *chunk
     memset(&fmt, 0, sizeof(struct wave_fmt));
  
     id3->vbr = false;   /* All Wave/Wave64 files are CBR */
-    id3->filesize = filesize(fd);
+    id3->filesize = ffilesize(fd);
 
     /* get RIFF chunk header */
     lseek(fd, 0, SEEK_SET);

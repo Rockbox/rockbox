@@ -266,7 +266,7 @@ static inline int rm_parse_header(int fd, RMContext *rmctx, struct mp3entry *id3
             rmctx->data_offset = skipped + 8;
             rmctx->bit_rate = rmctx->block_align * rmctx->sample_rate / 192;
             if (rmctx->block_align)
-                rmctx->nb_packets = (filesize(fd) - rmctx->data_offset) / rmctx->block_align;
+                rmctx->nb_packets = (ffilesize(fd) - rmctx->data_offset) / rmctx->block_align;
             if (rmctx->sample_rate)
                 rmctx->duration = (uint32_t)(256LL * 6 * 1000 * rmctx->nb_packets / rmctx->sample_rate);
             rmctx->flags |= RM_RAW_DATASTREAM;
@@ -504,6 +504,6 @@ bool get_rm_metadata(int fd, struct mp3entry* id3)
     id3->bitrate = (rmctx->bit_rate + 500) / 1000;
     id3->frequency = rmctx->sample_rate;
     id3->length = rmctx->duration;
-    id3->filesize = filesize(fd);
+    id3->filesize = ffilesize(fd);
     return true;
 }

@@ -133,7 +133,7 @@ static int load_image(char *filename, struct image_info *info,
     }
     else
     {
-        filesize = rb->filesize(fd);
+        filesize = rb->ffilesize(fd);
     }
 
     /* allocate JPEG buffer */

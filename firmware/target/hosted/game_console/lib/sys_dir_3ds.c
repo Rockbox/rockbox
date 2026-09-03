@@ -390,7 +390,7 @@ file_error:
 }
 
 /* get the portable info from the native entry */
-struct dirinfo dir_get_info(DIR *dirp, struct dirent *entry)
+struct dirinfo console_dir_get_info(DIR *dirp, struct dirent *entry)
 {
     int rc;
     if (!dirp || !entry)

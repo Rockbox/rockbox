@@ -325,7 +325,7 @@ file_error:
 /** Extensions **/
 
 /* get the binary size of a file (in bytes) */
-off_t console_filesize(int fildes)
+off_t console_ffilesize(int fildes)
 {
     struct filestr_desc * const file = GET_FILESTR(READER, fildes);
     if (!file)

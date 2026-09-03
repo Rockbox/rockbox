@@ -906,7 +906,7 @@ static int wave_open(void)
      (cfg.samplerate != 44100) && (cfg.samplerate != 48000))    return -9;
 
   header_size = 0x28;
-  wav_size = rb->filesize(wavfile);
+  wav_size = rb->ffilesize(wavfile);
   rb->lseek(wavfile, header_size, SEEK_SET);
 
   return 0;

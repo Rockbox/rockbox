@@ -87,7 +87,7 @@ static int W_Filelength(int handle)
        I_Error("W_Filelength: Error fstating");
      return fileinfo.st_size;
    */
-   return filesize(handle);
+   return ffilesize(handle);
 }
 
 void ExtractFileBase (const char *path, char *dest)

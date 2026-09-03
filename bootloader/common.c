@@ -153,7 +153,7 @@ int load_raw_firmware(unsigned char* buf, char* firmware, int buffer_size)
         return EFILE_NOT_FOUND;
     }
 
-    len = filesize(fd);
+    len = ffilesize(fd);
 
     if (len > buffer_size)
         return EFILE_TOO_BIG;

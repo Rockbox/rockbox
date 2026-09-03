@@ -823,7 +823,7 @@ bool get_mp4_metadata(int fd, struct mp3entry* id3)
     id3->filesize = 0;
     errno = 0;
 
-    if (read_mp4_container(fd, id3, filesize(fd)) && (errno == 0)
+    if (read_mp4_container(fd, id3, ffilesize(fd)) && (errno == 0)
         && (id3->samples > 0) && (id3->frequency > 0)
         && (id3->filesize > 0))
     {

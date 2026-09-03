@@ -65,6 +65,9 @@
 #ifndef dir_exists
 #define dir_exists      FS_PREFIX(dir_exists)
 #endif
+#ifndef dir_get_info
+#define dir_get_info    FS_PREFIX(dir_get_info)
+#endif
 #ifndef root_realpath
 #define root_realpath      FS_PREFIX(root_realpath)
 #endif
@@ -84,13 +87,5 @@ struct dirinfo
     off_t        size;      /* binary size of file */
     time_t       mtime;     /* local file time */
 };
-
-#ifndef DIRFUNCTIONS_DECLARED
-/* TIP: set errno to zero before calling to see if anything failed */
-struct dirinfo dir_get_info(DIR *dirp, struct DIRENT *entry);
-const char* root_realpath(void);
-#endif /* !DIRFUNCTIONS_DECLARED */
-
-
 
 #endif /* _DIR_H_ */

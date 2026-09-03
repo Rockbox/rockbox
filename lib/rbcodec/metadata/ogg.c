@@ -133,7 +133,7 @@ bool get_ogg_metadata(int fd, struct mp3entry* id3)
             return false;
     }
 
-    id3->filesize = filesize(fd);
+    id3->filesize = ffilesize(fd);
     
     /* We need to ensure the serial number from this page is the same as the
      * one from the last page (since we only support a single bitstream).

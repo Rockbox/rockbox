@@ -117,7 +117,7 @@ static enum settings_file_status clock_settings_load(
     if(fd >= 0)
     {
         /* basic consistency check */
-        if(rb->filesize(fd) != sizeof(*settings))
+        if(rb->ffilesize(fd) != sizeof(*settings))
             rb->close(fd);
         else
         {

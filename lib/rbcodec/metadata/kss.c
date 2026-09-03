@@ -40,7 +40,7 @@ bool get_kss_metadata(int fd, struct mp3entry* id3)
         return false;
 
     id3->vbr = false;
-    id3->filesize = filesize(fd);
+    id3->filesize = ffilesize(fd);
     /* we only render 16 bits, 44.1KHz, Stereo */
     id3->bitrate = 706;
     id3->frequency = 44100;

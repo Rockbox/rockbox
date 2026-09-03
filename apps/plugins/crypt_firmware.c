@@ -150,7 +150,7 @@ enum plugin_status plugin_start(const void* parameter)
         return PLUGIN_ERROR;
     }
 
-    length = rb->filesize(fd);
+    length = rb->ffilesize(fd);
 
     if (length < 12) {
         rb->splash(HZ*2, "File too small");

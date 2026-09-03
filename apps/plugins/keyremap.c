@@ -374,7 +374,7 @@ static int keyremap_open_file(const char *filename, int *fd, size_t *fsize)
         *fd = rb->open(filename, O_RDONLY);
         if (*fd)
         {
-            *fsize = rb->filesize(*fd);
+            *fsize = rb->ffilesize(*fd);
 
             count = *fsize / sizeof(struct button_mapping);
 

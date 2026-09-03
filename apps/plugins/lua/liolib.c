@@ -267,7 +267,7 @@ static int read_number (lua_State *L, int *f) {
 static int test_eof (lua_State *L, int *f) {
   off_t s = lseek(*f, 0, SEEK_CUR);
   lua_pushlstring(L, NULL, 0);
-  return s < filesize(*f);
+  return s < ffilesize(*f);
 }
 
 
