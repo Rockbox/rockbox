@@ -66,7 +66,6 @@ Example
     All fields except those marked (optional) above are required.
 */
 
-#include "rbversion.h"
 #include "plugin.h"
 #include "lib/configfile.h"
 
