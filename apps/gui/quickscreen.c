@@ -71,7 +71,6 @@ static void quickscreen_fix_viewports(struct quickscreen *qs, enum screen_type s
     int line_height, width, pad = 0;
     int left_width = 0, right_width = 0;
     unsigned char *str;
-    struct screen *display = &screens[screen];
     struct viewport *parent = &qs->parent[screen];
     struct viewport *vps = qs->vps[screen];
     struct viewport *vp_icons = &qs->vp_icons[screen];
@@ -113,12 +112,12 @@ static void quickscreen_fix_viewports(struct quickscreen *qs, enum screen_type s
     if (qs->items[QUICKSCREEN_LEFT])
     {
         str = P2STR(ID2P(qs->items[QUICKSCREEN_LEFT]->lang_id));
-        left_width = display->getstringsize(str, NULL, NULL);
+        left_width = font_getstringsize(str, NULL, NULL, parent->font);
     }
     if (qs->items[QUICKSCREEN_RIGHT])
     {
         str = P2STR(ID2P(qs->items[QUICKSCREEN_RIGHT]->lang_id));
-        right_width = display->getstringsize(str, NULL, NULL);
+        right_width = font_getstringsize(str, NULL, NULL, parent->font);
     }
 
     width = MAX(left_width, right_width);
