@@ -25,6 +25,7 @@
 
 /* this includes a couple of 3ds headers */
 #include "bfile.h"
+#include "sys_timer.h"
 
 #include <3ds/types.h>
 #include <3ds/allocator/linear.h>

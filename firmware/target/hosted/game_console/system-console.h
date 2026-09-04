@@ -17,16 +17,10 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef _SYSTEM_SDL_H_
-#define _SYSTEM_SDL_H_
+#ifndef _SYSTEM_CONSOLE_H_
+#define _SYSTEM_CONSOLE_H_
 
 #include <stdbool.h>
-#include <stdbool.h>
-
-#include "sys_timer.h"
-#ifdef BIT
-#undef BIT
-#endif
 
 #include "config.h"
 #include "gcc_extensions.h"
@@ -57,7 +51,7 @@ void sim_kernel_shutdown(void);
 void sys_handle_argv(int argc, char *argv[]);
 void gui_message_loop(void);
 void sim_do_exit(void) NORETURN_ATTR;
-void sdl_sys_quit(void);
+void console_sys_quit(void);
 
 void mcuhwc_init(void);
 void mcuhwc_close(void);
@@ -67,4 +61,4 @@ extern bool showremote;
 extern double display_zoom;
 extern long start_tick;
 
-#endif /* _SYSTEM_SDL_H_ */
+#endif /* _SYSTEM_CONSOLE_H_ */

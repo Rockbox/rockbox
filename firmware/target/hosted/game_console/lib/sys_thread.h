@@ -21,7 +21,6 @@
 #ifndef __SYSTHREAD_H__
 #define __SYSTHREAD_H__
 
-#include "sys_types.h"
 #include "sys_atomic.h"
 
 #include "thread.h"

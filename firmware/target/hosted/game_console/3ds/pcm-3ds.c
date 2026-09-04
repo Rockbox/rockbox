@@ -33,6 +33,9 @@
 #include <3ds/synchronization.h>
 #include <3ds/allocator/linear.h>
 
+#include "sys_atomic.h"
+#include "sys_thread.h"
+
 #include "config.h"
 #include "debug.h"
 #include "sound.h"
