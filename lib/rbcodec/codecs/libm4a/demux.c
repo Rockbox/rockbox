@@ -478,7 +478,11 @@ static bool read_chunk_stco(qtmovie_t *qtmovie, size_t chunk_len)
         else
         {
             // we failed to alloc memory for lookup table, so reduce seek accuracy and try again
-            fit_numentries = numentries / accuracy_divider;
+            /* Entries 0, divider, 2*divider, ... require a ceiling divide.
+             * The old floor allocation overran by one entry whenever the
+             * chunk count was not evenly divisible. */
+            fit_numentries =
+                (numentries + accuracy_divider - 1) / accuracy_divider;
         }
     }
     DEBUGF("lookup_table numentries %d, fit_numentries %ld\n", numentries, fit_numentries);
@@ -638,18 +642,26 @@ static bool read_chunk_minf(qtmovie_t *qtmovie, size_t chunk_len)
     size_t size_remaining = chunk_len - 8;
     uint32_t i;
 
-    /* Check for smhd, only kind of minf we care about */
-
-    if ((i = stream_read_uint32(qtmovie->stream)) != 16)
+    /* Check for smhd, the only kind of minf we care about. MP4 video files
+     * normally put a video trak before the AAC trak. Older Rockbox code
+     * treated that vmhd as fatal, which made aac.codec unable to decode the
+     * audio from an otherwise ordinary .mp4/.m4v. Skip a non-audio minf and
+     * continue looking for the sound track. */
+    i = stream_read_uint32(qtmovie->stream);
+    if (i < 8 || i > size_remaining)
     {
         DEBUGF("unexpected size in media info: %ld\n", (long)i);
-        stream_skip(qtmovie->stream, size_remaining-4);
-        return true;
+        return false;
     }
 
     if (stream_read_uint32(qtmovie->stream) != MAKEFOURCC('s','m','h','d'))
     {
-        DEBUGF("not a sound header! can't handle this.\n");
+        stream_skip(qtmovie->stream, size_remaining - 8);
+        return true;
+    }
+    if (i != 16)
+    {
+        DEBUGF("unexpected sound header size: %ld\n", (long)i);
         return false;
     }
 
