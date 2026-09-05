@@ -183,6 +183,9 @@ option from the \setting{Context Menu} (see \reference{ref:Contextmenu}).}
                           & \fname{.uni, .umx, .xm}         &   \\
         MPEG Player       & \fname{.mpg, .mpeg, .mpv, .m2v}  &   \\
     }
+    \opt{HAVE_HW_H264}{
+        H.264 Player      & \fname{.mp4, .m4v, .mov}          &   \\
+    }
         MP3 Encoder       & \fname{.wav}                     & x \\
         Rockboy       & \fname{.gb, .gbc}                &   \\
     Search                & \fname{.m3u, .m3u8}              & x \\
@@ -210,6 +213,8 @@ option from the \setting{Context Menu} (see \reference{ref:Contextmenu}).}
 \nopt{lowmem}{\input{plugins/mikmod.tex}}
 
 \nopt{lowmem}{\input{plugins/mpegplayer.tex}}
+
+\opt{HAVE_HW_H264}{\input{plugins/h264_player.tex}}
 
 \input{plugins/mp3_encoder.tex}
 

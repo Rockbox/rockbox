@@ -1680,6 +1680,10 @@ target/arm/s5l8702/ipod6g/adc-6g.c
 target/arm/s5l8702/ipod6g/powermgmt-6g.c
 target/arm/s5l8702/ipod6g/power-6g.c
 target/arm/s5l8702/ipod6g/storage_ata-6g.c
+#if defined(HAVE_HW_H264) && !defined(BOOTLOADER)
+target/arm/s5l8702/ipod6g/vpu-6g.c
+target/arm/s5l8702/ipod6g/vpu-h264-6g.c
+#endif
 #if (CONFIG_RTC == RTC_NANO2G)
 target/arm/s5l8702/ipod6g/rtc-6g.c
 #endif

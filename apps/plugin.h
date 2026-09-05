@@ -83,6 +83,9 @@ int plugin_open(const char *plugin, const char *parameter);
 #include "metadata.h"
 #include "sound.h"
 #include "audio.h"
+#ifdef HAVE_HW_H264
+#include "hw_h264.h"
+#endif
 #include "voice_thread.h"
 #include "root_menu.h"
 #include "talk.h"
@@ -179,7 +182,7 @@ int plugin_open(const char *plugin, const char *parameter);
  * when this happens please take the opportunity to sort in
  * any new functions "waiting" at the end of the list.
  */
-#define PLUGIN_API_VERSION 284
+#define PLUGIN_API_VERSION 285
 
 /* 239 Marks the removal of ARCHOS HWCODEC and CHARCELL */
 
@@ -1045,6 +1048,9 @@ struct plugin_api {
     int (*gesture_flick_get_in_vp)(const struct gesture_event *gevt,
                                    const struct viewport *vp);
     int (*gesture_flick_get)(const struct gesture_event *gevt);
+#endif
+#ifdef HAVE_HW_H264
+    const struct hw_h264_api *hw_h264;
 #endif
 };
 

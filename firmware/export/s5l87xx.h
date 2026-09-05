@@ -1643,6 +1643,28 @@ The following peripherals are not present in the Samsung S5L8700 datasheet.
 Information for them was gathered solely by reverse-engineering Apple's firmware.
 */
 
+/* VPU-B H.264 decoder - S5L8702 */
+#if CONFIG_CPU == S5L8702
+#define VPU_MODE        (*((REG32_PTR_T)(0x38100314)))
+#define VPU_BASE        0x39800000
+#define VPU_REG(off)    (*((REG32_PTR_T)(VPU_BASE + (off))))
+
+#define VPU_DPB_Y(i)    VPU_REG((i) * 12)
+#define VPU_DPB_CB(i)   VPU_REG((i) * 12 + 4)
+#define VPU_DPB_CR(i)   VPU_REG((i) * 12 + 8)
+#define VPU_OUT_Y       VPU_REG(0x0cc)
+#define VPU_OUT_CB      VPU_REG(0x0d0)
+#define VPU_OUT_CR      VPU_REG(0x0d4)
+#define VPU_CTRL_BUF    VPU_REG(0x0d8)
+#define VPU_SLICE_DESC  VPU_REG(0x0dc)
+#define VPU_DIMS        VPU_REG(0x0e0)
+#define VPU_STRIDES     VPU_REG(0x0e4)
+#define VPU_CTRL        VPU_REG(0x0e8)
+#define VPU_STATUS0     VPU_REG(0x0f0)
+#define VPU_STATUS1     VPU_REG(0x0f4)
+#define VPU_CONFIG      VPU_REG(0x118)
+#endif
+
 /* Hardware AES crypto unit - S5L8701+ */
 #if CONFIG_CPU==S5L8701
 #define AES_BASE 0x39800000

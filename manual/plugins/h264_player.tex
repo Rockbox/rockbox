@@ -1,0 +1,26 @@
+\subsection{H.264 Player}
+
+The H.264 Player uses a supported player's hardware video decoder to play
+H.264 video from \fname{.mp4}, \fname{.m4v}, and \fname{.mov} files. It
+supports H.264 Baseline Profile through level 3.0 at resolutions up to
+640x480. AAC-LC audio is supported.
+
+Select a supported file in the Rockbox \setting{File Browser} to start
+playback. Playback resumes from the last saved position unless the previous
+playback reached the end or the final five percent of the file.
+
+\begin{btnmap}
+    \ActionWpsPlay
+    & Pause / Resume\\
+    \ActionWpsVolUp{} / \ActionWpsVolDown
+    & Adjust volume up / down\\
+    \ActionWpsSkipPrev{} / \ActionWpsSkipNext
+    & Seek backward / forward by 10 seconds\\
+    \ActionWpsMenu
+    & Open the H.264 Player menu\\
+    \ActionWpsStop
+    & Exit the player\\
+\end{btnmap}
+
+The player menu can resume playback or exit the player. A resume point is
+saved when playback is stopped before the final five percent of the file.

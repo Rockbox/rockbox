@@ -58,6 +58,11 @@
 /* define this to enable JPEG decoding */
 #define HAVE_JPEG
 
+/* S5L8702 VPU-B hardware H.264 decoder. */
+#ifndef SIMULATOR
+#define HAVE_HW_H264
+#endif
+
 /* define this if you can invert the colours on your LCD */
 //#define HAVE_LCD_INVERT
 
