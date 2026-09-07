@@ -324,3 +324,7 @@ usbdac
 #if defined(UTF8PROC_EXPORTS)
 utf8proc
 #endif
+
+#if defined(HAVE_COMPOSITE_VIDEO_OUT)
+videoout
+#endif
