@@ -17219,12 +17219,15 @@
   desc: in settings menu
   user: core
   <source>
-    *: "Touchscreen Flick Shortcuts"
+    *: none
+    touchscreen: "Touchscreen Flick Shortcuts"
   </source>
   <dest>
-    *: "Touchscreen Flick Shortcuts"
+    *: none
+    touchscreen: "Touchscreen Flick Shortcuts"
   </dest>
   <voice>
-    *: "Touchscreen Flick Shortcuts"
+    *: none
+    touchscreen: "Touchscreen Flick Shortcuts"
   </voice>
 </phrase>
