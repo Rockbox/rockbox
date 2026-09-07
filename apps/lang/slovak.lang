@@ -17127,3 +17127,37 @@
     *: "Typ filtra"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_COMPOSITE_VIDEO_OUTPUT
+  desc: Enables composite video framebuffer mirroring on supported targets
+  user: core
+  <source>
+    *: none
+    videoout: "Composite Video Output"
+  </source>
+  <dest>
+    *: none
+    videoout: "Kompozitný video výstup"
+  </dest>
+  <voice>
+    *: none
+    videoout: "Kompozitný video výstup"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_FLICK_SHORTCUTS
+  desc: in settings menu
+  user: core
+  <source>
+    *: none
+    touchscreen: "Touchscreen Flick Shortcuts"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Skratky švihnutia na obrazovke"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Skratky švihnutia na obrazovke"
+  </voice>
+</phrase>

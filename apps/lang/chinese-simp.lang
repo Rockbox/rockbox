@@ -17134,3 +17134,37 @@
     *: "滤波器类型"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_COMPOSITE_VIDEO_OUTPUT
+  desc: Enables composite video framebuffer mirroring on supported targets
+  user: core
+  <source>
+    *: none
+    videoout: "Composite Video Output"
+  </source>
+  <dest>
+    *: none
+    videoout: "复合视频(AV)输出"
+  </dest>
+  <voice>
+    *: none
+    videoout: "复合视频输出"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_FLICK_SHORTCUTS
+  desc: in settings menu
+  user: core
+  <source>
+    *: none
+    touchscreen: "Touchscreen Flick Shortcuts"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "触控滑动快捷方式"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "触控滑动快捷方式"
+  </voice>
+</phrase>
