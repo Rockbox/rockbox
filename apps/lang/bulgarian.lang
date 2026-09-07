@@ -1009,10 +1009,10 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: "Peak Filter %d"
+    *: "Peak Filter"
   </source>
   <dest>
-    *: "Пиков филтър %d"
+    *: "Пиков филтър"
   </dest>
   <voice>
     *: "Пиков филтър"
@@ -17102,128 +17102,64 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SET_CONTEXT_ITEM
-  desc: WPS context item
+  id: LANG_EQUALIZER_BAND
+  desc: in the equalizer settings menu
   user: core
   <source>
-    *: "Set Context Item"
+    *: "Filter %d"
   </source>
   <dest>
-    *: "Избери елемент за контекст"
+    *: "Филтър %d"
   </dest>
   <voice>
-    *: "Избери елемент за контекст"
+    *: "Филтър"
   </voice>
 </phrase>
 <phrase>
-  id: LANG_FILE_NOT_FOUND
-  desc: When file does not exist
+  id: LANG_EQUALIZER_FILTER_TYPE
+  desc: in the equalizer settings menu
   user: core
   <source>
-    *: "File not found"
+    *: "Filter Type"
   </source>
   <dest>
-    *: "Не е намерен файл"
+    *: "Вид на филтъра"
   </dest>
   <voice>
-    *: "Не е намерен файл"
+    *: "Вид на филтъра"
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SHOW_IN_FILES
-  desc: Reveal item in File Browser
+  id: LANG_COMPOSITE_VIDEO_OUTPUT
+  desc: Enables composite video framebuffer mirroring on supported targets
   user: core
   <source>
-    *: "Show in Files"
+    *: none
+    videoout: "Composite Video Output"
   </source>
   <dest>
-    *: "Покажи във файлов мениджър"
+    *: none
+    videoout: "Композитен видео изход"
   </dest>
   <voice>
-    *: "Покажи във файлов мениджър"
+    *: none
+    videoout: "Композитен видео изход"
   </voice>
 </phrase>
 <phrase>
-  id: LANG_CHANNEL_SWAP
-  desc: in sound_settings
+  id: LANG_TOUCHSCREEN_FLICK_SHORTCUTS
+  desc: in settings menu
   user: core
   <source>
-    *: "Swap Left & Right"
+    *: none
+    touchscreen: "Touchscreen Flick Shortcuts"
   </source>
   <dest>
-    *: "Размяна на ляво/дясно"
+    *: none
+    touchscreen: "Преки пътища на тъчскрийн"
   </dest>
   <voice>
-    *: "Размяна на ляво и дясно"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_COUNTDOWN_TIMER_SET
-  desc: countdown_timer plugin - header shown on the setup screen where the user enters the countdown duration
-  user: core
-  <source>
-    *: "SET TIMER"
-  </source>
-  <dest>
-    *: "НАСТРОЙКА ТАЙМЕР"
-  </dest>
-  <voice>
-    *: "Настройка таймер"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_COUNTDOWN_TIMER_RUNNING
-  desc: countdown_timer plugin - status label shown while the countdown is active
-  user: core
-  <source>
-    *: "RUNNING"
-  </source>
-  <dest>
-    *: "АКТИВЕН"
-  </dest>
-  <voice>
-    *: "Активен"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_COUNTDOWN_TIMER_PAUSED
-  desc: countdown_timer plugin - status label shown while the countdown is paused
-  user: core
-  <source>
-    *: "PAUSED"
-  </source>
-  <dest>
-    *: "ПАУЗА"
-  </dest>
-  <voice>
-    *: "Пауза"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_COUNTDOWN_TIMER_OVERTIME
-  desc: countdown_timer plugin - status label shown when the countdown has passed zero and is counting up
-  user: core
-  <source>
-    *: "OVERTIME"
-  </source>
-  <dest>
-    *: "ИЗВЪНРЕДНО"
-  </dest>
-  <voice>
-    *: "Извънредно"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_COUNTDOWN_TIMER_FINISHED
-  desc: countdown_timer plugin - status label shown at the moment the countdown expires
-  user: core
-  <source>
-    *: "FINISHED"
-  </source>
-  <dest>
-    *: "ЗАВЪРШЕН"
-  </dest>
-  <voice>
-    *: "Завършен"
+    *: none
+    touchscreen: "Преки пътища на тъчскрийн"
   </voice>
 </phrase>
