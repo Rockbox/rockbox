@@ -67,14 +67,13 @@ void quickscreen_set_skinned(enum screen_type screen, bool skinned)
 }
 
 /* Set up icons viewport */
-static inline void setup_icons(struct viewport *vp_icons, int excess_width,
-                               int top_y, int top_height, int bottom_y)
+static inline void setup_icons(struct viewport *vp_icons, struct viewport *vps)
 {
-    vp_icons->x += (vp_icons->width - CENTER_ICONAREA_SIZE - excess_width)/2;
-    vp_icons->y = top_y + top_height;
+    vp_icons->x = vps[QUICKSCREEN_LEFT].x + vps[QUICKSCREEN_LEFT].width;
+    vp_icons->y = vps[QUICKSCREEN_TOP].y + vps[QUICKSCREEN_TOP].height;
 
-    vp_icons->width = CENTER_ICONAREA_SIZE + excess_width;
-    vp_icons->height = bottom_y - vp_icons->y;
+    vp_icons->width = vps[QUICKSCREEN_RIGHT].x - vp_icons->x;
+    vp_icons->height = vps[QUICKSCREEN_BOTTOM].y - vp_icons->y;
 
     /* Shrink icons vp by a few pixels if there is room,
        so the arrows aren't drawn right next to the text */
@@ -108,7 +107,7 @@ static inline void set_y_axis(struct viewport *left, struct viewport *right,
 
     if (nb_lines >= MAX_NEEDED_LINES) /* more than enough vertical space */
     {
-        top->y += MARGIN;
+        top->y    += MARGIN;
         bottom->y -= MARGIN;
     }
     if (nb_lines >= 2) /* Single line uses parent height and y position  */
@@ -119,15 +118,14 @@ static inline void set_y_axis(struct viewport *left, struct viewport *right,
     }
 }
 
-/* Set x-position and width for left and right text viewport.
-   Returns excess horizontal space, after accounting for icon area size. */
-static inline int set_x_axis(struct viewport *left, struct viewport *right,
-                             int width)
+/* Set x-position and width for left and right text viewport */
+static inline void set_x_axis(struct viewport *left, struct viewport *right,
+                              int width)
 {
-    int pad = 0, excess = 0;
     int parent_width = left->width;
+    int remaining_width = parent_width - width*2 - CENTER_ICONAREA_SIZE;
 
-    if (width*2 + CENTER_ICONAREA_SIZE > parent_width)
+    if (remaining_width < 0)
     {
         /* Shrink left and right text vps */
         width = parent_width;
@@ -139,21 +137,14 @@ static inline int set_x_axis(struct viewport *left, struct viewport *right,
         if (width >= 2)
             width /= 2;
     }
-    else
+    else if (remaining_width > MARGIN*4)
     {
-        /* space for padding or for excess gap between icons */
-        excess = parent_width - CENTER_ICONAREA_SIZE - width*2;
-        if (excess > MARGIN*4)
-        {
-            pad = MARGIN;
-            excess -= MARGIN*2;
-        }
+        left->x  += MARGIN;
+        right->x -= MARGIN;
     }
-    left->x += pad;
-    right->x += parent_width - width - pad;
-    right->width = left->width = width;
 
-    return excess;
+    right->x += parent_width - width;
+    right->width = left->width = width;
 }
 
 /* Set up all QS viewports */
@@ -162,43 +153,35 @@ static void quickscreen_setup_viewports(struct quickscreen *qs,
 {
     struct viewport *parent = &qs->parent[screen];
     struct viewport *vps = qs->vps[screen];
-    int width = 0, excess;
-    const char *str;
+    int width = 0;
 
     qs->vp_icons[screen] = *parent;
     FOR_QS_ITEMS(i)
+    {
         vps[i] = *parent;
+        vps[i].flags &= ~VP_FLAG_ALIGNMENT_MASK;
 
-    /* Calculate left and right item's maximum title width */
-    if (qs->items[QUICKSCREEN_LEFT])
-    {
-        str = P2STR(ID2P(qs->items[QUICKSCREEN_LEFT]->lang_id));
-        width = font_getstringsize(str, NULL, NULL, parent->font);
-    }
-    if (qs->items[QUICKSCREEN_RIGHT])
-    {
-        str = P2STR(ID2P(qs->items[QUICKSCREEN_RIGHT]->lang_id));
+        /* Check maximum width needed for left or right text vp */
+        if (!qs->items[i] || (i != QUICKSCREEN_LEFT && i != QUICKSCREEN_RIGHT))
+            continue;
+        const char *str = P2STR(ID2P(qs->items[i]->lang_id));
         width = MAX(font_getstringsize(str, NULL, NULL, parent->font), width);
     }
+    /* Set text alignment */
+    vps[QUICKSCREEN_RIGHT].flags  |= VP_FLAG_ALIGN_RIGHT;
+    vps[QUICKSCREEN_TOP].flags    |= VP_FLAG_ALIGN_CENTER;
+    vps[QUICKSCREEN_BOTTOM].flags |= VP_FLAG_ALIGN_CENTER;
 
-    /* Set x-position and width for left and right text viewports. Top and bottom
-       use entire width. Check for excess space after accounting for icon area */
-    excess = set_x_axis(&vps[QUICKSCREEN_LEFT], &vps[QUICKSCREEN_RIGHT], width);
+    /* Set x-position and width for left and right text viewports
+       (top and bottom use parent's entire width) */
+    set_x_axis(&vps[QUICKSCREEN_LEFT], &vps[QUICKSCREEN_RIGHT], width);
 
     /* Set y-position and height for all text viewports */
     set_y_axis(&vps[QUICKSCREEN_LEFT], &vps[QUICKSCREEN_RIGHT],
                &vps[QUICKSCREEN_TOP], &vps[QUICKSCREEN_BOTTOM]);
 
-    /* Configure icons viewport based on text vp dimensions and excess width */
-    setup_icons(&qs->vp_icons[screen], excess, vps[QUICKSCREEN_TOP].y,
-                vps[QUICKSCREEN_TOP].height, vps[QUICKSCREEN_BOTTOM].y);
-
-    /* text alignment */
-    vps[QUICKSCREEN_LEFT].flags &= ~VP_FLAG_ALIGNMENT_MASK;   /* left-aligned  */
-    vps[QUICKSCREEN_TOP].flags    |= VP_FLAG_ALIGN_CENTER;    /* centered      */
-    vps[QUICKSCREEN_BOTTOM].flags |= VP_FLAG_ALIGN_CENTER;    /* centered      */
-    vps[QUICKSCREEN_RIGHT].flags  &= ~VP_FLAG_ALIGNMENT_MASK; /* right-aligned */
-    vps[QUICKSCREEN_RIGHT].flags  |= VP_FLAG_ALIGN_RIGHT;
+    /* Icons viewport fills center area */
+    setup_icons(&qs->vp_icons[screen], vps);
 }
 
 /* Draw settings item into current viewport */
