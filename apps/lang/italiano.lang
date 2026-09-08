@@ -17127,3 +17127,37 @@
     *: "Tipo Filtro"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_COMPOSITE_VIDEO_OUTPUT
+  desc: Enables composite video framebuffer mirroring on supported targets
+  user: core
+  <source>
+    *: none
+    videoout: "Composite Video Output"
+  </source>
+  <dest>
+    *: none
+    videoout: "Uscita Video Composito"
+  </dest>
+  <voice>
+    *: none
+    videoout: "Uscita Video Composito"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_FLICK_SHORTCUTS
+  desc: in settings menu
+  user: core
+  <source>
+    *: none
+    touchscreen: "Touchscreen Flick Shortcuts"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Scorciatoie mediante lo scorrimento sul touchscreen"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Scorciatoie mediante lo scorrimento sul touchscreen"
+  </voice>
+</phrase>
