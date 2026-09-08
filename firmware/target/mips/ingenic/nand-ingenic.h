@@ -18,6 +18,8 @@
  *
  ****************************************************************************/
 
+/* Not nand.h: firmware/export/nand.h already exists and wins on include order
+ * for some build contexts, which resolves silently to the wrong header. */
 #ifndef __NAND_INGENIC_H__
 #define __NAND_INGENIC_H__
 
@@ -32,6 +34,8 @@
 #define NAND_ERR_ERASE_FAIL     (-3)
 #define NAND_ERR_UNALIGNED      (-4)
 #define NAND_ERR_ECC_FAIL       (-5)
+#define NAND_ERR_IO             (-6)
+#define NAND_ERR_TIMEOUT        (-7)
 
 /* keep max page size in sync with the NAND chip table in the .c file */
 #define NAND_DRV_SCRATCHSIZE 32
@@ -133,7 +137,7 @@ struct nand_chip {
     uint32_t cmd_program_load;
 
     /* Chip-specific setup routine */
-    void(*setup_chip)(struct nand_drv* drv);
+    int(*setup_chip)(struct nand_drv* drv);
 };
 
 enum nand_readid_method {
@@ -219,7 +223,7 @@ extern int nand_open(struct nand_drv* drv);
 extern void nand_close(struct nand_drv* drv);
 
 /* Enable/disable OTP access. OTP data pages are usually vendor-specific. */
-void nand_enable_otp(struct nand_drv* drv, bool enable);
+int nand_enable_otp(struct nand_drv* drv, bool enable);
 
 /* Read / program / erase operations. Buffer needs to be cache-aligned for DMA.
  * Read and program operate on full page data, ie. including OOB data areas.

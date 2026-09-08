@@ -84,7 +84,7 @@ extern void sfc_irq_begin(void);
 extern void sfc_irq_end(void);
 
 /* Change the SFC clock frequency */
-extern void sfc_set_clock(uint32_t freq);
+extern int sfc_set_clock(uint32_t freq);
 
 /* Set the device configuration register */
 static inline void sfc_set_dev_conf(uint32_t conf)
@@ -111,7 +111,7 @@ static inline void sfc_set_wp_enable(bool en)
  * - Data commands must specify a direction of transfer using the high bit
  *   of the `size` argument by OR'ing in `SFC_READ` or `SFC_WRITE`.
  */
-extern void sfc_exec(uint32_t cmd, uint32_t addr, void* data, uint32_t size);
+extern int sfc_exec(uint32_t cmd, uint32_t addr, void* data, uint32_t size);
 
 /* NOTE: the above will need to be changed if we need better performance
  * The hardware can do multiple commands in a sequence, including polling,

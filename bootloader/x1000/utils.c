@@ -435,7 +435,9 @@ static int dump_flash_onfi_info(int fd)
         return ret;
     }
 
-    nand_enable_otp(ndrv, true);
+    ret = nand_enable_otp(ndrv, true);
+    if(ret < 0)
+        goto out;
 
     int i;
     bool is_onfi;
@@ -488,7 +490,11 @@ static int dump_flash_onfi_info(int fd)
     fdprintf(fd, "page read time = %u\n", load_le16(buf+137));
 
   out:
-    nand_enable_otp(ndrv, false);
+    {
+        int rc = nand_enable_otp(ndrv, false);
+        if(ret == NAND_SUCCESS)
+            ret = rc;
+    }
     nand_close(ndrv);
     nand_unlock(ndrv);
     return ret;
