@@ -70,7 +70,7 @@ void audiohw_init(void)
     aic_enable_i2s_bit_clock(true);
 
     /* Open DAC driver */
-    i2c_x1000_set_freq(1, I2C_FREQ_400K);
+    i2c_ingenic_set_freq(1, I2C_FREQ_400K);
     codec_start();
 }
 

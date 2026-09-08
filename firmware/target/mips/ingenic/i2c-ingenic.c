@@ -19,25 +19,17 @@
  ****************************************************************************/
 
 /* #define LOGF_ENABLE */
-#include "i2c-ingenic.h"
 #include "system.h"
 #include "kernel.h"
 #include "panic.h"
 #include "logf.h"
-#include "clk-x1000.h"
-#include "irq-x1000.h"
-#include "x1000/i2c.h"
-#include "x1000/cpm.h"
-
-#if I2C_ASYNC_BUS_COUNT != 3
-# error "Wrong I2C_ASYNC_BUS_COUNT (should be 3)"
-#endif
+#include "ingenic-soc.h"
 
 #define FIFO_SIZE       64  /* Size of data FIFOs */
 #define FIFO_TX_THRESH  16  /* Wake up when TX FIFO gets to this level */
 #define FIFO_RX_SLACK   2   /* Slack space to leave, avoids RX FIFO overflow */
 
-typedef struct i2c_x1000_bus {
+typedef struct i2c_ingenic_bus {
     /* Hardware channel, this is just equal to i2c-async bus number. */
     int chn;
 
@@ -60,9 +52,9 @@ typedef struct i2c_x1000_bus {
      *
      * For READs phase2 sets buffer[0] to NULL and count[0] equal to count[1].
      * Now count[0] counts the number of bytes left to request, and count[1]
-     * counts the number of bytes left to receive. i2c_x1000_fifo_write() sees
+     * counts the number of bytes left to receive. i2c_ingenic_fifo_write() sees
      * that buffer[0] is NULL and sends read requests instead of data bytes.
-     * buffer[1] is advanced by i2c_x1000_fifo_read() we receive bytes.
+     * buffer[1] is advanced by i2c_ingenic_fifo_read() we receive bytes.
      */
     unsigned char* buffer[2];
     int count[2];
@@ -84,11 +76,11 @@ typedef struct i2c_x1000_bus {
 
     /* Flag used to indicate a reset is processing */
     int resetting;
-} i2c_x1000_bus;
+} i2c_ingenic_bus;
 
-static i2c_x1000_bus i2c_x1000_busses[3];
+static i2c_ingenic_bus i2c_ingenic_busses[I2C_ASYNC_BUS_COUNT];
 
-static void i2c_x1000_fifo_write(i2c_x1000_bus* bus)
+static void i2c_ingenic_fifo_write(i2c_ingenic_bus* bus)
 {
     int tx_free, tx_n;
 
@@ -170,14 +162,14 @@ static void i2c_x1000_fifo_write(i2c_x1000_bus* bus)
     }
 }
 
-static void i2c_x1000_fifo_read(i2c_x1000_bus* bus)
+static void i2c_ingenic_fifo_read(i2c_ingenic_bus* bus)
 {
     /* Get number of bytes in the RX FIFO */
     int rx_n = REG_I2C_RXFLR(bus->chn);
 
     /* Shouldn't happen, but check just in case */
     if(rx_n > bus->count[1]) {
-        panicf("i2c_x1000(%d): expected %d bytes in RX fifo, got %d",
+        panicf("i2c(%d): expected %d bytes in RX fifo, got %d",
                bus->chn, bus->count[1], rx_n);
     }
 
@@ -188,7 +180,7 @@ static void i2c_x1000_fifo_read(i2c_x1000_bus* bus)
     }
 }
 
-static void i2c_x1000_interrupt(i2c_x1000_bus* bus)
+static void i2c_ingenic_interrupt(i2c_ingenic_bus* bus)
 {
     int intr = REG_I2C_INTST(bus->chn);
     int status = I2C_STATUS_OK;
@@ -198,7 +190,7 @@ static void i2c_x1000_interrupt(i2c_x1000_bus* bus)
      * safe to leave this interrupt unmasked all the time.
      */
     if(intr & jz_orm(I2C_INTST, TXABT)) {
-        logf("i2c_x1000(%d): got TXABT (%08lx)",
+        logf("i2c(%d): got TXABT (%08lx)",
              bus->chn, REG_I2C_ABTSRC(bus->chn));
 
         REG_I2C_CTXABT(bus->chn);
@@ -209,7 +201,7 @@ static void i2c_x1000_interrupt(i2c_x1000_bus* bus)
     /* FIFO errors shouldn't occur unless driver did something dumb */
     if(intr & jz_orm(I2C_INTST, RXUF, TXOF, RXOF)) {
 #if 1
-        panicf("i2c_x1000(%d): fifo error (%08x)", bus->chn, intr);
+        panicf("i2c(%d): fifo error (%08x)", bus->chn, intr);
 #else
         /* This is how the error condition would be cleared */
         REG_I2C_CTXOF(bus->chn);
@@ -223,7 +215,7 @@ static void i2c_x1000_interrupt(i2c_x1000_bus* bus)
     /* Read from FIFO on reads, and check if we have sent/received
      * the expected amount of data. If so, complete the descriptor. */
     if(bus->tran_mode == I2C_READ) {
-        i2c_x1000_fifo_read(bus);
+        i2c_ingenic_fifo_read(bus);
         if(bus->count[1] == 0)
             goto _done;
     } else if(bus->count[0] == 0) {
@@ -231,7 +223,7 @@ static void i2c_x1000_interrupt(i2c_x1000_bus* bus)
     }
 
     /* Still need to send or request data -- issue commands to FIFO */
-    i2c_x1000_fifo_write(bus);
+    i2c_ingenic_fifo_write(bus);
     return;
 
   _done:
@@ -242,27 +234,29 @@ static void i2c_x1000_interrupt(i2c_x1000_bus* bus)
 
 void I2C0(void)
 {
-    i2c_x1000_interrupt(&i2c_x1000_busses[0]);
+    i2c_ingenic_interrupt(&i2c_ingenic_busses[0]);
 }
 
 void I2C1(void)
 {
-    i2c_x1000_interrupt(&i2c_x1000_busses[1]);
+    i2c_ingenic_interrupt(&i2c_ingenic_busses[1]);
 }
 
+#if I2C_ASYNC_BUS_COUNT > 2
 void I2C2(void)
 {
-    i2c_x1000_interrupt(&i2c_x1000_busses[2]);
+    i2c_ingenic_interrupt(&i2c_ingenic_busses[2]);
 }
+#endif
 
-static int i2c_x1000_bus_timeout(struct timeout* tmo)
+static int i2c_ingenic_bus_timeout(struct timeout* tmo)
 {
     /* Buggy device is preventing the operation from completing, so we
      * can't do much except reset the bus and hope for the best. Device
      * drivers can aid us by detecting the TIMEOUT status we return and
      * resetting the device to get it out of a bugged state. */
 
-    i2c_x1000_bus* bus = (i2c_x1000_bus*)tmo->data;
+    i2c_ingenic_bus* bus = (i2c_ingenic_bus*)tmo->data;
     switch(bus->resetting) {
     default:
         /* Start of reset. Disable the controller */
@@ -297,9 +291,29 @@ static int i2c_x1000_bus_timeout(struct timeout* tmo)
     }
 }
 
+static bool i2c_ingenic_set_target(int chn, uint32_t target)
+{
+    /* Keep held transfers running when the target is unchanged. */
+    if(REG_I2C_TAR(chn) == target)
+        return true;
+
+    /* TAR requires an empty TX FIFO and an idle master.
+     * Poll for up to 1 ms; submission can run in IRQ context. */
+    unsigned mask = jz_orm(I2C_STATUS, TFE, MSTACT);
+    for(int i = 0; i < 1000; ++i) {
+        if((REG_I2C_STATUS(chn) & mask) == jz_orm(I2C_STATUS, TFE)) {
+            REG_I2C_TAR(chn) = target;
+            return true;
+        }
+        udelay(1);
+    }
+
+    return false;
+}
+
 void __i2c_async_submit(int busnr, i2c_descriptor* desc)
 {
-    i2c_x1000_bus* bus = &i2c_x1000_busses[busnr];
+    i2c_ingenic_bus* bus = &i2c_ingenic_busses[busnr];
 
     if(desc->tran_mode == I2C_READ) {
         if(desc->count[0] > 0) {
@@ -341,12 +355,15 @@ void __i2c_async_submit(int busnr, i2c_descriptor* desc)
     /* Ensure interrupts are cleared */
     REG_I2C_CINT(busnr);
 
-    /* Program target address */
-    jz_overwritef(I2C_TAR(busnr), ADDR(desc->slave_addr & ~I2C_10BIT_ADDR),
-                  10BITS(desc->slave_addr & I2C_10BIT_ADDR ? 1 : 0));
+    uint32_t target = jz_orf(I2C_TAR, ADDR(desc->slave_addr & ~I2C_10BIT_ADDR),
+                           10BITS(desc->slave_addr & I2C_10BIT_ADDR ? 1 : 0));
+    if(!i2c_ingenic_set_target(busnr, target)) {
+        timeout_register(&bus->tmo, i2c_ingenic_bus_timeout, 1, (intptr_t)bus);
+        return;
+    }
 
     /* Do the initial FIFO fill; this sets up the needed interrupts. */
-    i2c_x1000_fifo_write(bus);
+    i2c_ingenic_fifo_write(bus);
 
     /* Software timeout to deal with buggy slave devices that pull the bus
      * high forever and leave us hanging. Use 100ms + whatever time should
@@ -354,7 +371,7 @@ void __i2c_async_submit(int busnr, i2c_descriptor* desc)
      * because of the ACKs necessary after each byte.
      */
     long ticks = (HZ/10) + (HZ * 9 * bus->byte_cnt_end / bus->freq);
-    timeout_register(&bus->tmo, i2c_x1000_bus_timeout, ticks, (intptr_t)bus);
+    timeout_register(&bus->tmo, i2c_ingenic_bus_timeout, ticks, (intptr_t)bus);
 }
 
 void i2c_init(void)
@@ -363,31 +380,33 @@ void i2c_init(void)
     __i2c_async_init();
 
     /* Initialize our bus data structures */
-    for(int i = 0; i < 3; ++i) {
-        i2c_x1000_busses[i].chn = i;
-        i2c_x1000_busses[i].freq = 0;
-        i2c_x1000_busses[i].resetting = 0;
+    for(int i = 0; i < I2C_ASYNC_BUS_COUNT; ++i) {
+        i2c_ingenic_busses[i].chn = i;
+        i2c_ingenic_busses[i].freq = 0;
+        i2c_ingenic_busses[i].resetting = 0;
     }
 }
 
 /* Stuff only required during initialization is below, basically the same as
  * the old driver except for how the IRQs are initially set up. */
 
-static void i2c_x1000_gate(int chn, int gate)
+static void i2c_ingenic_gate(int chn, int gate)
 {
     switch(chn) {
     case 0: jz_writef(CPM_CLKGR, I2C0(gate)); break;
     case 1: jz_writef(CPM_CLKGR, I2C1(gate)); break;
+#if I2C_ASYNC_BUS_COUNT > 2
     case 2: jz_writef(CPM_CLKGR, I2C2(gate)); break;
+#endif
     default: break;
     }
 }
 
-static void i2c_x1000_enable(int chn)
+static void i2c_ingenic_enable(int chn)
 {
     /* Enable controller */
     jz_writef(I2C_ENABLE(chn), ACTIVE(1));
-    while(jz_readf(I2C_ENBST(chn), ACTIVE) == 0);
+    SOC_SPIN_UNTIL(jz_readf(I2C_ENBST(chn), ACTIVE) != 0);
 
     /* Set up interrutpts */
     jz_overwritef(I2C_INTMSK(chn), RXFL(0), TXEMP(0),
@@ -395,7 +414,7 @@ static void i2c_x1000_enable(int chn)
     system_enable_irq(IRQ_I2C(chn));
 }
 
-static void i2c_x1000_disable(int chn)
+static void i2c_ingenic_disable(int chn)
 {
     /* Disable interrupts */
     system_disable_irq(IRQ_I2C(chn));
@@ -403,27 +422,27 @@ static void i2c_x1000_disable(int chn)
 
     /* Disable controller */
     jz_writef(I2C_ENABLE(chn), ACTIVE(0));
-    while(jz_readf(I2C_ENBST(chn), ACTIVE));
+    SOC_SPIN_WHILE(jz_readf(I2C_ENBST(chn), ACTIVE));
 }
 
-void i2c_x1000_set_freq(int chn, int freq)
+void i2c_ingenic_set_freq(int chn, int freq)
 {
     /* Store frequency */
-    i2c_x1000_busses[chn].freq = freq;
+    i2c_ingenic_busses[chn].freq = freq;
 
     /* Disable the channel if previously active */
-    i2c_x1000_gate(chn, 0);
+    i2c_ingenic_gate(chn, 0);
     if(jz_readf(I2C_ENBST(chn), ACTIVE) == 1)
-        i2c_x1000_disable(chn);
+        i2c_ingenic_disable(chn);
 
     /* Request to shut down the channel */
     if(freq == 0) {
-        i2c_x1000_gate(chn, 1);
+        i2c_ingenic_gate(chn, 1);
         return;
     }
 
     /* Calculate timing parameters */
-    unsigned pclk = clk_get(X1000_CLK_PCLK);
+    unsigned pclk = clk_get(SOC_CLK_PCLK);
     unsigned t_SU_DAT = pclk / (freq * 8);
     unsigned t_HD_DAT = pclk / (freq * 12);
     unsigned t_LOW    = pclk / (freq * 2);
@@ -455,5 +474,5 @@ void i2c_x1000_set_freq(int chn, int freq)
     }
 
     /* Enable the controller */
-    i2c_x1000_enable(chn);
+    i2c_ingenic_enable(chn);
 }

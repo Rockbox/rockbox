@@ -93,7 +93,7 @@ void button_init_device(void)
     gpio_enable_irq(GPIO_WHEEL2);
 
     /* Init touchscreen driver */
-    i2c_x1000_set_freq(FT6x06_BUS, I2C_FREQ_400K);
+    i2c_ingenic_set_freq(FT6x06_BUS, I2C_FREQ_400K);
     ft6x06_init();
 
     /* Reset touch controller */

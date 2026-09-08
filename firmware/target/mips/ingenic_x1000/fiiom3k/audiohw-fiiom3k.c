@@ -54,7 +54,7 @@ void audiohw_init(void)
     aic_enable_i2s_master_clock(true);
 
     /* Initialize DAC */
-    i2c_x1000_set_freq(AK4376_BUS, I2C_FREQ_400K);
+    i2c_ingenic_set_freq(AK4376_BUS, I2C_FREQ_400K);
     ak4376_open();
     set_ak_freqmode();
 }

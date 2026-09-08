@@ -89,7 +89,7 @@ void audiohw_init(void)
     mdelay(10);
     gpio_set_level(GPIO_STEREOSW_MUTE, 0);
 
-    i2c_x1000_set_freq(ES9018K2M_BUS, I2C_FREQ_400K);
+    i2c_ingenic_set_freq(ES9018K2M_BUS, I2C_FREQ_400K);
 
     // devices hw2 and newer use es9018k2m i2c dac
     // hw1 devices use swvol

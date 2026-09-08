@@ -48,7 +48,7 @@ unsigned short percent_to_volt_charge[11] =
 void power_init(void)
 {
     /* Initialize driver */
-    i2c_x1000_set_freq(2, I2C_FREQ_400K);
+    i2c_ingenic_set_freq(2, I2C_FREQ_400K);
     axp_init();
 
     /* Set lowest sample rate */

@@ -38,6 +38,6 @@ extern void i2c_init(void) INIT_ATTR;
  *
  * TODO: move this to the i2c-async API, it's simple enough
  */
-extern void i2c_x1000_set_freq(int chn, int freq);
+extern void i2c_ingenic_set_freq(int chn, int freq);
 
 #endif /* __I2C_INGENIC_H__ */
