@@ -22,7 +22,7 @@
  ****************************************************************************/
 
 #include "rtc.h"
-#include "x1000/rtc.h"
+#include "ingenic-soc.h"
 #include <stdint.h>
 
 /* 4 byte magic number 'RTCV' */

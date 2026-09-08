@@ -500,8 +500,8 @@ drivers/rtc/rtc_mc13783.c
 drivers/rtc/rtc_jz4740.c
 #elif (CONFIG_RTC == RTC_JZ4760)
 drivers/rtc/rtc_jz4760.c
-#elif (CONFIG_RTC == RTC_X1000)
-drivers/rtc/rtc_x1000.c
+#elif (CONFIG_RTC == RTC_X1000) || (CONFIG_RTC == RTC_X1600)
+drivers/rtc/rtc_ingenic.c
 #elif (CONFIG_RTC == RTC_S35390A)
 drivers/rtc/rtc_s35390a.c
 #elif (CONFIG_RTC == RTC_S35380A)

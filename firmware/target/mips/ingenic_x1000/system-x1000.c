@@ -44,7 +44,7 @@
 #include "eros_qn_codec.h"
 #endif
 
-#ifdef X1000_CPUIDLE_STATS
+#ifdef INGENIC_CPUIDLE_STATS
 int __cpu_idle_avg = 0;
 int __cpu_idle_cur = 0;
 uint32_t __cpu_idle_ticks = 0;

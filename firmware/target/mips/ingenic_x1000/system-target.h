@@ -23,7 +23,7 @@
 
 #ifdef DEBUG
 /* Define this to get CPU idle stats, visible in the debug menu. */
-# define X1000_CPUIDLE_STATS
+# define INGENIC_CPUIDLE_STATS
 #endif
 
 #include "cpu.h"
@@ -53,7 +53,7 @@ static inline int set_irq_level(int lev)
     return oldreg;
 }
 
-#ifdef X1000_CPUIDLE_STATS
+#ifdef INGENIC_CPUIDLE_STATS
 /* CPU idle stats, updated each kernel tick in kernel-x1000.c */
 extern int __cpu_idle_avg;
 extern int __cpu_idle_cur;
@@ -64,7 +64,7 @@ extern uint32_t __cpu_idle_reftick;
 static inline uint32_t __ost_read32(void);
 static inline void core_sleep(void)
 {
-#ifdef X1000_CPUIDLE_STATS
+#ifdef INGENIC_CPUIDLE_STATS
     uint32_t t1 = __ost_read32();
 #endif
 
@@ -81,7 +81,7 @@ static inline void core_sleep(void)
         ".set pop\n\t"
         ::: "t0", "t1", "t2");
 
-#ifdef X1000_CPUIDLE_STATS
+#ifdef INGENIC_CPUIDLE_STATS
     uint32_t t2 = __ost_read32();
     __cpu_idle_ticks += t2 - t1;
 #endif

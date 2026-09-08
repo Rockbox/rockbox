@@ -20,14 +20,14 @@
 
 #include "kernel.h"
 #include "system.h"
-#include "x1000/ost.h"
+#include "ingenic-soc.h"
 
 #define CPU_IDLE_SAMPLES 100
 
 void tick_start(unsigned interval_in_ms)
 {
     jz_writef(OST_CTRL, PRESCALE1_V(BY_16));
-    jz_write(OST_1DFR, interval_in_ms*(X1000_EXCLK_FREQ/16000));
+    jz_write(OST_1DFR, interval_in_ms*(SOC_EXCLK_FREQ/16000));
     jz_write(OST_1CNT, 0);
     jz_write(OST_1FLG, 0);
     jz_write(OST_1MSK, 0);
@@ -36,7 +36,7 @@ void tick_start(unsigned interval_in_ms)
 
 void OST(void)
 {
-#ifdef X1000_CPUIDLE_STATS
+#ifdef INGENIC_CPUIDLE_STATS
     /* CPU idle time accounting */
     uint32_t now = __ost_read32();
     uint32_t div = now - __cpu_idle_reftick;
@@ -51,5 +51,6 @@ void OST(void)
 
     /* Call regular kernel tick */
     jz_write(OST_1FLG, 0);
+    SOC_OST_ACK_RECHECK();
     call_tick_tasks();
 }

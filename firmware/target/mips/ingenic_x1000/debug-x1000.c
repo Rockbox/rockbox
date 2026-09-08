@@ -148,7 +148,7 @@ static bool dbg_audio(void)
     return false;
 }
 
-#ifdef X1000_CPUIDLE_STATS
+#ifdef INGENIC_CPUIDLE_STATS
 static bool dbg_cpuidle(void)
 {
     do {
@@ -184,7 +184,7 @@ static const struct {
 } menuitems[] = {
     {"Clocks", &dbg_clocks},
     {"GPIOs", &dbg_gpios},
-#ifdef X1000_CPUIDLE_STATS
+#ifdef INGENIC_CPUIDLE_STATS
     {"CPU idle", &dbg_cpuidle},
 #endif
     {"Audio", &dbg_audio},
