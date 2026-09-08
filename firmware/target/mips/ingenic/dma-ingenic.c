@@ -20,8 +20,6 @@
 
 #include "system.h"
 #include "dma-ingenic.h"
-#include "irq-x1000.h"
-#include "x1000/cpm.h"
 #include "panic.h"
 
 static dma_cb_func dma_callbacks[DMA_NUM_USED_CHANNELS];

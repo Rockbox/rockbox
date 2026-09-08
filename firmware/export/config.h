@@ -81,6 +81,7 @@
 #define IMX233        233
 #define RK27XX       2700
 #define X1000        1000
+#define X1600        1600
 #define STM32H743   32743
 #define N10480H     10480
 #define TACHYON     4000

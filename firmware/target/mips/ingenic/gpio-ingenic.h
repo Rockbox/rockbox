@@ -21,8 +21,12 @@
 #ifndef __GPIO_INGENIC_H__
 #define __GPIO_INGENIC_H__
 
-#include "x1000/gpio.h"
 #include "config.h"
+#if CONFIG_CPU == X1600
+#include "x1600/gpio.h"
+#else
+#include "x1000/gpio.h"
+#endif
 
 /* GPIO port numbers */
 #define GPIO_A 0
@@ -30,6 +34,7 @@
 #define GPIO_C 2
 #define GPIO_D 3
 #define GPIO_Z 7
+#define GPIO_NUM_PORTS 4
 
 /* GPIO function bits */
 #define GPIO_F_PULL 16

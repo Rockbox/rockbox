@@ -21,8 +21,7 @@
 #ifndef __DMA_INGENIC_H__
 #define __DMA_INGENIC_H__
 
-#include "x1000/dma.h"
-#include "x1000/dma_chn.h"
+#include "ingenic-soc.h"
 #include <stdint.h>
 
 /* Events passed to DMA callbacks */
