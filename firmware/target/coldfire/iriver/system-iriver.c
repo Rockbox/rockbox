@@ -21,9 +21,11 @@
 #include "cpu.h"
 #include "kernel.h"
 #include "system.h"
+#include "system-iriver.h"
 #include "power.h"
 #include "timer.h"
 #include "pcf50606.h"
+#include <string.h>
 
 /* Settings for all possible clock frequencies (with properly working timers)
  * NOTE: Some 5249 chips don't like having PLLDIV set to 0. We must avoid that!
@@ -160,4 +162,32 @@ void cf_set_cpu_frequency(long frequency)
 #endif
         break;
     }
+}
+
+static bool detect_flash_header(uint8_t *addr)
+{
+#ifndef BOOTLOADER
+    int oldmode = system_memory_guard(MEMGUARD_NONE);
+#endif
+    struct flash_header hdr;
+    memcpy(&hdr, addr, sizeof(struct flash_header));
+#ifndef BOOTLOADER
+    system_memory_guard(oldmode);
+#endif
+    return hdr.magic == FLASH_MAGIC;
+}
+
+bool detect_flashed_romimage(void)
+{
+    return detect_flash_header((uint8_t *)FLASH_ROMIMAGE_ENTRY);
+}
+
+bool detect_flashed_ramimage(void)
+{
+    return detect_flash_header((uint8_t *)FLASH_RAMIMAGE_ENTRY);
+}
+
+bool detect_original_firmware(void)
+{
+    return !(detect_flashed_ramimage() || detect_flashed_romimage());
 }

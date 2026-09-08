@@ -148,9 +148,6 @@
 /* Define this if you want to use coldfire's i2c interface */
 #define CONFIG_I2C I2C_COLDFIRE
 
-/* Define this if you can run rockbox from flash memory */
-#define HAVE_FLASHED_ROCKBOX
-
 /* define this if the hardware can be powered off while charging */
 #define HAVE_POWEROFF_WHILE_CHARGING
 

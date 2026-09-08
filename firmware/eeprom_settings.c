@@ -23,6 +23,7 @@
 #include "crc32.h"
 
 #include "system.h"
+#include "system-iriver.h"
 #include "string.h"
 #include "logf.h"
 

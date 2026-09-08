@@ -23,6 +23,7 @@
 #include "plugin.h"
 #include "lib/helper.h"
 #include "checksum.h"
+#include "system-iriver.h"
 
 /*
  * Flash commands may rely on null pointer dereferences to work correctly.

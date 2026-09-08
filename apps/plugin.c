@@ -67,6 +67,10 @@
 #include "usbstack/usb_audio.h"
 #endif
 
+#if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
+#include "system-iriver.h"
+#endif
+
 #define WRAPPER(_x_) _x_ ## _wrapper
 
 #if (CONFIG_PLATFORM & PLATFORM_HOSTED)

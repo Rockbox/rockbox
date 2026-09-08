@@ -25,6 +25,7 @@
 #include "string.h"
 #include "cpu.h"
 #include "system.h"
+#include "system-iriver.h"
 #include "lcd.h"
 #include "lcd-remote.h"
 #include "scroll_engine.h"
