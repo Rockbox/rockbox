@@ -2663,7 +2663,7 @@ char* strtok_r(char *ptr, const char *sep, char **end)
 
 int system_memory_guard(int newmode)
     \group kernel/ system
-    \conditions ((CONFIG_PLATFORM & PLATFORM_NATIVE))
+    \conditions ((CONFIG_PLATFORM & PLATFORM_NATIVE) && defined(CPU_COLDFIRE))
     \param newmode
     \return
     \description

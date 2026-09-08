@@ -207,12 +207,6 @@ void system_exception_wait(void)
     while(1);
 }
 
-int system_memory_guard(int newmode)
-{
-    (void)newmode;
-    return 0;
-}
-
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
 
 void set_cpu_frequency(long frequency)

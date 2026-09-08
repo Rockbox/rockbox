@@ -664,9 +664,3 @@ void system_exception_wait(void)
     PROC_CTL(CURRENT_CORE) = 0x40000000;
     while (1);
 }
-
-int system_memory_guard(int newmode)
-{
-    (void)newmode;
-    return 0;
-}

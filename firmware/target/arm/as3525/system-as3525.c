@@ -398,12 +398,6 @@ void system_exception_wait(void)
     while(!button_read_device());
 }
 
-int system_memory_guard(int newmode)
-{
-    (void)newmode;
-    return 0;
-}
-
 /* usecs may be at most 2^32/248 (17 seconds) for 248MHz max cpu freq */
 void udelay(unsigned usecs)
 {

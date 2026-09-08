@@ -174,12 +174,6 @@ void gpt_stop(void)
     restore_interrupt(status);
 }
 
-int system_memory_guard(int newmode)
-{
-    (void)newmode;
-    return 0;
-}
-
 void system_halt(void)
 {
     disable_interrupt(IRQ_FIQ_STATUS);

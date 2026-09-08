@@ -307,6 +307,8 @@ struct plugin_api {
     int (*font_load)(const char *path);
     void (*font_unload)(int font_id);
     struct font* (*font_get)(int font);
+    int (*font_measurestring)(const unsigned char *str, size_t maxbytes,
+                              size_t maxwidth, int *w, int *h, int fontnum);
     int  (*font_getstringsize)(const unsigned char *str, int *w, int *h,
                                int fontnumber);
     int (*font_get_width)(struct font* pf, ucschar_t char_code);
@@ -374,11 +376,11 @@ struct plugin_api {
     bool (*is_backlight_on)(bool ignore_always_off);
     void (*backlight_on)(void);
     void (*backlight_off)(void);
+    void (*backlight_set_on_button_hold)(int index);
     void (*backlight_set_timeout)(int index);
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
     void (*backlight_set_brightness)(int val);
 #endif /* HAVE_BACKLIGHT_BRIGHTNESS */
-
 #if CONFIG_CHARGING
     void (*backlight_set_timeout_plugged)(int index);
 #endif
@@ -389,6 +391,9 @@ struct plugin_api {
     void (*remote_backlight_set_timeout)(int index);
 #if CONFIG_CHARGING
     void (*remote_backlight_set_timeout_plugged)(int index);
+#endif
+#if defined(HAS_REMOTE_BUTTON_HOLD)
+    void (*remote_backlight_set_on_button_hold)(int index);
 #endif
 #endif /* HAVE_REMOTE_LCD */
 #endif /* HAVE_BACKLIGHT */
@@ -451,6 +456,9 @@ struct plugin_api {
     void (*gesture_vel_process)(struct gesture_vel *gv,
                                 const struct touchevent *ev);
     bool (*gesture_vel_get)(struct gesture_vel *gv, int *xvel, int *yvel);
+    int (*gesture_flick_get_in_vp)(const struct gesture_event *gevt,
+                                   const struct viewport *vp);
+    int (*gesture_flick_get)(const struct gesture_event *gevt);
 #endif
     bool (*action_userabort)(int timeout);
     int (*core_set_keyremap)(struct button_mapping* core_keymap, int count);
@@ -603,7 +611,9 @@ struct plugin_api {
     void (*set_sleeptimer_duration)(int minutes);
     int (*get_sleep_timer)(void);
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
+#if defined(CPU_COLDFIRE)
     int (*system_memory_guard)(int newmode);
+#endif
     long *cpu_frequency;
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
 #ifdef CPU_BOOST_LOGGING
@@ -1038,24 +1048,12 @@ struct plugin_api {
     int (*path_strip_volume)(const char *name, const char **nameptr, bool greedy);
 #endif
 
-    /* new stuff at the end, sort into place next time
-       the API gets incompatible */
-    int (*font_measurestring)(const unsigned char *str, size_t maxbytes,
-                              size_t maxwidth, int *w, int *h, int fontnum);
-#ifdef HAVE_TOUCHSCREEN
-    int (*gesture_flick_get_in_vp)(const struct gesture_event *gevt,
-                                   const struct viewport *vp);
-    int (*gesture_flick_get)(const struct gesture_event *gevt);
-#endif
 #ifdef HAVE_HW_H264
     const struct hw_h264_api *hw_h264;
 #endif
-#ifdef HAVE_BACKLIGHT
-    void (*backlight_set_on_button_hold)(int index);
-#endif
-#if defined(HAVE_REMOTE_LCD) && defined(HAS_REMOTE_BUTTON_HOLD)
-    void (*remote_backlight_set_on_button_hold)(int index);
-#endif
+
+    /* new stuff at the end, sort into place next time
+       the API gets incompatible */
 };
 
 /* plugin header */

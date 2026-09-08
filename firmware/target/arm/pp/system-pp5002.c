@@ -235,9 +235,3 @@ void system_exception_wait(void)
     sleep_core(CURRENT_CORE);
     while (1);
 }
-
-int system_memory_guard(int newmode)
-{
-    (void)newmode;
-    return 0;
-}

@@ -154,12 +154,6 @@ void system_exception_wait(void)
     while(imx233_power_read_pswitch() != 0) {}
 }
 
-int system_memory_guard(int newmode)
-{
-    (void)newmode;
-    return 0;
-}
-
 static void set_page_tables(void)
 {
     /* map every memory region to itself */

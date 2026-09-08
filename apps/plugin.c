@@ -263,6 +263,7 @@ static const struct plugin_api rockbox_api = {
     font_load,
     font_unload,
     font_get,
+    font_measurestring,
     font_getstringsize,
     font_get_width,
     screen_clear_area,
@@ -319,6 +320,7 @@ static const struct plugin_api rockbox_api = {
     is_backlight_on,
     backlight_on,
     backlight_off,
+    backlight_set_on_button_hold,
     backlight_set_timeout,
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
     backlight_set_brightness,
@@ -334,6 +336,9 @@ static const struct plugin_api rockbox_api = {
     remote_backlight_set_timeout,
 #if CONFIG_CHARGING
     remote_backlight_set_timeout_plugged,
+#endif
+#if defined(HAS_REMOTE_BUTTON_HOLD)
+    remote_backlight_set_on_button_hold,
 #endif
 #endif /* HAVE_REMOTE_LCD */
 #endif /* HAVE_BACKLIGHT */
@@ -381,6 +386,8 @@ static const struct plugin_api rockbox_api = {
     gesture_vel_reset,
     gesture_vel_process,
     gesture_vel_get,
+    gesture_flick_get_in_vp,
+    gesture_flick_get,
 #endif
     action_userabort,
     core_set_keyremap,
@@ -517,7 +524,9 @@ static const struct plugin_api rockbox_api = {
     set_sleeptimer_duration, /*stub*/
     get_sleep_timer, /*stub*/
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
+#if defined(CPU_COLDFIRE)
     system_memory_guard,
+#endif
     &cpu_frequency,
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
@@ -873,22 +882,12 @@ static const struct plugin_api rockbox_api = {
     path_strip_volume,
 #endif
 
-    /* new stuff at the end, sort into place next time
-       the API gets incompatible */
-    font_measurestring,
-#ifdef HAVE_TOUCHSCREEN
-    gesture_flick_get_in_vp,
-    gesture_flick_get,
-#endif
 #ifdef HAVE_HW_H264
     &target_hw_h264_api,
 #endif
-#ifdef HAVE_BACKLIGHT
-    backlight_set_on_button_hold,
-#endif
-#if defined(HAVE_REMOTE_LCD) && defined(HAS_REMOTE_BUTTON_HOLD)
-    remote_backlight_set_on_button_hold,
-#endif
+
+    /* new stuff at the end, sort into place next time
+       the API gets incompatible */
 };
 
 static int plugin_buffer_handle;

@@ -196,13 +196,6 @@ void system_reboot(void)
     while(1);
 }
 
-int system_memory_guard(int mode)
-{
-    /* unused */
-    (void)mode;
-    return 0;
-}
-
 /* Simple delay API -- slow path functions */
 
 void __udelay(uint32_t us)

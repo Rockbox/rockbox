@@ -156,10 +156,3 @@ void udelay(uint32_t us)
         start = value;
     }
 }
-
-int system_memory_guard(int newmode)
-{
-    /* TODO -- maybe use MPU here to give some basic protection */
-    (void)newmode;
-    return MEMGUARD_NONE;
-}
