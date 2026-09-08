@@ -21,6 +21,7 @@
 #include "system.h"
 #include "kernel.h"
 #include "sfc-x1000.h"
+#include "gpio-ingenic.h"
 #include "clk-x1000.h"
 #include "irq-x1000.h"
 
@@ -38,6 +39,11 @@ static struct semaphore sfc_sema;
  * just to wait on a semaphore. */
 static void(*sfc_wait)(void) = sfc_poll_wait;
 #endif
+
+void sfc_configure_pins(void)
+{
+    gpioz_configure(GPIO_A, 0x3f << 26, GPIOF_DEVICE(1));
+}
 
 void sfc_open(void)
 {

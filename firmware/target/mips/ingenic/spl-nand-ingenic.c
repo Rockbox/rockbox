@@ -18,16 +18,16 @@
  *
  ****************************************************************************/
 
-#include "spl-x1000.h"
-#include "gpio-ingenic.h"
+#include "spl-ingenic.h"
 #include "nand-ingenic.h"
+#include "ingenic-soc.h"
 
 static struct nand_drv* ndrv = NULL;
 
 int spl_storage_open(void)
 {
     /* We need to assign the GPIOs manually */
-    gpioz_configure(GPIO_A, 0x3f << 26, GPIOF_DEVICE(1));
+    sfc_configure_pins();
 
     /* Allocate NAND driver manually in DRAM */
     ndrv = spl_alloc(sizeof(struct nand_drv));

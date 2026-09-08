@@ -19,7 +19,8 @@
  ****************************************************************************/
 
 #include "installer-ingenic.h"
-#include "nand-ingenic.h"
+#include "system.h"
+#include "ingenic-soc.h"
 #include "core_alloc.h"
 #include "file.h"
 #include "microtar-rockbox.h"
@@ -50,10 +51,10 @@ static const struct update_part updates[] = {
     {
         .filename = "spl." BOOTFILE_EXT,
         .offset = 0,
-        .length = 12 * 1024,
+        .length = INSTALL_SPL_LENGTH,
     },
     {
-        .filename = "bootloader.ucl",
+        .filename = INSTALL_BOOTLOADER_NAME,
         .offset = 0x6800,
         .length = 102 * 1024,
     },

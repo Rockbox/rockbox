@@ -19,7 +19,7 @@
  ****************************************************************************/
 
 #include "nand-ingenic.h"
-#include "sfc-x1000.h"
+#include "ingenic-soc.h"
 #include "system.h"
 #include "logf.h"
 #include <string.h>
@@ -259,7 +259,7 @@ int nand_open(struct nand_drv* drv)
                             STA_TYPE_V(1BYTE), CMD_TYPE_V(8BITS),
                             SMP_DELAY(0)));
     int rc = NAND_ERR_IO;
-    if(sfc_set_clock(X1000_EXCLK_FREQ) < 0)
+    if(sfc_set_clock(SOC_EXCLK_FREQ) < 0)
         goto err;
 
     /* Send the software reset command */

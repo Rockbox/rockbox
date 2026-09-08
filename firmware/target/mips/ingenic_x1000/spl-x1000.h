@@ -25,23 +25,6 @@
 #include <stddef.h>
 #include <stdint.h>
 
-/* Memory allocator. Allocation starts from the top of DRAM and counts down.
- * Allocation sizes are rounded up to a multiple of the cacheline size, so
- * the returned address is always suitably aligned for DMA. */
-extern void* spl_alloc(size_t count);
-
-/* Access to boot storage medium, eg. flash or MMC/SD card.
- *
- * Read address and length is given in bytes. To make life easier, no
- * alignment restrictions are placed on the buffer, length, or address.
- * The buffer doesn't even need to be in DRAM.
- */
-extern int spl_storage_open(void);
-extern void spl_storage_close(void);
-extern int spl_storage_read(uint32_t addr, uint32_t length, void* buffer);
-
-/* Called on a fatal error -- it should do something visible to the user
- * like flash the backlight repeatedly. */
-extern void spl_error(void) __attribute__((noreturn));
+#include "spl-ingenic.h"
 
 #endif /* __SPL_X1000_H__ */
