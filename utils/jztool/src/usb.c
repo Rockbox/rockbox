@@ -143,13 +143,36 @@ void jz_usb_close(jz_usbdev* dev)
     free(dev);
 }
 
+// Direction of each vendor request's control transfer.
+//
+// GET_CPU_INFO returns data, so it must be a device-to-host (IN) request. The
+// Ingenic documentation says otherwise -- X1600 PM Table 34-6 lists it as
+// "bmRequestType = 40H (D7 0: Host to Device)" *with* wLength = 0008H, which is
+// self-contradictory -- and jztool originally followed the documentation and
+// hard-coded LIBUSB_ENDPOINT_OUT for every request.
+//
+// VERIFIED on X1600 hardware (HiBy R1 in BootROM USB mode, a108:eaef): request
+// 0 with bmRequestType 0x40 fails with EIO, and with 0xC0 it returns the 5-byte
+// string "X1600". Every other request carries no data and stays OUT.
+static const unsigned char vendor_req_dir[6] = {
+    [VR_GET_CPU_INFO]     = LIBUSB_ENDPOINT_IN,
+    [VR_SET_DATA_ADDRESS] = LIBUSB_ENDPOINT_OUT,
+    [VR_SET_DATA_LENGTH]  = LIBUSB_ENDPOINT_OUT,
+    [VR_FLUSH_CACHES]     = LIBUSB_ENDPOINT_OUT,
+    [VR_PROGRAM_START1]   = LIBUSB_ENDPOINT_OUT,
+    [VR_PROGRAM_START2]   = LIBUSB_ENDPOINT_OUT,
+};
+
 // Does an Ingenic-specific vendor request
 // Written with X1000 in mind but other Ingenic CPUs have the same commands
 static int jz_usb_vendor_req(jz_usbdev* dev, int req, uint32_t arg,
                              void* buffer, int buflen)
 {
+    if(req < 0 || req >= (int)(sizeof(vendor_req_dir)/sizeof(vendor_req_dir[0])))
+        return JZ_ERR_OTHER;
+
     int rc = libusb_control_transfer(dev->handle,
-        LIBUSB_ENDPOINT_OUT | LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_RECIPIENT_DEVICE,
+        vendor_req_dir[req] | LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_RECIPIENT_DEVICE,
         req, arg >> 16, arg & 0xffff, buffer, buflen, 1000);
 
     if(rc < 0) {
@@ -276,7 +299,11 @@ int jz_usb_flush_caches(jz_usbdev* dev)
  */
 int jz_usb_get_cpu_info(jz_usbdev* dev, char* buffer, size_t buflen)
 {
+    /* Must be zeroed first: the X1000 answers with 8 bytes ("X1000_v1") but the
+     * X1600 answers with only 5 ("X1600"), and jz_usb_vendor_req() does not
+     * report the transferred length, so the tail would otherwise be garbage. */
     char tmpbuf[JZ_CPUINFO_BUFLEN];
+    memset(tmpbuf, 0, sizeof(tmpbuf));
     int rc = jz_usb_vendor_req(dev, VR_GET_CPU_INFO, 0, tmpbuf, 8);
     if(rc != JZ_SUCCESS)
         return rc;

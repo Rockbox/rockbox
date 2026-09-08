@@ -82,11 +82,13 @@ enum jz_device_type {
     JZ_DEVICE_SHANLINGQ1,
     JZ_DEVICE_EROSQ,
     JZ_DEVICE_SHANLINGM0PRO,
+    JZ_DEVICE_HIBYR1,
     JZ_NUM_DEVICES,
 };
 
 enum jz_cpu_type {
     JZ_CPU_X1000,
+    JZ_CPU_X1600,
     JZ_NUM_CPUS,
 };
 
@@ -178,6 +180,7 @@ int jz_usb_get_cpu_info(jz_usbdev* dev, char* buffer, size_t buflen);
  */
 
 int jz_x1000_boot(jz_usbdev* dev, jz_device_type type, const char* filename);
+int jz_x1600_boot(jz_usbdev* dev, jz_device_type type, const char* filename);
 
 /******************************************************************************
  * Buffer API and other functions

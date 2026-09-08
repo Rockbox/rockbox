@@ -70,10 +70,13 @@ void usage_x1000(void)
     exit(4);
 }
 
-int cmdline_x1000(int argc, char** argv)
+/* The "load" command. Identical for every Ingenic CPU except for the usage
+ * text and which jz_*_boot() does the work. */
+int cmdline_load(int argc, char** argv, void (*usage_fn)(void),
+                 int (*boot_fn)(jz_usbdev*, jz_device_type, const char*))
 {
     if(argc < 2 || strcmp(argv[0], "load")) {
-        usage_x1000();
+        usage_fn();
         return 2;
     }
 
@@ -83,13 +86,48 @@ int cmdline_x1000(int argc, char** argv)
         return 1;
     }
 
-    rc = jz_x1000_boot(usbdev, dev_info->device_type, argv[1]);
+    rc = boot_fn(usbdev, dev_info->device_type, argv[1]);
     if(rc < 0) {
         jz_log(jz, JZ_LOG_ERROR, "Boot failed: %d", rc);
         return 1;
     }
 
     return 0;
+}
+
+void usage_x1600(void)
+{
+    printf(
+"Usage:\n"
+"  jztool hibyr1 load <bootloader.r1>\n"
+"\n"
+"The 'load' command boots the Rockbox bootloader in recovery mode over the\n"
+"X1600 BootROM's USB protocol. The player must be in USB boot mode.\n"
+"\n"
+"To put a HiBy R1 in USB boot mode:\n"
+"\n"
+"1. Hold POWER until the player is fully off.\n"
+"2. Unplug the USB cable.\n"
+"3. Hold down NEXT (the lower button on the right-hand side).\n"
+"4. While still holding NEXT, plug the USB cable in. Do NOT press POWER --\n"
+"   inserting the cable is what powers the SoC, and boot_sel is sampled at\n"
+"   that instant, so NEXT has to be held before the cable goes in.\n"
+"5. Release NEXT after about three seconds.\n"
+"\n"
+"The player gives no visible indication. It should appear as USB device\n"
+"a108:eaef, \"Ingenic USB BOOT DEVICE\". Prefer a port directly on the\n"
+"computer over a hub chain.\n"
+"\n"
+"If the BootROM stops responding, a full power-off is required -- unplug the\n"
+"cable and let the player discharge, then start again from step 1. Replugging\n"
+"alone is not enough.\n"
+"\n"
+"Note for Windows users: you need to install the WinUSB driver using a\n"
+"3rd-party tool such as Zadig <https://zadig.akeo.ie> before this tool\n"
+"can access your player in USB boot mode.\n"
+"\n");
+
+    exit(4);
 }
 
 void usage(void)
@@ -203,7 +241,10 @@ int main(int argc, char** argv)
     case JZ_DEVICE_SHANLINGQ1:
     case JZ_DEVICE_EROSQ:
     case JZ_DEVICE_SHANLINGM0PRO:
-        return cmdline_x1000(argc, argv);
+        return cmdline_load(argc, argv, usage_x1000, jz_x1000_boot);
+
+    case JZ_DEVICE_HIBYR1:
+        return cmdline_load(argc, argv, usage_x1600, jz_x1600_boot);
 
     default:
         jz_log(jz, JZ_LOG_ERROR, "INTERNAL ERROR: unhandled device type");

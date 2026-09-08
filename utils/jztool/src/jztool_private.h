@@ -40,4 +40,18 @@ struct jz_usbdev {
 int jz_context_ref_libusb(jz_context* jz);
 void jz_context_unref_libusb(jz_context* jz);
 
+/* Boot package access, shared by the per-CPU boot code. Declared as
+ * "struct mtar" rather than mtar_t so this header need not pull in
+ * microtar.h; it is the same type microtar typedefs. */
+struct mtar;
+
+enum {
+    JZ_BOOT_DECOMPRESS = 0x01,
+    JZ_BOOT_OPTIONAL   = 0x02,
+};
+
+int jz_boot_get_file(jz_context* jz, struct mtar* tar, const char* file,
+                     unsigned int flags, jz_buffer** buf);
+int jz_boot_show_version(jz_context* jz, jz_buffer* info_file);
+
 #endif /* JZTOOL_PRIVATE_H */

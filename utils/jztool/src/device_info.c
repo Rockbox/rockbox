@@ -58,6 +58,19 @@ static const jz_device_info infotable[JZ_NUM_DEVICES] = {
         .vendor_id = 0x0525,
         .product_id = 0xa4a5,
     },
+    [JZ_DEVICE_HIBYR1] = {
+        .name = "hibyr1",
+        .file_ext = "r1",
+        .description = "HiBy R1",
+        .device_type = JZ_DEVICE_HIBYR1,
+        .cpu_type = JZ_CPU_X1600,
+        /* NOTE(x1600): these are the mass-storage-mode IDs and are UNVERIFIED.
+         * The only IDs confirmed on the device are the BootROM's, which live in
+         * the cputable entry below. Fill these in from `lsusb` with the player
+         * booted into its normal firmware and mounted as UMS. */
+        .vendor_id = 0x0000,
+        .product_id = 0x0000,
+    },
 };
 
 static const jz_cpu_info cputable[JZ_NUM_CPUS] = {
@@ -69,6 +82,24 @@ static const jz_cpu_info cputable[JZ_NUM_CPUS] = {
         .stage1_exec_addr = 0xf4001800,
         .stage2_load_addr = 0x80004000,
         .stage2_exec_addr = 0x80004000,
+    },
+    [JZ_CPU_X1600] = {
+        /* A HiBy R1 in BootROM USB mode enumerates as
+         * a108:eaef "Ingenic USB BOOT DEVICE", interface class 255, bulk
+         * endpoints 0x01 OUT / 0x81 IN with 512-byte packets, and answers
+         * GET_CPU_INFO (with bmRequestType 0xC0, see src/usb.c) with "X1600". */
+        .info_str = "X1600",
+        .vendor_id = 0xa108,
+        .product_id = 0xeaef,
+
+        /* Raw USB stage1, linked above the BootROM's cache area (PM 34.3).
+         * Unlike the X1000 flash SPL, this image has no header to skip. */
+        .stage1_load_addr = 0x8000a000,
+        .stage1_exec_addr = 0x8000a000,
+
+        /* Matches X1600_BOOT_LOAD_ADDR in firmware/export/x1600.h. */
+        .stage2_load_addr = 0x80100000,
+        .stage2_exec_addr = 0x80100000,
     },
 };
 

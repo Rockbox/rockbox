@@ -100,70 +100,6 @@ static int run_stage2(jz_usbdev* dev, jz_buffer* buf)
     return jz_usb_start2(dev, load_addr);
 }
 
-enum {
-    F_DECOMPRESS = 0x01,
-    F_OPTIONAL   = 0x02,
-};
-
-static int get_file(jz_context* jz, mtar_t* tar, const char* file,
-                    unsigned int flags, jz_buffer** buf)
-{
-    jz_buffer* buffer = NULL;
-    const mtar_header_t* h;
-    int rc;
-
-    rc = mtar_find(tar, file);
-    if(rc != MTAR_ESUCCESS) {
-        if(!(flags & F_OPTIONAL))
-            jz_log(jz, JZ_LOG_ERROR, "can't find %s in boot file, tar error %d", file, rc);
-        return JZ_ERR_OPEN_FILE;
-    }
-
-    h = mtar_get_header(tar);
-    buffer = jz_buffer_alloc(h->size, NULL);
-    if(!buffer)
-        return JZ_ERR_OUT_OF_MEMORY;
-
-    rc = mtar_read_data(tar, buffer->data, buffer->size);
-    if(rc < 0 || (unsigned)rc != buffer->size) {
-        jz_buffer_free(buffer);
-        jz_log(jz, JZ_LOG_ERROR, "can't read %s in boot file, tar error %d", file, rc);
-        return JZ_ERR_BAD_FILE_FORMAT;
-    }
-
-    if(flags & F_DECOMPRESS) {
-        uint32_t dst_len;
-        jz_buffer* nbuf = jz_ucl_unpack(buffer->data, buffer->size, &dst_len);
-        jz_buffer_free(buffer);
-        if(!nbuf) {
-            jz_log(jz, JZ_LOG_ERROR, "error decompressing %s in boot file", file);
-            return JZ_ERR_BAD_FILE_FORMAT;
-        }
-
-        /* for simplicity just forget original size of buffer */
-        nbuf->size = dst_len;
-        buffer = nbuf;
-    }
-
-    *buf = buffer;
-    return JZ_SUCCESS;
-}
-
-static int show_version(jz_context* jz, jz_buffer* info_file)
-{
-    /* Extract the version string and log it for informational purposes */
-    char* boot_version = (char*)info_file->data;
-    char* endpos = memchr(boot_version, '\n', info_file->size);
-    if(!endpos) {
-        jz_log(jz, JZ_LOG_ERROR, "invalid metadata in boot file");
-        return JZ_ERR_BAD_FILE_FORMAT;
-    }
-
-    *endpos = 0;
-    jz_log(jz, JZ_LOG_NOTICE, "Rockbox bootloader version: %s", boot_version);
-    return JZ_SUCCESS;
-}
-
 /** \brief Load the Rockbox bootloader on an X1000 device
  * \param dev       USB device freshly returned by jz_usb_open()
  * \param filename  Path to the "bootloader.target" file
@@ -193,7 +129,7 @@ int jz_x1000_boot(jz_usbdev* dev, jz_device_type type, const char* filename)
     }
 
     /* Extract all necessary files */
-    rc = get_file(dev->jz, &tar, spl_filename, false, &spl);
+    rc = jz_boot_get_file(dev->jz, &tar, spl_filename, false, &spl);
     if(rc != JZ_SUCCESS)
         goto error;
 
@@ -206,8 +142,8 @@ int jz_x1000_boot(jz_usbdev* dev, jz_device_type type, const char* filename)
      */
     const char* bl_files[2] = {"bootloader2.ucl", "bootloader.ucl"};
     for(int i = 0; i < 2; ++i) {
-        rc = get_file(dev->jz, &tar, bl_files[i],
-                      F_DECOMPRESS|F_OPTIONAL, &bootloader);
+        rc = jz_boot_get_file(dev->jz, &tar, bl_files[i],
+                      JZ_BOOT_DECOMPRESS|JZ_BOOT_OPTIONAL, &bootloader);
         if(rc == JZ_SUCCESS)
             break;
         else if(rc != JZ_ERR_OPEN_FILE)
@@ -219,12 +155,12 @@ int jz_x1000_boot(jz_usbdev* dev, jz_device_type type, const char* filename)
         goto error;
     }
 
-    rc = get_file(dev->jz, &tar, "bootloader-info.txt", false, &info_file);
+    rc = jz_boot_get_file(dev->jz, &tar, "bootloader-info.txt", false, &info_file);
     if(rc != JZ_SUCCESS)
         goto error;
 
     /* Display the version string */
-    rc = show_version(dev->jz, info_file);
+    rc = jz_boot_show_version(dev->jz, info_file);
     if(rc != JZ_SUCCESS)
         goto error;
 
