@@ -1789,6 +1789,116 @@ node TCU {
     }
 }
 
+node UART {
+    title "UART"
+    addr 0xb0030000
+
+    reg URBR {
+        instance 0x0 0x1000 4
+    }
+    reg UTHR {
+        instance 0x0 0x1000 4
+    }
+    reg UDLLR {
+        instance 0x0 0x1000 4
+    }
+    reg UDLHR {
+        instance 0x4 0x1000 4
+    }
+    reg UIER {
+        instance 0x4 0x1000 4
+        bit 5 RETOIE
+        bit 4 RTOIE
+        bit 3 MSIE
+        bit 2 RLSIE
+        bit 1 TDRIE
+        bit 0 RDRIE
+    }
+    reg UIIR {
+        instance 0x8 0x1000 4
+        fld 7 6 FFMSEL { enum NON_FIFO_MODE 0x0; enum FIFO_MODE 0x1 }
+        fld 3 1 INID { enum MODEM_STATUS 0x0; enum TRANSMIT_DATA_REQ 0x1; enum RECEIVE_DATA_READY 0x2; enum RECEIVE_LINE_STATUS 0x3; enum RECEIVE_EMPTY_TIME_OUT 0x5; enum RECEIVE_TIME_OUT 0x6 }
+        bit 0 INPEND
+    }
+    reg UFCR {
+        instance 0x8 0x1000 4
+        fld 7 6 RDTR { enum 1BYTE 0x0; enum 8BYTE 0x1; enum 16BYTE 0x2; enum 32BYTE 0x3 }
+        bit 4 UME
+        bit 3 DME
+        bit 2 TFRT
+        bit 1 RFRT
+        bit 0 FME
+    }
+    reg ULCR {
+        instance 0xc 0x1000 4
+        fld 1 0 WLS { enum 5BITS 0x0; enum 6BITS 0x1; enum 7BITS 0x2; enum 8BITS 0x3 }
+        bit 7 DLAB
+        bit 6 SBK
+        bit 5 STPAR
+        bit 4 PARM { enum ODD 0x0; enum EVEN 0x1 }
+        bit 3 PARE
+        bit 2 SBLS { enum 1_STOP_BIT 0x0; enum 2_STOP_BITS 0x1 }
+    }
+    reg UMCR {
+        instance 0x10 0x1000 4
+        bit 7 MDCE
+        bit 6 FCM
+        bit 4 LOOP
+        bit 1 RTS
+    }
+    reg ULSR {
+        instance 0x14 0x1000 4
+        bit 7 FIFOE
+        bit 6 TEMP
+        bit 5 TDRQ
+        bit 4 BI
+        bit 3 FMER
+        bit 2 PARER
+        bit 1 OVER
+        bit 0 DRY
+    }
+    reg UMSR {
+        instance 0x18 0x1000 4
+        bit 4 CTS
+        bit 0 CCTS
+    }
+    reg USPR {
+        instance 0x1c 0x1000 4
+    }
+    reg ISR {
+        instance 0x20 0x1000 4
+        bit 4 RDPL
+        bit 3 TDPL
+        bit 2 XMODE
+        bit 1 RCVEIR
+        bit 0 XMITIR
+    }
+    reg UMR {
+        instance 0x24 0x1000 4
+    }
+    reg UACR {
+        instance 0x28 0x1000 4
+    }
+    reg URCR {
+        instance 0x40 0x1000 4
+    }
+    reg UTCR {
+        instance 0x44 0x1000 4
+    }
+    reg URFCR {
+        desc "URFCR 0x48: RXFIFO empty-timeout count, PM 25.7.2.18 (line 25046). Reset 0x0000002C.  Must be at least 1.  This is the timeout that drives UIER.RETOIE / UIIR.INID = RECEIVE_EMPTY_TIME_OUT."
+        instance 0x48 0x1000 4
+        fld 6 0 ETO_CNT
+    }
+    reg URTDCR {
+        desc "URTDCR 0x50: separate RX / TX DMA control, PM 25.7.2.19 (line 25066). Lets receive and transmit DMA be enabled independently instead of the single UFCR.DME switch."
+        instance 0x50 0x1000 4
+        bit 7 RTD_EN
+        bit 1 RTD_R
+        bit 0 RTD_T
+    }
+}
+
 node WDT {
     title "WDT"
     addr 0xb0002000

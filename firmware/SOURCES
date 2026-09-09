@@ -1839,6 +1839,7 @@ target/mips/ingenic_x1600/pcm-x1600.c
 target/mips/ingenic_x1600/sfc-x1600.c
 target/mips/ingenic_x1600/system-x1600.c
 target/mips/ingenic_x1600/timer-x1600.c
+target/mips/ingenic_x1600/uart-x1600.c
 #if (CONFIG_STORAGE & (STORAGE_SD|STORAGE_MMC|STORAGE_ATA))
 target/mips/ingenic/msc-ingenic.c
 target/mips/ingenic_x1600/hibyr1/sdmmc-hibyr1.c
