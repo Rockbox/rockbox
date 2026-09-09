@@ -1527,6 +1527,65 @@ node RTC {
     reg WKUPPINCR 0x48
 }
 
+node SADC {
+    title "SADC (SAR A/D controller)"
+    addr 0xb0070000
+
+    reg ENA 0x0 {
+        desc "ADENA, PM 19.5.2.1 (line 18875).  Reset 0x8000, i.e. powered DOWN. Access size is 16 bits per PM Table 19-3, but all defined bits live in the low half word so a 32-bit access reaches them; declared 32-bit for uniformity with the rest of the block."
+        bit 15 POWER
+        bit 14 POW_OPT
+        bit 9 REPTEN
+        bit 3 AUX3EN
+        bit 2 AUX2EN
+        bit 1 AUX1EN
+        bit 0 AUX0EN
+    }
+    reg CFG 0x4 {
+        desc "ADCFG, PM 19.5.2.2 (line 18915).  Reset 0x00000001. ADC_RST is active low: 0 asserts the PHY soft reset. PM says to keep ADC_TRIM at 0 (test mode only)."
+        fld 31 16 ADC_TRIM
+        bit 0 ADC_RST
+    }
+    reg CTRL 0x8 {
+        desc "ADCTRL, PM 19.5.2.3 (line 18935).  Reset 0xFF -- everything masked. 1 = data-ready interrupt masked."
+        bit 3 ARDYM3
+        bit 2 ARDYM2
+        bit 1 ARDYM1
+        bit 0 ARDYM0
+    }
+    reg STATE 0xc {
+        desc "ADSTATE, PM 19.5.2.4 (line 18968).  Reset 0. Data-ready flags; write 1 to clear (RWC)."
+        bit 3 ARDY3
+        bit 2 ARDY2
+        bit 1 ARDY1
+        bit 0 ARDY0
+    }
+    reg DATA0 0x10 {
+        desc "ADATA0 (0x10) holds AUX1 in [27:16] and AUX0 in [11:0]; ADATA1 (0x14) holds AUX3 in [27:16] and AUX2 in [15:0]'s low 12 bits. PM 19.5.2.5 (line 18995) and 19.5.2.6 (line 19018). Writing either register zeroes the stored samples."
+        fld 27 16 AUX1
+        fld 11 0 AUX0
+    }
+    reg DATA1 0x14 {
+        fld 27 16 AUX3
+        fld 11 0 AUX2
+    }
+    reg CLK 0x20 {
+        desc "ADCLK, PM 19.5.2.7 (line 19045).  Reset 0x00041000. adc_clk = dev_clk / CLKDIV        (CLKDIV rounded down to even; 0 bypasses) us_clk  = adc_clk / CLKDIV_US     (likewise) ms_clk  = us_clk  / (CLKDIV_MS+1) The odd/even rule (PM lines 19058, 19064): an odd value divides by field-1."
+        fld 31 16 CLKDIV_MS
+        fld 15 8 CLKDIV_US
+        fld 7 0 CLKDIV
+    }
+    reg STB 0x24 {
+        desc "ADSTB, PM 19.5.2.8 (line 19067).  Reset 0x00030000. Settling delays in ADC clock cycles."
+        fld 31 16 PD_DELAY
+        fld 15 0 STABLE
+    }
+    reg RETM 0x28 {
+        desc "ADRETM, PM 19.5.2.9 (line 19087).  Reset 0. Repeat-sampling interval, in units of ms_clk, used when ADENA.REPTEN = 1."
+        fld 31 0 RETIME
+    }
+}
+
 node SFC {
     title "SFC (SPI flash controller)"
     addr 0xb3440000
