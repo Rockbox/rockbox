@@ -25,7 +25,8 @@
 #include "system.h"
 #include "mmu-mips.h"
 
-#if CONFIG_CPU == JZ4732 || CONFIG_CPU == JZ4760B || CONFIG_CPU == X1000
+#if CONFIG_CPU == JZ4732 || CONFIG_CPU == JZ4760B || CONFIG_CPU == X1000 || \
+    CONFIG_CPU == X1600
 /* XBurst core has 32 JTLB entries */
 #define NR_TLB_ENTRIES  32
 #else
@@ -132,9 +133,10 @@ void mmu_init(void)
 }
 
 /* Target specific operations:
- * - invalidate BTB (Branch Table Buffer)
+ * - invalidate BTB (Branch Target Buffer)
  * - sync barrier after cache operations */
-#if CONFIG_CPU == JZ4732 || CONFIG_CPU == JZ4760B || CONFIG_CPU == X1000
+#if CONFIG_CPU == JZ4732 || CONFIG_CPU == JZ4760B || CONFIG_CPU == X1000 || \
+    CONFIG_CPU == X1600
 #define INVALIDATE_BTB()                     \
 do {                                         \
         register unsigned long tmp;          \
@@ -167,6 +169,19 @@ do {                                         \
     :                                        \
     : "i" (op), "m"(*(unsigned char *)(addr)))
 
+#if CONFIG_CPU == X1600
+#define SDHitWBInv   ((K_CacheHitWBInv << S_CacheFunc) | K_CacheSecU)
+#define SDHitInv     ((K_CacheHitInv << S_CacheFunc) | K_CacheSecU)
+#define SDIndexWBInv ((K_CacheIndexWBInv << S_CacheFunc) | K_CacheSecU)
+#define L2_CACHE_SIZE (128 * 1024)
+
+static inline void l2_cache_barrier(void)
+{
+    (void)*(volatile unsigned long*)A_K1BASE;
+    SYNC_WB();
+}
+#endif
+
 /* rockbox cache api */
 
 /* Writeback whole D-cache
@@ -185,6 +200,11 @@ void commit_discard_dcache(void)
         __CACHE_OP(DCIndexWBInv, i);
 
     SYNC_WB();
+#if CONFIG_CPU == X1600
+    for(i = A_K0BASE; i < A_K0BASE + L2_CACHE_SIZE; i += CACHEALIGN_SIZE)
+        __CACHE_OP(SDIndexWBInv, i);
+    l2_cache_barrier();
+#endif
 }
 
 /* Writeback lines of D-cache corresponding to address range and
@@ -199,12 +219,20 @@ void commit_discard_dcache_range(const void *base, unsigned int size)
         __CACHE_OP(DCHitWBInv, ptr);
 
     SYNC_WB();
+#if CONFIG_CPU == X1600
+    for(ptr = CACHEALIGN_DOWN((char*)base); ptr != end; ptr += CACHEALIGN_SIZE)
+        __CACHE_OP(SDHitWBInv, ptr);
+    l2_cache_barrier();
+#endif
 }
 
 /* Writeback lines of D-cache corresponding to address range
  */
 void commit_dcache_range(const void *base, unsigned int size)
 {
+#if CONFIG_CPU == X1600
+    commit_discard_dcache_range(base, size);
+#else
     char *ptr = CACHEALIGN_DOWN((char*)base);
     char *end = CACHEALIGN_UP((char*)base + size);
 
@@ -212,6 +240,7 @@ void commit_dcache_range(const void *base, unsigned int size)
         __CACHE_OP(DCHitWB, ptr);
 
     SYNC_WB();
+#endif
 }
 
 /* Invalidate D-cache lines corresponding to address range
@@ -227,6 +256,10 @@ void discard_dcache_range(const void *base, unsigned int size)
        to discard. */
     if (base != ptr) {
         __CACHE_OP(DCHitWBInv, ptr);
+#if CONFIG_CPU == X1600
+        SYNC_WB();
+        __CACHE_OP(SDHitWBInv, ptr);
+#endif
         ptr += CACHEALIGN_SIZE;
     }
 
@@ -235,13 +268,25 @@ void discard_dcache_range(const void *base, unsigned int size)
     if (ptr != end && (end !=((char*)base + size))) {
         end -= CACHEALIGN_SIZE;
         __CACHE_OP(DCHitWBInv, end);
+#if CONFIG_CPU == X1600
+        SYNC_WB();
+        __CACHE_OP(SDHitWBInv, end);
+#endif
     }
 
+#if CONFIG_CPU == X1600
+    char *l2_ptr = ptr;
+#endif
     /* Finally, discard whatever is left */
     for(; ptr != end; ptr += CACHEALIGN_SIZE)
         __CACHE_OP(DCHitInv, ptr);
 
     SYNC_WB();
+#if CONFIG_CPU == X1600
+    for(; l2_ptr != end; l2_ptr += CACHEALIGN_SIZE)
+        __CACHE_OP(SDHitInv, l2_ptr);
+    l2_cache_barrier();
+#endif
 }
 
 /* Invalidate whole I-cache */
@@ -260,6 +305,9 @@ static void discard_icache(void)
     for (i=A_K0BASE; i<A_K0BASE+CACHE_SIZE; i+=CACHEALIGN_SIZE)
         __CACHE_OP(ICIndexStTag, i);
 
+#if CONFIG_CPU == X1600
+    l2_cache_barrier();
+#endif
     INVALIDATE_BTB();
 }
 
