@@ -869,6 +869,38 @@ node DPU {
     }
 }
 
+node EFUSE {
+    title "EFUSE slave interface"
+    addr 0xb3540000
+
+    reg CTRL 0x0 {
+        desc "EFUCTRL, PM 20.2.2.1 (line 19183).  Reset 0x001F0000 (Length = 31 -> 32 B)."
+        fld 27 21 ADDRESS
+        fld 20 16 LENGTH
+        bit 15 PG_EN
+        bit 1 WR_EN
+        bit 0 RD_EN
+    }
+    reg CFG 0x4 {
+        desc "EFUSE access timing in AHB2 clock periods (PM 20.2.2.2)."
+        bit 31 INT_EN
+        fld 23 20 RD_ADJ
+        fld 19 16 RD_STROBE
+        fld 15 12 WR_ADJ
+        fld 11 0 WR_STROBE
+    }
+    reg STATE 0x8 {
+        access read-only
+        desc "EFUSE completion status (PM 20.2.2.3). Only RD_DONE and WR_DONE are described here."
+        bit 1 WR_DONE
+        bit 0 RD_DONE
+    }
+    reg DATA {
+        desc "EFUDATA0..7, 0x0C + n*4.  PM Table (line 19173ff). 32 bytes of read/write buffer."
+        instance 0xc 0x4 8
+    }
+}
+
 node GPIO {
     title "GPIO / pin controller"
     addr 0xb0010000
