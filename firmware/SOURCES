@@ -901,6 +901,8 @@ target/mips/system-mips.c
 target/mips/ingenic_jz47xx/crt0.S
 #elif CONFIG_CPU==X1000
 target/mips/ingenic_x1000/crt0.S
+#elif CONFIG_CPU==X1600
+target/mips/ingenic_x1600/crt0.S
 #endif
 
 #else
@@ -1824,7 +1826,13 @@ drivers/audio/x1000-codec.c
 #endif /* CONFIG_CPU == X1000 */
 
 #if CONFIG_CPU == X1600
+target/mips/ingenic_x1600/boot-x1600.c
 target/mips/ingenic_x1600/clk-x1600.c
+target/mips/ingenic/dma-ingenic.c
+target/mips/ingenic/gpio-ingenic.c
+target/mips/ingenic/kernel-ingenic.c
+target/mips/ingenic_x1600/system-x1600.c
+target/mips/ingenic_x1600/timer-x1600.c
 #endif /* CONFIG_CPU == X1600 */
 
 #if defined(ONDA_VX747) || defined(ONDA_VX747P) || defined(ONDA_VX777)

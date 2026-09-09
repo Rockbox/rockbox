@@ -387,3 +387,363 @@ node CPM {
         bit 19 WORD_IF { enum 8BIT 0x0; enum 16BIT 0x1 }
     }
 }
+
+node DMA {
+    title "DMA"
+    addr 0xb3421000
+
+    reg CTRL 0x0 {
+        bit 31 FMSC
+        bit 30 FSSI
+        bit 29 FTSSI
+        bit 28 FUART
+        bit 27 FAIC
+        bit 3 HALT
+        bit 2 AR
+        bit 0 ENABLE
+    }
+    reg IRQP 0x4
+    reg DB 0x8 {
+        variant set 4
+    }
+    reg DIP 0x10
+    reg DIC 0x14
+}
+
+node DMA_CHN {
+    title "DMA_CHN"
+    addr 0xb3420000
+
+    reg SA {
+        instance 0x0 0x20 32
+    }
+    reg TA {
+        instance 0x4 0x20 32
+    }
+    reg TC {
+        instance 0x8 0x20 32
+        fld 31 24 DOA
+        fld 23 0 CNT
+    }
+    reg RT {
+        instance 0xc 0x20 32
+        fld 5 0 TYPE { enum AUTO 0x08; enum CAN0_TX 0x0a; enum CAN0_RX 0x0b; enum CAN1_TX 0x0c; enum CAN1_RX 0x0d; enum UART3_TX 0x0e; enum UART3_RX 0x0f; enum UART2_TX 0x10; enum UART2_RX 0x11; enum UART1_TX 0x12; enum UART1_RX 0x13; enum UART0_TX 0x14; enum UART0_RX 0x15; enum SSI0_TX 0x16; enum SSI0_RX 0x17; enum I2C0_TX 0x24; enum I2C0_RX 0x25; enum I2C1_TX 0x26; enum I2C1_RX 0x27; enum SSI_SLV_TX 0x2a; enum SSI_SLV_RX 0x2b; enum MSC0_TX 0x34; enum MSC0_RX 0x35; enum MSC1_TX 0x36; enum MSC1_RX 0x37; enum SADC_RX 0x38; enum AIC_TL 0x3d; enum AIC_TX 0x3e; enum AIC_RX 0x3f }
+    }
+    reg CS {
+        instance 0x10 0x20 32
+        fld 15 8 CDOA
+        bit 31 NDES
+        bit 30 DES8
+        bit 4 AR
+        bit 3 TT
+        bit 2 HLT
+        bit 0 CTE
+    }
+    reg CM {
+        instance 0x14 0x20 32
+        fld 19 16 RDIL
+        fld 15 14 SP { enum 32BIT 0x0; enum 8BIT 0x1; enum 16BIT 0x2 }
+        fld 13 12 DP { enum 32BIT 0x0; enum 8BIT 0x1; enum 16BIT 0x2 }
+        fld 10 8 TSZ { enum 32BIT 0x0; enum 8BIT 0x1; enum 16BIT 0x2; enum 16BYTE 0x3; enum 32BYTE 0x4; enum 64BYTE 0x5; enum 128BYTE 0x6; enum AUTO 0x7 }
+        bit 23 SAI
+        bit 22 DAI
+        bit 2 STDE
+        bit 1 TIE
+        bit 0 LINK
+    }
+    reg DA {
+        instance 0x18 0x20 32
+        fld 31 12 DBA
+        fld 11 4 DOA
+    }
+    reg SD {
+        instance 0x1c 0x20 32
+        fld 31 16 TSD
+        fld 15 0 SSD
+    }
+}
+
+node GPIO {
+    title "GPIO / pin controller"
+    addr 0xb0010000
+
+    reg PIN {
+        access read-only
+        desc "PxPINL: PORT PIN Level register, read only. PM 21.4.2.1 (line 19889)."
+        instance 0x0 0x100 8
+    }
+    reg INT {
+        desc "PxINT: 1 = pin is an interrupt source, 0 = device function or plain GPIO. PM 21.4.2.2-4 (line 19910). Reset 0x00000000."
+        instance 0x10 0x100 8
+        variant set 4
+        variant clr 8
+    }
+    reg MSK {
+        desc "PxMSK: with INT=1, 1 = interrupt disabled; with INT=0, 1 = GPIO, 0 = device function.  PM 21.4.2.5-7 (line 19964).  Reset: PA 0xFFFFFFFF, PB 0xDFFBF7B0, PC 0x9F7E0007, PD 0x0000003F (PM Table 21-7, line 19758ff -- the non-0xFF.. resets are the pins that come out of reset already muxed to a device)."
+        instance 0x20 0x100 8
+        variant set 4
+        variant clr 8
+    }
+    reg PAT1 {
+        desc "PxPAT1: PM 21.4.2.8-10 (line 20050). INT=1           -> 0 = level triggered,     1 = edge triggered INT=0 && MSK=0  -> 0 = device 0 or 1,       1 = device 2 or 3 INT=0 && MSK=1  -> 0 = GPIO output,         1 = GPIO input"
+        instance 0x30 0x100 8
+        variant set 4
+        variant clr 8
+    }
+    reg PAT0 {
+        desc "PxPAT0: PM 21.4.2.11-13 (line 20104). INT=1 && PAT1=0 -> 0 = low level,           1 = high level INT=1 && PAT1=1 -> 0 = falling edge,        1 = rising edge INT=0 && MSK=0  -> selects device 0/1 (PAT1=0) or device 2/3 (PAT1=1) INT=0 && MSK=1 && PAT1=0 -> GPIO output level"
+        instance 0x40 0x100 8
+        variant set 4
+        variant clr 8
+    }
+    reg FLAG {
+        access read-only
+        desc "PxFLG (0x50, read only) / PxFLGC (0x58, write 1 to clear). PM 21.4.2.14-15 (line 20161).  Note there is no PxFLGS."
+        instance 0x50 0x100 8
+        variant clr 8
+    }
+    reg EDG {
+        desc "PxEDG: dual edge interrupt select -- NEW on X1600, occupies the offset the X1000 used for its pull-up register.  PM 21.4.2.16-18 (line 20219). 0 = single edge, edge chosen by PAT0 1 = dual edge, PAT0 ignored"
+        instance 0x70 0x100 8
+        variant set 4
+        variant clr 8
+    }
+    reg PULL {
+        desc "Pad pull enable (PM 21.4.2.19-21): 0 disables the pull, 1 enables it. Direction is fixed per pad; PC24-PC26 pull down. Named GPIO_PULL for the shared driver."
+        instance 0x80 0x100 8
+        variant set 4
+        variant clr 8
+    }
+    reg Z_GID2LD 0x7f0 {
+        access write-only
+        desc "PzGID2LD: writing a port number here atomically copies the shadow group's INT/MSK/PAT1/PAT0 into that port, avoiding the transient states you get from programming the four registers one at a time.  PM 21.4.2.23 (line 20438); the worked example at line 20535 writes 0x1 to select port B."
+    }
+}
+
+node INTC {
+    title "interrupt controller"
+    addr 0xb0001000
+
+    reg SRC {
+        access read-only
+        desc "ICSRn -- raw source status, read only."
+        instance 0x0 0x20 8
+    }
+    reg MSK {
+        desc "ICMRn -- 1 = masked.  SET at +0x4, CLR at +0x8."
+        instance 0x4 0x20 8
+        variant set 4
+        variant clr 8
+    }
+    reg PND {
+        access read-only
+        desc "ICPRn -- pending after masking, read only.  This is what a dispatcher wants."
+        instance 0x10 0x20 8
+    }
+    reg DSR {
+        access read-only
+        desc "PDMA interrupt status, mask and pending groups (PM Table 17-2). Group stride is 0xc; these use the PDMA channel map."
+        instance 0x34 0xc 8
+    }
+    reg DMR {
+        instance 0x38 0xc 8
+    }
+    reg DPR {
+        access read-only
+        instance 0x3c 0xc 8
+    }
+}
+
+node OST {
+    title "OST (operating system timer)"
+    addr 0xb2000000
+
+    reg CTRL 0x0 {
+        desc "OSTCCR, PM 14.3.2.1 (line 15986).  Reset 0."
+        fld 3 2 PRESCALE2 { enum BY_1 0x0; enum BY_4 0x1; enum BY_16 0x2 }
+        fld 1 0 PRESCALE1 { enum BY_1 0x0; enum BY_4 0x1; enum BY_16 0x2 }
+    }
+    reg ENABLE 0x4 {
+        access read-only
+        desc "OSTER (0x04, read only) with OSTESR (0x34) / OSTECR (0x38). PM 14.3.2.2 (line 16022), 14.3.2.10 (line 16161), 14.3.2.11 (line 16188). Both channels can therefore be started on the same cycle."
+        variant set 48
+        variant clr 52
+        bit 0 OST1
+        bit 1 OST2
+    }
+    reg CLEAR 0x8 {
+        access write-only
+        desc "OSTCR, PM 14.3.2.3 (line 16046): write 1 to zero a counter."
+        bit 0 OST1
+        bit 1 OST2
+    }
+    reg 1FLG 0xc {
+        desc "OSTFR, PM 14.3.2.4 (line 16072): ost1 full-match flag, write 1 to clear. Only channel 1 has a flag -- ost2 is free running and cannot interrupt."
+        bit 0 FFLAG
+    }
+    reg 1MSK 0x10 {
+        desc "OSTMR, PM 14.3.2.5 (line 16089).  Reset 0x00000001, i.e. masked."
+        bit 0 FMASK
+    }
+    reg 1DFR 0x14 {
+        desc "OST1DFR, PM 14.3.2.6 (line 16111).  Reset 0xFFFFFFFF. ost1 counts up to this value, then wraps to 0 and raises OSTFR.FFLAG."
+    }
+    reg 1CNT 0x18 {
+        desc "OST1 read/write counter (PM 14.3.2.7). Clear it directly or through OST_CLEAR."
+    }
+    reg 2CNTH 0x1c {
+        desc "OST2 64-bit counter (PM 14.3.2.8-9). Read the low half first, then the latched high half in OST_2CNTHB."
+    }
+    reg 2CNTL 0x20
+    reg 2CNTHB 0x24 {
+        access read-only
+    }
+}
+
+node TCU {
+    title "TCU (timer / counter unit)"
+    addr 0xb0002000
+
+    reg ENABLE 0x10 {
+        access read-only
+        desc "TER (0x10, RO) with TESR (0x14) / TECR (0x18). PM 12.4.2.1-3 (lines 14176, 14224, 14270).  Reset 0. Named TCU_ENABLE to match the X1000 headers."
+        variant set 4
+        variant clr 8
+        bit 0 TCEN0
+        bit 1 TCEN1
+        bit 2 TCEN2
+        bit 3 TCEN3
+        bit 4 TCEN4
+        bit 5 TCEN5
+        bit 6 TCEN6
+        bit 7 TCEN7
+        bit 15 OSTEN
+    }
+    reg STOP 0x1c {
+        access read-only
+        desc "Timer clock-stop status (PM 12.4.2.4-6). Set and clear aliases are at +0x10 and +0x20."
+        variant set 16
+        variant clr 32
+    }
+    reg FLAG 0x20 {
+        access read-only
+        desc "TFR (0x20, RO) with TFSR (0x24) / TFCR (0x28). PM 12.4.2.7-9 (lines 14466, 14518, 14545).  Reset 0. Layout mirrors TMR below: FFLAG per channel in [7:0], OST in [15], HFLAG per channel in [23:16], WDT half-match in [24]."
+        variant set 4
+        variant clr 8
+        bit 0 FFLAG0
+        bit 1 FFLAG1
+        bit 2 FFLAG2
+        bit 3 FFLAG3
+        bit 4 FFLAG4
+        bit 5 FFLAG5
+        bit 6 FFLAG6
+        bit 7 FFLAG7
+        bit 15 OSTFLAG
+        bit 16 HFLAG0
+        bit 17 HFLAG1
+        bit 18 HFLAG2
+        bit 19 HFLAG3
+        bit 20 HFLAG4
+        bit 21 HFLAG5
+        bit 22 HFLAG6
+        bit 23 HFLAG7
+        bit 24 WDTFLAG
+    }
+    reg MASK 0x30 {
+        access read-only
+        desc "Timer interrupt masks (PM 12.4.2.10-12). A set bit masks the corresponding full-match or half-match interrupt."
+        variant set 4
+        variant clr 8
+        bit 0 FMASK0
+        bit 1 FMASK1
+        bit 2 FMASK2
+        bit 3 FMASK3
+        bit 4 FMASK4
+        bit 5 FMASK5
+        bit 6 FMASK6
+        bit 7 FMASK7
+        bit 15 OSTMASK
+        bit 16 HMASK0
+        bit 17 HMASK1
+        bit 18 HMASK2
+        bit 19 HMASK3
+        bit 20 HMASK4
+        bit 21 HMASK5
+        bit 22 HMASK6
+        bit 23 HMASK7
+        bit 24 HMASKW
+    }
+    reg CMP_FULL {
+        desc "Per-channel registers, n = 0..7. TDFRn 0x40+n*0x10, TDHRn 0x44+n*0x10, TCNTn 0x48+n*0x10, TCRn 0x4C+n*0x10. PM 12.4.2.13-16 (lines 14675, 14689, 14708, 14723).  All 16 bits wide. Names match the X1000 headers (CMP_FULL / CMP_HALF / COUNT / CTRL)."
+        instance 0x40 0x10 8
+    }
+    reg CMP_HALF {
+        instance 0x44 0x10 8
+    }
+    reg COUNT {
+        instance 0x48 0x10 8
+    }
+    reg CTRL {
+        desc "Timer control (PM 12.4.2.16). PRESCALE and EXT retain the X1000 encodings; the capture and clock-selection fields differ."
+        instance 0x4c 0x10 8
+        bit 26 STORE_NEG_EN
+        bit 25 STORE_POS_EN
+        bit 24 STORE_EN
+        fld 23 22 COUNT_MODE { enum TO_FULL 0x0; enum TO_FFFF_WRAP 0x1; enum TO_FFFF_HOLD 0x2 }
+        bit 21 GPIO1_NEG_EN
+        bit 20 GPIO1_POS_EN
+        bit 19 GPIO0_NEG_EN
+        bit 18 GPIO0_POS_EN
+        bit 17 CLK_NEG_EN
+        bit 16 CLK_POS_EN
+        bit 15 SHUTDOWN
+        bit 14 GATE_POLA
+        bit 13 DIRECTION_POLA
+        fld 12 11 GATE_SEL { enum OFF 0x0; enum CLK 0x1; enum GPIO0 0x2; enum GPIO1 0x3 }
+        fld 10 8 DIRECTION_SEL { enum OFF 0x0; enum CLK 0x1; enum GPIO0 0x2; enum GPIO1 0x3; enum QUADRATURE 0x4 }
+        bit 7 GPIO1_EN
+        bit 6 GPIO0_EN
+        fld 5 3 PRESCALE { enum BY_1 0x0; enum BY_4 0x1; enum BY_16 0x2; enum BY_64 0x3; enum BY_256 0x4; enum BY_1024 0x5 }
+        bit 2 EXT_EN
+    }
+    reg CAPCR {
+        desc "Timer capture, filter and store controls (PM 12.4.2.17-19). Only register addresses are described here."
+        instance 0xc0 0x4 8
+    }
+    reg CAPVR {
+        instance 0xe0 0x4 8
+    }
+    reg FIRVR {
+        instance 0x1a0 0x4 8
+    }
+    reg STORE_FLAG 0x200 {
+        access read-only
+        desc "Store flag/mask block, PM Table 12-3 (line 14166ff). TSFR 0x200 (RO) + TSFSR 0x204 / TSFCR 0x208 TSMR 0x210 (RO) + TSMSR 0x214 / TSMCR 0x218, reset 0x000000FF"
+        variant set 4
+        variant clr 8
+    }
+    reg STORE_MASK 0x210 {
+        access read-only
+        variant set 4
+        variant clr 8
+    }
+    reg STORE_VALUE {
+        instance 0x220 0x4 8
+    }
+    reg STORE_FILTER {
+        instance 0x240 0x4 8
+    }
+}
+
+node WDT {
+    title "WDT"
+    addr 0xb0002000
+
+    reg DATA 0x0
+    reg ENABLE 0x4
+    reg COUNT 0x8
+    reg CTRL 0xc {
+        fld 5 3 PRESCALE { enum BY_1 0x0; enum BY_4 0x1; enum BY_16 0x2; enum BY_64 0x3; enum BY_256 0x4; enum BY_1024 0x5 }
+        fld 2 0 SOURCE { enum EXT 0x4; enum RTC 0x2; enum PLCK 0x1 }
+    }
+}
