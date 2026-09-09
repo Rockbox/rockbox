@@ -342,6 +342,8 @@ int main (int argc, char** argv)
             modelnum = 117;
         else if (!strcmp(&argv[1][5], "nn4g")) /* iPod Nano 4th Gen */
             modelnum = 118;
+        else if (!strcmp(&argv[1][5], "hbr1")) /* HiBy R1 (native) */
+            modelnum = 126;
         else {
             fprintf(stderr, "unsupported model: %s\n", &argv[1][5]);
             return 2;

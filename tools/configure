@@ -1770,7 +1770,7 @@ cat <<EOF
  ==Shanling==                                    ==HiBy==
  260) Q1                   ==Surfans==           300) R3 Pro II
                            280) F28 (WIP)        301) R1
- ==Echo project==
+ ==Echo project==                                304) R1 baremetal (WIP)
  270) Echo R1 (WIP)       ==Nintendo==          ==Hidizs==
                           290) 3DS (WIP)        302) AP80 Pro Max (WIP)
 EOF
@@ -1793,6 +1793,8 @@ fi
   scramblebitmaptools="$genericbitmaptools scramble"
   # used by X1000 targets
   x1000tools="$genericbitmaptools scramble mkspl-x1000 uclpack"
+  # used by X1600 targets
+  x1600tools="$genericbitmaptools scramble mkspl-x1600 uclpack"
   # default to not generating ELF files
   USE_ELF="no"
   PLUGIN_USE_ELF="no"
@@ -4274,6 +4276,32 @@ fi
     t_cpu="hosted"
     t_manufacturer="game_console"
     t_model="psp"
+    ;;
+
+    304|hibyr1native)
+    target_id=126
+    modelname="hibyr1native"
+    target="HIBY_R1_NATIVE"
+    memory=64
+    mipsr2elcc
+    appextra=""
+    plugins="yes"
+    tool="$rootdir/tools/scramble -add=hbr1 "
+    boottool="$rootdir/tools/mkspl-x1600 -type=nand -ppb=2 -bpp=2 "
+    output="rockbox.r1"
+    bootoutput="bootloader.r1"
+    sysfontbl="24-Terminus"
+    sysfont="20-Terminus"
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
+    toolset="$x1600tools"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="mips"
+    t_manufacturer="ingenic_x1600"
+    t_soc="ingenic"
+    t_model="hibyr1"
     ;;
 
 

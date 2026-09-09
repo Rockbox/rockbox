@@ -5,7 +5,7 @@
 
 /* RoLo-related defines */
 #define MODEL_NAME      "HiBy R1 Native"
-#define MODEL_NUMBER    125
+#define MODEL_NUMBER    126
 #define BOOTFILE_EXT    "r1"
 #define BOOTFILE        "rockbox." BOOTFILE_EXT
 
@@ -167,7 +167,6 @@
 #define HAVE_VOLUME_IN_LIST
 #define HAVE_QUICKSCREEN
 #define HAVE_HOTKEY
-#define AB_REPEAT_ENABLE
 
 /* Bluetooth, Wi-Fi, recording and general-purpose LED support are not
  * implemented. */

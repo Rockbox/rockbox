@@ -525,7 +525,7 @@
 #define UI_LCD_POSX                 79
 #define UI_LCD_POSY                 63
 
-#elif defined(HIBY_R1)
+#elif defined(HIBY_R1) || defined(HIBY_R1_NATIVE)
 #define UI_TITLE                    "Hiby R1"
 #define UI_WIDTH                    634
 #define UI_HEIGHT                   1016

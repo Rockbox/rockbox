@@ -90,7 +90,11 @@ shanling-q1.c
 #elif CONFIG_KEYPAD == RG_NANO_PAD
 rg-nano.c
 #elif CONFIG_KEYPAD == HIBY_R3PROII_PAD
+#ifdef HIBY_R1_NATIVE
+hiby-r1.c
+#else
 hiby-r3proii.c
+#endif
 #elif CONFIG_KEYPAD == HIDIZS_AP80MAX_PAD
 hidizs-ap80max.c
 #endif
