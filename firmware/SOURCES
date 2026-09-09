@@ -1830,6 +1830,7 @@ target/mips/ingenic_x1600/boot-x1600.c
 target/mips/ingenic_x1600/clk-x1600.c
 target/mips/ingenic/dma-ingenic.c
 target/mips/ingenic/gpio-ingenic.c
+target/mips/ingenic/i2c-ingenic.c
 target/mips/ingenic/kernel-ingenic.c
 target/mips/ingenic_x1600/system-x1600.c
 target/mips/ingenic_x1600/timer-x1600.c

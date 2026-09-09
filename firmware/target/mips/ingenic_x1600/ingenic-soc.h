@@ -31,6 +31,8 @@
 #include "x1600/dma_chn.h"
 #include "x1600/cpm.h"
 #include "x1600/ost.h"
+#include "x1600/rtc.h"
+#include "x1600/i2c.h"
 
 #define SOC_CLK_PCLK X1600_CLK_PCLK
 #define SOC_EXCLK_FREQ X1600_EXCLK_FREQ

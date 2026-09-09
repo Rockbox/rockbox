@@ -520,6 +520,200 @@ node GPIO {
     }
 }
 
+node I2C {
+    title "I2C controller (DesignWare APB I2C)"
+    addr 0xb0050000
+
+    reg CON {
+        instance 0x0 0x1000 3
+        fld 2 1 SPEED { enum 100K 0x1; enum 400K 0x2; enum 3400K 0x3 }
+        bit 6 SLVDIS
+        bit 5 RESTART
+        bit 4 MATP
+        bit 3 SATP
+        bit 0 MD
+    }
+    reg DC {
+        instance 0x10 0x1000 3
+        fld 7 0 DAT
+        bit 10 RESTART
+        bit 9 STOP
+        bit 8 CMD
+    }
+    reg INTST {
+        instance 0x2c 0x1000 3
+        bit 11 GC
+        bit 10 STT
+        bit 9 STP
+        bit 8 ACT
+        bit 7 RXDN
+        bit 6 TXABT
+        bit 5 RDREQ
+        bit 4 TXEMP
+        bit 3 TXOF
+        bit 2 RXFL
+        bit 1 RXOF
+        bit 0 RXUF
+    }
+    reg INTMSK {
+        instance 0x30 0x1000 3
+        bit 11 GC
+        bit 10 STT
+        bit 9 STP
+        bit 8 ACT
+        bit 7 RXDN
+        bit 6 TXABT
+        bit 5 RDREQ
+        bit 4 TXEMP
+        bit 3 TXOF
+        bit 2 RXFL
+        bit 1 RXOF
+        bit 0 RXUF
+    }
+    reg RINTST {
+        instance 0x34 0x1000 3
+        bit 11 GC
+        bit 10 STT
+        bit 9 STP
+        bit 8 ACT
+        bit 7 RXDN
+        bit 6 TXABT
+        bit 5 RDREQ
+        bit 4 TXEMP
+        bit 3 TXOF
+        bit 2 RXFL
+        bit 1 RXOF
+        bit 0 RXUF
+    }
+    reg ENABLE {
+        instance 0x6c 0x1000 3
+        bit 1 ABORT
+        bit 0 ACTIVE
+    }
+    reg STATUS {
+        instance 0x70 0x1000 3
+        bit 6 SLVACT
+        bit 5 MSTACT
+        bit 4 RFF
+        bit 3 RFNE
+        bit 2 TFE
+        bit 1 TFNF
+        bit 0 ACT
+    }
+    reg ENBST {
+        instance 0x9c 0x1000 3
+        bit 2 SLVRDLST
+        bit 1 SLVDISB
+        bit 0 ACTIVE
+    }
+    reg TAR {
+        instance 0x4 0x1000 3
+        fld 9 0 ADDR
+        bit 12 10BITS
+        bit 11 SPECIAL
+        bit 10 GC_OR_START
+    }
+    reg SAR {
+        instance 0x8 0x1000 3
+    }
+    reg SHCNT {
+        instance 0x14 0x1000 3
+    }
+    reg SLCNT {
+        instance 0x18 0x1000 3
+    }
+    reg FHCNT {
+        instance 0x1c 0x1000 3
+    }
+    reg FLCNT {
+        instance 0x20 0x1000 3
+    }
+    reg RXTL {
+        instance 0x38 0x1000 3
+    }
+    reg TXTL {
+        instance 0x3c 0x1000 3
+    }
+    reg TXFLR {
+        instance 0x74 0x1000 3
+    }
+    reg RXFLR {
+        instance 0x78 0x1000 3
+    }
+    reg SDAHD {
+        instance 0x7c 0x1000 3
+    }
+    reg ABTSRC {
+        instance 0x80 0x1000 3
+    }
+    reg DMACR {
+        instance 0x88 0x1000 3
+    }
+    reg DMATDLR {
+        instance 0x8c 0x1000 3
+    }
+    reg DMARDLR {
+        instance 0x90 0x1000 3
+    }
+    reg SDASU {
+        instance 0x94 0x1000 3
+    }
+    reg ACKGC {
+        instance 0x98 0x1000 3
+    }
+    reg FLT {
+        instance 0xa0 0x1000 3
+    }
+    reg CINT {
+        instance 0x40 0x1000 3
+    }
+    reg CRXUF {
+        instance 0x44 0x1000 3
+    }
+    reg CRXOF {
+        instance 0x48 0x1000 3
+    }
+    reg CTXOF {
+        instance 0x4c 0x1000 3
+    }
+    reg CRXREQ {
+        instance 0x50 0x1000 3
+    }
+    reg CTXABT {
+        instance 0x54 0x1000 3
+    }
+    reg CRXDN {
+        instance 0x58 0x1000 3
+    }
+    reg CACT {
+        instance 0x5c 0x1000 3
+    }
+    reg CSTP {
+        instance 0x60 0x1000 3
+    }
+    reg CSTT {
+        instance 0x64 0x1000 3
+    }
+    reg CGC {
+        instance 0x68 0x1000 3
+    }
+    reg HS_MADDR {
+        instance 0xc 0x1000 3
+        fld 2 0 HSMAR
+    }
+    reg HHCNT {
+        desc "I2C_HHCNT / I2C_HLCNT: SCL high/low counts for high-speed (3.4 Mb/s) mode. PM 22.2.2.10 (line 20966) and 22.2.2.11 (line 20983). Resets 0x0006 / 0x0010.  Minimum programmable values are 6 and 8; smaller values are silently clamped.  Neither register exists on the X1000."
+        instance 0x24 0x1000 3
+    }
+    reg HLCNT {
+        instance 0x28 0x1000 3
+    }
+    reg SDNACK {
+        desc "I2CSDNACK 0x84: generate a SLV_DATA_NACK.  PM Table 22-3 (line 20659). Field layout not transcribed; slave mode is unused by Rockbox."
+        instance 0x84 0x1000 3
+    }
+}
+
 node INTC {
     title "interrupt controller"
     addr 0xb0001000
@@ -598,6 +792,49 @@ node OST {
     reg 2CNTHB 0x24 {
         access read-only
     }
+}
+
+node RTC {
+    title "RTC"
+    addr 0xb0003000
+
+    reg CR 0x0 {
+        bit 7 WRDY
+        bit 6 1HZ
+        bit 5 1HZIE
+        bit 4 AF
+        bit 3 AIE
+        bit 2 AE
+        bit 1 SELEXC
+        bit 0 ENABLE
+    }
+    reg SR 0x4
+    reg SAR 0x8
+    reg GR 0xc {
+        fld 25 16 ADJC
+        fld 15 0 NC1HZ
+        bit 31 LOCK
+    }
+    reg HCR 0x20
+    reg HWFCR 0x24
+    reg HRCR 0x28
+    reg HWCR 0x2c {
+        fld 31 3 EPDET
+        bit 0 EALM
+    }
+    reg HWRSR 0x30 {
+        bit 8 APD
+        bit 5 HR
+        bit 4 PPR
+        bit 1 PIN
+        bit 0 ALM
+    }
+    reg HSPR 0x34
+    reg WENR 0x3c {
+        bit 31 WEN
+        fld 15 0 WENPAT
+    }
+    reg WKUPPINCR 0x48
 }
 
 node TCU {
