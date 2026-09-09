@@ -24,7 +24,7 @@
 #include "i2c-async.h"
 #include <string.h>
 
-#if defined(HAVE_AXP2101_ADDON)
+#if defined(HAVE_AXP2101)
 # include "axp-2101.h"
 # include "devicedata.h"
 #endif

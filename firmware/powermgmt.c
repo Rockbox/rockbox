@@ -120,7 +120,8 @@ static int battery_capacity = BATTERY_CAPACITY_DEFAULT;
 unsigned short power_history[POWER_HISTORY_LEN] = {0};
 
 #if (CONFIG_CPU == JZ4732) || (CONFIG_CPU == JZ4760B) || \
-    (CONFIG_CPU == X1000) || (CONFIG_PLATFORM & PLATFORM_HOSTED)
+    (CONFIG_CPU == X1000) || (CONFIG_CPU == X1600) || \
+    (CONFIG_PLATFORM & PLATFORM_HOSTED)
 static long power_stack[DEFAULT_STACK_SIZE/sizeof(long)];
 #else
 static long power_stack[DEFAULT_STACK_SIZE/2/sizeof(long)];

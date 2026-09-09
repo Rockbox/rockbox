@@ -278,6 +278,7 @@
 #define LCD_EROSQ         71 /* as used by the ErosQ (native) */
 #define LCD_ECHO_R1       72 /* ILI9342, as used by the Echo R1 */
 #define LCD_AGPTEK_ROCKER 73 /* ST7735S, as used by the Agptek Rocker (native) */
+#define LCD_HIBY_R1       74 /* as used by the HiBy R1 (native) */
 
 /* LCD_PIXELFORMAT */
 #define HORIZONTAL_PACKING 1
@@ -598,6 +599,8 @@ Lyre prototype 1 */
 #include "config/hidizsap80max.h"
 #elif defined(SONY_PSP)
 #include "config/sonypsp.h"
+#elif defined(HIBY_R1_NATIVE)
+#include "config/hibyr1native.h"
 #else
 #error "unknown hardware platform!"
 #endif

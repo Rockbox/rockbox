@@ -607,6 +607,8 @@ drivers/audio/cs42l51.c
 drivers/audio/es9018.c
 #elif defined (HAVE_ES9218)
 drivers/audio/es9218.c
+#elif defined (HAVE_CS43131)
+drivers/audio/cs43131.c
 #endif /* defined(HAVE_*) */
 #else /* PLATFORM_HOSTED */
 #if defined(HAVE_SDL_AUDIO) || defined(SIMULATOR)
@@ -1922,6 +1924,17 @@ target/mips/ingenic_x1000/sdmmc-x1000-common.c
 target/mips/ingenic/spl-nand-ingenic.c
 #endif /* AGPTEK_ROCKER_NATIVE */
 
+#if defined(HIBY_R1_NATIVE)
+/* The codec uses software I2C. */
+drivers/generic_i2c.c
+target/mips/ingenic_x1600/hibyr1/audiohw-hibyr1.c
+target/mips/ingenic_x1600/hibyr1/backlight-hibyr1.c
+target/mips/ingenic_x1600/hibyr1/button-hibyr1.c
+target/mips/ingenic_x1600/hibyr1/lcd-hibyr1.c
+target/mips/ingenic_x1600/hibyr1/power-hibyr1.c
+target/mips/ingenic/spl-nand-ingenic.c
+#endif /* HIBY_R1_NATIVE */
+
 #if defined(SAMSUNG_YH820) || defined(SAMSUNG_YH920) || defined(SAMSUNG_YH925)
 target/arm/samsung/akcodec-yh82x_yh92x.c
 target/arm/samsung/button-yh82x_yh92x.c
@@ -2206,11 +2219,14 @@ drivers/i2c-async.c
 #ifdef HAVE_AXP_PMU
 drivers/axp-pmu.c
 #endif
-#ifdef HAVE_AXP2101_ADDON
+#ifdef HAVE_AXP2101
 drivers/axp-2101.c
 #endif
 #ifdef HAVE_FT6x06
 drivers/ft6x06.c
+#endif
+#ifdef HAVE_CST8XX
+drivers/cst8xx.c
 #endif
 #ifdef HAVE_CW2015
 drivers/cw2015.c
