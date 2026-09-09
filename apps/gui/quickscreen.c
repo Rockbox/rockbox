@@ -42,6 +42,8 @@
     text and icons, or between text and parent boundaries. */
 #define MARGIN 10
 #define CENTER_ICONAREA_SIZE (MARGIN + 8*2)
+#define QS_ICON_WIDTH 7
+#define QS_ICON_HEIGHT 8
 
 #define FOR_QS_ITEMS(i) for (int i = 0; i < QUICKSCREEN_ITEM_COUNT; i++)
 
@@ -249,24 +251,33 @@ static void quickscreen_draw(struct quickscreen *qs, enum screen_type screen)
         }
 
     /* icons */
-    if (parent->width > CENTER_ICONAREA_SIZE && vp_icons->height >= 8)
+    if (parent->width > CENTER_ICONAREA_SIZE && vp_icons->height >= QS_ICON_HEIGHT)
     {
         display->set_viewport(vp_icons);
-        if (qs->items[QUICKSCREEN_TOP])
-            display->mono_bitmap(bitmap_icons_7x8[Icon_UpArrow],
-                                 (vp_icons->width/2) - 4, 0, 7, 8);
-
-        if (qs->items[QUICKSCREEN_RIGHT])
-            display->mono_bitmap(bitmap_icons_7x8[Icon_FastForward],
-                                 vp_icons->width - 8, (vp_icons->height/2) - 4, 7, 8);
 
         if (qs->items[QUICKSCREEN_LEFT])
             display->mono_bitmap(bitmap_icons_7x8[Icon_FastBackward],
-                                 0, (vp_icons->height/2) - 4, 7, 8);
+                                 0,
+                                 vp_icons->height/2 - QS_ICON_HEIGHT/2,
+                                 QS_ICON_WIDTH, QS_ICON_HEIGHT);
+
+        if (qs->items[QUICKSCREEN_RIGHT])
+            display->mono_bitmap(bitmap_icons_7x8[Icon_FastForward],
+                                 vp_icons->width - QS_ICON_WIDTH,
+                                 vp_icons->height/2 - QS_ICON_HEIGHT/2,
+                                 QS_ICON_WIDTH, QS_ICON_HEIGHT);
+
+        if (qs->items[QUICKSCREEN_TOP])
+            display->mono_bitmap(bitmap_icons_7x8[Icon_UpArrow],
+                                 vp_icons->width/2 - QS_ICON_WIDTH/2,
+                                 0,
+                                 QS_ICON_WIDTH, QS_ICON_HEIGHT);
 
         if (qs->items[QUICKSCREEN_BOTTOM])
             display->mono_bitmap(bitmap_icons_7x8[Icon_DownArrow],
-                                 (vp_icons->width/2) - 4, vp_icons->height - 8, 7, 8);
+                                 vp_icons->width/2 - QS_ICON_WIDTH/2,
+                                 vp_icons->height - QS_ICON_HEIGHT,
+                                 QS_ICON_WIDTH, QS_ICON_HEIGHT);
     }
 
     skin_mark_dirty(screen);
