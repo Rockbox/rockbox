@@ -318,12 +318,12 @@ uint32_t clk_get(x1600_clk_t clk)
         if(jz_readf(CPM_CLKGR, MSC0))
             return 0;
         return clk_get_periph_src(jz_readf(CPM_MSC0CDR, MPCS)) /
-               ((jz_readf(CPM_MSC0CDR, MSCCDR) + 1) * 2);
+               ((jz_readf(CPM_MSC0CDR, CLKDIV) + 1) * 2);
     case X1600_CLK_MSC1:
         if(jz_readf(CPM_CLKGR, MSC1))
             return 0;
         return clk_get_periph_src(jz_readf(CPM_MSC1CDR, MPCS)) /
-               ((jz_readf(CPM_MSC1CDR, MSCCDR) + 1) * 2);
+               ((jz_readf(CPM_MSC1CDR, CLKDIV) + 1) * 2);
 
     case X1600_CLK_SFC:
         if(jz_readf(CPM_CLKGR, SFC))

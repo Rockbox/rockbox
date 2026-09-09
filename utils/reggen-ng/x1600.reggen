@@ -161,20 +161,20 @@ node CPM {
     reg MSC0CDR 0x68 {
         desc "MSC0CDR, PM 11.1.2.8 (line 12435).  Reset 0x40000000. !! Ratio is (MSC0CDR + 1) * 2, not +1. !! On the HiBy R1, MSC0 is the SDIO wifi and MSC1 is the microSD slot -- the reverse of every X1000 target."
         fld 31 30 MPCS { enum SCLK_A 0x0; enum MPLL 0x1; enum EPLL 0x2 }
-        bit 29 CE_MSC
-        bit 28 MSC_BUSY
+        bit 29 CE
+        bit 28 BUSY
         bit 27 MSC_STOP
         bit 15 S_CLK_SEL { enum PHASE_90 0x0; enum PHASE_180 0x1 }
-        fld 7 0 MSCCDR
+        fld 7 0 CLKDIV
     }
     reg MSC1CDR 0xa4 {
         desc "MSC1CDR, PM 11.1.2.9 (line 12484).  Reset 0x40000000. !! Ratio is (MSC1CDR + 1) * 2, not +1. !! On the HiBy R1, MSC0 is the SDIO wifi and MSC1 is the microSD slot -- the reverse of every X1000 target."
         fld 31 30 MPCS { enum SCLK_A 0x0; enum MPLL 0x1; enum EPLL 0x2 }
-        bit 29 CE_MSC
-        bit 28 MSC_BUSY
+        bit 29 CE
+        bit 28 BUSY
         bit 27 MSC_STOP
         bit 15 S_CLK_SEL { enum PHASE_90 0x0; enum PHASE_180 0x1 }
-        fld 7 0 MSCCDR
+        fld 7 0 CLKDIV
     }
     reg SFCCDR 0x74 {
         desc "SFCCDR, PM 11.1.2.10 (line 12534).  Ratio = SFCCDR+1.  Boot flash."
@@ -930,6 +930,188 @@ node INTC {
     reg DPR {
         access read-only
         instance 0x3c 0xc 8
+    }
+}
+
+node MSC {
+    title "MSC (MMC / SD / CE-ATA controller)"
+    addr 0xb3450000
+
+    reg CTRL {
+        instance 0x0 0x10000 3
+        fld 1 0 CLOCK { enum DO_NOTHING 0x0; enum STOP 0x1; enum START 0x2 }
+        bit 15 SEND_CCSD
+        bit 14 SEND_AS_CCSD
+        bit 7 EXIT_MULTIPLE
+        bit 6 EXIT_TRANSFER
+        bit 5 START_READ_WAIT
+        bit 4 STOP_READ_WAIT
+        bit 3 RESET
+        bit 2 START_OP
+    }
+    reg STAT {
+        instance 0x4 0x10000 3
+        fld 28 24 PINS
+        fld 3 2 CRC_WRITE_ERROR { enum NONE 0x0; enum BADDATA 0x1; enum NOCRC 0x2 }
+        bit 31 AUTO_CMD12_DONE
+        bit 20 BCE
+        bit 19 BDE
+        bit 18 BAE
+        bit 17 BAR
+        bit 16 DMAEND
+        bit 15 IS_RESETTING
+        bit 14 SDIO_INT_ACTIVE
+        bit 13 PROG_DONE
+        bit 12 DATA_TRAN_DONE
+        bit 11 END_CMD_RES
+        bit 10 DATA_FIFO_AFULL
+        bit 9 IS_READ_WAIT
+        bit 8 CLOCK_EN
+        bit 7 DATA_FIFO_FULL
+        bit 6 DATA_FIFO_EMPTY
+        bit 5 CRC_RES_ERROR
+        bit 4 CRC_READ_ERROR
+        bit 1 TIME_OUT_RES
+        bit 0 TIME_OUT_READ
+    }
+    reg CMDAT {
+        instance 0xc 0x10000 3
+        fld 15 14 RTRG { enum GE16 0x0; enum GE32 0x1; enum GE64 0x2; enum GE96 0x3 }
+        fld 13 12 TTRG { enum LE16 0x0; enum LE32 0x1; enum LE64 0x2; enum LE96 0x3 }
+        fld 10 9 BUS_WIDTH { enum 1BIT 0x0; enum 4BIT 0x2; enum 8BIT 0x3 }
+        fld 2 0 RESP_FMT
+        bit 31 CCS_EXPECTED
+        bit 30 READ_CEATA
+        bit 27 DIS_BOOT
+        bit 25 EXP_BOOT_ACK
+        bit 24 BOOT_MODE
+        bit 17 SDIO_PRDT
+        bit 16 AUTO_CMD12
+        bit 11 IO_ABORT
+        bit 7 INIT
+        bit 6 BUSY
+        bit 5 STREAM_BLOCK
+        bit 4 WRITE_READ
+        bit 3 DATA_EN
+    }
+    reg IMASK {
+        instance 0x24 0x10000 3
+        fld 28 24 PINS
+        bit 31 DMA_DATA_DONE
+        bit 23 WR_ALL_DONE
+        bit 20 BCE
+        bit 19 BDE
+        bit 18 BAE
+        bit 17 BAR
+        bit 16 DMAEND
+        bit 15 AUTO_CMD12_DONE
+        bit 14 DATA_FIFO_FULL
+        bit 13 DATA_FIFO_EMPTY
+        bit 12 CRC_RES_ERROR
+        bit 11 CRC_READ_ERROR
+        bit 10 CRC_WRITE_ERROR
+        bit 9 TIME_OUT_RES
+        bit 8 TIME_OUT_READ
+        bit 7 SDIO
+        bit 6 TXFIFO_WR_REQ
+        bit 5 RXFIFO_RD_REQ
+        bit 2 END_CMD_RES
+        bit 1 PROG_DONE
+        bit 0 DATA_TRAN_DONE
+    }
+    reg IFLAG {
+        instance 0x28 0x10000 3
+        fld 28 24 PINS
+        bit 31 DMA_DATA_DONE
+        bit 23 WR_ALL_DONE
+        bit 20 BCE
+        bit 19 BDE
+        bit 18 BAE
+        bit 17 BAR
+        bit 16 DMAEND
+        bit 15 AUTO_CMD12_DONE
+        bit 14 DATA_FIFO_FULL
+        bit 13 DATA_FIFO_EMPTY
+        bit 12 CRC_RES_ERROR
+        bit 11 CRC_READ_ERROR
+        bit 10 CRC_WRITE_ERROR
+        bit 9 TIME_OUT_RES
+        bit 8 TIME_OUT_READ
+        bit 7 SDIO
+        bit 6 TXFIFO_WR_REQ
+        bit 5 RXFIFO_RD_REQ
+        bit 2 END_CMD_RES
+        bit 1 PROG_DONE
+        bit 0 DATA_TRAN_DONE
+    }
+    reg LPM {
+        instance 0x40 0x10000 3
+        fld 31 30 DRV_SEL { enum FALL_EDGE 0x0; enum RISE_EDGE_DELAY_1NS 0x1; enum RISE_EDGE_DELAY_QTR_PHASE 0x2 }
+        bit 29 SMP_SEL { enum RISE_EDGE 0x0; enum RISE_EDGE_DELAYED 0x1 }
+        bit 0 ENABLE
+    }
+    reg DMAC {
+        instance 0x44 0x10000 3
+        fld 6 5 ADDR_OFFSET
+        fld 3 2 INCR
+        bit 7 MODE_SEL
+        bit 4 ALIGN_EN
+        bit 1 DMASEL
+        bit 0 ENABLE
+    }
+    reg CTRL2 {
+        instance 0x58 0x10000 3
+        fld 28 24 PIN_INT_POLARITY
+        fld 2 0 SPEED { enum DEFAULT 0x0; enum HIGHSPEED 0x1; enum SDR12 0x2; enum SDR25 0x3; enum SDR50 0x4 }
+        bit 4 STPRM
+    }
+    reg CLKRT {
+        instance 0x8 0x10000 3
+    }
+    reg RESTO {
+        instance 0x10 0x10000 3
+    }
+    reg RDTO {
+        instance 0x14 0x10000 3
+    }
+    reg BLKLEN {
+        instance 0x18 0x10000 3
+    }
+    reg NOB {
+        instance 0x1c 0x10000 3
+    }
+    reg SNOB {
+        instance 0x20 0x10000 3
+    }
+    reg CMD {
+        instance 0x2c 0x10000 3
+    }
+    reg ARG {
+        instance 0x30 0x10000 3
+    }
+    reg RES {
+        instance 0x34 0x10000 3
+    }
+    reg RXFIFO {
+        instance 0x38 0x10000 3
+    }
+    reg TXFIFO {
+        instance 0x3c 0x10000 3
+    }
+    reg DMANDA {
+        instance 0x48 0x10000 3
+    }
+    reg DMADA {
+        instance 0x4c 0x10000 3
+    }
+    reg DMALEN {
+        instance 0x50 0x10000 3
+    }
+    reg DMACMD {
+        instance 0x54 0x10000 3
+    }
+    reg RTCNT {
+        instance 0x5c 0x10000 3
     }
 }
 

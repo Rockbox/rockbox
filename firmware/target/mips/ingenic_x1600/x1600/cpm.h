@@ -743,24 +743,24 @@
 #define BFM_CPM_MSC0CDR_MPCS(v)             BM_CPM_MSC0CDR_MPCS
 #define BF_CPM_MSC0CDR_MPCS_V(e)            BF_CPM_MSC0CDR_MPCS(BV_CPM_MSC0CDR_MPCS__##e)
 #define BFM_CPM_MSC0CDR_MPCS_V(v)           BM_CPM_MSC0CDR_MPCS
-#define BP_CPM_MSC0CDR_MSCCDR               0
-#define BM_CPM_MSC0CDR_MSCCDR               0xff
-#define BF_CPM_MSC0CDR_MSCCDR(v)            (((v) & 0xff) << 0)
-#define BFM_CPM_MSC0CDR_MSCCDR(v)           BM_CPM_MSC0CDR_MSCCDR
-#define BF_CPM_MSC0CDR_MSCCDR_V(e)          BF_CPM_MSC0CDR_MSCCDR(BV_CPM_MSC0CDR_MSCCDR__##e)
-#define BFM_CPM_MSC0CDR_MSCCDR_V(v)         BM_CPM_MSC0CDR_MSCCDR
-#define BP_CPM_MSC0CDR_CE_MSC               29
-#define BM_CPM_MSC0CDR_CE_MSC               0x20000000
-#define BF_CPM_MSC0CDR_CE_MSC(v)            (((v) & 0x1) << 29)
-#define BFM_CPM_MSC0CDR_CE_MSC(v)           BM_CPM_MSC0CDR_CE_MSC
-#define BF_CPM_MSC0CDR_CE_MSC_V(e)          BF_CPM_MSC0CDR_CE_MSC(BV_CPM_MSC0CDR_CE_MSC__##e)
-#define BFM_CPM_MSC0CDR_CE_MSC_V(v)         BM_CPM_MSC0CDR_CE_MSC
-#define BP_CPM_MSC0CDR_MSC_BUSY             28
-#define BM_CPM_MSC0CDR_MSC_BUSY             0x10000000
-#define BF_CPM_MSC0CDR_MSC_BUSY(v)          (((v) & 0x1) << 28)
-#define BFM_CPM_MSC0CDR_MSC_BUSY(v)         BM_CPM_MSC0CDR_MSC_BUSY
-#define BF_CPM_MSC0CDR_MSC_BUSY_V(e)        BF_CPM_MSC0CDR_MSC_BUSY(BV_CPM_MSC0CDR_MSC_BUSY__##e)
-#define BFM_CPM_MSC0CDR_MSC_BUSY_V(v)       BM_CPM_MSC0CDR_MSC_BUSY
+#define BP_CPM_MSC0CDR_CLKDIV               0
+#define BM_CPM_MSC0CDR_CLKDIV               0xff
+#define BF_CPM_MSC0CDR_CLKDIV(v)            (((v) & 0xff) << 0)
+#define BFM_CPM_MSC0CDR_CLKDIV(v)           BM_CPM_MSC0CDR_CLKDIV
+#define BF_CPM_MSC0CDR_CLKDIV_V(e)          BF_CPM_MSC0CDR_CLKDIV(BV_CPM_MSC0CDR_CLKDIV__##e)
+#define BFM_CPM_MSC0CDR_CLKDIV_V(v)         BM_CPM_MSC0CDR_CLKDIV
+#define BP_CPM_MSC0CDR_CE                   29
+#define BM_CPM_MSC0CDR_CE                   0x20000000
+#define BF_CPM_MSC0CDR_CE(v)                (((v) & 0x1) << 29)
+#define BFM_CPM_MSC0CDR_CE(v)               BM_CPM_MSC0CDR_CE
+#define BF_CPM_MSC0CDR_CE_V(e)              BF_CPM_MSC0CDR_CE(BV_CPM_MSC0CDR_CE__##e)
+#define BFM_CPM_MSC0CDR_CE_V(v)             BM_CPM_MSC0CDR_CE
+#define BP_CPM_MSC0CDR_BUSY                 28
+#define BM_CPM_MSC0CDR_BUSY                 0x10000000
+#define BF_CPM_MSC0CDR_BUSY(v)              (((v) & 0x1) << 28)
+#define BFM_CPM_MSC0CDR_BUSY(v)             BM_CPM_MSC0CDR_BUSY
+#define BF_CPM_MSC0CDR_BUSY_V(e)            BF_CPM_MSC0CDR_BUSY(BV_CPM_MSC0CDR_BUSY__##e)
+#define BFM_CPM_MSC0CDR_BUSY_V(v)           BM_CPM_MSC0CDR_BUSY
 #define BP_CPM_MSC0CDR_MSC_STOP             27
 #define BM_CPM_MSC0CDR_MSC_STOP             0x8000000
 #define BF_CPM_MSC0CDR_MSC_STOP(v)          (((v) & 0x1) << 27)
@@ -790,24 +790,24 @@
 #define BFM_CPM_MSC1CDR_MPCS(v)             BM_CPM_MSC1CDR_MPCS
 #define BF_CPM_MSC1CDR_MPCS_V(e)            BF_CPM_MSC1CDR_MPCS(BV_CPM_MSC1CDR_MPCS__##e)
 #define BFM_CPM_MSC1CDR_MPCS_V(v)           BM_CPM_MSC1CDR_MPCS
-#define BP_CPM_MSC1CDR_MSCCDR               0
-#define BM_CPM_MSC1CDR_MSCCDR               0xff
-#define BF_CPM_MSC1CDR_MSCCDR(v)            (((v) & 0xff) << 0)
-#define BFM_CPM_MSC1CDR_MSCCDR(v)           BM_CPM_MSC1CDR_MSCCDR
-#define BF_CPM_MSC1CDR_MSCCDR_V(e)          BF_CPM_MSC1CDR_MSCCDR(BV_CPM_MSC1CDR_MSCCDR__##e)
-#define BFM_CPM_MSC1CDR_MSCCDR_V(v)         BM_CPM_MSC1CDR_MSCCDR
-#define BP_CPM_MSC1CDR_CE_MSC               29
-#define BM_CPM_MSC1CDR_CE_MSC               0x20000000
-#define BF_CPM_MSC1CDR_CE_MSC(v)            (((v) & 0x1) << 29)
-#define BFM_CPM_MSC1CDR_CE_MSC(v)           BM_CPM_MSC1CDR_CE_MSC
-#define BF_CPM_MSC1CDR_CE_MSC_V(e)          BF_CPM_MSC1CDR_CE_MSC(BV_CPM_MSC1CDR_CE_MSC__##e)
-#define BFM_CPM_MSC1CDR_CE_MSC_V(v)         BM_CPM_MSC1CDR_CE_MSC
-#define BP_CPM_MSC1CDR_MSC_BUSY             28
-#define BM_CPM_MSC1CDR_MSC_BUSY             0x10000000
-#define BF_CPM_MSC1CDR_MSC_BUSY(v)          (((v) & 0x1) << 28)
-#define BFM_CPM_MSC1CDR_MSC_BUSY(v)         BM_CPM_MSC1CDR_MSC_BUSY
-#define BF_CPM_MSC1CDR_MSC_BUSY_V(e)        BF_CPM_MSC1CDR_MSC_BUSY(BV_CPM_MSC1CDR_MSC_BUSY__##e)
-#define BFM_CPM_MSC1CDR_MSC_BUSY_V(v)       BM_CPM_MSC1CDR_MSC_BUSY
+#define BP_CPM_MSC1CDR_CLKDIV               0
+#define BM_CPM_MSC1CDR_CLKDIV               0xff
+#define BF_CPM_MSC1CDR_CLKDIV(v)            (((v) & 0xff) << 0)
+#define BFM_CPM_MSC1CDR_CLKDIV(v)           BM_CPM_MSC1CDR_CLKDIV
+#define BF_CPM_MSC1CDR_CLKDIV_V(e)          BF_CPM_MSC1CDR_CLKDIV(BV_CPM_MSC1CDR_CLKDIV__##e)
+#define BFM_CPM_MSC1CDR_CLKDIV_V(v)         BM_CPM_MSC1CDR_CLKDIV
+#define BP_CPM_MSC1CDR_CE                   29
+#define BM_CPM_MSC1CDR_CE                   0x20000000
+#define BF_CPM_MSC1CDR_CE(v)                (((v) & 0x1) << 29)
+#define BFM_CPM_MSC1CDR_CE(v)               BM_CPM_MSC1CDR_CE
+#define BF_CPM_MSC1CDR_CE_V(e)              BF_CPM_MSC1CDR_CE(BV_CPM_MSC1CDR_CE__##e)
+#define BFM_CPM_MSC1CDR_CE_V(v)             BM_CPM_MSC1CDR_CE
+#define BP_CPM_MSC1CDR_BUSY                 28
+#define BM_CPM_MSC1CDR_BUSY                 0x10000000
+#define BF_CPM_MSC1CDR_BUSY(v)              (((v) & 0x1) << 28)
+#define BFM_CPM_MSC1CDR_BUSY(v)             BM_CPM_MSC1CDR_BUSY
+#define BF_CPM_MSC1CDR_BUSY_V(e)            BF_CPM_MSC1CDR_BUSY(BV_CPM_MSC1CDR_BUSY__##e)
+#define BFM_CPM_MSC1CDR_BUSY_V(v)           BM_CPM_MSC1CDR_BUSY
 #define BP_CPM_MSC1CDR_MSC_STOP             27
 #define BM_CPM_MSC1CDR_MSC_STOP             0x8000000
 #define BF_CPM_MSC1CDR_MSC_STOP(v)          (((v) & 0x1) << 27)

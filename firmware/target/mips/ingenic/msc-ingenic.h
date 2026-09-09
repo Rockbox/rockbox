@@ -7,6 +7,7 @@
  *                     \/            \/     \/    \/            \/
  *
  * Copyright (C) 2021 Aidan MacDonald
+ * Copyright (C) 2026 Michael McAllister
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,13 +18,13 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef __MSC_X1000_H__
-#define __MSC_X1000_H__
+#ifndef __MSC_INGENIC_H__
+#define __MSC_INGENIC_H__
 
 #include "sdmmc_host.h"
 
 /* Must be allocated on a cacheline boundary */
-struct x1000_msc_dma_desc
+struct ingenic_msc_dma_desc
 {
     uint32_t nda;
     uint32_t mem;
@@ -31,11 +32,11 @@ struct x1000_msc_dma_desc
     uint32_t cmd;
 };
 
-struct x1000_msc_controller
+struct ingenic_msc_controller
 {
     int msc_nr;
     uint32_t src_clk_freq;
-    struct x1000_msc_dma_desc *dma_desc;
+    struct ingenic_msc_dma_desc *dma_desc;
 
     uint32_t bus_clock;
     uint32_t cmdat_def;
@@ -47,17 +48,17 @@ struct x1000_msc_controller
     struct semaphore sem;
 };
 
-void x1000_msc_init(struct x1000_msc_controller* ctl,
-                    struct x1000_msc_dma_desc *dma_desc,
-                    int msc_nr, uint32_t src_clk_freq);
+void ingenic_msc_init(struct ingenic_msc_controller *ctl,
+                      struct ingenic_msc_dma_desc *dma_desc,
+                      int msc_nr, uint32_t src_clk_freq);
 
-void x1000_msc_set_power_enabled(void *controller, bool enabled);
-void x1000_msc_set_bus_width(void *controller, uint32_t width);
-void x1000_msc_set_bus_clock(void *controller, uint32_t clock);
-int x1000_msc_submit_command(void *controller,
-                             const struct sdmmc_host_command *cmd,
-                             struct sdmmc_host_response *resp);
-void x1000_msc_abort_command(void *controller);
-void x1000_msc_irq_handler(struct x1000_msc_controller *ctl);
+void ingenic_msc_set_power_enabled(void *controller, bool enabled);
+void ingenic_msc_set_bus_width(void *controller, uint32_t width);
+void ingenic_msc_set_bus_clock(void *controller, uint32_t clock);
+int ingenic_msc_submit_command(void *controller,
+                              const struct sdmmc_host_command *cmd,
+                              struct sdmmc_host_response *resp);
+void ingenic_msc_abort_command(void *controller);
+void ingenic_msc_irq_handler(struct ingenic_msc_controller *ctl);
 
-#endif /* __MSC_X1000_H__ */
+#endif /* __MSC_INGENIC_H__ */

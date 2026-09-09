@@ -19,10 +19,11 @@
  ****************************************************************************/
 #include "sdmmc_host.h"
 #include "sdmmc_poll.h"
-#include "msc-x1000.h"
+#include "msc-ingenic.h"
 #include "gpio-ingenic.h"
 #include "irq-x1000.h"
 #include "clk-x1000.h"
+#include "x1000/msc.h"
 
 /* All current X1000 targets use MSC0 */
 #define MSC_NUM                 0
@@ -43,15 +44,15 @@
 
 static struct sdmmc_host sdmmc;
 static struct sdmmc_poll sdmmc_poll;
-static struct x1000_msc_controller msc_ctl;
-static struct x1000_msc_dma_desc msc_dma_desc;
+static struct ingenic_msc_controller msc_ctl;
+static struct ingenic_msc_dma_desc msc_dma_desc CACHEALIGN_ATTR;
 
 static const struct sdmmc_controller_ops sdmmc_ops = {
-    .set_power_enabled  = x1000_msc_set_power_enabled,
-    .set_bus_width      = x1000_msc_set_bus_width,
-    .set_bus_clock      = x1000_msc_set_bus_clock,
-    .submit_command     = x1000_msc_submit_command,
-    .abort_command      = x1000_msc_abort_command,
+    .set_power_enabled  = ingenic_msc_set_power_enabled,
+    .set_bus_width      = ingenic_msc_set_bus_width,
+    .set_bus_clock      = ingenic_msc_set_bus_clock,
+    .submit_command     = ingenic_msc_submit_command,
+    .abort_command      = ingenic_msc_abort_command,
 };
 
 static const struct sdmmc_host_config sdmmc_config INITDATA_ATTR = {
@@ -87,7 +88,7 @@ void sdmmc_host_target_init(void)
     jz_writef(CPM_MSC0CDR, CE(0));
 
     /* Initialize controller */
-    x1000_msc_init(&msc_ctl, &msc_dma_desc, MSC_NUM, clk_get(MSC_SOURCE_CLOCK));
+    ingenic_msc_init(&msc_ctl, &msc_dma_desc, MSC_NUM, clk_get(MSC_SOURCE_CLOCK));
     system_enable_irq(MSC_NUM == 0 ? IRQ_MSC0 : IRQ_MSC1);
 
     /* Initialize SD/MMC host driver */
@@ -106,11 +107,11 @@ void sdmmc_host_target_init(void)
 #if MSC_NUM == 0
 void MSC0(void)
 {
-    x1000_msc_irq_handler(&msc_ctl);
+    ingenic_msc_irq_handler(&msc_ctl);
 }
 #else
 void MSC1(void)
 {
-    x1000_msc_irq_handler(&msc_ctl);
+    ingenic_msc_irq_handler(&msc_ctl);
 }
 #endif

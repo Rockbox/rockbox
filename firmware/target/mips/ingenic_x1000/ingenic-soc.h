@@ -22,7 +22,7 @@
 #ifndef __INGENIC_SOC_H__
 #define __INGENIC_SOC_H__
 #include "irq-x1000.h"
-#include "msc-x1000.h"
+#include "x1000/msc.h"
 #include "uart-x1000.h"
 #include "gpio-ingenic.h"
 #include "sfc-x1000.h"

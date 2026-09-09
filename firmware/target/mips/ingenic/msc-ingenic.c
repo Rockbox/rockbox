@@ -7,6 +7,7 @@
  *                     \/            \/     \/    \/            \/
  *
  * Copyright (C) 2021-2026 Aidan MacDonald
+ * Copyright (C) 2026 Michael McAllister
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,19 +20,10 @@
  ****************************************************************************/
 #include "system.h"
 #include "panic.h"
-#include "led.h"
-#include "msc-x1000.h"
-#include "gpio-ingenic.h"
-#include "irq-x1000.h"
-#include "clk-x1000.h"
-#include "x1000/msc.h"
-#include "x1000/cpm.h"
+#include "msc-ingenic.h"
+#include "ingenic-soc.h"
 #include <string.h>
 #include <stddef.h>
-
-/*
- * TODO: Clock helpers could be factored out of this file
- */
 
 static uint32_t get_msc_clkgr_bit(int msc)
 {
@@ -57,8 +49,7 @@ static void msc_gate_clock(int msc, bool gate)
 static void msc_set_clock(int msc, uint32_t src_freq, uint32_t bus_freq)
 {
     /* Wait for clock to go idle from any ongoing operation */
-    while (jz_readf(MSC_STAT(msc), CLOCK_EN))
-        sleep(1);
+    SOC_SPIN_WHILE_DO(jz_readf(MSC_STAT(msc), CLOCK_EN), sleep(1));
 
     /*
      * Handle MSCxDIV, the max CLKRT division factor is 1/128
@@ -70,13 +61,13 @@ static void msc_set_clock(int msc, uint32_t src_freq, uint32_t bus_freq)
     if (msc == 0)
     {
         jz_writef(CPM_MSC0CDR, CE(1), CLKDIV(div - 1));
-        while(jz_readf(CPM_MSC0CDR, BUSY));
+        SOC_SPIN_WHILE(jz_readf(CPM_MSC0CDR, BUSY));
         jz_writef(CPM_MSC0CDR, CE(0));
     }
     else
     {
         jz_writef(CPM_MSC1CDR, CE(1), CLKDIV(div - 1));
-        while(jz_readf(CPM_MSC1CDR, BUSY));
+        SOC_SPIN_WHILE(jz_readf(CPM_MSC1CDR, BUSY));
         jz_writef(CPM_MSC1CDR, CE(0));
     }
 
@@ -105,9 +96,9 @@ static void msc_set_clock(int msc, uint32_t src_freq, uint32_t bus_freq)
     }
 }
 
-void x1000_msc_init(struct x1000_msc_controller* ctl,
-                    struct x1000_msc_dma_desc *dma_desc,
-                    int msc_nr, uint32_t src_clk_freq)
+void ingenic_msc_init(struct ingenic_msc_controller *ctl,
+                      struct ingenic_msc_dma_desc *dma_desc,
+                      int msc_nr, uint32_t src_clk_freq)
 {
     memset(ctl, 0, sizeof(*ctl));
 
@@ -122,9 +113,9 @@ void x1000_msc_init(struct x1000_msc_controller* ctl,
     msc_gate_clock(ctl->msc_nr, true);
 }
 
-void x1000_msc_set_power_enabled(void *controller, bool enabled)
+void ingenic_msc_set_power_enabled(void *controller, bool enabled)
 {
-    struct x1000_msc_controller *ctl = controller;
+    struct ingenic_msc_controller *ctl = controller;
 
     if (enabled)
     {
@@ -134,7 +125,7 @@ void x1000_msc_set_power_enabled(void *controller, bool enabled)
         jz_overwritef(MSC_CTRL(ctl->msc_nr), RESET(1));
         udelay(100);
         jz_writef(MSC_CTRL(ctl->msc_nr), RESET(0));
-        while (jz_readf(MSC_STAT(ctl->msc_nr), IS_RESETTING));
+        SOC_SPIN_WHILE(jz_readf(MSC_STAT(ctl->msc_nr), IS_RESETTING));
 
         /* Ensure interrupt state is clear */
         REG_MSC_IMASK(ctl->msc_nr) = 0xFFFFFFFFu;
@@ -158,9 +149,9 @@ void x1000_msc_set_power_enabled(void *controller, bool enabled)
     }
 }
 
-void x1000_msc_set_bus_width(void *controller, uint32_t width)
+void ingenic_msc_set_bus_width(void *controller, uint32_t width)
 {
-    struct x1000_msc_controller *ctl = controller;
+    struct ingenic_msc_controller *ctl = controller;
 
     switch (width)
     {
@@ -181,9 +172,9 @@ void x1000_msc_set_bus_width(void *controller, uint32_t width)
     }
 }
 
-void x1000_msc_set_bus_clock(void *controller, uint32_t clock)
+void ingenic_msc_set_bus_clock(void *controller, uint32_t clock)
 {
-    struct x1000_msc_controller *ctl = controller;
+    struct ingenic_msc_controller *ctl = controller;
     uint32_t bus_freq = sdmmc_host_get_bus_freq(clock);
 
     ctl->bus_clock = clock;
@@ -192,11 +183,11 @@ void x1000_msc_set_bus_clock(void *controller, uint32_t clock)
         msc_set_clock(ctl->msc_nr, ctl->src_clk_freq, bus_freq);
 }
 
-int x1000_msc_submit_command(void *controller,
-                             const struct sdmmc_host_command *cmd,
-                             struct sdmmc_host_response *resp)
+int ingenic_msc_submit_command(void *controller,
+                              const struct sdmmc_host_command *cmd,
+                              struct sdmmc_host_response *resp)
 {
-    struct x1000_msc_controller *ctl = controller;
+    struct ingenic_msc_controller *ctl = controller;
     uint32_t cmdat = ctl->cmdat_def;
     uint32_t imask = jz_orm(MSC_IMASK,
                             CRC_RES_ERROR, CRC_READ_ERROR, CRC_WRITE_ERROR,
@@ -310,7 +301,7 @@ int x1000_msc_submit_command(void *controller,
     return ctl->err_code;
 }
 
-static void x1000_msc_finish_command(struct x1000_msc_controller *ctl)
+static void ingenic_msc_finish_command(struct ingenic_msc_controller *ctl)
 {
     REG_MSC_IMASK(ctl->msc_nr) = 0xFFFFFFFFu;
     REG_MSC_IFLAG(ctl->msc_nr) = 0xFFFFFFFFu;
@@ -318,9 +309,9 @@ static void x1000_msc_finish_command(struct x1000_msc_controller *ctl)
     semaphore_release(&ctl->sem);
 }
 
-void x1000_msc_abort_command(void *controller)
+void ingenic_msc_abort_command(void *controller)
 {
-    struct x1000_msc_controller *ctl = controller;
+    struct ingenic_msc_controller *ctl = controller;
     int irq = disable_irq_save();
 
     /*
@@ -334,12 +325,12 @@ void x1000_msc_abort_command(void *controller)
     semaphore_wait(&ctl->sem, TIMEOUT_NOBLOCK);
 
     ctl->err_code = SDMMC_STATUS_ERROR;
-    x1000_msc_finish_command(ctl);
+    ingenic_msc_finish_command(ctl);
 
     restore_irq(irq);
 }
 
-static void x1000_msc_read_response(struct x1000_msc_controller *ctl)
+static void ingenic_msc_read_response(struct ingenic_msc_controller *ctl)
 {
     uint32_t res = REG_MSC_RES(ctl->msc_nr);
     uint32_t dat;
@@ -371,7 +362,7 @@ static void x1000_msc_read_response(struct x1000_msc_controller *ctl)
     }
 }
 
-void x1000_msc_irq_handler(struct x1000_msc_controller *ctl)
+void ingenic_msc_irq_handler(struct ingenic_msc_controller *ctl)
 {
     const uint32_t tmo_bits = jz_orm(MSC_IFLAG, TIME_OUT_READ, TIME_OUT_RES);
     const uint32_t crc_bits = jz_orm(MSC_IFLAG, CRC_RES_ERROR, CRC_READ_ERROR, CRC_WRITE_ERROR);
@@ -388,9 +379,9 @@ void x1000_msc_irq_handler(struct x1000_msc_controller *ctl)
     {
         REG_MSC_IMASK(ctl->msc_nr) |= BM_MSC_IFLAG_END_CMD_RES;
         REG_MSC_IFLAG(ctl->msc_nr) = BM_MSC_IFLAG_END_CMD_RES;
-        x1000_msc_read_response(ctl);
+        ingenic_msc_read_response(ctl);
     }
 
     if ((iflag & ctl->iflag_done) || ctl->err_code)
-        x1000_msc_finish_command(ctl);
+        ingenic_msc_finish_command(ctl);
 }
