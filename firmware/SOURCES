@@ -1834,6 +1834,13 @@ target/mips/ingenic/i2c-ingenic.c
 target/mips/ingenic/kernel-ingenic.c
 target/mips/ingenic_x1600/system-x1600.c
 target/mips/ingenic_x1600/timer-x1600.c
+#ifdef BOOTLOADER
+target/mips/ingenic_x1600/spl-start.S
+target/mips/ingenic_x1600/spl-x1600.c
+target/mips/ingenic_x1600/usbstage1-x1600.c
+target/mips/ingenic_x1600/ddr-x1600.c
+common/ucl_decompress.c
+#endif
 #endif /* CONFIG_CPU == X1600 */
 
 #if defined(ONDA_VX747) || defined(ONDA_VX747P) || defined(ONDA_VX777)

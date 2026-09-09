@@ -388,6 +388,191 @@ node CPM {
     }
 }
 
+node DDRC {
+    title "DDR controller APB interface"
+    addr 0xb34f0000
+
+    reg STATUS 0x0 {
+        desc "DSTATUS, PM 3.5.2.1 (line 1692).  Read only in practice despite the RW in the table -- every documented bit is R, and MISS self-clears on read. The X1000 header declares no bitfields for this register at all; these come straight from the X1600 PM."
+        bit 31 DFI_INIT_C
+        bit 7 ENDIAN
+        bit 6 MISS
+        bit 5 DPD
+        bit 4 PD
+        bit 3 AREF
+        bit 2 SREF
+        bit 1 CKE1
+        bit 0 CKE0
+    }
+    reg CFG 0x4 {
+        desc "DDR configuration, control and load-mode registers (PM 3.5.2.2-4). Field layouts are not described here."
+    }
+    reg CTRL 0x8
+    reg LMR 0xc
+    reg REFCNT 0x18 {
+        desc "DREFCNT 0x18: auto-refresh counter."
+    }
+    reg MMAP {
+        desc "DMMAP0 0x24 / DMMAP1 0x28: chip-select address mapping. With a single 64 MB device only DMMAP0 is meaningful."
+        instance 0x24 0x4 8
+    }
+    reg STRB 0x34 {
+        desc "DSTRB 0x34: multi-media stride register."
+    }
+    reg TIMING {
+        desc "DTIMING1..6, 0x60 + (n-1)*4.  Programmable DRAM timing. Indexed 0..5 here for DTIMING1..DTIMING6."
+        instance 0x60 0x4 8
+    }
+    reg REMAP {
+        desc "DREMAP1..5, 0x9C + (n-1)*4: logical to physical address remapping. Indexed 0..4 here for DREMAP1..DREMAP5."
+        instance 0x9c 0x4 8
+    }
+    reg DLP 0xbc {
+        desc "DDLP 0xBC: DFI low-power handshake."
+    }
+    reg WCMDCTRL1 0x100 {
+        desc "DDR command arbitration and QoS controls (PM Table 3-1). The initialization sequence makes these settings optional."
+    }
+    reg RCMDCTRL0 0x104
+    reg RCMDCTRL1 0x108
+    reg BOUNDAEYSEL 0x10c
+    reg WDATTHD {
+        instance 0x114 0x4 8
+    }
+    reg CHWDQOS {
+        instance 0x200 0x4 8
+    }
+    reg CHRDQOS {
+        instance 0x220 0x4 8
+    }
+    reg IPORTWPRI 0x240
+    reg IPORTRPRI 0x244
+    reg AUTOSR_EN 0x304 {
+        desc "Auto self-refresh enable. PM 3.5.2.28 prints the address as 0xB3010304 -- the 0xb301xxxx prefix of the APB shim documented earlier in the same chapter, not the 0xb34f0000 controller base every neighbouring register here uses. The offset 0x304 is right and the base in the PM is a typo: the X1000's headers, generated from a different document for a shipping port, place AUTOSR at the same offset off 0xb34f0000."
+    }
+    reg AUTOSR_CNT 0x308 {
+        desc "Auto self-refresh idle count (PM 3.5.2.29). Like AUTOSR_EN, this uses the DDRC base despite the different base printed in the manual."
+    }
+    reg EFPRB_CFG 0x30c
+    reg EFPRB_VALUE 0x310 {
+        access read-only
+    }
+}
+
+node DDRC_APB {
+    title "DDR controller APB interface"
+    addr 0xb3012000
+
+    reg PHYRET_CFG 0x34 {
+        desc "PHY retention configuration (PM Table 3-1)."
+    }
+    reg CLKSTP_CFG 0x68 {
+        desc "auto clock gating configuration"
+    }
+    reg STATUS 0x6c {
+        access read-only
+        desc "DDR status (read only)"
+    }
+    reg EPD_HADDR 0x70 {
+        desc "EPD wake-up address, high"
+    }
+    reg EPD_LADDR 0x74 {
+        desc "EPD wake-up address, low"
+    }
+    reg AUTOPRE_CFG 0x7c {
+        desc "auto pre-charge configuration"
+    }
+    reg PHYRST_CFG 0x80 {
+        desc "DDR PHY reset control"
+    }
+    reg CKC_CFG0 0x84 {
+        desc "clock change configuration 0"
+    }
+    reg CKC_CFG1 0x88 {
+        desc "clock change configuration 1"
+    }
+    reg PHY_INIT 0x8c {
+        desc "DFI initial configuration"
+    }
+}
+
+node DDRPHY {
+    title "Innosilicon DDR PHY"
+    addr 0xb3011000
+
+    reg PHY_RST 0x0 {
+        desc "PHY reset. NOT DOCUMENTED IN THE PM: this whole node's offsets and bit meanings come from the vendor SPL's disassembly, cross-checked against PM Table 3-2 only where that table agrees with the per-register sections (it often does not, and where they conflict the SPL wins -- it is what boots this silicon). Do NOT copy the X1000's ddrphy.h here: that is a Synopsys DesignWare PUB (PIR/PGCR/PGSR/DTPR) at the SAME base address, and not one register name is shared. The registers are 8 bits wide but each occupies a 32-bit word and must be accessed with 32-bit loads and stores."
+    }
+    reg MEM_CFG 0x4 {
+        desc "Memory configuration. MEMSEL 3 = LPDDR2, BSTSEL = burst 8. CALIB_APPLY is undocumented, but both the PM and the vendor SPL set it after RX calibration."
+        field 1 0 MEMSEL
+        bit 4 BSTSEL
+        bit 6 CALIB_APPLY
+    }
+    reg TRAIN_CTRL 0x8 {
+        desc "DQS-gating training. DSACE enables calibration, DSCSE selects register-bypass mode (0 = automatic)."
+        bit 0 DSACE
+        bit 1 DSCSE
+    }
+    reg CL 0x14 {
+        desc "CAS latency"
+    }
+    reg AL 0x18 {
+        desc "Additive latency. Kept 0."
+    }
+    reg CWL 0x1c {
+        desc "CAS write latency"
+    }
+    reg GATE_DELAY 0x28 {
+        desc "DQS gate delay"
+        field 3 1 DELAY
+    }
+    reg CMD_BYPASS 0x50 {
+        desc "CMD/CK DLL bypass. The PM gives this offset two incompatible meanings; the vendor SPL's usage matches Table 3-7. Copied verbatim -- do not repurpose without hardware."
+    }
+    reg CMD_DLL 0x54 {
+        desc "CMD/CK DLL control"
+    }
+    reg DQ_WIDTH 0x7c {
+        desc "Data bus width. 3 = 16 bit."
+    }
+    reg PLL_FBDIV 0x80 {
+        desc "PHY PLL feedback divider"
+    }
+    reg PLL_CTRL 0x84 {
+        desc "PHY PLL control"
+        bit 1 POWDOWN
+    }
+    reg PLL_PDIV 0x88 {
+        desc "PHY PLL post-divider"
+        field 7 5 POSTDIV
+    }
+    reg PLL_LOCK 0x108 {
+        access read-only
+        desc "PHY PLL lock status"
+        bit 3 LOCKED
+    }
+    reg CALIB_DONE 0x10c {
+        access read-only
+        desc "RX calibration status. DONE_L and DONE_H are the low and high byte lanes; the vendor also waits for the undocumented bit 4 to be clear, so the mask it tests is 0x13 for a value of 0x03."
+        bit 0 DONE_L
+        bit 1 DONE_H
+        bit 4 UNDOC4
+    }
+    reg RXDLL_DQS0 0x160 {
+        desc "RX DLL for DQS0. The PM calls this CALIB_DELAY_AL."
+    }
+    reg RXDLL_DQS1 0x1a0 {
+        desc "RX DLL for DQS1. The PM calls this CALIB_DELAY_AH."
+    }
+    reg CALIB_RES_L 0x1d0 {
+        desc "RX calibration result, low byte lane"
+    }
+    reg CALIB_RES_R 0x1d4 {
+        desc "RX calibration result, high byte lane"
+    }
+}
+
 node DMA {
     title "DMA"
     addr 0xb3421000
