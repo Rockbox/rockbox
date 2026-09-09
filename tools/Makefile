@@ -13,10 +13,10 @@ LDFLAGS :=
 CLEANALL := scramble descramble iriver bmp2rb rdf2binary convbdf \
     generate_rocklatin mkboot ipod_fw codepages uclpack mi4 gigabeat lngdump \
     telechips gigabeats creative hmac-sha1 rbspeexenc mkzenboot mk500boot \
-    convttf mkspl-x1000 wavtrim voicefont reggen
+    convttf mkspl-x1000 mkspl-x1600 wavtrim voicefont reggen
 
 all: scramble descramble rdf2binary mkboot mkzenboot convbdf codepages \
-	uclpack rbspeexenc voicefont mk500boot mkspl-x1000
+	uclpack rbspeexenc voicefont mk500boot mkspl-x1000 mkspl-x1600
 
 scramble: scramble.o iriver.o mi4.o gigabeat.o gigabeats.o telechips.o \
 	iaudio_bl_flash.o creative.o hmac-sha1.o rkw.o
@@ -56,6 +56,9 @@ mkzenboot: mkzenboot.o hmac-sha1.o
 	$(SILENT)$(CC) $(LDFLAGS) $+ -lz -o $@
 
 mkspl-x1000: mkspl-x1000.c
+	$(SILENT)$(CC) $(LDFLAGS) $+ -o $@
+
+mkspl-x1600: mkspl-x1600.c
 	$(SILENT)$(CC) $(LDFLAGS) $+ -o $@
 
 mkzenboot.exe: mkzenboot.o hmac-sha1.o

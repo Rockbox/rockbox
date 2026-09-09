@@ -21,6 +21,12 @@
 #ifndef __GUI_INGENIC_H__
 #define __GUI_INGENIC_H__
 
+/* The target's bootloader header supplies the keymap */
+#if defined(HIBY_R1_NATIVE)
+# include "x1600/x1600bootloader.h"
+#else
+# include "x1000/x1000bootloader.h"
+#endif
 #include "lcd.h"
 #include <stdbool.h>
 #include <stdint.h>

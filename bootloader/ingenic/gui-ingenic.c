@@ -19,7 +19,6 @@
  ****************************************************************************/
 
 #include "gui-ingenic.h"
-#include "x1000/x1000bootloader.h"  /* BL_* keymap */
 #include "system.h"
 #include "kernel.h"
 #include "lcd.h"

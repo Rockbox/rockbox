@@ -148,6 +148,7 @@ __pycache__
 /tools/mktccboot
 /tools/mkzenboot
 /tools/mkspl-x1000
+/tools/mkspl-x1600
 /tools/iaudio_bl_flash.c
 /tools/iaudio_bl_flash.h
 /tools/.vagrant
@@ -334,3 +335,7 @@ __pycache__
 
 # /utils/time-sync/
 /utils/time-sync/time-sync
+
+# /utils/jztool/
+/utils/jztool/build*
+/utils/jztool/jztool.*

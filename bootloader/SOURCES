@@ -80,6 +80,13 @@ x1000/install.c
 x1000/main.c
 x1000/recovery.c
 x1000/utils.c
+#elif defined(HIBY_R1_NATIVE)
+ingenic/gui-ingenic.c
+x1600/boot.c
+x1600/gui.c
+x1600/main.c
+x1600/recovery.c
+x1600/utils.c
 #elif defined(ECHO_R1)
 echoplayer.c
 #elif defined(SONY_PSP)
