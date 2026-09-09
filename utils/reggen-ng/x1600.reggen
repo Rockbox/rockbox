@@ -8,6 +8,92 @@ isa     "mips"
 version "1.0"
 author  "Michael McAllister"
 
+node AIC {
+    title "AIC (audio interface controller, I2S)"
+    addr 0xb0079000
+
+    reg FR 0x0 {
+        desc "AIC configuration (PM 9.7.2.1). The reset values in Table 9-4 and the register diagram disagree."
+        fld 27 24 RFTH
+        fld 20 16 TFTH
+        bit 12 MSB
+        bit 8 DMODE { enum SHARE_CLK_4LINE 0x0; enum INDEP_CLK_6LINE 0x1 }
+        bit 6 LSMP { enum PLAY_ZERO 0x0; enum PLAY_LAST 0x1 }
+        bit 4 AUSEL { enum I2S 0x1 }
+        bit 3 RST
+        bit 2 TMASTER
+        bit 1 RMASTER
+        bit 0 ENB
+    }
+    reg CR 0x4 {
+        desc "AICCR, PM 9.7.2.2 (line 9722).  Reset 0x01240000. TFLUSH/RFLUSH are write-1-only and always read 0."
+        bit 31 ETFLOR
+        bit 30 ETFLS
+        bit 28 PACK16
+        fld 26 24 CHANNEL { enum MONO 0x0; enum STEREO 0x1 }
+        bit 23 ETFL
+        bit 22 TLDMS
+        fld 21 19 OSS { enum 8BIT 0x0; enum 16BIT 0x1; enum 18BIT 0x2; enum 20BIT 0x3; enum 24BIT 0x4 }
+        fld 18 16 ISS { enum 8BIT 0x0; enum 16BIT 0x1; enum 18BIT 0x2; enum 20BIT 0x3; enum 24BIT 0x4 }
+        bit 15 RDMS
+        bit 14 TDMS
+        fld 13 12 MONOCTR { enum BOTH 0x0; enum RIGHT_ONLY 0x1; enum LEFT_ONLY 0x2 }
+        bit 10 ENDSW
+        bit 8 TFLUSH
+        bit 7 RFLUSH
+        bit 6 EROR
+        bit 5 ETUR
+        bit 4 ERFS
+        bit 3 ETFS
+        bit 2 ENLBF
+        bit 1 ERPL
+        bit 0 EREC
+    }
+    reg I2SCR 0x10 {
+        desc "I2SCR, PM 9.7.2.3 (line 9895).  Reset 0. RFIRST and SWLH must only be touched while playback is stopped."
+        bit 17 RFIRST { enum LEFT_FIRST 0x0; enum RIGHT_FIRST 0x1 }
+        bit 16 SWLH
+        bit 0 AMSL { enum I2S 0x0; enum MSB_JUSTIFIED 0x1 }
+    }
+    reg SR 0x14 {
+        desc "AIC status (PM 9.7.2.4). Clear ROR, TUR and TFLOR by writing zero to the corresponding bit."
+        fld 29 24 RFL
+        fld 20 15 TFLL
+        fld 13 8 TFL
+        bit 6 ROR
+        bit 5 TUR
+        bit 4 RFS
+        bit 3 TFS
+        bit 2 TFLOR
+        bit 1 TFLS
+    }
+    reg I2SSR 0x1c {
+        access read-only
+        desc "I2S status (PM 9.7.2.5). TBSY, RBSY and BSY follow the register diagram; the field table is incomplete."
+        bit 5 CHBSY
+        bit 4 TBSY
+        bit 3 RBSY
+        bit 2 BSY
+    }
+    reg I2SDIV 0x30 {
+        desc "I2S dividers (PM 9.7.2.6). SYS_CLK = TDIV * BIT_CLK and BIT_CLK = 64 * sample rate. TDIV must be even."
+        fld 24 16 RDIV
+        fld 8 0 TDIV
+    }
+    reg DR 0x34 {
+        desc "AICDR, PM 9.7.2.7 (line 10130).  The FIFO port: writes push a sample onto the transmit FIFO, reads pop one off the receive FIFO.  FIFO width is 24 bits and samples narrower than that are LSB-justified.  Left channel goes first unless I2SCR.RFIRST says otherwise."
+        fld 23 0 DATA
+    }
+    reg LR 0x38 {
+        access read-only
+        desc "Loop transmit FIFO and its level (PM 9.7.2.8-9). Enabled by AIC_CR.ETFL."
+        fld 23 0 DATALP
+    }
+    reg TFLR 0x3c {
+        fld 3 0 TFLTH
+    }
+}
+
 node CPM {
     title "CPM (clock, reset and power controller)"
     addr 0xb0000000

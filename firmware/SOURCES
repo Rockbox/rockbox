@@ -1826,6 +1826,7 @@ drivers/audio/x1000-codec.c
 #endif /* CONFIG_CPU == X1000 */
 
 #if CONFIG_CPU == X1600
+target/mips/ingenic_x1600/aic-x1600.c
 target/mips/ingenic_x1600/boot-x1600.c
 target/mips/ingenic_x1600/clk-x1600.c
 target/mips/ingenic/dma-ingenic.c
@@ -1833,6 +1834,7 @@ target/mips/ingenic/gpio-ingenic.c
 target/mips/ingenic/i2c-ingenic.c
 target/mips/ingenic/kernel-ingenic.c
 target/mips/ingenic/nand-ingenic.c
+target/mips/ingenic_x1600/pcm-x1600.c
 target/mips/ingenic_x1600/sfc-x1600.c
 target/mips/ingenic_x1600/system-x1600.c
 target/mips/ingenic_x1600/timer-x1600.c
