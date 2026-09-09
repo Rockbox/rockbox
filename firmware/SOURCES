@@ -1834,6 +1834,7 @@ target/mips/ingenic/gpio-ingenic.c
 target/mips/ingenic/i2c-ingenic.c
 target/mips/ingenic/kernel-ingenic.c
 target/mips/ingenic/nand-ingenic.c
+target/mips/ingenic_x1600/dpu-x1600.c
 target/mips/ingenic_x1600/pcm-x1600.c
 target/mips/ingenic_x1600/sfc-x1600.c
 target/mips/ingenic_x1600/system-x1600.c

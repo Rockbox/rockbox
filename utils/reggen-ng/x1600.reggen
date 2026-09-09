@@ -734,6 +734,141 @@ node DMA_CHN {
     }
 }
 
+node DPU {
+    title "DPU (display controller)"
+    addr 0xb3050000
+
+    reg SRD_CHAIN_ADDR 0x1000 {
+        desc "DC_SRD_CHAIN_ADDR, PM 10.5.3.1.1 (line 10938).  Before start: address of the first descriptor.  While running: address of the NEXT descriptor, and it may be rewritten to splice a new descriptor into the chain."
+    }
+    reg SRD_CHAIN_CTRL 0x1004 {
+        access write-only
+        desc "DC_SRD_CHAIN_CTRL, PM 10.5.3.1.2 (line 10951).  Write-only kick."
+        bit 0 SRD_CHAIN_START
+    }
+    reg CTRL 0x2000 {
+        access write-only
+        desc "DC_CTRL, PM 10.5.3.2 (line 10965).  Write-only. GEN_STP_SRD finishes the frame in flight; QCK_STP_SRD does not."
+        bit 4 GEN_STP_SRD
+        bit 2 DES_CNT_RST
+        bit 1 QCK_STP_SRD
+    }
+    reg ST 0x2004 {
+        access read-only
+        desc "DC_ST, PM 10.5.3.3 (line 10995).  Read only. Clear the sticky bits through DC_CLR_ST, not by writing here."
+        bit 17 DISP_END
+        bit 8 TFT_UNDR
+        bit 7 STOP_SRD_ACK
+        bit 3 SRD_WORKING
+        bit 2 SRD_START
+        bit 1 SRD_END
+        bit 0 WORKING
+    }
+    reg CLR_ST 0x2008 {
+        access write-only
+        desc "DC_CLR_ST, PM 10.5.3.4 (line 11026).  Write 1 to clear the matching DC_ST bit."
+        bit 17 CLR_DISP_END
+        bit 8 CLR_TFT_UNDR
+        bit 7 CLR_STP_SRD_ACK
+        bit 2 CLR_SRD_START
+        bit 1 CLR_SRD_END
+    }
+    reg INTC 0x200c {
+        desc "DC_INTC, PM 10.5.3.5 (line 11050).  1 = generate the interrupt. Note the inverted sense of the name: setting a '_MSK' bit UNMASKS it. These gate the single DPU line into INTC group 0 bit 31 (IRQ_LCD)."
+        bit 17 EOD_MSK
+        bit 8 UOT_MSK
+        bit 7 SSA_MSK
+        bit 2 SOS_MSK
+        bit 1 EOS_MSK
+    }
+    reg INT_FLAG 0x2010 {
+        access read-only
+        desc "DC_INT_FLAG, PM 10.5.3.6 (line 11088).  Read only, post-mask."
+        bit 17 INT_EOD
+        bit 8 INT_UOT
+        bit 7 INT_SSA
+        bit 2 INT_SOS
+        bit 1 INT_EOS
+    }
+    reg COM_CONFIG 0x2014 {
+        desc "Common display configuration (PM 10.5.3.7). Only BURST_LEN_RDMA is described here; preserve the other bits."
+        fld 5 4 BURST_LEN_RDMA { enum BY_4 0x0; enum BY_8 0x1; enum BY_16 0x2; enum BY_32 0x3 }
+    }
+    reg PCFG_RD_CTRL 0x2018 {
+        desc "QoS / arbitration knobs, PM 10.5.3.8 (line 11137). DC_PCFG_RD_CTRL reset 0x00000006, DC_PCFG_OFIFO reset 0x03190842 (which is exactly what live hardware reads, so leaving them alone is safe). Field layouts not transcribed; treat these as opaque and do not modify them without a reason."
+    }
+    reg PCFG_OFIFO 0x2020
+    reg RDMA_DES 0x2114 {
+        access read-only
+        desc "Debug / progress read-outs, PM 10.5.3.9 (line 11188) and 10.5.3.10 (line 11206).  All read only. DC_RDMA_DES         0x2114  descriptor fetch counter DC_RDMA_CHAIN_SITE  0x2204  address of the descriptor being processed DC_RDMA_SITE        0x3110  current pixel position"
+    }
+    reg RDMA_CHAIN_SITE 0x2204 {
+        access read-only
+    }
+    reg RDMA_SITE 0x3110 {
+        access read-only
+    }
+    reg DISP_COM 0x8000 {
+        desc "Display interface configuration (PM 10.5.4.1). The register diagram and hardware retain clock-gate bits 7:5 at reset; preserve them when selecting the interface."
+        fld 21 16 DP_DITHER_DW
+        bit 7 DITHER_CLKGATE_EN
+        bit 6 SLCD_CLKGATE_EN
+        bit 5 TFT_CLKGATE_EN
+        bit 4 DP_DITHER_EN
+        fld 1 0 DP_IF_SEL { enum NONE 0x0; enum TFT 0x1; enum SLCD 0x2 }
+    }
+    reg TFT_TIMING_HSYNC 0x9000 {
+        desc "TFT timing, PM 10.5.4.2.1-4 (lines 11322, 11347, 11366, 11393). All four registers share the same shape: a 12-bit 'start' in [27:16] and a 12-bit 'end' in [11:0], both counted in dot clocks (lines for the vertical pair).  PM says none of the four fields may be zero. TFT_TIMING_HSYNC, PM line 11322."
+        fld 27 16 HPS
+        fld 11 0 HPE
+    }
+    reg TFT_TIMING_VSYNC 0x9004 {
+        desc "TFT_TIMING_VSYNC, PM line 11347."
+        fld 27 16 VPS
+        fld 11 0 VPE
+    }
+    reg TFT_TIMING_HDE 0x9008 {
+        desc "TFT_TIMING_HDE, PM line 11366."
+        fld 27 16 HDS
+        fld 11 0 HDE
+    }
+    reg TFT_TIMING_VDE 0x900c {
+        desc "TFT_TIMING_VDE, PM line 11393."
+        fld 27 16 VDS
+        fld 11 0 VDE
+    }
+    reg TFT_TRAN_CFG 0x9010 {
+        desc "TFT_TRAN_CFG, PM 10.5.4.2.5 (line 11414). The xxx_DL bits give each sync signal its INVALID (idle) level, so the 'pulse' region described by the timing registers above is the inverse of it."
+        fld 21 19 COLOR_EVEN { enum RGB 0x0; enum RBG 0x1; enum BGR 0x2; enum BRG 0x3; enum GBR 0x4; enum GRB 0x5 }
+        fld 18 16 COLOR_ODD { enum RGB 0x0; enum RBG 0x1; enum BGR 0x2; enum BRG 0x3; enum GBR 0x4; enum GRB 0x5 }
+        bit 10 PIX_CLK_INV
+        bit 9 DE_DL
+        bit 8 HSYNC_DL
+        bit 7 VSYNC_DL
+        fld 2 0 MODE { enum PARALLEL_888 0x0; enum PARALLEL_666 0x1; enum PARALLEL_565 0x2; enum SERIAL_8BIT_RGB 0x4; enum SERIAL_8BIT_RGBD 0x5 }
+    }
+    reg TFT_ST 0x9014 {
+        access read-only
+        desc "TFT_ST, PM 10.5.4.2.6 (line 11457).  Read only. UNDER means the controller hit an underrun and is shipping a black frame."
+        bit 1 WORKING
+        bit 0 UNDER
+    }
+    reg SLCD_PANEL_CFG 0xa000 {
+        desc "Smart LCD interface registers (PM 10.5.4.3). Unused by the HiBy R1 parallel RGB panel; only addresses are described here."
+    }
+    reg SLCD_WR_DUTY 0xa004
+    reg SLCD_TIMING 0xa008
+    reg SLCD_FRM_SIZE 0xa00c
+    reg SLCD_SLOW_TIME 0xa010
+    reg SLCD_REG_IF 0xa014
+    reg SLCD_ST 0xa018 {
+        access read-only
+    }
+    reg SLCD_REG_CTRL 0xa01c {
+        access write-only
+    }
+}
+
 node GPIO {
     title "GPIO / pin controller"
     addr 0xb0010000
@@ -1243,6 +1378,108 @@ node OST {
     }
     reg 2CNTL 0x20
     reg 2CNTHB 0x24 {
+        access read-only
+    }
+}
+
+node PWM {
+    title "PWM (pulse modulator module)"
+    addr 0xb34c0000
+
+    reg ENABLE 0x8 {
+        access read-only
+        desc "Eight independent PWM channels clocked by CPM_PWMCDR (PM 13.4). The HiBy R1 backlight uses channel 0 on PC00; X1000 uses its TCU for PWM."
+        bit 0 PWM0
+        bit 1 PWM1
+        bit 2 PWM2
+        bit 3 PWM3
+        bit 4 PWM4
+        bit 5 PWM5
+        bit 6 PWM6
+        bit 7 PWM7
+    }
+    reg UPDATE 0x10 {
+        access write-only
+        desc "PWMUPT, PM 13.4.2 (line 15524): write 1 to latch a new PWMWCn."
+        bit 0 PWM0
+        bit 1 PWM1
+        bit 2 PWM2
+        bit 3 PWM3
+        bit 4 PWM4
+        bit 5 PWM5
+        bit 6 PWM6
+        bit 7 PWM7
+    }
+    reg BUSY 0x14 {
+        access read-only
+        desc "PWMBSY, PM 13.4.3 (line 15541): 1 while an update is still pending."
+        bit 0 PWM0
+        bit 1 PWM1
+        bit 2 PWM2
+        bit 3 PWM3
+        bit 4 PWM4
+        bit 5 PWM5
+        bit 6 PWM6
+        bit 7 PWM7
+    }
+    reg MODE 0x20 {
+        desc "PWMMS, PM 13.4.4 (line 15562): 0 = register mode, 1 = DMA mode."
+        bit 0 PWM0
+        bit 1 PWM1
+        bit 2 PWM2
+        bit 3 PWM3
+        bit 4 PWM4
+        bit 5 PWM5
+        bit 6 PWM6
+        bit 7 PWM7
+    }
+    reg INIT_LVL 0x24 {
+        desc "PWMINL, PM 13.4.5 (line 15576): initial output level per channel."
+        bit 0 PWM0
+        bit 1 PWM1
+        bit 2 PWM2
+        bit 3 PWM3
+        bit 4 PWM4
+        bit 5 PWM5
+        bit 6 PWM6
+        bit 7 PWM7
+    }
+    reg IDLE_LVL 0x28 {
+        desc "PWMIDL, PM 13.4.6 (line 15594): idle (disabled) output level."
+        bit 0 PWM0
+        bit 1 PWM1
+        bit 2 PWM2
+        bit 3 PWM3
+        bit 4 PWM4
+        bit 5 PWM5
+        bit 6 PWM6
+        bit 7 PWM7
+    }
+    reg CNT_CFG {
+        desc "PWMCCn, PM 13.4.7 (line 15606).  n = 0..7. freq = input clock / 2^PRESCALE, PRESCALE must be < 8."
+        instance 0x40 0x4 8
+        fld 3 0 PRESCALE
+    }
+    reg WAVE_CFG {
+        desc "PWMWCn, PM 13.4.8 (line 15621).  n = 0..7. Period = HIGH + LOW count clocks; duty = HIGH / (HIGH + LOW). !! Neither field may be zero (PM lines 15636, 15638). !!"
+        instance 0x80 0x4 8
+        fld 31 16 HIGH
+        fld 15 0 LOW
+    }
+    reg DMA_DATA {
+        access write-only
+        desc "PWM DMA control and status registers (PM 13.4.9-17). Rockbox uses register mode; only DMA register addresses are described here."
+        instance 0xc0 0x4 8
+    }
+    reg DMA_FIFO_NUM {
+        access read-only
+        instance 0x100 0x4 8
+    }
+    reg DMA_TRIG_NUM {
+        instance 0x140 0x4 8
+    }
+    reg DMA_REQ_EN 0x180
+    reg DMA_REQ_ST 0x184 {
         access read-only
     }
 }
