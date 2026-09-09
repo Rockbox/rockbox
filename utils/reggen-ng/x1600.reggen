@@ -1022,6 +1022,133 @@ node RTC {
     reg WKUPPINCR 0x48
 }
 
+node SFC {
+    title "SFC (SPI flash controller)"
+    addr 0xb3440000
+
+    reg GLB 0x0 {
+        fld 31 16 POLL_TIME
+        bit 15 DES_EN
+        bit 14 CDT_EN
+        fld 12 7 THRESHOLD
+        fld 5 3 PHASE_NUM
+        bit 13 TRAN_DIR { enum READ 0x0; enum WRITE 0x1 }
+        bit 6 OP_MODE { enum SLAVE 0x0; enum DMA 0x1 }
+        bit 2 WP_EN
+        fld 1 0 BURST_MD { enum INCR4 0x0; enum INCR8 0x1; enum INCR16 0x2; enum INCR32 0x3 }
+    }
+    reg DEV_CONF 0x4 {
+        fld 17 16 SMP_DELAY
+        fld 14 13 STA_TYPE { enum 1BYTE 0x0; enum 2BYTE 0x1; enum 3BYTE 0x2; enum 4BYTE 0x3 }
+        fld 12 11 THOLD
+        fld 10 9 TSETUP
+        fld 8 5 TSH
+        bit 15 CMD_TYPE { enum 8BITS 0x0; enum 16BITS 0x1 }
+        bit 4 CPHA
+        bit 3 CPOL
+        bit 2 CE_DL
+        bit 1 HOLD_DL
+        bit 0 WP_DL
+    }
+    reg DEV_STA_EXP 0x8
+    reg DEV_STA_RT 0xc
+    reg DEV_STA_MSK 0x10
+    reg TRAN_CONF {
+        instance 0x14 0x4 6
+        fld 28 26 ADDR_WIDTH
+        fld 22 17 DUMMY_BITS
+        fld 15 0 COMMAND
+        bit 25 POLL_EN
+        bit 24 CMD_EN
+        bit 23 PHASE_FMT
+        bit 16 DATA_EN
+    }
+    reg TRAN_LENGTH 0x2c
+    reg DEV_ADDR {
+        instance 0x30 0x4 6
+    }
+    reg DEV_PLUS {
+        instance 0x48 0x4 6
+    }
+    reg MEM_ADDR 0x60
+    reg TRIG 0x64 {
+        bit 2 FLUSH
+        bit 1 STOP
+        bit 0 START
+    }
+    reg SR 0x68 {
+        fld 22 16 FIFO_NUM
+        fld 6 5 BUSY
+        bit 4 END
+        bit 3 TREQ
+        bit 2 RREQ
+        bit 1 OVER
+        bit 0 UNDER
+    }
+    reg SCR 0x6c {
+        bit 4 CLR_END
+        bit 3 CLR_TREQ
+        bit 2 CLR_RREQ
+        bit 1 CLR_OVER
+        bit 0 CLR_UNDER
+    }
+    reg INTC 0x70 {
+        bit 4 MSK_END
+        bit 3 MSK_TREQ
+        bit 2 MSK_RREQ
+        bit 1 MSK_OVER
+        bit 0 MSK_UNDER
+    }
+    reg FSM 0x74 {
+        fld 19 16 STATE_AHB
+        fld 15 11 STATE_SPI
+        fld 9 6 STATE_CLK
+        fld 5 3 STATE_DMAC
+        fld 2 0 STATE_RMC
+    }
+    reg CGE 0x78 {
+        bit 5 SFC
+        bit 4 FIFO
+        bit 3 DMA
+        bit 2 RMC
+        bit 1 SPI
+        bit 0 REG
+    }
+    reg DATA 0x1000
+    reg CMD_IDX 0x7c {
+        desc "CMD_IDX 0x7c: command index into the CDT.  Reset 0, writable mask 0xC000003F, i.e. a 6-bit index plus two top control bits. The two high bits are not described in the text extraction."
+    }
+    reg COL_ADDR 0x80 {
+        desc "Column and row addresses for descriptor-driven SPI NAND transfers."
+    }
+    reg ROW_ADDR 0x84
+    reg STA_ADDR {
+        desc "STA_ADDR0 0x88 / STA_ADDR1 0x8c: device status register addresses used by the hardware status-polling engine."
+        instance 0x88 0x4 2
+    }
+    reg DES_ADDR 0x90 {
+        desc "DES_ADDR 0x90: DMA descriptor chain address, used when GLB.DES_EN is set (in which case SFC_MEM_ADDR is ignored -- PM line 6167)."
+    }
+    reg GLB1 0x94 {
+        desc "Global configuration 1 (PM 5.7.3.2). CHIP_SEL selects the chip; CHIP1_SEL forces chip 1."
+        bit 31 CHIP1_SEL
+        fld 1 0 CHIP_SEL
+    }
+    reg DEV1_STA_RT 0x98 {
+        access read-only
+        desc "DEV1_STA_RT 0x98: real-time status of the second device (chip select 1). Unused on the HiBy R1, which has a single SPI NAND."
+    }
+    reg TRAN_CONF1 {
+        desc "Per-phase transfer mode (PM 5.7.3.9). The mode field is in TRAN_CONF1 rather than TRAN_CONF on X1600."
+        instance 0x9c 0x4 6
+        fld 7 4 TRAN_MD
+    }
+    reg CDT {
+        desc "CDT: the Command Descriptor Table register window, 0x800..0xc00 (PM Table 5-2, line 6143).  256 words.  Enabled by GLB.CDT_EN. With CDT mode the controller walks a table of pre-programmed commands rather than being driven register-by-register, which is how the vendor SPL reads pages at full speed."
+        instance 0x800 0x4 256
+    }
+}
+
 node TCU {
     title "TCU (timer / counter unit)"
     addr 0xb0002000

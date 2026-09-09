@@ -23,6 +23,7 @@
 #define __INGENIC_SOC_H__
 #include "irq-x1600.h"
 #include "gpio-x1600.h"
+#include "sfc-x1600.h"
 #include "nand-ingenic.h"
 #include "i2c-ingenic.h"
 #include "clk-x1600.h"
