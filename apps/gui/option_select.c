@@ -108,7 +108,12 @@ const char *option_get_valuestring(const struct settings_list *setting,
         if (formatter)
             str = formatter(buffer, buf_len, (int)temp_var, str_unit);
         else if (!is_time_setting)
-            snprintf(buffer, buf_len, "%d %s", (int)temp_var, str_unit?str_unit:"");
+        {
+            if (str_unit && str_unit[0])
+                snprintf(buffer, buf_len, "%d %s", (int)temp_var, str_unit);
+            else
+                snprintf(buffer, buf_len, "%d", (int)temp_var);
+        }
     }
     else if (HASFLAG(setting, F_T_SOUND))
     {
