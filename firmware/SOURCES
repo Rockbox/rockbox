@@ -1823,6 +1823,10 @@ drivers/audio/x1000-codec.c
 #endif
 #endif /* CONFIG_CPU == X1000 */
 
+#if CONFIG_CPU == X1600
+target/mips/ingenic_x1600/clk-x1600.c
+#endif /* CONFIG_CPU == X1600 */
+
 #if defined(ONDA_VX747) || defined(ONDA_VX747P) || defined(ONDA_VX777)
 target/mips/ingenic_jz47xx/onda_vx747/backlight-onda_vx7X7.c
 target/mips/ingenic_jz47xx/onda_vx747/lcd-onda_vx747.c

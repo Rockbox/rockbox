@@ -46,6 +46,7 @@ class Node:
         self.instances = []
         self.children = []
         self.register_width = None
+        self.register_access = None
         self.fields = []
 
     def gen(self):
@@ -66,6 +67,8 @@ class Node:
         if self.register_width is not None:
             reg = E("register",
                     E("width", self.register_width))
+            if self.register_access is not None:
+                reg.append(E("access", self.register_access))
             for f in self.fields:
                 reg.append(f.gen())
             node.append(reg)
@@ -223,7 +226,14 @@ class Parser:
                 'fld': self.parse_field,
                 'bit': self.parse_field,
                 'variant': self.parse_variant,
+                'access': (self.parse_printable, 1),
             })
+
+            if 'access' in results:
+                acc = results['access'][0]
+                if acc not in ('read-only', 'read-write', 'write-only'):
+                    self.err('access must be read-only, read-write or write-only')
+                ret.register_access = acc
 
             if 'field' in results:
                 ret.fields += results['field']

@@ -1,0 +1,389 @@
+# Copyright (C) 2026 Michael McAllister
+# Ingenic X1600 register description. Regenerate headers with regen-x1600.sh.
+# Register definitions live here; driver constants live in the target headers.
+
+name    "x1600"
+title   "Ingenic X1600"
+isa     "mips"
+version "1.0"
+author  "Michael McAllister"
+
+node CPM {
+    title "CPM (clock, reset and power controller)"
+    addr 0xb0000000
+
+    reg CPCCR 0x0 {
+        desc "CPCCR, PM 11.1.2.1 (line 11982).  Reset 0x95000000. The xxDIV fields all encode 'divide by (field + 1)', 1..16. Constraints (PM line 12157): AHB2 must be 1x or 2x PCLK, and CCLK must be 1/2/3/4 x the L2 cache clock."
+        fld 31 30 SEL_SRC { enum STOP 0x0; enum EXCLK 0x1; enum APLL 0x2 }
+        fld 29 28 SEL_CPLL { enum STOP 0x0; enum SCLK_A 0x1; enum MPLL 0x2 }
+        fld 27 26 SEL_H0PLL { enum STOP 0x0; enum SCLK_A 0x1; enum MPLL 0x2 }
+        fld 25 24 SEL_H2PLL { enum STOP 0x0; enum SCLK_A 0x1; enum MPLL 0x2 }
+        bit 23 GATE_SCLKA
+        bit 22 CE_CPU
+        bit 21 CE_AHB0
+        bit 20 CE_AHB2
+        fld 19 16 PDIV
+        fld 15 12 H2DIV
+        fld 11 8 H0DIV
+        fld 7 4 L2CDIV
+        fld 3 0 CDIV
+    }
+    reg CPCSR 0xd4 {
+        access read-only
+        desc "CPCSR, PM 11.1.2.2 (line 12168).  All bits read-only. xxx_MUX  == 1 means the corresponding CPCCR mux has settled. xxx_BUSY == 1 means a divider change is still in progress."
+        bit 31 SRC_MUX
+        bit 30 CPU_MUX
+        bit 29 AHB0_MUX
+        bit 28 AHB2_MUX
+        bit 27 DDR_MUX
+        bit 2 H2DIV_BUSY
+        bit 1 H0DIV_BUSY
+        bit 0 CDIV_BUSY
+    }
+    reg CPPCR 0xc {
+        desc "CPPCR, PM 11.1.2.1 (line 13112).  Reset 0x00000020. Global PLL controls; the DACPD bits are test-mode only ('don't change')."
+        bit 31 A_DACPD
+        bit 30 APLL_BP
+        bit 29 M_DACPD
+        bit 28 MPLL_BP
+        bit 27 E_DACPD
+        bit 26 EPLL_BP
+        fld 7 0 PLLST
+    }
+    reg CPAPCR 0x10 {
+        desc "CPAPCR, PM (see block comment above).  Reset 0x010049C0."
+        fld 31 20 M
+        fld 19 14 N
+        fld 13 11 OD1
+        fld 10 8 OD0
+        bit 7 DSMPD
+        bit 6 PHASEPD
+        bit 5 POSTDIVPD
+        bit 4 VCOPD
+        bit 3 ON
+        bit 2 LOCK
+        bit 0 EN
+    }
+    reg CPMPCR 0x14 {
+        desc "CPMPCR, PM (see block comment above).  Reset 0x010049C0."
+        fld 31 20 M
+        fld 19 14 N
+        fld 13 11 OD1
+        fld 10 8 OD0
+        bit 7 DSMPD
+        bit 6 PHASEPD
+        bit 5 POSTDIVPD
+        bit 4 VCOPD
+        bit 3 ON
+        bit 2 LOCK
+        bit 0 EN
+    }
+    reg CPEPCR 0x18 {
+        desc "CPEPCR, PM (see block comment above).  Reset 0x010049C0."
+        fld 31 20 M
+        fld 19 14 N
+        fld 13 11 OD1
+        fld 10 8 OD0
+        bit 7 DSMPD
+        bit 6 PHASEPD
+        bit 5 POSTDIVPD
+        bit 4 VCOPD
+        bit 3 ON
+        bit 2 LOCK
+        bit 0 EN
+    }
+    reg CPAPACR 0x84 {
+        desc "CPAPACR: APLL fractional feedback divider, FRAC/2^24.  Reset 0."
+        fld 23 0 FRAC
+    }
+    reg CPMPACR 0x88 {
+        desc "CPMPACR: MPLL fractional feedback divider, FRAC/2^24.  Reset 0."
+        fld 23 0 FRAC
+    }
+    reg CPEPACR 0x8c {
+        desc "CPEPACR: EPLL fractional feedback divider, FRAC/2^24.  Reset 0."
+        fld 23 0 FRAC
+    }
+    reg DDRCDR 0x2c {
+        desc "DDRCDR, PM 11.1.2.3 (line 12221).  Reset 0x40000000.  Ratio = DDRCDR+1."
+        fld 31 30 DCS { enum STOP 0x0; enum SCLK_A 0x1; enum MPLL 0x2 }
+        bit 29 CE_DDR
+        bit 28 DDR_BUSY
+        bit 27 DDR_STOP
+        bit 26 GATE_EN
+        bit 25 CHANGE_EN
+        bit 24 FLAG
+        fld 3 0 DDRCDR
+    }
+    reg MACCDR 0x54 {
+        desc "MACCDR, PM 11.1.2.4 (line 12273).  Ratio = MACCDR+1.  Unused on HiBy R1."
+        fld 31 30 MACPCS { enum SCLK_A 0x0; enum MPLL 0x1; enum EPLL 0x2 }
+        bit 29 CE_MAC
+        bit 28 MAC_BUSY
+        bit 27 MAC_STOP
+        fld 7 0 MACCDR
+    }
+    reg I2S0CDR 0x60 {
+        desc "I2S fractional divider (PM 11.1.2.5): output = parent * M / N, with N >= 2*M."
+        bit 30 I2PCS { enum SCLK_A 0x0; enum EPLL 0x1 }
+        bit 29 CE_I2S
+        fld 28 20 I2SDIV_M
+        fld 19 0 I2SDIV_N
+    }
+    reg I2S1CDR 0x7c {
+        desc "I2S1CDR -- transmit (i2s0_dev_tclk), MEASURED -- not in the PM"
+        bit 30 I2PCS { enum SCLK_A 0x0; enum EPLL 0x1 }
+        bit 29 CE_I2S
+        fld 28 20 I2SDIV_M
+        fld 19 0 I2SDIV_N
+    }
+    reg I2S0CDR1 0x70 {
+        desc "I2SxCDR1, PM 11.1.2.6 (line 12360). Both auto-calculate bits normally stay 0 and I2SDIV_D is then don't-care. PM erratum at line 12388: bits 30 and 31 are cross-wired in silicon -- writing NEN lands in DEN and vice versa.  Avoid both bits. I2S0CDR1 -- PM 11.1.2.6 line 12360"
+        bit 31 I2S_NEN
+        bit 30 I2S_DEN
+        fld 19 0 I2SDIV_D
+    }
+    reg I2S1CDR1 0x80 {
+        desc "I2S1CDR1 -- MEASURED -- not in the PM"
+        bit 31 I2S_NEN
+        bit 30 I2S_DEN
+        fld 19 0 I2SDIV_D
+    }
+    reg LPCDR 0x64 {
+        desc "LPCDR: the DPU pixel clock.  PM 11.1.2.7 (line 12396).  Ratio = LPCDR+1. On the HiBy R1 this is EPLL(300 MHz) / 11 -> ~27.3 MHz nominal; the panel actually runs at a measured 28,303,248 Hz, so the exact live divider setting still has to be read back and verified."
+        fld 31 30 LPCS { enum SCLK_A 0x0; enum MPLL 0x1; enum EPLL 0x2 }
+        bit 29 CE_LCD
+        bit 28 LCD_BUSY
+        bit 27 LCD_STOP
+        bit 26 LCD_IO_INV
+        fld 7 0 LPCDR
+    }
+    reg MSC0CDR 0x68 {
+        desc "MSC0CDR, PM 11.1.2.8 (line 12435).  Reset 0x40000000. !! Ratio is (MSC0CDR + 1) * 2, not +1. !! On the HiBy R1, MSC0 is the SDIO wifi and MSC1 is the microSD slot -- the reverse of every X1000 target."
+        fld 31 30 MPCS { enum SCLK_A 0x0; enum MPLL 0x1; enum EPLL 0x2 }
+        bit 29 CE_MSC
+        bit 28 MSC_BUSY
+        bit 27 MSC_STOP
+        bit 15 S_CLK_SEL { enum PHASE_90 0x0; enum PHASE_180 0x1 }
+        fld 7 0 MSCCDR
+    }
+    reg MSC1CDR 0xa4 {
+        desc "MSC1CDR, PM 11.1.2.9 (line 12484).  Reset 0x40000000. !! Ratio is (MSC1CDR + 1) * 2, not +1. !! On the HiBy R1, MSC0 is the SDIO wifi and MSC1 is the microSD slot -- the reverse of every X1000 target."
+        fld 31 30 MPCS { enum SCLK_A 0x0; enum MPLL 0x1; enum EPLL 0x2 }
+        bit 29 CE_MSC
+        bit 28 MSC_BUSY
+        bit 27 MSC_STOP
+        bit 15 S_CLK_SEL { enum PHASE_90 0x0; enum PHASE_180 0x1 }
+        fld 7 0 MSCCDR
+    }
+    reg SFCCDR 0x74 {
+        desc "SFCCDR, PM 11.1.2.10 (line 12534).  Ratio = SFCCDR+1.  Boot flash."
+        fld 31 30 SFCS { enum SCLK_A 0x0; enum MPLL 0x1; enum EPLL 0x2 }
+        bit 29 CE_SFC
+        bit 28 SFC_BUSY
+        bit 27 SFC_STOP
+        fld 7 0 SFCCDR
+    }
+    reg SSICDR 0x5c {
+        desc "SSICDR, PM 11.1.2.11 (line 12580).  Ratio = SSICDR+1."
+        fld 31 30 SPCS { enum SCLK_A 0x0; enum MPLL 0x1; enum EPLL 0x2 }
+        bit 29 CE_SSI
+        bit 28 SSI_BUSY
+        bit 27 SSI_STOP
+        fld 7 0 SSICDR
+    }
+    reg PWMCDR 0x6c {
+        desc "PWMCDR, PM 11.1.2.13 (line 12671).  Ratio = PWMCDR+1. NOTE the divider is only 4 bits wide here even though the PM prose copies the 'varies from 1 to 256' sentence from SFCCDR -- the bit table says [3:0]. Drives the LCD backlight (PC00 / PWM channel 0) on the HiBy R1."
+        fld 31 30 PWMPCS { enum SCLK_A 0x0; enum MPLL 0x1; enum EPLL 0x2 }
+        bit 29 CE_PWM
+        bit 28 PWM_BUSY
+        bit 27 PWM_STOP
+        fld 3 0 PWMCDR
+    }
+    reg CIMCDR 0x78 {
+        desc "CIMCDR 0x78, CAN0CDR 0xA0, CAN1CDR 0xA8, CDBUSCDR 0xAC, MPHY0C 0xE4. All follow the same template (PM 11.1.2.12/14/15/16/17); none of them is used on the HiBy R1, so only the addresses are declared -- add fields if a driver ever needs them."
+    }
+    reg CAN0CDR 0xa0
+    reg CAN1CDR 0xa8
+    reg CDBUSCDR 0xac
+    reg MPHY0C 0xe4
+    reg CLKGR 0x20 {
+        desc "Clock gates (PM 11.2.2.6). Reset is 0x47ffffe0 according to Table 11-3 and the register diagram."
+        bit 31 DDR
+        bit 29 AHB0
+        bit 28 APB0
+        bit 27 RTC
+        bit 24 AES
+        bit 23 LCD
+        bit 22 CIM
+        bit 21 PDMA
+        bit 20 OST
+        bit 19 SSI0
+        bit 18 TCU
+        bit 17 DTRNG
+        bit 16 UART2
+        bit 15 UART1
+        bit 14 UART0
+        bit 13 SADC
+        bit 11 AUDIO
+        bit 10 SSI_SLV
+        bit 8 I2C1
+        bit 7 I2C0
+        bit 5 MSC1
+        bit 4 MSC0
+        bit 3 OTG
+        bit 2 SFC
+        bit 1 EFUSE
+        bit 0 NEMC
+    }
+    reg CLKGR1 0x28 {
+        desc "CLKGR1, PM 11.2.2.7 (line 13632).  Reset 0x37FFFFFF, which matches hardware exactly at BootROM time.  Bit list from PM lines 13640..13679. Bits 8/9 are the two halves of the AIC clock: rclk = capture, tclk = playback."
+        bit 30 ARB
+        bit 28 MIPI_CSI
+        bit 26 INTC
+        bit 23 GMAC0
+        bit 16 UART3
+        bit 9 I2S0_TCLK
+        bit 8 I2S0_RCLK
+        bit 6 HASH
+        bit 5 PWM
+        bit 2 CDBUS
+        bit 1 CAN1
+        bit 0 CAN0
+    }
+    reg LCR 0x4 {
+        desc "LCR, PM 11.2.2.1 (line 13494).  Reset 0."
+        fld 19 8 PST
+        bit 4 PD_IDLES
+        fld 1 0 LPM { enum IDLE 0x0; enum SLEEP 0x1; enum IDLE_CORE_PG 0x2 }
+    }
+    reg OPCR 0x24 {
+        desc "OPCR, PM 11.2.2.14 (line 13845).  Reset 0x00801500 per the prose (Table 11-3 says 0x10801500; the register diagram's RST row decodes to 0x00801500, so the table's IDLE_DIS bit looks like a typo)."
+        bit 31 IDLE_DIS
+        bit 30 MASK_INT
+        bit 28 GATE_SCLKA_BUS
+        bit 26 L2C_PD
+        bit 24 REQ_MODE
+        bit 23 GATE_USBPHY_CLK
+        bit 22 NEMC_ROM_CLR_DS_EN
+        bit 21 PDMA_RAM_CLR_EN
+        bit 20 DDR_CLR_SD_EN
+        fld 19 8 O1ST
+        bit 7 SPENDN0
+        bit 5 CIM_MCLK_GATE
+        bit 4 O1SE
+        bit 3 PD
+        bit 2 ERCS { enum EXCLK_DIV512 0x0; enum RTCLK 0x1 }
+        bit 1 BUS_MODE
+    }
+    reg SRBC 0xc4 {
+        desc "SRBC, PM 11.2.2.9 (line 13712).  Reset 0.  Soft resets are level signals: assert, wait, deassert.  GMAC's soft reset is NOT here (it lives in MPHYC.SOFT_RST)."
+        bit 19 LCD_SR
+        bit 18 CIM_SR
+        bit 15 CAN0_SR
+        bit 14 CAN1_SR
+        bit 13 CDBUS_SR
+        bit 12 OTG_SR
+        bit 11 HASH_SR
+        bit 10 AES_SR
+        bit 8 AUDIO_SR
+        bit 7 DDR_STOP
+        bit 1 CPU_ACK
+        bit 0 DDR_ACK
+    }
+    reg MEMPD0 0xf8 {
+        desc "Peripheral SRAM power-down control (PM 11.2.2.10-11). A set bit powers down the block; keep its clock running during the transition."
+        bit 29 CDBUS
+        bit 26 PWM
+        bit 25 GMAC
+        bit 24 USB
+        bit 23 SFC
+        bit 22 MSC1
+        bit 21 MSC0
+        bit 20 AES
+        bit 19 PDMA_SLP
+        bit 18 PDMA_SEC
+        bit 17 PDMA
+        bit 16 NEMC
+        bit 6 AIC
+        bit 5 SSI_SLV
+        bit 4 SSI0
+        bit 3 UART3
+        bit 2 UART2
+        bit 1 UART1
+        bit 0 UART0
+    }
+    reg MEMPD1 0xfc {
+        bit 5 CIM
+        bit 4 DPU
+        bit 3 DDR_CH6
+        bit 2 DDR_CH5
+        bit 1 DDR_CH3
+        bit 0 DDR_TOP
+    }
+    reg SLBC 0xc8 {
+        desc "Sleep-mode boot vector, PM 11.2.2.12/13 (lines 13808, 13826). SLBC=1 makes a sleep wake-up jump straight to SLPC instead of re-running the boot ROM; only valid when P0 was shut down in sleep mode."
+        bit 0 SLBC
+    }
+    reg SLPC 0xcc
+    reg PSWCST {
+        desc "Power switch chain start times, PM 11.2.2.2-5 (line 13524), in PCLK cycles."
+        instance 0x90 0x4 8
+    }
+    reg MESTSEL 0xec {
+        desc "MESTSEL, PM 11.2.2.8 (line 13681): async handshake / mux priority control. The PM's field diagram for this register is illegible in the text extraction (a 'Mux-priority' field plus TST0..TST5); no bitfields are declared because none could be read with confidence."
+    }
+    reg CPSPR 0x34 {
+        desc "Scratch register (PM 11.1.2.22). Write 0x5a5a to CPSPPR to unlock writes, then 0xa5a5 to lock them."
+    }
+    reg CPSPPR 0x38
+    reg DRCG 0xd0 {
+        desc "DRCG, PM 11.1.2.21 (line 12956): DDR clock gate.  Reset 0x00000001. Field layout not transcribed; only the address is trustworthy."
+    }
+    reg INTR 0xb0 {
+        desc "CPM interrupt registers, PM 11.1.2.18-20 (lines 12907, 12928, 12944). These feed INTC group 1 bit 19 (IRQ_CPM). Per-bit meanings not transcribed."
+    }
+    reg INTRE 0xb4
+    reg SFTINT 0xbc
+    reg USBPCR 0x3c {
+        desc "USB PHY parameters (PM 11.1.2.24). Field definitions follow the X1000 layout, consistent with the X1600 reset values."
+        bit 31 USB_MODE
+        bit 30 AVLD_REG
+        bit 28 IDPULLUP_MASK
+        bit 27 INCR_MASK
+        bit 26 TXRISETUNE
+        bit 25 COMMONONN
+        bit 24 VBUSVLDEXT
+        bit 23 VBUSVLDEXTSEL
+        bit 22 POR
+        bit 21 SIDDQ
+        bit 20 OTG_DISABLE
+        fld 19 17 COMPDISTUNE
+        fld 16 14 OTGTUNE
+        fld 13 11 SQRXTUNE
+        fld 10 8 TXFSLSTUNE
+        fld 7 6 TXPREEMPHTUNE
+        fld 5 4 TXHSXVTUNE
+        fld 3 0 TXVREFTUNE
+    }
+    reg USBRDT 0x40 {
+        desc "USB reset-detect timer (PM 11.1.2.25). Reset 0x02000096 matches the X1000 field layout."
+        bit 26 IDDIG_EN
+        bit 25 VBFIL_LD_EN
+        fld 24 23 HB_MASK
+        fld 22 0 RDT
+    }
+    reg USBVBFIL 0x44 {
+        desc "VBUS filter, PM 11.1.2.26 (line 13062).  Reset 0x00ff0080, which decodes cleanly as IDDIGFIL 0xff and VBFIL 0x80."
+        fld 31 16 IDDIGFIL
+        fld 15 0 VBFIL
+    }
+    reg USBPCR1 0x48 {
+        desc "USB PHY control (PM 11.1.2.27). Configure the reference clock and UTMI interface width before starting the USB core."
+        bit 31 BVLD_REG
+        fld 27 26 REFCLK_SEL { enum CRYSTAL 0x0; enum EXTERNAL 0x1; enum CLKCORE 0x2 }
+        fld 25 24 REFCLK_DIV { enum 12MHZ 0x0; enum 24MHZ 0x1; enum 48MHZ 0x2 }
+        bit 21 PORT_RST
+        bit 19 WORD_IF { enum 8BIT 0x0; enum 16BIT 0x1 }
+    }
+}

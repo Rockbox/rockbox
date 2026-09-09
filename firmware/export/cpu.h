@@ -58,6 +58,8 @@
 #include "rk27xx.h"
 #elif CONFIG_CPU == X1000
 #include "x1000.h"
+#elif CONFIG_CPU == X1600
+#include "x1600.h"
 #elif CONFIG_CPU == STM32H743
 #include "stm32h743.h"
 #endif
