@@ -343,6 +343,8 @@ struct queue_head {
 static struct queue_head qh_array[USB_NUM_ENDPOINTS*2]
     USB_QHARRAY_ATTR;
 
+static int pending_device_address = -1;
+
 static struct semaphore transfer_completion_signal[USB_NUM_ENDPOINTS*2]
     SHAREDBSS_ATTR;
 
@@ -677,7 +679,9 @@ bool usb_drv_powered(void)
 
 void usb_drv_set_address(int address)
 {
-    REG_DEVICEADDR = address << USBDEVICEADDRESS_BIT_POS;
+    /* SET_ADDRESS is captured when the setup packet arrives and applied
+     * after the EP0 IN status stage completes. */
+    (void)address;
 }
 
 void usb_drv_reset_endpoint(int endpoint, bool send)
@@ -1080,7 +1084,17 @@ static void control_received(void)
         }
     }
 
-    usb_core_setup_received((struct usb_ctrlrequest*)tmp);
+    struct usb_ctrlrequest *req = (struct usb_ctrlrequest*)tmp;
+
+    /* A new setup packet supersedes any unfinished SET_ADDRESS request. */
+    pending_device_address = -1;
+
+    if ((req->bRequestType & (USB_TYPE_MASK | USB_RECIP_MASK)) ==
+            (USB_TYPE_STANDARD | USB_RECIP_DEVICE) &&
+        req->bRequest == USB_REQ_SET_ADDRESS)
+        pending_device_address = req->wValue;
+
+    usb_core_setup_received(req);
 }
 
 static void transfer_completed(void)
@@ -1113,6 +1127,14 @@ static void transfer_completed(void)
                         ((td->size_ioc_sts & DTD_PACKET_SIZE) >> DTD_LENGTH_BIT_POS));
                     td=(struct transfer_descriptor*) td->next_td_ptr;
                 }
+                if (ep == EP_CONTROL && dir == DIR_IN &&
+                    pending_device_address >= 0 &&
+                    qh->status == 0 && length == 0) {
+                    REG_DEVICEADDR =
+                        pending_device_address << USBDEVICEADDRESS_BIT_POS;
+                    pending_device_address = -1;
+                }
+
                 if(qh->wait) {
                     qh->wait=0;
                     semaphore_release(&transfer_completion_signal[pipe]);
@@ -1134,6 +1156,7 @@ static void bus_reset(void)
     logf("usb bus_reset");
 
     REG_DEVICEADDR = 0;
+    pending_device_address = -1;
     REG_ENDPTSETUPSTAT = REG_ENDPTSETUPSTAT;
     REG_ENDPTCOMPLETE  = REG_ENDPTCOMPLETE;
 
