@@ -51,6 +51,9 @@
 #include <math.h>
 #include "os_support.h"
 #include "mathops.h"
+#if defined(OPUS_ARM_ASM)
+#include "arm/mdct_armv4.h"
+#endif
 #include "stack_alloc.h"
 
 #if defined(MIPSr1_ASM)
@@ -265,6 +268,10 @@ void clt_mdct_backward_c(const mdct_lookup *l, kiss_fft_scalar *in, kiss_fft_sca
       kiss_fft_scalar * OPUS_RESTRICT yp = out+(overlap>>1);
       const kiss_twiddle_scalar * OPUS_RESTRICT t = &trig[0];
       const opus_int16 * OPUS_RESTRICT bitrev = l->kfft[shift]->bitrev;
+#ifdef OVERRIDE_MDCT_PREROT
+      mdct_prerot_armv4(xp1, xp2, t, bitrev, yp, N4,
+                        2*stride*(int)sizeof(kiss_fft_scalar));
+#else
       for(i=0;i<N4;i++)
       {
          int rev;
@@ -279,6 +286,7 @@ void clt_mdct_backward_c(const mdct_lookup *l, kiss_fft_scalar *in, kiss_fft_sca
          xp1+=2*stride;
          xp2-=2*stride;
       }
+#endif
    }
 
    opus_fft_impl(l->kfft[shift], (kiss_fft_cpx*)(out+(overlap>>1)));
@@ -291,6 +299,9 @@ void clt_mdct_backward_c(const mdct_lookup *l, kiss_fft_scalar *in, kiss_fft_sca
       const kiss_twiddle_scalar *t = &trig[0];
       /* Loop to (N4+1)>>1 to handle odd N4. When N4 is odd, the
          middle pair will be computed twice. */
+#ifdef OVERRIDE_MDCT_POSTROT
+      mdct_postrot_armv4(yp0, yp1, t, N4, (N4+1)>>1);
+#else
       for(i=0;i<(N4+1)>>1;i++)
       {
          kiss_fft_scalar re, im, yr, yi;
@@ -319,6 +330,7 @@ void clt_mdct_backward_c(const mdct_lookup *l, kiss_fft_scalar *in, kiss_fft_sca
          yp0 += 2;
          yp1 -= 2;
       }
+#endif
    }
 
    /* Mirror on both sides for TDAC */
@@ -328,6 +340,9 @@ void clt_mdct_backward_c(const mdct_lookup *l, kiss_fft_scalar *in, kiss_fft_sca
       const opus_val16 * OPUS_RESTRICT wp1 = window;
       const opus_val16 * OPUS_RESTRICT wp2 = window+overlap-1;
 
+#ifdef OVERRIDE_MDCT_MIRROR
+      mdct_mirror_armv4(xp1, yp1, wp1, wp2, overlap/2);
+#else
       for(i = 0; i < overlap/2; i++)
       {
          kiss_fft_scalar x1, x2;
@@ -338,6 +353,7 @@ void clt_mdct_backward_c(const mdct_lookup *l, kiss_fft_scalar *in, kiss_fft_sca
          wp1++;
          wp2--;
       }
+#endif
    }
 }
 #endif /* OVERRIDE_clt_mdct_backward */

@@ -1,0 +1,60 @@
+/* Copyright (c) 2025 Xiph.Org Foundation and contributors
+   Copyright (c) 2026 Michael Giacomelli
+
+   Redistribution and use in source and binary forms, with or without
+   modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice,
+       this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright notice,
+       this list of conditions and the following disclaimer in the
+       documentation and/or other materials provided with the distribution.
+
+   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+   AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+   ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+   LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+   CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+   SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+   INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+   CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+   POSSIBILITY OF SUCH DAMAGE.
+*/
+
+#ifndef MDCT_ARMv4_H
+#define MDCT_ARMv4_H
+
+/* Hand-written inner loops for the backward MDCT.  Only the three loops are
+   replaced; the setup around them stays in C, so mdct.c remains readable and
+   the assembly needs no knowledge of mdct_lookup.  See
+   celt/arm/mdct_armv4_asm.S for why the compiled loops lose.
+
+   Building with OPUS_ARM_NO_MDCT_ASM selects the C loops instead, which is
+   how the two are compared. */
+
+#if defined(OPUS_ARM_INLINE_ASM) && defined(FIXED_POINT) \
+ && !defined(OPUS_ARM_NO_MDCT_ASM)
+
+#define OVERRIDE_MDCT_PREROT
+#define OVERRIDE_MDCT_POSTROT
+#define OVERRIDE_MDCT_MIRROR
+
+/* step is a byte stride, so the caller scales by sizeof(kiss_fft_scalar). */
+void mdct_prerot_armv4(const kiss_fft_scalar *xp1,
+                       const kiss_fft_scalar *xp2,
+                       const kiss_twiddle_scalar *t,
+                       const opus_int16 *bitrev,
+                       kiss_fft_scalar *yp, int N4, int step);
+
+void mdct_postrot_armv4(kiss_fft_scalar *yp0, kiss_fft_scalar *yp1,
+                        const kiss_twiddle_scalar *t, int N4, int count);
+
+void mdct_mirror_armv4(kiss_fft_scalar *xp1, kiss_fft_scalar *yp1,
+                       const opus_val16 *wp1, const opus_val16 *wp2,
+                       int count);
+
+#endif
+
+#endif /* MDCT_ARMv4_H */
