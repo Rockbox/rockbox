@@ -78,6 +78,7 @@ struct Im3Hdr
 enum {
     MODEL_UNKNOWN = -1,
     MODEL_IPOD6G = 0,
+    MODEL_IPODNANO3G,
     /* new models go here */
 
     NUM_MODELS

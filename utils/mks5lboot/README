@@ -5,7 +5,13 @@ A tool to install/uninstall a dual bootloader into a s5l8702 based
 device:
 
   - iPod Classic 6G
-  - iPod Nano 3G (WIP)
+  - iPod Nano 3G
+
+Nano 3G support is currently limited to 4GB units with the tested Hynix
+A514D3AD NAND configuration. The installer cannot identify the NAND while
+the device is in DFU mode; see the Rockbox manual's Nano 3G installation
+section before installing. Other configurations are rejected by the
+bootloader rather than enabled with untested geometry or programming modes.
 
 
 Usage
@@ -45,7 +51,8 @@ Commands:
   <platform> is the name of the platform (type of device) for
   which the DFU uninstaller will be built. Currently supported
   platform names are:
-    ipod6g:  iPod Classic 6G
+    ipod6g:      iPod Classic 6G
+    ipodnano3g:  iPod Nano 3G
 
 Options:
   -p, --pid <pid>   Use a specific <pid> (Product Id) USB device,
@@ -64,13 +71,14 @@ Dual bootloader installation
 
 Prerequisites:
 
-  - An iPod Classic 6th with Apple firmware installed and running, current
-    supported FW versions for existing models:
+  - An iPod Classic 6th or iPod Nano 3G with Apple firmware installed and
+    running, current supported FW versions for existing models:
 
     Classic 6th 80/160 Late 2007 (1G):  1.1.2
     Classic 6th 120 Late 2008 (2G):     2.0.1
     Classic 6th 160 Late 2009 (3G):     2.0.4
     Classic 6th 160 Late 2012 (4G):     2.0.5
+    Nano 3G 4GB:                        1.0.1 to 1.1.3
 
   - If your iPod is formated using Apple partitions you must convert this
     ipod to FAT32 format (aka a "winpod"), see http://www.rockbox.org/

@@ -27,8 +27,9 @@ LINKFILE = dualboot.lds
 # 1) add x to the list in TARGETS
 # 2) create a variable named OPT_x of the form:
 #    OPT_x=target specific defines
-TARGETS = ipod6g
+TARGETS = ipod6g ipodnano3g
 OPT_ipod6g = -DIPOD_6G -DMEMORYSIZE=64
+OPT_ipodnano3g = -DIPOD_NANO3G -DMEMORYSIZE=32
 
 LOADERS = install uninstall
 OPT_install =
@@ -53,7 +54,15 @@ $(foreach l, $(LOADERS), $(foreach t, $(TARGETS),\
 INCLUDES += -I. -I.. -I$(FIRMDIR) -I$(FWARM) -I$(FW8702)
 INCLUDES += $(addprefix -I$(FIRMDIR)/, export include libc/include kernel/include)
 # target/loader specific includes
-$(foreach l,$(LOADERS),$(foreach t,$(TARGETS),$(eval INC_$(l)_$(t) = -I$(FW8702)/$(t))))
+#
+# Each target also needs the autoconf.h that tools/configure generates for
+# its bootloader build; it cannot be derived here. Configure a bootloader
+# build for each target and pass the directories, e.g.
+#
+#   make CONFIGDIR_ipod6g=../../../build-ipod6g-bl \
+#        CONFIGDIR_ipodnano3g=../../../build-nano3g-bl
+$(foreach l,$(LOADERS),$(foreach t,$(TARGETS),\
+	$(eval INC_$(l)_$(t) = -I$(FW8702)/$(t) -I$(CONFIGDIR_$(t)))))
 
 CFLAGS = $(INCLUDES) -mcpu=arm926ej-s -std=gnu99 -nostdlib -ffreestanding -Os -W -Wall\
 		-Wundef -Wstrict-prototypes -ffunction-sections -fdata-sections -Wl,--gc-sections $(DEFINES)
@@ -69,9 +78,14 @@ OUTPUTDEBUG = $(BOOTBINS:%.arm-bin=$(BUILDDIR)%.arm-elf) $(BOOTBINS:%.arm-bin=$(
 
 all: $(BUILDDIR) $(OUTPUTDUALBOOT)
 
+# config.h emits ARM assembler macros (ldmpc/ldrpc) whenever __ASSEMBLER__ is
+# defined, which the linker script has to do; strip them and their bodies, or
+# ld chokes on them. Lines containing a backslash are macro bodies.
 $(BUILDDIR)$(PFX)%.lds: $(LINKFILE)
 	@echo Creating $@
-	$(SILENT)$(CROSS)$(CC) $(INC_$*) $(CFLAGS) $(OPT_$*) -E -x c - < $< | sed '/#/d' > $@
+	$(SILENT)$(CROSS)$(CC) $(INC_$*) $(CFLAGS) $(OPT_$*) -E -x c - < $< \
+		| sed -e '/#/d' -e '/^[[:space:]]*\.\(macro\|endm\|syntax\)/d' \
+		      -e '/\\/d' > $@
 
 $(BUILDDIR)$(PFX)%.arm-elf: $(BUILDDIR)$(PFX)%.lds $(SOURCES)
 	@echo CC -T $(notdir $^ $(SRC_$*))

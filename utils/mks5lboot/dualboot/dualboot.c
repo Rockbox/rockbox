@@ -105,7 +105,27 @@ static uint16_t fatal[] = { 3000,500,500, 3000,500,500, 3000,500,0, 0 };
 #define sad2 (&fatal[3])
 #define sad  (&fatal[6])
 
-/* iPod Classic: decrypted hashes for known OFs */
+/* Decrypted hashes for known OFs.
+ *
+ * identify_fw() decrypts the IM3 header's data_sign with the hardware UKEY
+ * and looks the result up here. Anything not listed is assumed to be a RB
+ * bootloader (FW_RB), so a model whose OF is missing from this table cannot
+ * be installed to or uninstalled from - both paths bail out before writing,
+ * which is safe but does nothing. The table is therefore per target. */
+#ifdef IPOD_NANO3G
+/* iPod Nano 3G. The decrypted data_sign is the first SIGN_SZ bytes of the
+ * SHA-1 of the plaintext bootloader. Each firmware's updater (aupd) carries
+ * that bootloader, 0x1f800 bytes, in a NOR image; these were computed from
+ * the aupd of every release. v1.1.3 was also read from a 4GB unit's NOR. */
+static unsigned char of_sha[][SIGN_SZ] = {
+    "\xC1\x3E\xBC\x68\x7C\xCD\xE8\x22\xAD\xBD\x88\x94\xA9\x95\x21\x4B", /* v1.0.1 */
+    "\xC4\x57\xFD\x04\x8E\xFB\xF1\x1A\x9D\xFA\x80\x11\x1E\x3F\xA6\x3E", /* v1.0.2 */
+    "\x2E\x7F\xA3\x4A\xF1\xAA\x75\x4B\x34\xF7\xB9\xC4\x58\xCF\xBD\xDB", /* v1.0.3 */
+    "\x15\xA6\x6A\xBF\xA4\x3D\xFA\x76\x9F\xCE\xCE\x39\x1F\x28\xEB\x47", /* v1.1 */
+    "\x60\xAC\x5A\x12\x38\x65\x0D\x2B\xC6\x63\x15\x02\xA0\x44\x84\x39"  /* v1.1.2 and v1.1.3 */
+};
+#else
+/* iPod Classic */
 static unsigned char of_sha[][SIGN_SZ] = {
     "\x31\xD1\x7A\x3A\x4B\x05\xE4\x09\x6B\x58\x31\x0A\xB7\x6C\x2F\x88", /* v1.0.1 */
     "\x7C\xEF\x11\xD1\x3A\x96\xBA\x1C\x1C\x73\x42\x91\xF3\xFC\xBF\x20", /* v1.0.3 */
@@ -117,6 +137,7 @@ static unsigned char of_sha[][SIGN_SZ] = {
     "\x06\x85\xDF\x28\xE4\xD7\xF4\x82\xC0\x73\xB0\x53\x26\xFC\xB0\xFE", /* v2.0.4 */
     "\x60\x80\x7D\x33\xA8\xDE\xF8\x49\xBB\xBE\x01\x45\xFF\x62\x40\x19"  /* v2.0.5 */
 };
+#endif
 #define N_OF (int)(sizeof(of_sha)/SIGN_SZ)
 
 /* we can assume that unknown FW is a RB bootloader */

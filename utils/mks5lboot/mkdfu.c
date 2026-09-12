@@ -55,6 +55,10 @@ const struct ipod_models ipod_identity[] =
         "Classic 6G", "ipod6g", "ip6g", 71,
         dualboot_install_ipod6g,   sizeof(dualboot_install_ipod6g),
         dualboot_uninstall_ipod6g, sizeof(dualboot_uninstall_ipod6g) },
+    [MODEL_IPODNANO3G] = {
+        "Nano 3G", "ipodnano3g", "nn3g", 117,
+        dualboot_install_ipodnano3g,   sizeof(dualboot_install_ipodnano3g),
+        dualboot_uninstall_ipodnano3g, sizeof(dualboot_uninstall_ipodnano3g) },
 };
 
 struct Im3Info s5l8702hdr =
