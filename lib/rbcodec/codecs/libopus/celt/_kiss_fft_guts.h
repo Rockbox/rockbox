@@ -160,14 +160,20 @@
 #  define KISS_FFT_COS(phase)  floor(.5+TWID_MAX*cos (phase))
 #  define KISS_FFT_SIN(phase)  floor(.5+TWID_MAX*sin (phase))
 #  define HALF_OF(x) ((x)>>1)
+/* Unlike HALF_OF, this rounds rather than truncating.  It stands in for a
+   multiply in kf_bfly5, where a floor bias costs measurable accuracy and the
+   extra add is far cheaper than the multiply it replaces. */
+#  define QUARTER_OF(x) (((x)+2)>>2)
 #elif defined(USE_SIMD)
 #  define KISS_FFT_COS(phase) _mm_set1_ps( cos(phase) )
 #  define KISS_FFT_SIN(phase) _mm_set1_ps( sin(phase) )
 #  define HALF_OF(x) ((x)*_mm_set1_ps(.5f))
+#  define QUARTER_OF(x) ((x)*_mm_set1_ps(.25f))
 #else
 #  define KISS_FFT_COS(phase) (kiss_fft_scalar) cos(phase)
 #  define KISS_FFT_SIN(phase) (kiss_fft_scalar) sin(phase)
 #  define HALF_OF(x) ((x)*.5f)
+#  define QUARTER_OF(x) ((x)*.25f)
 #endif
 
 #define  kf_cexp(x,phase) \

@@ -8,6 +8,9 @@ celt/entcode.c
 celt/entdec.c
 celt/entenc.c
 celt/kiss_fft.c
+#if defined(CPU_ARM) && (ARM_ARCH == 4)
+celt/arm/kiss_fft_armv4_asm.S
+#endif
 celt/laplace.c
 celt/mathops.c
 celt/mdct.c

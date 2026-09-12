@@ -116,6 +116,31 @@
     } \
     while(0)
 
+/* Hand-written radix bodies.  See celt/arm/kiss_fft_armv4_asm.S for why:
+   briefly, the compiled kernels spill their loop-invariant pointers and
+   reload them every pass, and gcc will not form ldm/stm from contiguous C
+   accesses.  The assembly keeps the bookkeeping resident and moves the data
+   in bursts.  These take st->twiddles rather than st, so the assembly needs
+   no knowledge of the layout of kiss_fft_state. */
+#ifndef OPUS_ARM_NO_FFT_ASM
+#define OVERRIDE_kf_bfly3
+#define OVERRIDE_kf_bfly4
+#define OVERRIDE_kf_bfly5
+
+void kf_bfly3_armv4(kiss_fft_cpx *Fout, const kiss_twiddle_cpx *tw,
+                    int fstride, int m, int N, int mm);
+void kf_bfly4_armv4(kiss_fft_cpx *Fout, const kiss_twiddle_cpx *tw,
+                    int fstride, int m, int N, int mm);
+void kf_bfly5_armv4(kiss_fft_cpx *Fout, const kiss_twiddle_cpx *tw,
+                    int fstride, int m, int N, int mm);
+
+#define kf_bfly3(Fout, fstride, st, m, N, mm) \
+   kf_bfly3_armv4((Fout), (st)->twiddles, (int)(fstride), (m), (N), (mm))
+#define kf_bfly4(Fout, fstride, st, m, N, mm) \
+   kf_bfly4_armv4((Fout), (st)->twiddles, (int)(fstride), (m), (N), (mm))
+#define kf_bfly5(Fout, fstride, st, m, N, mm)    kf_bfly5_armv4((Fout), (st)->twiddles, (int)(fstride), (m), (N), (mm))
+#endif /* OPUS_ARM_NO_FFT_ASM */
+
 #endif /* FIXED_POINT */
 
 #endif /* KISS_FFT_ARMv4_H */

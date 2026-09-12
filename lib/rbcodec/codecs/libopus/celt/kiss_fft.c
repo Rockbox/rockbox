@@ -101,6 +101,7 @@ static void kf_bfly2(
    }
 }
 
+#ifndef OVERRIDE_kf_bfly4
 static void kf_bfly4(
                      kiss_fft_cpx * Fout,
                      const size_t fstride,
@@ -143,21 +144,23 @@ static void kf_bfly4(
       {
          Fout = Fout_beg + i*mm;
          tw3 = tw2 = tw1 = st->twiddles;
+         /* The first pass twiddles by twiddles[0], which is 1, so it needs no
+            multiplies at all.  Rather than duplicate the body, the loop is
+            rotated: pass j does its own arithmetic and then twiddles for pass
+            j+1.  In fixed point twiddles[0] is 32767 rather than 32768, so
+            skipping it also drops a small systematic gain error. */
+         scratch[0] = Fout[m];
+         scratch[1] = Fout[m2];
+         scratch[2] = Fout[m3];
+         j = 0;
          /* m is guaranteed to be a multiple of 4. */
-         for (j=0;j<m;j++)
+         for (;;)
          {
-            C_MUL(scratch[0],Fout[m] , *tw1 );
-            C_MUL(scratch[1],Fout[m2] , *tw2 );
-            C_MUL(scratch[2],Fout[m3] , *tw3 );
-
             C_SUB( scratch[5] , *Fout, scratch[1] );
             C_ADDTO(*Fout, scratch[1]);
             C_ADD( scratch[3] , scratch[0] , scratch[2] );
             C_SUB( scratch[4] , scratch[0] , scratch[2] );
             C_SUB( Fout[m2], *Fout, scratch[3] );
-            tw1 += fstride;
-            tw2 += fstride*2;
-            tw3 += fstride*3;
             C_ADDTO( *Fout , scratch[3] );
 
             Fout[m].r = ADD32_ovflw(scratch[5].r, scratch[4].i);
@@ -165,14 +168,25 @@ static void kf_bfly4(
             Fout[m3].r = SUB32_ovflw(scratch[5].r, scratch[4].i);
             Fout[m3].i = ADD32_ovflw(scratch[5].i, scratch[4].r);
             ++Fout;
+
+            if (++j >= m)
+               break;
+            tw1 += fstride;
+            tw2 += fstride*2;
+            tw3 += fstride*3;
+            C_MUL(scratch[0],Fout[m] , *tw1 );
+            C_MUL(scratch[1],Fout[m2] , *tw2 );
+            C_MUL(scratch[2],Fout[m3] , *tw3 );
          }
       }
    }
 }
+#endif /* OVERRIDE_kf_bfly4 */
 
 
 #ifndef RADIX_TWO_ONLY
 
+#ifndef OVERRIDE_kf_bfly3
 static void kf_bfly3(
                      kiss_fft_cpx * Fout,
                      const size_t fstride,
@@ -200,17 +214,16 @@ static void kf_bfly3(
    {
       Fout = Fout_beg + i*mm;
       tw1=tw2=st->twiddles;
+      /* twiddles[0] is 1, so the first pass needs no multiplies.  The loop is
+         rotated instead of duplicated: each pass twiddles for the next one. */
+      scratch[1] = Fout[m];
+      scratch[2] = Fout[m2];
       /* For non-custom modes, m is guaranteed to be a multiple of 4. */
       k=m;
-      do {
-
-         C_MUL(scratch[1],Fout[m] , *tw1);
-         C_MUL(scratch[2],Fout[m2] , *tw2);
+      for (;;) {
 
          C_ADD(scratch[3],scratch[1],scratch[2]);
          C_SUB(scratch[0],scratch[1],scratch[2]);
-         tw1 += fstride;
-         tw2 += fstride*2;
 
          Fout[m].r = SUB32_ovflw(Fout->r, HALF_OF(scratch[3].r));
          Fout[m].i = SUB32_ovflw(Fout->i, HALF_OF(scratch[3].i));
@@ -226,9 +239,17 @@ static void kf_bfly3(
          Fout[m].i = ADD32_ovflw(Fout[m].i, scratch[0].r);
 
          ++Fout;
-      } while(--k);
+
+         if (--k == 0)
+            break;
+         tw1 += fstride;
+         tw2 += fstride*2;
+         C_MUL(scratch[1],Fout[m] , *tw1);
+         C_MUL(scratch[2],Fout[m2] , *tw2);
+      }
    }
 }
+#endif /* OVERRIDE_kf_bfly3 */
 
 
 #ifndef OVERRIDE_kf_bfly5
@@ -244,20 +265,27 @@ static void kf_bfly5(
    kiss_fft_cpx *Fout0,*Fout1,*Fout2,*Fout3,*Fout4;
    int i, u;
    kiss_fft_cpx scratch[13];
-   const kiss_twiddle_cpx *tw;
+   const kiss_twiddle_cpx *tw1,*tw2,*tw3,*tw4;
    kiss_twiddle_cpx ya,yb;
+   /* cos(2*pi/5) + cos(4*pi/5) is exactly -1/2 and cos(2*pi/5) - cos(4*pi/5)
+      is exactly sqrt(5)/2, so the four cosine products below collapse into a
+      shift by two plus a single multiply by yc = sqrt(5)/4. The Q15 constants
+      satisfy the first identity exactly (10126 - 26510 == -16384), so yc is
+      just (ya.r - yb.r)/2 and no accuracy is given up. */
+   opus_val16 yc;
    kiss_fft_cpx * Fout_beg = Fout;
 
 #ifdef FIXED_POINT
-   ya.r = 10126;
+   /*ya.r = 10126;*/ /* Folded into yc */
    ya.i = -31164;
-   yb.r = -26510;
+   /*yb.r = -26510;*/ /* Folded into yc */
    yb.i = -19261;
+   yc = 18318;
 #else
    ya = st->twiddles[fstride*m];
    yb = st->twiddles[fstride*2*m];
+   yc = HALF_OF(ya.r - yb.r);
 #endif
-   tw=st->twiddles;
 
    for (i=0;i<N;i++)
    {
@@ -267,26 +295,42 @@ static void kf_bfly5(
       Fout2=Fout0+2*m;
       Fout3=Fout0+3*m;
       Fout4=Fout0+4*m;
+      tw4 = tw3 = tw2 = tw1 = st->twiddles;
 
+      /* twiddles[0] is 1, so the first pass needs no multiplies.  The loop is
+         rotated instead of duplicated: each pass twiddles for the next one. */
+      scratch[1] = *Fout1;
+      scratch[2] = *Fout2;
+      scratch[3] = *Fout3;
+      scratch[4] = *Fout4;
+      u = 0;
       /* For non-custom modes, m is guaranteed to be a multiple of 4. */
-      for ( u=0; u<m; ++u ) {
+      for (;;) {
          scratch[0] = *Fout0;
 
-         C_MUL(scratch[1] ,*Fout1, tw[u*fstride]);
-         C_MUL(scratch[2] ,*Fout2, tw[2*u*fstride]);
-         C_MUL(scratch[3] ,*Fout3, tw[3*u*fstride]);
-         C_MUL(scratch[4] ,*Fout4, tw[4*u*fstride]);
-
+         /* scratch[7]/scratch[8] hold the sum/difference pairs, and
+            scratch[3]/scratch[4] are reused to hold their sum and difference. */
          C_ADD( scratch[7],scratch[1],scratch[4]);
          C_SUB( scratch[10],scratch[1],scratch[4]);
          C_ADD( scratch[8],scratch[2],scratch[3]);
          C_SUB( scratch[9],scratch[2],scratch[3]);
 
-         Fout0->r = ADD32_ovflw(Fout0->r, ADD32_ovflw(scratch[7].r, scratch[8].r));
-         Fout0->i = ADD32_ovflw(Fout0->i, ADD32_ovflw(scratch[7].i, scratch[8].i));
+         C_ADD( scratch[3],scratch[7],scratch[8]);
+         C_SUB( scratch[4],scratch[7],scratch[8]);
 
-         scratch[5].r = ADD32_ovflw(scratch[0].r, ADD32_ovflw(S_MUL(scratch[7].r,ya.r), S_MUL(scratch[8].r,yb.r)));
-         scratch[5].i = ADD32_ovflw(scratch[0].i, ADD32_ovflw(S_MUL(scratch[7].i,ya.r), S_MUL(scratch[8].i,yb.r)));
+         C_ADDTO(*Fout0, scratch[3]);
+
+         /* scratch[0] - (scratch[7]+scratch[8])/4 is the term common to both
+            output pairs; +/- sqrt(5)/4*(scratch[7]-scratch[8]) separates them.
+            QUARTER_OF() rounds, which recovers about half the accuracy the
+            substitution would otherwise cost. */
+         scratch[3].r = SUB32_ovflw(scratch[0].r, QUARTER_OF(scratch[3].r));
+         scratch[3].i = SUB32_ovflw(scratch[0].i, QUARTER_OF(scratch[3].i));
+         scratch[4].r = S_MUL(scratch[4].r,yc);
+         scratch[4].i = S_MUL(scratch[4].i,yc);
+
+         C_ADD( scratch[5],scratch[3],scratch[4]);
+         C_SUB( scratch[11],scratch[3],scratch[4]);
 
          scratch[6].r =  ADD32_ovflw(S_MUL(scratch[10].i,ya.i), S_MUL(scratch[9].i,yb.i));
          scratch[6].i = NEG32_ovflw(ADD32_ovflw(S_MUL(scratch[10].r,ya.i), S_MUL(scratch[9].r,yb.i)));
@@ -294,8 +338,6 @@ static void kf_bfly5(
          C_SUB(*Fout1,scratch[5],scratch[6]);
          C_ADD(*Fout4,scratch[5],scratch[6]);
 
-         scratch[11].r = ADD32_ovflw(scratch[0].r, ADD32_ovflw(S_MUL(scratch[7].r,yb.r), S_MUL(scratch[8].r,ya.r)));
-         scratch[11].i = ADD32_ovflw(scratch[0].i, ADD32_ovflw(S_MUL(scratch[7].i,yb.r), S_MUL(scratch[8].i,ya.r)));
          scratch[12].r = SUB32_ovflw(S_MUL(scratch[9].i,ya.i), S_MUL(scratch[10].i,yb.i));
          scratch[12].i = SUB32_ovflw(S_MUL(scratch[10].r,yb.i), S_MUL(scratch[9].r,ya.i));
 
@@ -303,6 +345,17 @@ static void kf_bfly5(
          C_SUB(*Fout3,scratch[11],scratch[12]);
 
          ++Fout0;++Fout1;++Fout2;++Fout3;++Fout4;
+
+         if (++u >= m)
+            break;
+         tw1 += fstride;
+         tw2 += fstride*2;
+         tw3 += fstride*3;
+         tw4 += fstride*4;
+         C_MUL(scratch[1] ,*Fout1, *tw1);
+         C_MUL(scratch[2] ,*Fout2, *tw2);
+         C_MUL(scratch[3] ,*Fout3, *tw3);
+         C_MUL(scratch[4] ,*Fout4, *tw4);
       }
    }
 }
