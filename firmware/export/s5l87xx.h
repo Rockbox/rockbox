@@ -870,6 +870,9 @@
 #define FMC_BASE 0x3C200000
 #elif CONFIG_CPU==S5L8701
 #define FMC_BASE 0x39400000
+#elif CONFIG_CPU==S5L8702
+/* The first of two controllers; the BootROM addresses the second at +0x400 */
+#define FMC_BASE 0x38a00000
 #endif
 
 #define FMCTRL0                 (*(REG32_PTR_T)(FMC_BASE + 0x0000))     /* Control Register0 */
@@ -925,8 +928,19 @@
 #define RSSYND3_1               (*(REG32_PTR_T)(FMC_BASE + 0x0184))     /* On-the-fly Synd Register3[63:32] */
 #define RSSYND3_2               (*(REG32_PTR_T)(FMC_BASE + 0x0188))     /* On-the-fly Synd Register3[71:64] */
 #define FLAGSYND                (*(REG32_PTR_T)(FMC_BASE + 0x0190))     /* On-the-fly ECC Result Flag */
+
+/* S5L8702 registers used by Apple's NANDReadPage (BootROM 0x20009910).
+ * The real names are unknown. */
+#define FMUNK78                 (*(REG32_PTR_T)(FMC_BASE + 0x0078))     /* spare decode setup, 0x5140 */
+#define FMUNK7C                 (*(REG32_PTR_T)(FMC_BASE + 0x007C))     /* bit 1 start/busy; FMSYND5..7 */
+#define FMTRANS0                (*(REG32_PTR_T)(FMC_BASE + 0x080C))     /* per-chunk ECC correction kick */
+#define FMUNK810                (*(REG32_PTR_T)(FMC_BASE + 0x0810))     /* bit 0: correction failed, inferred */
+#define FMTRANS1                (*(REG32_PTR_T)(FMC_BASE + 0x0814))     /* correction mode, always 0x01000180 */
+#define FMTRANSSTAT             (*(REG32_PTR_T)(FMC_BASE + 0x0840))     /* correction status, w1c; bit 2 done */
+
 #define FMCTRL0_ENABLEDMA       (1 << 10)
 #define FMCTRL0_UNK1            (1 << 11)
+#define FMCTRL0_AUTOXFER        (1 << 24)       /* S5L8702: write the chunk to the address in FMDATAW0 */
 #define FMCTRL1_DOTRANSADDR     (1 << 0)
 #define FMCTRL1_DOREADDATA      (1 << 1)
 #define FMCTRL1_DOWRITEDATA     (1 << 2)
@@ -940,6 +954,9 @@
 #define FMCSTAT_BANK1READY      (1 << 5)
 #define FMCSTAT_BANK2READY      (1 << 6)
 #define FMCSTAT_BANK3READY      (1 << 7)
+#define FMCSTAT_UNK20           (1 << 20)       /* S5L8702: chunk written to memory */
+#define FMCSTAT_STATUSREADY     (1 << 23)       /* S5L8702: set after READ STATUS; not a ready bit */
+#define FMCSTAT_UNK27           (1 << 27)       /* S5L8702: chunk has ECC errors (inferred) */
 
 /* 13. SECURE DIGITAL CARD INTERFACE (SDCI) */
 #if CONFIG_CPU==S5L8700 || CONFIG_CPU==S5L8701
