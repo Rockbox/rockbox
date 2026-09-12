@@ -339,7 +339,7 @@ void pmu_preinit(void)
     pmu_wr(0x16, 0x14);
     pmu_wr(0x15, 0x14);     // TBC: Vnand = 2000 + val*50 = 3000 mV
     pmu_wr(0x18, 0x18);     // TBC TBC TBC: Vaccy = 3200 mV ???
-    pmu_wr(0x10, (pmu_rd(0x10) & 0xdb) | 0x8);  // TBC: bit4 is related to NAND, LDO_0x15 on/off ???
+    pmu_wr(0x10, (pmu_rd(0x10) & 0xdf) | 0x8);  /* keep bit 2: NAND needs it */
 
                             // TBC: 0x30, 0x31 y 0x32 seems related to ADC (norboot)
     pmu_wr(0x34, 0x72);     // TBC: en DA9030: TBATHIGH (0-255, TBAT high temperature threshold
