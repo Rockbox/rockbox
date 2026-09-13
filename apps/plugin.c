@@ -889,7 +889,7 @@ static const struct plugin_api rockbox_api = {
 #ifdef HAVE_BACKLIGHT
     backlight_set_on_button_hold,
 #endif
-#ifdef HAS_REMOTE_BUTTON_HOLD
+#if defined(HAVE_REMOTE_LCD) && defined(HAS_REMOTE_BUTTON_HOLD)
     remote_backlight_set_on_button_hold,
 #endif
 };

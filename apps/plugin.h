@@ -1055,7 +1055,7 @@ struct plugin_api {
 #ifdef HAVE_BACKLIGHT
     void (*backlight_set_on_button_hold)(int index);
 #endif
-#ifdef HAS_REMOTE_BUTTON_HOLD
+#if defined(HAVE_REMOTE_LCD) && defined(HAS_REMOTE_BUTTON_HOLD)
     void (*remote_backlight_set_on_button_hold)(int index);
 #endif
 };
