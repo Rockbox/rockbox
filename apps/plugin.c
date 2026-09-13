@@ -886,6 +886,10 @@ static const struct plugin_api rockbox_api = {
 #ifdef HAVE_HW_H264
     &target_hw_h264_api,
 #endif
+    backlight_set_on_button_hold,
+#ifdef HAS_REMOTE_BUTTON_HOLD
+    remote_backlight_set_on_button_hold,
+#endif
 };
 
 static int plugin_buffer_handle;

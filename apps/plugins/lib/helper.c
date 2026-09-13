@@ -56,6 +56,7 @@ void backlight_use_settings(void)
     rb->backlight_set_timeout_plugged(rb->global_settings->
                                       backlight_timeout_plugged);
 #endif /* CONFIG_CHARGING */
+    rb->backlight_set_on_button_hold(rb->global_settings->backlight_on_button_hold);
 }
 #else /* HAVE_BACKLIGHT */
 /* DUMMY FUNCTIONS */
@@ -113,6 +114,9 @@ void remote_backlight_use_settings(void)
     rb->remote_backlight_set_timeout_plugged(rb->global_settings-> 
                                              remote_backlight_timeout_plugged);
 #endif /* CONFIG_CHARGING */
+#ifdef HAS_REMOTE_BUTTON_HOLD
+    rb->remote_backlight_set_on_button_hold(rb->global_settings->remote_backlight_on_button_hold);
+#endif
 }
 #else /* HAVE_REMOTE_LCD */
 /* DUMMY FUNCTIONS */
