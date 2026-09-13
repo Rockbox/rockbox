@@ -1052,7 +1052,9 @@ struct plugin_api {
 #ifdef HAVE_HW_H264
     const struct hw_h264_api *hw_h264;
 #endif
+#ifdef HAVE_BACKLIGHT
     void (*backlight_set_on_button_hold)(int index);
+#endif
 #ifdef HAS_REMOTE_BUTTON_HOLD
     void (*remote_backlight_set_on_button_hold)(int index);
 #endif
