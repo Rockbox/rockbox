@@ -68,6 +68,7 @@
 #endif
 #ifdef HAVE_TAGCACHE
 #include "tagcache.h"
+#include "tagtree.h"
 #endif
 #include "language.h"
 #include "plugin.h"
@@ -269,6 +270,12 @@ static int browser(void* param)
             }
             if (!tagcache_is_usable())
                 return GO_TO_PREVIOUS;
+            if (!tagtree_ready())
+            {
+                splashf(HZ*3, "%s\n%s", str(LANG_FILE_NOT_FOUND),
+                        ROCKBOX_DIR "/tagnavi.config");
+                return GO_TO_PREVIOUS;
+            }
             filter = SHOW_ID3DB;
             last_ft_dirlevel = tc->dirlevel;
             tc->dirlevel = last_db_dirlevel;

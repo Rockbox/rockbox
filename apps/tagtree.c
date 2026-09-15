@@ -1467,9 +1467,16 @@ static bool initialize_tagtree(void) /* also used when user selects 'Reload' in 
     return true;
 }
 
+static bool tagnavi_loaded;
+
 void tagtree_init(void)
 {
-    initialize_tagtree();
+    tagnavi_loaded = initialize_tagtree();
+}
+
+bool tagtree_ready(void)
+{
+    return tagnavi_loaded;
 }
 
 static int format_str(struct tagcache_search *tcs, struct display_format *fmt,
@@ -2097,7 +2104,8 @@ int tagtree_load(struct tree_context* c)
         {
             splash(HZ, ID2P(LANG_WAIT));
             tagtree_unload(c);
-            if (!initialize_tagtree())
+            tagnavi_loaded = initialize_tagtree();
+            if (!tagnavi_loaded)
                 return 0;
         }
         c->dirlevel = 0;
