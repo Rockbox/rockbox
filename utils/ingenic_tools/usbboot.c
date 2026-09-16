@@ -103,7 +103,7 @@ void jz_get_cpu_info(void)
     int ret = libusb_control_transfer(g_usb_dev,
         LIBUSB_ENDPOINT_IN | LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_RECIPIENT_DEVICE,
         VR_GET_CPU_INFO, 0, 0, buf, 8, 1000);
-    if(ret != 0)
+    if(ret < 0)
         die("Can't get CPU info: %d", ret);
 
     buf[8] = 0;
@@ -172,7 +172,7 @@ void jz_download(const char* filename)
         int ret = libusb_control_transfer(g_usb_dev, \
             LIBUSB_ENDPOINT_OUT|LIBUSB_REQUEST_TYPE_VENDOR|LIBUSB_RECIPIENT_DEVICE, \
             VR_##type, param >> 16, param & 0xffff, NULL, 0, 1000); \
-        if(ret != 0) \
+        if(ret < 0) \
             die("Request " #type " failed: %d", ret); \
     }
 
