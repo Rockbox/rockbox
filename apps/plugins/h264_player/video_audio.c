@@ -450,7 +450,7 @@ int video_audio_init(const char *filepath,
     audio_fd = rb->open(filepath, O_RDONLY);
     if (audio_fd < 0)
         return -1;
-    audio_file_size = rb->filesize(audio_fd);
+    audio_file_size = rb->ffilesize(audio_fd);
     if (audio_file_size <= 0)
     {
         rb->close(audio_fd);

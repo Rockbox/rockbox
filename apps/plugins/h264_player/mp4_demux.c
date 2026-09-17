@@ -1353,7 +1353,7 @@ int mp4v_demux_open(const char *filepath,
     fd = rb->open(filepath, O_RDONLY);
     if (fd < 0)
         return -1;
-    file_size = rb->filesize(fd);
+    file_size = rb->ffilesize(fd);
     if (file_size <= 0 || (uint64_t)file_size > UINT32_MAX)
     {
         rb->close(fd);
