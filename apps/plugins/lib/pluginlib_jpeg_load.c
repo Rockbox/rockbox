@@ -23,5 +23,5 @@
 #include <plugin.h>
 #include "wrappers.h"
 
-#define filesize rb->filesize
+#define ffilesize rb->ffilesize
 #include "../../recorder/jpeg_load.c"

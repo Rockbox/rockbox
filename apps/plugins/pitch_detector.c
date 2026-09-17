@@ -354,7 +354,7 @@ static void load_settings(void)
     }
 
     /* basic consistency check */
-    if(rb->filesize(fd) == sizeof(settings)){
+    if(rb->ffilesize(fd) == sizeof(settings)){
         rb->read(fd, &settings, sizeof(settings));
         rb->memcpy(&hdd_settings, &settings, sizeof(settings));
     }
