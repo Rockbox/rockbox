@@ -127,6 +127,7 @@
 #define SENSE_MEDIUM_ERROR          0x03
 #define SENSE_ILLEGAL_REQUEST       0x05
 #define SENSE_UNIT_ATTENTION        0x06
+#define SENSE_DATA_PROTECT          0x07
 
 #define ASC_MEDIUM_NOT_PRESENT      0x3a
 #define ASC_INVALID_FIELD_IN_CBD    0x24
@@ -135,6 +136,14 @@
 #define ASC_READ_ERROR              0x11
 #define ASC_NOT_READY               0x04
 #define ASC_INVALID_COMMAND         0x20
+#define ASC_WRITE_PROTECTED         0x27
+
+/* A drive whose driver can only read it is reported write protected */
+#ifdef HAVE_STORAGE_READONLY
+#define LUN_READONLY(lun)   storage_readonly(lun)
+#else
+#define LUN_READONLY(lun)   false
+#endif
 
 #define ASCQ_BECOMING_READY         0x01
 
@@ -905,7 +914,8 @@ static void handle_scsi(struct command_block_wrapper* cbw)
                     tb.ms_data_10->mode_data_length =
                         htobe16(sizeof(struct mode_sense_data_10)-2);
                     tb.ms_data_10->medium_type = 0;
-                    tb.ms_data_10->device_specific = 0;
+                    tb.ms_data_10->device_specific =
+                        LUN_READONLY(lun) ? 0x80 : 0;
                     tb.ms_data_10->reserved = 0;
                     tb.ms_data_10->longlba = 1;
                     tb.ms_data_10->block_descriptor_length =
@@ -969,7 +979,8 @@ static void handle_scsi(struct command_block_wrapper* cbw)
                     tb.ms_data_6->mode_data_length =
                         sizeof(struct mode_sense_data_6)-1;
                     tb.ms_data_6->medium_type = 0;
-                    tb.ms_data_6->device_specific = 0;
+                    tb.ms_data_6->device_specific =
+                        LUN_READONLY(lun) ? 0x80 : 0;
                     tb.ms_data_6->block_descriptor_length =
                         sizeof(struct mode_sense_bdesc_shortlba);
                     tb.ms_data_6->block_descriptor.density_code = 0;
@@ -1249,6 +1260,13 @@ static void handle_scsi(struct command_block_wrapper* cbw)
                 cur_sense_data.ascq=0;
                 break;
             }
+            if(LUN_READONLY(lun)) {
+                send_csw(UMS_STATUS_FAIL);
+                cur_sense_data.sense_key=SENSE_DATA_PROTECT;
+                cur_sense_data.asc=ASC_WRITE_PROTECTED;
+                cur_sense_data.ascq=0;
+                break;
+            }
             cur_cmd.data[0] = tb.transfer_buffer;
             cur_cmd.data[1] = &tb.transfer_buffer[WRITE_BUFFER_SIZE];
             cur_cmd.data_select=0;
@@ -1281,6 +1299,13 @@ static void handle_scsi(struct command_block_wrapper* cbw)
                 send_csw(UMS_STATUS_FAIL);
                 cur_sense_data.sense_key=SENSE_NOT_READY;
                 cur_sense_data.asc=ASC_MEDIUM_NOT_PRESENT;
+                cur_sense_data.ascq=0;
+                break;
+            }
+            if(LUN_READONLY(lun)) {
+                send_csw(UMS_STATUS_FAIL);
+                cur_sense_data.sense_key=SENSE_DATA_PROTECT;
+                cur_sense_data.asc=ASC_WRITE_PROTECTED;
                 cur_sense_data.ascq=0;
                 break;
             }
