@@ -357,6 +357,16 @@ void deemphasis(celt_sig *in[], opus_val16 *pcm, int N, int C, int downsample, c
    RESTORE_STACK;
 }
 
+#ifndef OVERRIDE_CELT_SAT
+/* Clamp n samples to +/-SIG_SAT in place. */
+static OPUS_INLINE void celt_sat(celt_sig *x, int n)
+{
+   int i;
+   for (i=0;i<n;i++)
+      x[i] = SATURATE(x[i], SIG_SAT);
+}
+#endif
+
 #ifndef RESYNTH
 static
 #endif
@@ -432,8 +442,7 @@ void celt_synthesis(const CELTMode *mode, celt_norm *X, celt_sig * out_syn[],
    /* Saturate IMDCT output so that we can't overflow in the pitch postfilter
       or in the */
    c=0; do {
-      for (i=0;i<N;i++)
-         out_syn[c][i] = SATURATE(out_syn[c][i], SIG_SAT);
+      celt_sat(out_syn[c], N);
    } while (++c<CC);
    RESTORE_STACK;
 }
