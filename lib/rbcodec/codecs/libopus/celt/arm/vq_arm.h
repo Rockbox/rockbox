@@ -31,7 +31,7 @@
    chain writes X[i+stride] and reads it straight back as the next x1, so at
    stride 1 one of the two loads is redundant and one of the two stores is
    dead, and both kernels carry that value in a register instead.  Bit-exact;
-   see celt/arm/exp_rotation1_armv5e_asm.S.
+   see celt/arm/exp_rotation1_armv5e_asm.S and _armv4_asm.S.
 
    Shares OPUS_ARM_NO_BANDS_ASM with arm/bands_arm.h as the escape hatch. */
 
@@ -50,6 +50,15 @@ void exp_rotation1_armv5e(celt_norm *X, int len, int stride, opus_val16 c,
 void normres_scale_armv5e(celt_norm *X, const int *iy, int N, int g,
                           int shift);
 #define NORMRES_SCALE normres_scale_armv5e
+
+#elif defined(FIXED_POINT) && !defined(OPUS_ARM_NO_BANDS_ASM) \
+ && defined(OPUS_ARM_INLINE_ASM) && (ARM_ARCH == 4)
+
+#define OVERRIDE_vq_exp_rotation1
+void exp_rotation1_armv4(celt_norm *X, int len, int stride, opus_val16 c,
+                         opus_val16 s);
+#define exp_rotation1(X, len, stride, c, s) \
+   exp_rotation1_armv4((X), (len), (stride), (c), (s))
 
 #endif
 
