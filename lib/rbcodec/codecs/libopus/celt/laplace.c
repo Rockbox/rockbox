@@ -91,7 +91,7 @@ void ec_laplace_encode(ec_enc *enc, int *value, unsigned fs, int decay)
    ec_encode_bin(enc, fl, fl+fs, 15);
 }
 
-int ec_laplace_decode(ec_dec *dec, unsigned fs, int decay)
+ICODE_ATTR_OPUS int ec_laplace_decode(ec_dec *dec, unsigned fs, int decay)
 {
    int val=0;
    unsigned fl;

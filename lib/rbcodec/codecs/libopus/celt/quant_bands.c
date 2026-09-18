@@ -425,7 +425,7 @@ void quant_energy_finalise(const CELTMode *m, int start, int end, opus_val16 *ol
    }
 }
 
-void unquant_coarse_energy(const CELTMode *m, int start, int end, opus_val16 *oldEBands, int intra, ec_dec *dec, int C, int LM)
+ICODE_ATTR_OPUS void unquant_coarse_energy(const CELTMode *m, int start, int end, opus_val16 *oldEBands, int intra, ec_dec *dec, int C, int LM)
 {
    const unsigned char *prob_model = e_prob_model[LM][intra];
    int i, c;
@@ -490,7 +490,7 @@ void unquant_coarse_energy(const CELTMode *m, int start, int end, opus_val16 *ol
    }
 }
 
-void unquant_fine_energy(const CELTMode *m, int start, int end, opus_val16 *oldEBands, int *fine_quant, ec_dec *dec, int C)
+ICODE_ATTR_OPUS void unquant_fine_energy(const CELTMode *m, int start, int end, opus_val16 *oldEBands, int *fine_quant, ec_dec *dec, int C)
 {
    int i, c;
    /* Decode finer resolution */

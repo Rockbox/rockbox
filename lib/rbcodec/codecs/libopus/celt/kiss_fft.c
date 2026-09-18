@@ -575,7 +575,7 @@ void opus_fft_free(const kiss_fft_state *cfg, int arch)
 
 #endif /* CUSTOM_MODES */
 
-void opus_fft_impl(const kiss_fft_state *st,kiss_fft_cpx *fout)
+ICODE_ATTR_OPUS_MR void opus_fft_impl(const kiss_fft_state *st,kiss_fft_cpx *fout)
 {
     int m2, m;
     int p;
@@ -630,7 +630,7 @@ void opus_fft_impl(const kiss_fft_state *st,kiss_fft_cpx *fout)
    between the four transform lengths. */
 static const kiss_fft_state pfa_st32 = { 0, 0, 0, 0, {0}, 0, pfa_tw32, 0 };
 
-void opus_pfa_impl(const kiss_fft_cpx *fin,
+ICODE_ATTR_OPUS void opus_pfa_impl(const kiss_fft_cpx *fin,
                                    kiss_fft_cpx *fout, int nfft)
 {
    const opus_int16 *brev;

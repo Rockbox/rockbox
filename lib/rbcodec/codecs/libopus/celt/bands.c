@@ -92,7 +92,7 @@ opus_int16 bitexact_cos(opus_int16 x)
    return 1+x2;
 }
 
-int bitexact_log2tan(int isin,int icos)
+ICODE_ATTR_OPUS_MR int bitexact_log2tan(int isin,int icos)
 {
    int lc;
    int ls;
@@ -208,7 +208,7 @@ void normalise_bands(const CELTMode *m, const celt_sig * OPUS_RESTRICT freq, cel
 #endif /* FIXED_POINT */
 
 /* De-normalise the energy to produce the synthesis from the unit-energy bands */
-void denormalise_bands(const CELTMode *m, const celt_norm * OPUS_RESTRICT X,
+ICODE_ATTR_OPUS void denormalise_bands(const CELTMode *m, const celt_norm * OPUS_RESTRICT X,
       celt_sig * OPUS_RESTRICT freq, const opus_val16 *bandLogE, int start,
       int end, int M, int downsample, int silence)
 {
@@ -288,7 +288,7 @@ void denormalise_bands(const CELTMode *m, const celt_norm * OPUS_RESTRICT X,
 }
 
 /* This prevents energy collapse for transients with multiple short MDCTs */
-void anti_collapse(const CELTMode *m, celt_norm *X_, unsigned char *collapse_masks, int LM, int C, int size,
+ICODE_ATTR_OPUS void anti_collapse(const CELTMode *m, celt_norm *X_, unsigned char *collapse_masks, int LM, int C, int size,
       int start, int end, const opus_val16 *logE, const opus_val16 *prev1logE,
       const opus_val16 *prev2logE, const int *pulses, opus_uint32 seed, int arch)
 {
@@ -603,7 +603,7 @@ static const int ordery_table[] = {
       15,  0,  8,  7, 12,  3, 11,  4, 14,  1,  9,  6, 13,  2, 10,  5,
 };
 
-static void deinterleave_hadamard(celt_norm *X, int N0, int stride, int hadamard)
+ICODE_ATTR_OPUS static void deinterleave_hadamard(celt_norm *X, int N0, int stride, int hadamard)
 {
    int i,j;
    VARDECL(celt_norm, tmp);
@@ -653,7 +653,7 @@ static void interleave_hadamard(celt_norm *X, int N0, int stride, int hadamard)
 }
 
 #ifndef OVERRIDE_haar1
-void haar1(celt_norm *X, int N0, int stride)
+ICODE_ATTR_OPUS void haar1(celt_norm *X, int N0, int stride)
 {
    int i, j;
    N0 >>= 1;
@@ -722,7 +722,7 @@ struct split_ctx {
    int qalloc;
 };
 
-static void compute_theta(struct band_ctx *ctx, struct split_ctx *sctx,
+ICODE_ATTR_OPUS static void compute_theta(struct band_ctx *ctx, struct split_ctx *sctx,
       celt_norm *X, celt_norm *Y, int N, int *b, int B, int B0,
       int LM,
       int stereo, int *fill)
@@ -996,7 +996,7 @@ static unsigned quant_band_n1(struct band_ctx *ctx, celt_norm *X, celt_norm *Y, 
    It can split the band in two and transmit the energy difference with
    the two half-bands. It can be called recursively so bands can end up being
    split in 8 parts. */
-static unsigned quant_partition(struct band_ctx *ctx, celt_norm *X,
+ICODE_ATTR_OPUS static unsigned quant_partition(struct band_ctx *ctx, celt_norm *X,
       int N, int b, int B, celt_norm *lowband,
       int LM,
       opus_val16 gain, int fill)
@@ -1162,7 +1162,7 @@ static unsigned quant_partition(struct band_ctx *ctx, celt_norm *X,
 
 
 /* This function is responsible for encoding and decoding a band for the mono case. */
-static unsigned quant_band(struct band_ctx *ctx, celt_norm *X,
+ICODE_ATTR_OPUS static unsigned quant_band(struct band_ctx *ctx, celt_norm *X,
       int N, int b, int B, celt_norm *lowband,
       int LM, celt_norm *lowband_out,
       opus_val16 gain, celt_norm *lowband_scratch, int fill)
@@ -1288,7 +1288,7 @@ static unsigned quant_band(struct band_ctx *ctx, celt_norm *X,
 
 
 /* This function is responsible for encoding and decoding a band for the stereo case. */
-static unsigned quant_band_stereo(struct band_ctx *ctx, celt_norm *X, celt_norm *Y,
+ICODE_ATTR_OPUS static unsigned quant_band_stereo(struct band_ctx *ctx, celt_norm *X, celt_norm *Y,
       int N, int b, int B, celt_norm *lowband,
       int LM, celt_norm *lowband_out,
       celt_norm *lowband_scratch, int fill)
@@ -1449,7 +1449,7 @@ static void special_hybrid_folding(const CELTMode *m, celt_norm *norm, celt_norm
       OPUS_COPY(&norm2[n1], &norm2[2*n1 - n2], n2-n1);
 }
 
-void quant_all_bands(int encode, const CELTMode *m, int start, int end,
+ICODE_ATTR_OPUS void quant_all_bands(int encode, const CELTMode *m, int start, int end,
       celt_norm *X_, celt_norm *Y_, unsigned char *collapse_masks,
       const celt_ener *bandE, int *pulses, int shortBlocks, int spread,
       int dual_stereo, int intensity, int *tf_res, opus_int32 total_bits,

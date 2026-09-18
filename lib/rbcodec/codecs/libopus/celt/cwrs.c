@@ -536,7 +536,7 @@ static opus_val32 cwrsi(int _n,int _k,opus_uint32 _i,int *_y){
   return yy;
 }
 
-opus_val32 decode_pulses(int *_y,int _n,int _k,ec_dec *_dec){
+ICODE_ATTR_OPUS opus_val32 decode_pulses(int *_y,int _n,int _k,ec_dec *_dec){
   return cwrsi(_n,_k,ec_dec_uint(_dec,CELT_PVQ_V(_n,_k)),_y);
 }
 

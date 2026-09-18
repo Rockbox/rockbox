@@ -99,7 +99,7 @@ static int ec_read_byte_from_end(ec_dec *_this){
 
 /*Normalizes the contents of val and rng so that rng lies entirely in the
    high-order symbol.*/
-static void ec_dec_normalize(ec_dec *_this){
+ICODE_ATTR_OPUS static void ec_dec_normalize(ec_dec *_this){
   /*If the range is too small, rescale it and input some bits.*/
   while(_this->rng<=EC_CODE_BOT){
     int sym;
@@ -170,7 +170,7 @@ from8:
 # define EC_DEC_DIV(_n,_d,_ft) ((unsigned)((_n)/(_d)))
 #endif
 
-unsigned ec_decode(ec_dec *_this,unsigned _ft){
+ICODE_ATTR_OPUS unsigned ec_decode(ec_dec *_this,unsigned _ft){
   unsigned s;
   celt_sig_assert(_ft<=32768);
   _this->ext=celt_udiv(_this->rng,_ft);
@@ -178,7 +178,7 @@ unsigned ec_decode(ec_dec *_this,unsigned _ft){
   return _ft-EC_MINI(s+1,_ft);
 }
 
-unsigned ec_decode_bin(ec_dec *_this,unsigned _bits){
+ICODE_ATTR_OPUS unsigned ec_decode_bin(ec_dec *_this,unsigned _bits){
    unsigned s;
    celt_sig_assert(_bits<=15);
    _this->ext=_this->rng>>_bits;
@@ -186,7 +186,7 @@ unsigned ec_decode_bin(ec_dec *_this,unsigned _bits){
    return (1U<<_bits)-EC_MINI(s+1U,1U<<_bits);
 }
 
-void ec_dec_update(ec_dec *_this,unsigned _fl,unsigned _fh,unsigned _ft){
+ICODE_ATTR_OPUS void ec_dec_update(ec_dec *_this,unsigned _fl,unsigned _fh,unsigned _ft){
   opus_uint32 s;
   s=IMUL32(_this->ext,_ft-_fh);
   _this->val-=s;
@@ -195,7 +195,7 @@ void ec_dec_update(ec_dec *_this,unsigned _fl,unsigned _fh,unsigned _ft){
 }
 
 /*The probability of having a "one" is 1/(1<<_logp).*/
-int ec_dec_bit_logp(ec_dec *_this,unsigned _logp){
+ICODE_ATTR_OPUS int ec_dec_bit_logp(ec_dec *_this,unsigned _logp){
   opus_uint32 r;
   opus_uint32 d;
   opus_uint32 s;
@@ -231,7 +231,7 @@ int ec_dec_icdf(ec_dec *_this,const unsigned char *_icdf,unsigned _ftb){
   return ret;
 }
 
-opus_uint32 ec_dec_uint(ec_dec *_this,opus_uint32 _ft){
+ICODE_ATTR_OPUS opus_uint32 ec_dec_uint(ec_dec *_this,opus_uint32 _ft){
   unsigned ft;
   unsigned s;
   int      ftb;
@@ -258,7 +258,7 @@ opus_uint32 ec_dec_uint(ec_dec *_this,opus_uint32 _ft){
   }
 }
 
-opus_uint32 ec_dec_bits(ec_dec *_this,unsigned _bits){
+ICODE_ATTR_OPUS opus_uint32 ec_dec_bits(ec_dec *_this,unsigned _bits){
   ec_window   window;
   int         available;
   opus_uint32 ret;

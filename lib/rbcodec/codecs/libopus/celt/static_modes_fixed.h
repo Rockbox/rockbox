@@ -101,7 +101,9 @@ static const unsigned char cache_caps50[168] ICONST_ATTR = {
 
 #ifndef FFT_TWIDDLES48000_960
 #define FFT_TWIDDLES48000_960
-static const kiss_twiddle_cpx fft_twiddles48000_960[480] ICONST_ATTR = {
+/* Read only by the mixed-radix butterflies, which the prime factor
+   transform replaces; ICONST_ATTR_OPUS_MR drops it out of IRAM there. */
+static const kiss_twiddle_cpx fft_twiddles48000_960[480] ICONST_ATTR_OPUS_MR = {
 {32767, 0}, {32766, -429},
 {32757, -858}, {32743, -1287},
 {32724, -1715}, {32698, -2143},

@@ -46,7 +46,11 @@
 #include "config.h"
 #endif
 
+#ifdef OPUS_ARM_ICODE
+    .section .icode, "ax", %progbits
+#else
     .text
+#endif
     .align  2
 
 /* Frame: v[15] complex at 0..119, the s5/s11 park at 120..135, then the

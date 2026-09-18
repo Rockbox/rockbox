@@ -51,7 +51,11 @@
 #include "config.h"
 #endif
 
+#ifdef OPUS_ARM_ICODE
+    .section .icode, "ax", %progbits
+#else
     .text
+#endif
     .align  2
 
 /* One Q15 complex multiply, the same register discipline as the C_MUL asm in
@@ -134,7 +138,11 @@ mdct_prerot_armv4:
    back rather than sitting resident and unread.  Still assembled: a size the
    Good-Thomas path does not cover falls through to it, and correct-but-slow
    from DRAM is the right failure mode. */
+#if defined(OPUS_ARM_ICODE) && !defined(OPUS_PFA)
+    .section .icode, "ax", %progbits
+#else
     .text
+#endif
     .align  2
 
     .global mdct_postrot_armv4
@@ -182,7 +190,11 @@ mdct_postrot_armv4:
  * ------------------------------------------------------------------------ */
     .align  2
 
+#ifdef OPUS_ARM_ICODE
+    .section .icode, "ax", %progbits
+#else
     .text
+#endif
     .align  2
 
     .global mdct_mirror_armv4
@@ -209,7 +221,11 @@ mdct_mirror_armv4:
 
 
 #ifdef OPUS_PFA
+#ifdef OPUS_ARM_ICODE
+    .section .icode, "ax", %progbits
+#else
     .text
+#endif
 
 /* ------------------------------------------------------------------------
  * void mdct_postrot_pfa_armv4(const kiss_fft_scalar *S,

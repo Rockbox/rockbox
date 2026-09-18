@@ -40,7 +40,7 @@
 /*Compute floor(sqrt(_val)) with exact arithmetic.
   _val must be greater than 0.
   This has been tested on all possible 32-bit inputs greater than 0.*/
-unsigned isqrt32(opus_uint32 _val){
+ICODE_ATTR_OPUS unsigned isqrt32(opus_uint32 _val){
   unsigned b;
   unsigned g;
   int      bshift;
@@ -88,7 +88,7 @@ opus_val32 frac_div32(opus_val32 a, opus_val32 b)
 }
 
 /** Reciprocal sqrt approximation in the range [0.25,1) (Q16 in, Q14 out) */
-opus_val16 celt_rsqrt_norm(opus_val32 x)
+ICODE_ATTR_OPUS opus_val16 celt_rsqrt_norm(opus_val32 x)
 {
    opus_val16 n;
    opus_val16 r;

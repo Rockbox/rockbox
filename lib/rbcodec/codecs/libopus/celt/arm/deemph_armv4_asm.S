@@ -41,7 +41,11 @@
 #include "config.h"
 #endif
 
+#ifdef OPUS_ARM_ICODE
+    .section .icode, "ax", %progbits
+#else
     .text
+#endif
     .align  2
 
     .macro  PCM16 src, tmp

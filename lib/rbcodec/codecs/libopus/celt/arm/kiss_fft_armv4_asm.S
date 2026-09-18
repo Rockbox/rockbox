@@ -42,7 +42,21 @@
 #error "kiss_fft_armv4_asm.S must be assembled in ARM mode"
 #endif
 
+/* These kernels are 2,892 bytes that carry 43% of the cycles an ARMv4 decode
+ * spends, which makes them the densest thing in the codec to put in IRAM.
+ * config.h sets OPUS_ARM_ICODE on the targets whose codec IRAM window has
+ * room; everywhere else this stays in .text.  The firmware config.h it reads
+ * that from is assembly-safe, and libopus/config.h guards the rest of its
+ * includes with __ASSEMBLER__ so this include costs nothing here. */
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#ifdef OPUS_ARM_ICODE
+    .section .icode, "ax", %progbits
+#else
     .text
+#endif
     .align  2
 
 /* ------------------------------------------------------------------------
@@ -241,6 +255,18 @@ kf_bfly4_armv4:
  *   28  mm*8  32  m*8
  * ------------------------------------------------------------------------ */
     .align  2
+
+/* Unreachable once the prime factor transform is built, so it gives its IRAM
+   back rather than sitting resident and unread.  Still assembled: a size the
+   Good-Thomas path does not cover falls through to it, and correct-but-slow
+   from DRAM is the right failure mode. */
+#if defined(OPUS_ARM_ICODE) && !defined(OPUS_PFA)
+    .section .icode, "ax", %progbits
+#else
+    .text
+#endif
+    .align  2
+
     .global kf_bfly3_armv4
     .type   kf_bfly3_armv4, %function
 kf_bfly3_armv4:
