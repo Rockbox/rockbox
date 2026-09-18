@@ -300,5 +300,170 @@ mdct_mirror_armv5e:
     pop     {r4-r11, pc}
     .size   mdct_mirror_armv5e, .-mdct_mirror_armv5e
 
+#ifdef OPUS_PFA
+    .text
+    .align 2
+
+
+
+/* One post-rotated output.
+ *
+ *   \sel  picks which half of the packed twiddle pair to use
+ *   \pm   the pmap pointer, post-incremented by \pi
+ *   \b0/\o0  where yr goes, \b1/\o1 where yi goes
+ *
+ * r10 holds t[k] packed with its neighbour and r11 holds t[N4+k] with its
+ * neighbour, so two loads serve two outputs.  The gather is an ldrsh of the
+ * byte offset and one ldm, which fetches both halves of the complex value in
+ * a single transaction.
+ */
+/* The gather index arrives in r12, and this body loads the next one before
+   it needs its own loaded pair -- an index is a halfword, which interlocks
+   for two cycles if the address add follows it, and the ldm interlocks for
+   one if the multiply does.  Rotating the load one body ahead covers both,
+   and it is the only place to put it: every other register is live.
+
+   That in turn is why yr stores before yi is computed.  Holding the index
+   in r12 costs the body its second scratch, so the accumulator has to be
+   free again before the imaginary half starts.
+
+   \npm and \npi name the pointer the NEXT body reads, or none at the end of
+   the chain, where the loop head reloads instead. */
+    .macro  PR5_PFA sel, npm, npi, b0, o0, b1, o1
+    add     r12, r0, r12
+    ldm     r12, {r9, lr}           @ r9 = im = S[2p], lr = re = S[2p+1];
+                                    @ ldm fills in register order, not the
+                                    @ order written, so r9 takes the lower
+                                    @ address whichever way the list reads
+    .ifnc \npm, none
+    ldrsh   r12, [\npm], #\npi      @ the next body's index
+    .endif
+    smulw\sel  r8, lr, r10          @ re * t0
+    smlaw\sel  r8, r9, r11, r8      @ + im * t1            -> yr at Q16
+    mov     r8, r8, lsl #1
+    str     r8, [\b0, #\o0]
+    smulw\sel  r8, lr, r11          @ re * t1
+    smulw\sel  lr, r9, r10          @ im * t0
+    sub     r8, r8, lr
+    mov     r8, r8, lsl #1
+    str     r8, [\b1, #\o1]
+    .endm
+
+/* The same body for the scalar fallback, which loads its own index: it runs
+   one output per end, so there is no next body to rotate against. */
+    .macro  PR5_PFA_S sel, pm, pi, b0, o0, b1, o1
+    ldrsh   r12, [\pm], #\pi
+    add     r12, r0, r12
+    ldm     r12, {r9, lr}
+    smulw\sel  r8, lr, r10
+    smlaw\sel  r8, r9, r11, r8
+    smulw\sel  r12, lr, r11
+    smulw\sel  lr, r9, r10
+    mov     r8, r8, lsl #1
+    sub     r12, r12, lr
+    str     r8, [\b0, #\o0]
+    mov     r12, r12, lsl #1
+    str     r12, [\b1, #\o1]
+    .endm
+
+/* ------------------------------------------------------------------------
+ * void mdct_postrot_pfa_armv5e(const kiss_fft_scalar *S,
+ *                              kiss_fft_scalar *yp0, kiss_fft_scalar *yp1,
+ *                              const kiss_twiddle_scalar *t,
+ *                              const opus_int16 *pmap, int N4)
+ *
+ * The post-rotation for the Good-Thomas transform.  Same arithmetic as
+ * mdct_postrot_armv5e; what changes is that the spectrum arrives permuted,
+ * X[k] at M*(k mod 15) + (k mod M), so each end is gathered through pmap,
+ * which already holds that index as a byte offset.  The ascending half reads
+ * the table forwards and the descending half backwards.
+ *
+ * Gathering makes yp0 and yp1 write-only, and that is what lets the twiddles
+ * stay packed.  A kiss_twiddle_scalar is 16 bits, so t[k] and t[k+1] are one
+ * aligned word; the mixed-radix kernel exploits that by holding all four
+ * twiddle words -- both ends at once -- across a body that does two outputs
+ * from each.  Here two of those registers are spent on the pmap pointers, so
+ * instead the body does both ascending outputs, reloads the pair for the
+ * descending end, and does both of those.  That reordering is legal only
+ * because nothing is read back: in the in-place version the descending
+ * output has to be read before the ascending one overwrites it, which forces
+ * the two ends to interleave.
+ *
+ * No iteration counter either: the two pmap pointers walk towards each other
+ * and the loop ends when they cross.  Four outputs an iteration and N4 a
+ * multiple of four -- 60, 120, 240, 480 -- means that lands exactly.
+ *
+ * The scalar path below is the fallback for a trig table the packed loads
+ * cannot address as words, or an N4 the unroll does not divide.  No CELT
+ * mode reaches it; build with -DMDCT_ARMV5E_FORCE_SCALAR to route everything
+ * through it and confirm it still agrees.
+ * ------------------------------------------------------------------------ */
+    .align  2
+    .global mdct_postrot_pfa_armv5e
+    .type   mdct_postrot_pfa_armv5e, %function
+mdct_postrot_pfa_armv5e:
+    push    {r4-r11, lr}
+    ldr     r5, [sp, #36]           @ pmap
+    ldr     r12, [sp, #40]          @ N4
+    mov     r7, r12, lsl #1         @ byte offset from t[k] to t[N4+k]
+    sub     r8, r12, #1
+    add     r4, r3, r8, lsl #1      @ tb = &t[N4-1], walks down
+    add     r6, r5, r8, lsl #1      @ pd = &pmap[N4-1], walks down
+
+    /* The packed path needs the trig table word-addressable and N4 a
+       multiple of four; the second gives the first its stride and lets the
+       crossing test land exactly. */
+    orr     r8, r3, r12
+#ifdef MDCT_ARMV5E_FORCE_SCALAR
+    orr     r8, r8, #1
+#endif
+    tst     r8, #3
+    bne     .Lpost5_pfa_scalar
+
+    cmp     r5, r6
+    bhi     .Lpost5_pfa_done
+.Lpost5_pfa_pairs:
+    ldrsh   r12, [r5], #2           @ index of X[i]; the twiddle loads below
+                                    @ stand between it and the address add
+    ldr     r10, [r3]               @ t[i]    : t[i+1]
+    ldr     r11, [r3, r7]           @ t[N4+i] : t[N4+i+1]
+    add     r3, r3, #4
+    PR5_PFA b, r5, 2, r1, 0, r2, 4      @ X[i]
+    PR5_PFA t, r6, -2, r1, 8, r2, -4    @ X[i+1]
+
+    add     lr, r4, r7
+    ldr     r10, [r4, #-2]          @ t[N4-i-2] : t[N4-i-1]
+    ldr     r11, [lr, #-2]          @ t[N2-i-2] : t[N2-i-1]
+    sub     r4, r4, #4
+    PR5_PFA t, r6, -2, r2, 0, r1, 4     @ X[N4-1-i]
+    PR5_PFA b, none, 0, r2, -8, r1, 12  @ X[N4-2-i]
+
+    add     r1, r1, #16
+    sub     r2, r2, #16
+    cmp     r5, r6
+    blo     .Lpost5_pfa_pairs
+    b       .Lpost5_pfa_done
+
+/* One output per end per iteration, twiddles a halfword at a time.  The
+   crossing test is bls rather than blo so an odd N4 still computes its
+   middle pair, which is what the C loop to (N4+1)>>1 does. */
+.Lpost5_pfa_scalar:
+    cmp     r5, r6
+    bhi     .Lpost5_pfa_done
+.Lpost5_pfa_sloop:
+    ldrsh   r11, [r3, r7]           @ t[N4+i]
+    ldrsh   r10, [r3], #2           @ t[i]
+    PR5_PFA_S b, r5, 2, r1, 0, r2, 4
+    ldrsh   r11, [r4, r7]           @ t[N2-i-1]
+    ldrsh   r10, [r4], #-2          @ t[N4-i-1]
+    PR5_PFA_S b, r6, -2, r2, 0, r1, 4
+    add     r1, r1, #8
+    sub     r2, r2, #8
+    cmp     r5, r6
+    bls     .Lpost5_pfa_sloop
+.Lpost5_pfa_done:
+    pop     {r4-r11, pc}
+    .size   mdct_postrot_pfa_armv5e, .-mdct_postrot_pfa_armv5e
+#endif
 
     .section .note.GNU-stack,"",%progbits

@@ -40,6 +40,10 @@
 #include "os_support.h"
 #include "mathops.h"
 #include "stack_alloc.h"
+#ifdef OPUS_PFA
+#include "pfa.h"
+#include "pfa_tables.h"
+#endif
 
 /* The guts header contains all the multiplication and addition macros that are defined for
    complex numbers.  It also delares the kf_ internal functions.
@@ -618,6 +622,60 @@ void opus_fft_impl(const kiss_fft_state *st,kiss_fft_cpx *fout)
        m = m2;
     }
 }
+
+#ifdef OPUS_PFA
+/* kf_bfly4 reads nothing from the state but the twiddle table, and the prime
+   factor sub-transforms want their own: one 32-entry table serves all four
+   sizes, read with a stride, exactly as kiss_fft shares a single table
+   between the four transform lengths. */
+static const kiss_fft_state pfa_st32 = { 0, 0, 0, 0, {0}, 0, pfa_tw32, 0 };
+
+void opus_pfa_impl(const kiss_fft_cpx *fin,
+                                   kiss_fft_cpx *fout, int nfft)
+{
+   const opus_int16 *brev;
+   int M = nfft/15;
+   int n2;
+
+   switch (nfft)
+   {
+      case  60: brev = pfa_brev_4;  break;
+      case 120: brev = pfa_brev_8;  break;
+      case 240: brev = pfa_brev_16; break;
+      default:  brev = pfa_brev_32; break;
+   }
+
+   /* Pass 1: M fifteen-point DFTs.  The bit-reversal the radix-4 chain below
+      expects is folded into this scatter, so pass 2 needs no permutation of
+      its own. */
+   for (n2=0;n2<M;n2++)
+      PFA_FFT15(fin + 15*n2, fout + brev[n2], M);
+
+   /* Pass 2: fifteen M-point FFTs, contiguous and identical, so one call per
+      stage covers all fifteen with N counting groups across the lot.  The
+      factorisation is the one kf_factor would pick for M, which is why the
+      existing butterflies serve unchanged. */
+   switch (M)
+   {
+   case 4:
+      kf_bfly4(fout, 1, &pfa_st32, 1, 15, 4);
+      break;
+   case 8:
+      kf_bfly4(fout, 1, &pfa_st32, 1, 2*15, 4);
+      kf_bfly2(fout, 4, 15);
+      break;
+   case 16:
+      kf_bfly4(fout, 1, &pfa_st32, 1, 4*15, 4);
+      kf_bfly4(fout, 2, &pfa_st32, 4, 15, 16);
+      break;
+   default:
+      kf_bfly4(fout, 1, &pfa_st32, 1, 8*15, 4);
+      kf_bfly2(fout, 4, 4*15);
+      kf_bfly4(fout, 1, &pfa_st32, 8, 15, 32);
+      break;
+   }
+}
+#endif /* OPUS_PFA */
 
 void opus_fft_c(const kiss_fft_state *st,const kiss_fft_cpx *fin,kiss_fft_cpx *fout)
 {

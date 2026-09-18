@@ -44,6 +44,10 @@
 #define mdct_prerot_opt  mdct_prerot_armv4
 #define mdct_postrot_opt mdct_postrot_armv4
 
+#ifdef OPUS_PFA
+#define OVERRIDE_MDCT_POSTROT_PFA
+#define mdct_postrot_pfa_opt mdct_postrot_pfa_armv4
+#endif
 #define mdct_mirror_opt  mdct_mirror_armv4
 
 /* step is a byte stride, so the caller scales by sizeof(kiss_fft_scalar). */
@@ -56,6 +60,11 @@ void mdct_prerot_armv4(const kiss_fft_scalar *xp1,
 void mdct_postrot_armv4(kiss_fft_scalar *yp0, kiss_fft_scalar *yp1,
                         const kiss_twiddle_scalar *t, int N4, int count);
 
+#ifdef OPUS_PFA
+void mdct_postrot_pfa_armv4(const kiss_fft_scalar *S, kiss_fft_scalar *yp0,
+                            kiss_fft_scalar *yp1, const kiss_twiddle_scalar *t,
+                            const opus_int16 *pmap, int N4);
+#endif
 
 void mdct_mirror_armv4(kiss_fft_scalar *xp1, kiss_fft_scalar *yp1,
                        const opus_val16 *wp1, const opus_val16 *wp2,

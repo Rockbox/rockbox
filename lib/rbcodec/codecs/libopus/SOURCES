@@ -11,12 +11,14 @@ celt/kiss_fft.c
 #if defined(CPU_ARM) && (ARM_ARCH == 4)
 celt/arm/kiss_fft_armv4_asm.S
 celt/arm/mdct_armv4_asm.S
+celt/arm/pfa_armv4_asm.S
 celt/arm/comb_filter_armv4_asm.S
 celt/arm/denorm_armv4_asm.S
 celt/arm/deemph_armv4_asm.S
 #elif defined(CPU_ARM) && (ARM_ARCH >= 5) && (ARCH_PROFILE == ARM_PROFILE_CLASSIC)
 celt/arm/kiss_fft_armv5e_asm.S
 celt/arm/mdct_armv5e_asm.S
+celt/arm/pfa_armv5e_asm.S
 celt/arm/pitch_armv5e_asm.S
 celt/arm/comb_filter_armv5e_asm.S
 celt/arm/denorm_armv5e_asm.S
@@ -28,6 +30,7 @@ celt/arm/deemph_armv5e_asm.S
 celt/laplace.c
 celt/mathops.c
 celt/mdct.c
+celt/pfa.c
 celt/modes.c
 celt/pitch.c
 celt/quant_bands.c

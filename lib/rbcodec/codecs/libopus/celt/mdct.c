@@ -51,6 +51,41 @@
 #include <math.h>
 #include "os_support.h"
 #include "mathops.h"
+#ifdef OPUS_PFA
+#include "pfa.h"
+#include "pfa_tables.h"
+
+/* The pre-rotation already scatters through a table; for the prime factor
+   transform it reads this one instead of the bit-reversal, which is why the
+   gather costs nothing. */
+static const opus_int16 *pfa_gather(int n)
+{
+   switch (n)
+   {
+      case  60: return pfa_in_60;
+      case 120: return pfa_in_120;
+      case 240: return pfa_in_240;
+      default:  return pfa_in_480;
+   }
+}
+
+/* Where the post-rotation finds X[k], as a byte offset. */
+static const opus_int16 *pfa_postmap(int n)
+{
+   switch (n)
+   {
+      case  60: return pfa_post_60;
+      case 120: return pfa_post_120;
+      case 240: return pfa_post_240;
+      default:  return pfa_post_480;
+   }
+}
+
+/* Walk p(k) = M*(k mod 15) + (k mod M) by one step.  Both residues are
+   running counters, so the post-rotation needs no index table. */
+#define PFA_ADV_UP(p, k1, k2, M) do {    (p) += (M)+1;    if (++(k1) == 15) { (k1) = 0;     (p) -= 15*(M); }    if (++(k2) == (M)) { (k2) = 0;    (p) -= (M); } } while (0)
+#define PFA_ADV_DN(p, k1, k2, M) do {    (p) -= (M)+1;    if ((k1)-- == 0) { (k1) = 14;     (p) += 15*(M); }    if ((k2)-- == 0) { (k2) = (M)-1;  (p) += (M); } } while (0)
+#endif
 #if defined(OPUS_ARM_ASM)
 #include "arm/mdct_armv4.h"
 #include "arm/mdct_armv5e.h"
@@ -249,6 +284,12 @@ void clt_mdct_backward_c(const mdct_lookup *l, kiss_fft_scalar *in, kiss_fft_sca
    int i;
    int N, N2, N4;
    const kiss_twiddle_scalar *trig;
+#ifdef OPUS_PFA
+   int use_pfa;
+   kiss_fft_cpx *pfa_out = NULL;
+   VARDECL(kiss_fft_cpx, pfa_tmp);
+#endif
+   SAVE_STACK;
    (void) arch;
 
    N = l->n;
@@ -261,6 +302,18 @@ void clt_mdct_backward_c(const mdct_lookup *l, kiss_fft_scalar *in, kiss_fft_sca
    N2 = N>>1;
    N4 = N>>2;
 
+#ifdef OPUS_PFA
+   /* Pass 1 of the prime factor transform reads fifteen contiguous points
+      and writes them strided, so it cannot work in place.  The input buffer
+      is exactly the right size and is documented as destroyed here, so for
+      the usual stride==1 call it costs nothing; a strided call cannot reuse
+      it, but those are always the short transform, N4 == 60. */
+   use_pfa = OPUS_PFA_SIZE(N4) && (stride == 1 || N4 == 60);
+   ALLOC(pfa_tmp, (use_pfa && stride != 1) ? N4 : ALLOC_NONE, kiss_fft_cpx);
+   if (use_pfa)
+      pfa_out = (stride == 1) ? (kiss_fft_cpx *)in : pfa_tmp;
+#endif
+
    /* Pre-rotate */
    {
       /* Temp pointers to make it really clear to the compiler what we're doing */
@@ -269,6 +322,9 @@ void clt_mdct_backward_c(const mdct_lookup *l, kiss_fft_scalar *in, kiss_fft_sca
       kiss_fft_scalar * OPUS_RESTRICT yp = out+(overlap>>1);
       const kiss_twiddle_scalar * OPUS_RESTRICT t = &trig[0];
       const opus_int16 * OPUS_RESTRICT bitrev = l->kfft[shift]->bitrev;
+#ifdef OPUS_PFA
+      if (use_pfa) bitrev = pfa_gather(N4);
+#endif
 #ifdef OVERRIDE_MDCT_PREROT
       mdct_prerot_opt(xp1, xp2, t, bitrev, yp, N4,
                       2*stride*(int)sizeof(kiss_fft_scalar));
@@ -290,6 +346,11 @@ void clt_mdct_backward_c(const mdct_lookup *l, kiss_fft_scalar *in, kiss_fft_sca
 #endif
    }
 
+#ifdef OPUS_PFA
+   if (use_pfa)
+      opus_pfa_impl((const kiss_fft_cpx*)(out+(overlap>>1)), pfa_out, N4);
+   else
+#endif
    opus_fft_impl(l->kfft[shift], (kiss_fft_cpx*)(out+(overlap>>1)));
 
    /* Post-rotate and de-shuffle from both ends of the buffer at once to make
@@ -300,6 +361,51 @@ void clt_mdct_backward_c(const mdct_lookup *l, kiss_fft_scalar *in, kiss_fft_sca
       const kiss_twiddle_scalar *t = &trig[0];
       /* Loop to (N4+1)>>1 to handle odd N4. When N4 is odd, the
          middle pair will be computed twice. */
+#ifdef OPUS_PFA
+      if (use_pfa)
+      {
+         /* Same rotation, but the transform is in Good-Thomas order, so the
+            two ends are gathered through p(k) rather than read in place.
+            That is also why this writes a different buffer than it reads. */
+         const kiss_fft_scalar *S = (const kiss_fft_scalar *)pfa_out;
+         int M = N4/15;
+         int pa = 0, ka = 0, qa = 0;
+         int kd = (N4-1)%15, qd = (N4-1)&(M-1);
+         int pd = M*kd + qd;
+#ifdef OVERRIDE_MDCT_POSTROT_PFA
+         mdct_postrot_pfa_opt(S, yp0, yp1, t, pfa_postmap(N4), N4);
+         (void)pa; (void)ka; (void)qa; (void)pd; (void)kd; (void)qd; (void)M;
+#else
+         for(i=0;i<(N4+1)>>1;i++)
+         {
+            kiss_fft_scalar re, im, yr, yi;
+            kiss_twiddle_scalar t0, t1;
+            re = S[2*pa+1];
+            im = S[2*pa];
+            t0 = t[i];
+            t1 = t[N4+i];
+            yr = ADD32_ovflw(S_MUL(re,t0), S_MUL(im,t1));
+            yi = SUB32_ovflw(S_MUL(re,t1), S_MUL(im,t0));
+            re = S[2*pd+1];
+            im = S[2*pd];
+            yp0[0] = yr;
+            yp1[1] = yi;
+
+            t0 = t[(N4-i-1)];
+            t1 = t[(N2-i-1)];
+            yr = ADD32_ovflw(S_MUL(re,t0), S_MUL(im,t1));
+            yi = SUB32_ovflw(S_MUL(re,t1), S_MUL(im,t0));
+            yp1[0] = yr;
+            yp0[1] = yi;
+            yp0 += 2;
+            yp1 -= 2;
+            PFA_ADV_UP(pa, ka, qa, M);
+            PFA_ADV_DN(pd, kd, qd, M);
+         }
+#endif
+      }
+      else
+#endif
 #ifdef OVERRIDE_MDCT_POSTROT
       mdct_postrot_opt(yp0, yp1, t, N4, (N4+1)>>1);
 #else
@@ -356,5 +462,6 @@ void clt_mdct_backward_c(const mdct_lookup *l, kiss_fft_scalar *in, kiss_fft_sca
       }
 #endif
    }
+   RESTORE_STACK;
 }
 #endif /* OVERRIDE_clt_mdct_backward */

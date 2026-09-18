@@ -41,6 +41,16 @@
 #error "mdct_armv4_asm.S must be assembled in ARM mode"
 #endif
 
+/* These kernels are 2,892 bytes that carry 43% of the cycles an ARMv4 decode
+ * spends, which makes them the densest thing in the codec to put in IRAM.
+ * config.h sets OPUS_ARM_ICODE on the targets whose codec IRAM window has
+ * room; everywhere else this stays in .text.  The firmware config.h it reads
+ * that from is assembly-safe, and libopus/config.h guards the rest of its
+ * includes with __ASSEMBLER__ so this include costs nothing here. */
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
     .text
     .align  2
 
@@ -48,7 +58,9 @@
    arm/kiss_fft_armv4.h.  a is (\ar, \ai), b is (\br, \bi), \tt is scratch and
    the 64-bit low word.  Results: \mr = a.r*b.r - a.i*b.i, \mi = a.r*b.i +
    a.i*b.r.  \bi and \br are destroyed.  \mr must differ from \ar and \br,
-   \mi from \ai and \tt. */
+   \mi from \ai and \tt.  \tt and \mr may be the same register: \tt is dead
+   after the fourth instruction and \mr is not written until the sixth, and
+   sharing them is what lets these loops keep their invariants resident. */
     .macro  CMULQ15 ar, ai, br, bi, tt, mr, mi
     smull   \tt, \mi, \ai, \br
     smlal   \tt, \mi, \ar, \bi
@@ -79,28 +91,27 @@
     .type   mdct_prerot_armv4, %function
 mdct_prerot_armv4:
     push    {r4-r11, lr}
-    sub     sp, sp, #12
-    ldr     r5, [sp, #48]           @ yp
-    ldr     r6, [sp, #52]           @ N4, also the loop count
-    ldr     r4, [sp, #56]           @ step, in bytes
-    str     r4, [sp]                @ the one loop-invariant reload
-    mov     r4, r6, lsl #1          @ byte offset from t[i] to t[N4+i]
+    ldr     r5, [sp, #36]           @ yp
+    ldr     r6, [sp, #40]           @ N4, also the loop count
+    ldr     lr, [sp, #44]           @ step, in bytes
+    mov     r4, r6, lsl #1
+    sub     r4, r4, #2              @ t[i] is read post-incremented, so the
+                                    @ offset on to t[N4+i] is two less
     cmp     r6, #0
     ble     .Lpre_done
 .Lpre_loop:
-    ldr     r7, [sp]
-    ldr     r8, [r0], r7            @ x1 = *xp1++
-    ldr     r9, [r1], -r7           @ x2 = *xp2--
-    ldrsh   r11, [r2, r4]           @ t[N4+i]
+    ldr     r8, [r0], lr            @ x1 = *xp1++
+    ldr     r9, [r1], -lr           @ x2 = *xp2--
     ldrsh   r10, [r2], #2           @ t[i]
-    CMULQ15 r8, r9, r10, r11, lr, r7, ip
+    ldrsh   r11, [r2, r4]           @ t[N4+i], and cover t[i]'s I cycle
+    CMULQ15 r8, r9, r10, r11, r7, r7, ip
     ldrsh   r10, [r3], #2           @ rev
+    subs    r6, r6, #1              @ between the load and the address it
+                                    @ forms, where the counter is free
     add     r10, r5, r10, lsl #3
     stm     r10, {r7, ip}           @ yi at 2*rev, yr at 2*rev+1
-    subs    r6, r6, #1
     bne     .Lpre_loop
 .Lpre_done:
-    add     sp, sp, #12
     pop     {r4-r11, pc}
     .size   mdct_prerot_armv4, .-mdct_prerot_armv4
 
@@ -118,6 +129,14 @@ mdct_prerot_armv4:
  * store order here looks less symmetric than the arithmetic.
  * ------------------------------------------------------------------------ */
     .align  2
+
+/* Unreachable once the prime factor transform is built, so it gives its IRAM
+   back rather than sitting resident and unread.  Still assembled: a size the
+   Good-Thomas path does not cover falls through to it, and correct-but-slow
+   from DRAM is the right failure mode. */
+    .text
+    .align  2
+
     .global mdct_postrot_armv4
     .type   mdct_postrot_armv4, %function
 mdct_postrot_armv4:
@@ -162,6 +181,10 @@ mdct_postrot_armv4:
  * bursts; the win is entirely the multiplier operand form.
  * ------------------------------------------------------------------------ */
     .align  2
+
+    .text
+    .align  2
+
     .global mdct_mirror_armv4
     .type   mdct_mirror_armv4, %function
 mdct_mirror_armv4:
@@ -183,5 +206,84 @@ mdct_mirror_armv4:
 .Lmir_done:
     pop     {r4-r11, pc}
     .size   mdct_mirror_armv4, .-mdct_mirror_armv4
+
+
+#ifdef OPUS_PFA
+    .text
+
+/* ------------------------------------------------------------------------
+ * void mdct_postrot_pfa_armv4(const kiss_fft_scalar *S,
+ *                             kiss_fft_scalar *yp0, kiss_fft_scalar *yp1,
+ *                             const kiss_twiddle_scalar *t,
+ *                             const opus_int16 *pmap, int N4)
+ *
+ * The post-rotation for the Good-Thomas transform.  Same arithmetic as
+ * mdct_postrot_armv4, but the spectrum arrives permuted -- X[k] sits at
+ * M*(k mod 15) + (k mod M) -- so each end is gathered through pmap, which
+ * holds that index already scaled to a byte offset.  One table serves both
+ * ends: the ascending half reads it forwards, the descending half backwards.
+ *
+ * Gathering is why this reads a different buffer than it writes, and that
+ * turns out to simplify the kernel rather than complicate it.  The
+ * mixed-radix version has to store yp0[0] early and defer yp1[1] because it
+ * must read yp1 before overwriting it; here yp0 and yp1 are write-only, so
+ * both halves of each complex multiply store as soon as they exist and
+ * nothing stays live across the second one.
+ *
+ * No iteration counter: the two pmap pointers walk towards each other and
+ * the loop ends when they cross, which is the same (N4+1)>>1 iterations for
+ * the even N4 every CELT size has.
+ *
+ * N4*2, the offset from t[i] to t[N4+i], does fit in a register after all:
+ * the complex multiply's 64-bit scratch and its real result can share one,
+ * so the gather address register is free by the time the multiply needs a
+ * temporary.  It used to be reloaded from the frame once per end, which cost
+ * six cycles an iteration for want of that observation.
+ * ------------------------------------------------------------------------ */
+    .align  2
+    .global mdct_postrot_pfa_armv4
+    .type   mdct_postrot_pfa_armv4, %function
+mdct_postrot_pfa_armv4:
+    push    {r4-r11, lr}
+    ldr     r5, [sp, #36]           @ pmap
+    ldr     r6, [sp, #40]           @ N4
+    mov     r7, r6, lsl #1          @ byte offset from t[k] to t[N4+k]
+    sub     r6, r6, #1
+    add     r4, r3, r6, lsl #1      @ tb  = &t[N4-1], walks down
+    add     r6, r5, r6, lsl #1      @ pd  = &pmap[N4-1], walks down
+    cmp     r5, r6
+    bhi     .Lpost_pfa_done
+.Lpost_pfa_loop:
+    /* ascending end: X[i].  The gather index leads, so the address add and
+       the ldm each have an unrelated load in front of them, and the pair
+       lands a cycle before the multiply that wants it. */
+    ldrsh   r12, [r5], #2           @ byte offset of X[i]
+    ldrsh   r11, [r3, r7]           @ t1 = t[N4+i]
+    add     r12, r0, r12
+    ldm     r12, {r8, r9}           @ im = S[2p], re = S[2p+1]
+    ldrsh   r10, [r3], #2           @ t0 = t[i]
+    CMULQ15 r9, r8, r11, r10, r12, r12, lr
+    str     lr,  [r1]               @ yp0[0] = yr
+    str     r12, [r2, #4]           @ yp1[1] = yi
+
+    /* descending end: X[N4-1-i] */
+    ldrsh   r12, [r6], #-2          @ byte offset of X[N4-1-i]
+    ldrsh   r11, [r4, r7]           @ t1 = t[N2-i-1]
+    add     r12, r0, r12
+    ldm     r12, {r8, r9}
+    ldrsh   r10, [r4], #-2          @ t0 = t[N4-i-1]
+    CMULQ15 r9, r8, r11, r10, r12, r12, lr
+    str     lr,  [r2]               @ yp1[0] = yr'
+    str     r12, [r1, #4]           @ yp0[1] = yi'
+
+    add     r1, r1, #8
+    sub     r2, r2, #8
+    cmp     r5, r6
+    bls     .Lpost_pfa_loop         @ bls, not blo, so an odd N4 still gets
+                                    @ its middle pair, as the C loop does
+.Lpost_pfa_done:
+    pop     {r4-r11, pc}
+    .size   mdct_postrot_pfa_armv4, .-mdct_postrot_pfa_armv4
+#endif /* OPUS_PFA */
 
     .section .note.GNU-stack,"",%progbits

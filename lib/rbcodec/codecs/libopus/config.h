@@ -82,6 +82,14 @@
 
 #endif
 
+/* Good-Thomas FFT for the backward MDCT.  Every 48 kHz CELT transform length
+   is 15 times a power of two, so the prime factor algorithm applies and the
+   inter-stage twiddles -- 73% of the FFT multiplies -- disappear.  Define
+   OPUS_NO_PFA to fall back to the mixed-radix chain. */
+#ifndef OPUS_NO_PFA
+#define OPUS_PFA
+#endif
+
 #if defined(CPU_COLDFIRE)
 #define OPUS_CF_INLINE_ASM
 #endif
