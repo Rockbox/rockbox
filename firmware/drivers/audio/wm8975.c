@@ -25,6 +25,12 @@
  *
  ****************************************************************************/
 
+/*
+ * Wolfson WM8975 codec driver. It also covers the WM1870 fitted to the iPod
+ * Nano 3G (HAVE_WM1870), which answers the same registers and adds a few
+ * above them; the differences are behind that define.
+ */
+
 #include "logf.h"
 #include "system.h"
 #include "kernel.h"
@@ -34,6 +40,9 @@
 
 #include "wmcodec.h"
 #include "audiohw.h"
+#ifdef HAVE_WM1870
+#include "pcm_sampr.h"
+#endif
 
 static unsigned short wm8975_regs[WM8975_NUM_REGISTERS] =
 {
@@ -126,7 +135,35 @@ void audiohw_postinit(void)
     wm8975_write(PWRMGMT1, wm8975_regs[PWRMGMT1]);
     audiohw_mute(false);
 }
-#else /* !IPOD_NANO2G */
+#elif defined(HAVE_WM1870)
+/* The WM1870, set up as the original firmware does it. It answers the
+ * WM8975's registers and a few above them. */
+
+void audiohw_preinit(void)
+{
+    wm8975_write(RESET, RESET_RESET);
+
+    wm8975_write(PWRMGMT1, PWRMGMT1_VMIDSEL_50K | PWRMGMT1_VREF);
+    wm8975_write(AINTFCE, AINTFCE_MS | AINTFCE_LRP_I2S_RLO
+                        | AINTFCE_IWL_16BIT | AINTFCE_FORMAT_I2S);
+    wm8975_write(PWRMGMT2, PWRMGMT2_DACL | PWRMGMT2_DACR
+                         | PWRMGMT2_LOUT1 | PWRMGMT2_ROUT1);
+
+    wm8975_write(LOUTMIX1, LOUTMIX1_LD2LO | LOUTMIX1_LI2LOVOL(2)
+                         | LOUTMIX1_LMIXSEL_LADCIN);
+    wm8975_write(ROUTMIX2, ROUTMIX2_RD2RO | ROUTMIX2_RI2ROVOL(2));
+    wm8975_write(ROUTMIX1, ROUTMIX1_RMIXSEL_RADCIN);
+
+    wmcodec_write(WM1870_R67, 0x008);
+    wm8975_write(ADDCTRL2, ADDCTRL2_OUT3SW_MONOOUT | ADDCTRL2_LRCM);
+    wm8975_write(ADDCTRL3, ADDCTRL3_VROI);
+}
+
+void audiohw_postinit(void)
+{
+    audiohw_mute(false);
+}
+#else /* !IPOD_NANO2G && !HAVE_WM1870 */
 void audiohw_preinit(void)
 {
     /* POWER UP SEQUENCE */
@@ -240,7 +277,15 @@ void audiohw_close(void)
 /* Note: Disable output before calling this function */
 void audiohw_set_frequency(int fsel)
 {
+#ifdef HAVE_WM1870
+    /* The rate codes depend on the MCLK, so the target supplies them */
+    unsigned short sampctrl = wmcodec_sampctrl(hw_freq_sampr[fsel]);
+
+    if (sampctrl)
+        wm8975_write(SAMPCTRL, sampctrl);
+#else
     (void)fsel;
+#endif
 }
 
 #ifdef HAVE_RECORDING

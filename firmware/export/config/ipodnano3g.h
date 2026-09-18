@@ -138,22 +138,17 @@
 #define HAVE_MORSE_INPUT
 
 /* define this if you have a real-time clock */
-// TODO
-//#define CONFIG_RTC RTC_NANO3G
-#define CONFIG_RTC  0
+#define CONFIG_RTC RTC_NANO3G
 
 /* Define if the device can wake from an RTC alarm */
 //#define HAVE_RTC_ALARM
 
 #define CONFIG_LCD LCD_IPOD6GNANO3G4G
 
-// TODO
-#if 0
-/* Define the type of audio codec */
-#define HAVE_WM8975
-#endif
-// XXX: dummy for preliminary build, WRONG CODEC!!!
-#define HAVE_CS42L55
+/* Define the type of audio codec. The Nano 3G has a Wolfson WM1870 at I2C
+ * address 0x34, which the original firmware drives as a WM8975 plus a few
+ * registers above the WM8975's range, so wm8975.c covers it. */
+#define HAVE_WM1870
 
 #define HAVE_PCM_DMA_ADDRESS
 

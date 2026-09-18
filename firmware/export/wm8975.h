@@ -313,4 +313,7 @@ void audiohw_enable_lineout(bool enable);
 #define WM8975_88200HZ     0x7f
 #define WM8975_96000HZ     0x5d
 
+/* The WM1870 (HAVE_WM1870) answers these registers and a few above them */
+#define WM1870_R67         0x43
+
 #endif /* _WM8975_H */

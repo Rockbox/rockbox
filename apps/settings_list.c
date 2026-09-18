@@ -426,7 +426,7 @@ static const char graphic_numeric[] = "graphic,numeric";
 #  define DEFAULT_REC_MIC_GAIN 0
 #  define DEFAULT_REC_LEFT_GAIN 0
 #  define DEFAULT_REC_RIGHT_GAIN 0
-# elif defined(HAVE_WM8975)
+# elif defined(HAVE_WM8975) || defined(HAVE_WM1870)
 #  define DEFAULT_REC_MIC_GAIN 16
 #  define DEFAULT_REC_LEFT_GAIN 0
 #  define DEFAULT_REC_RIGHT_GAIN 0

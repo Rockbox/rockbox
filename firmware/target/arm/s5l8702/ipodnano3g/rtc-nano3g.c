@@ -24,6 +24,8 @@
 #include "pmu-target.h"
 #include "timefuncs.h"
 
+/* The PMU keeps seconds, minutes, hours, day, month and year (since 2000)
+ * in binary, and no weekday; see pmu_read_rtc() */
 
 void rtc_init(void)
 {
@@ -31,20 +33,16 @@ void rtc_init(void)
 
 int rtc_read_datetime(struct tm *tm)
 {
-    unsigned int i;
-    unsigned char buf[7];
+    unsigned char buf[6];
 
     pmu_read_rtc(buf);
-
-    for (i = 0; i < sizeof(buf); i++)
-        buf[i] = BCD2DEC(buf[i]);
 
     tm->tm_sec = buf[0];
     tm->tm_min = buf[1];
     tm->tm_hour = buf[2];
-    tm->tm_mday = buf[4];
-    tm->tm_mon = buf[5] - 1;
-    tm->tm_year = buf[6] + 100;
+    tm->tm_mday = buf[3];
+    tm->tm_mon = buf[4] - 1;
+    tm->tm_year = buf[5] + 100;
     tm->tm_yday = 0; /* Not implemented for now */
 
     set_day_of_week(tm);
@@ -53,19 +51,14 @@ int rtc_read_datetime(struct tm *tm)
 
 int rtc_write_datetime(const struct tm *tm)
 {
-    unsigned int i;
-    unsigned char buf[7];
+    unsigned char buf[6];
 
     buf[0] = tm->tm_sec;
     buf[1] = tm->tm_min;
     buf[2] = tm->tm_hour;
-    buf[3] = tm->tm_wday;
-    buf[4] = tm->tm_mday;
-    buf[5] = tm->tm_mon + 1;
-    buf[6] = tm->tm_year - 100;
-
-    for (i = 0; i < sizeof(buf); i++)
-         buf[i] = DEC2BCD(buf[i]);
+    buf[3] = tm->tm_mday;
+    buf[4] = tm->tm_mon + 1;
+    buf[5] = tm->tm_year - 100;
 
     pmu_write_rtc(buf);
     return 0;

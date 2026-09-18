@@ -58,9 +58,19 @@ unsigned int power_input_status(void)
     return status;
 }
 
+/* As the original firmware decides it: the charger is
+ * enabled (CHCTL bits 1..6), not suspended (SYSCTRLA bit 2), and not done:
+ * STATUSB bits 1..2 clear. Measured: they read 0 while a 4.1 V cell
+ * charges from USB, so they are taken as the charge-complete indication;
+ * they have not been seen set. */
 bool charging_state(void)
 {
-    // TODO
-    return false;
+    if (!(power_input_status() & POWER_INPUT_CHARGER))
+        return false;
+    if (!(pmu_read(D1671_REG_CHCTL) & 0x7e))
+        return false;
+    if (pmu_read(D1671_REG_SYSCTRLA) & 0x04)
+        return false;
+    return !(pmu_read(D1671_REG_STATUSB) & 0x06);
 }
 #endif /* CONFIG_CHARGING */

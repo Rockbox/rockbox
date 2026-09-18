@@ -21,3 +21,13 @@ Tested on the 4GB unit from DFU: host sees "Nano 3G NAND", 2113537 x
 2048-byte sectors, write protect on. `nandcheck.py collect` reads it in
 seven minutes on Linux and Windows, no ECC failures or timeouts, and the
 archive passes the host FTL suite.
+
+## Power, RTC, backlight, battery, audio
+
+Tested on the 4GB unit: 44.1 kHz WAV plays with elapsed time running;
+battery reads 4077 mV, charging true/false correctly with a cell below
+full; a time set in Rockbox survives a reboot; backlight and brightness
+work; "pause on headphone unplug" pauses on disconnect.
+
+Not tested: sample rates other than 44.1 kHz, and the charge-complete
+status bits (never seen set).

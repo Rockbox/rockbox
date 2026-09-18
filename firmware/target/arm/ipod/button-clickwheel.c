@@ -425,7 +425,12 @@ bool headphones_inserted(void)
 #if CONFIG_CPU==S5L8701
     return ((PDAT14 & (1 << 5)) != 0);
 #elif CONFIG_CPU==S5L8702 || CONFIG_CPU==S5L8720
+#ifdef IPOD_NANO3G
+    /* GPIO 7.0, high with headphones in (measured) */
+    return (PDAT(7) & (1 << 0)) != 0;
+#else
     return ((PDAT10 & (1 << 6)) != 0);
+#endif
 #endif
 }
 #endif

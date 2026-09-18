@@ -37,6 +37,9 @@ enum d1671_regs {
     D1671_REG_SYSCTRLA      = 0x08,
     D1671_REG_LEDCTL        = 0x20,
     D1671_REG_CHCTL         = 0x21,     // TBC
+    D1671_REG_ADCCTL        = 0x30,
+    D1671_REG_ADCLO         = 0x31,
+    D1671_REG_ADCHI         = 0x32,
     D1671_REG_RTCSEC        = 0x40,     // TBC
 };
 
@@ -87,13 +90,26 @@ enum d1671_reg_chctl {
     D1671_CHCTL_FASTCHRG    = 0x01,     /* 100/500mA USB limit */
 };
 
+enum d1671_reg_rtcsec {
+    /* set when the time is written, masked off when it is read */
+    D1671_RTCSEC_SET        = 0x40,
+};
+
+enum d1671_reg_adcctl {
+    D1671_ADCCTL_START      = 0x08,
+    D1671_ADCCTL_IDLE       = 0x20,     /* register's value at rest */
+};
+
 /* GPIO for external PMU interrupt */
 #define GPIO_EINT_PMU   0x7b
 
 struct pmu_adc_channel
 {
     const char *name;
-    // TODO
+    uint8_t mux;                /* register 0x30 value selecting the input */
+    uint8_t samples;            /* conversions averaged, 0 = not readable */
+    unsigned short offset_mv;   /* millivolts at raw 0 */
+    unsigned short span_mv;     /* millivolts from raw 0 to raw 1023 */
 };
 
 void pmu_preinit(void);

@@ -575,7 +575,7 @@ drivers/audio/wm8740.c
 drivers/audio/wm8751.c
 #elif defined(HAVE_WM8978)
 drivers/audio/wm8978.c
-#elif defined(HAVE_WM8975)
+#elif defined(HAVE_WM8975) || defined(HAVE_WM1870)
 drivers/audio/wm8975.c
 #elif defined(HAVE_WM8985)
 drivers/audio/wm8985.c
@@ -1647,7 +1647,7 @@ target/arm/s5l8702/ipodnano3g/serial-nano3g.c
 #endif
 #ifndef BOOTLOADER
 target/arm/s5l8702/ipodnano3g/audio-nano3g.c
-target/arm/s5l8702/ipodnano3g/cscodec-nano3g.c          // TODO: -> wmcodec-nano3g.c
+target/arm/s5l8702/ipodnano3g/wmcodec-nano3g.c
 #endif
 #endif /* IPOD_NANO3G */
 
