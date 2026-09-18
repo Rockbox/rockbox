@@ -461,13 +461,21 @@ void encode_pulses(const int *_y,int _n,int _k,ec_enc *_enc){
 }
 
 static opus_val32 cwrsi(int _n,int _k,opus_uint32 _i,int *_y){
+  const opus_uint32 *rk;
+  const opus_uint32 *rk1;
   opus_uint32 p;
+  opus_uint32 d;
   int         s;
   int         k0;
+  int         kc;
   opus_int16  val;
   opus_val32  yy=0;
   celt_assert(_k>0);
   celt_assert(_n>1);
+  /*_k never goes negative, so this cannot match before the pair has been 
+    loaded once.*/
+  kc=-1;
+  rk=rk1=NULL;
   while(_n>2){
     opus_uint32 q;
     /*Lots of pulses case:*/
@@ -495,12 +503,32 @@ static opus_val32 cwrsi(int _n,int _k,opus_uint32 _i,int *_y){
     }
     /*Lots of dimensions case:*/
     else{
-      /*Are there any pulses in this dimension at all?*/
-      p=CELT_PVQ_U_ROW[_k][_n];
-      q=CELT_PVQ_U_ROW[_k+1][_n];
-      if(p<=_i&&_i<q){
-        _i-=p;
-        *_y++=0;
+      if(_k!=kc){
+        rk=CELT_PVQ_U_ROW[_k];
+        rk1=CELT_PVQ_U_ROW[_k+1];
+        kc=_k;
+      }
+      p=rk[_n];
+      q=rk1[_n];
+      celt_sig_assert(p<=q);
+      d=_i-p;
+      if(d<q-p){
+        /*None, and more than half of all dimensions end here.  The next
+           dimension reads the same two rows one element lower, so test it
+           from inside this loop instead of going back through the dispatch
+           above, which would reload both row pointers to reach it.*/
+        for(;;){
+          _i=d;
+          *_y++=0;
+          _n--;
+          if(_n<=2||_k>=_n)break;
+          p=rk[_n];
+          q=rk1[_n];
+          d=_i-p;
+          if(d>=q-p)break;
+        }
+        /*_n is already decremented for every dimension handled above.*/
+        continue;
       }
       else{
         /*Are the pulses in this dimension negative?*/
