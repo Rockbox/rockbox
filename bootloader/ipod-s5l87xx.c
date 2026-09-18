@@ -45,6 +45,9 @@
 #include "version.h"
 #include "powermgmt.h"
 #include "usb.h"
+#ifdef IPOD_NANO3G
+#include "nand-target.h"
+#endif
 #ifdef HAVE_SERIAL
 #include "serial.h"
 #endif
@@ -878,6 +881,30 @@ void main(void)
 #endif
 
         rc = storage_init();
+#ifdef IPOD_NANO3G
+        if (rc == NAND_ERR_UNSUPPORTED) {
+            /* Rockbox only drives NAND chips proven on hardware. Say which
+             * one this is and how to get it validated, then leave the unit
+             * to Apple's firmware, which is untouched. */
+            lcd_set_foreground(LCD_RBYELLOW);
+            printf("NAND not supported yet");
+            lcd_set_foreground(LCD_WHITE);
+            printf("chip %08lx x %u", (unsigned long)nand_get_id(),
+                   nand_get_bank_count());
+            printf("Rockbox does not write to");
+            printf("chips it has not been");
+            printf("tested on.");
+            printf("Starting Apple firmware...");
+            sleep(8 * HZ);      /* long enough to read the message */
+            rc = kernel_launch_onb();
+            /* Only reached if the ONB could not be read from NOR */
+            printf("Apple firmware failed: %d", rc);
+            printf("Hold MENU+SELECT to reboot,");
+            printf("then SELECT+PLAY for disk mode");
+            while (1)
+                sleep(HZ);
+        }
+#endif
         if (rc != 0) {
             printf("Storage error: %d", rc);
             fatal_error(ERR_STORAGE);
@@ -964,6 +991,12 @@ void main(void)
                 printf("P%d T%02x S%llx",
                        i, pinfo.type, (unsigned long long)pinfo.size);
         }
+#if defined(IPOD_NANO3G) && defined(DEFAULT_VIRT_SECTOR_SIZE)
+        /* Nothing mounted: show USB hosts Apple's 4096-byte sectors, which
+         * its partition table counts in */
+        disk_set_sector_multiplier(IF_MD(0,)
+                                   DEFAULT_VIRT_SECTOR_SIZE / SECTOR_SIZE);
+#endif
         fatal_error(ERR_RB);
     }
 

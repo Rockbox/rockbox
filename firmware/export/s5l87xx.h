@@ -929,7 +929,7 @@
 #define RSSYND3_2               (*(REG32_PTR_T)(FMC_BASE + 0x0188))     /* On-the-fly Synd Register3[71:64] */
 #define FLAGSYND                (*(REG32_PTR_T)(FMC_BASE + 0x0190))     /* On-the-fly ECC Result Flag */
 
-/* S5L8702 registers used by Apple's NANDReadPage (BootROM 0x20009910).
+/* S5L8702 registers the BootROM's page read uses.
  * The real names are unknown. */
 #define FMUNK78                 (*(REG32_PTR_T)(FMC_BASE + 0x0078))     /* spare decode setup, 0x5140 */
 #define FMUNK7C                 (*(REG32_PTR_T)(FMC_BASE + 0x007C))     /* bit 1 start/busy; FMSYND5..7 */
@@ -938,6 +938,8 @@
 #define FMTRANS1                (*(REG32_PTR_T)(FMC_BASE + 0x0814))     /* correction mode, always 0x01000180 */
 #define FMTRANSSTAT             (*(REG32_PTR_T)(FMC_BASE + 0x0840))     /* correction status, w1c; bit 2 done */
 
+#define FMCTRL0_CE(bank)        (1 << ((bank) + 1))  /* chip enable bits 1-8 */
+#define FMCTRL0_CE_MASK         (0xff << 1)
 #define FMCTRL0_ENABLEDMA       (1 << 10)
 #define FMCTRL0_UNK1            (1 << 11)
 #define FMCTRL0_AUTOXFER        (1 << 24)       /* S5L8702: write the chunk to the address in FMDATAW0 */

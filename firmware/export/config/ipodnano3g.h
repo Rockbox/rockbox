@@ -80,6 +80,12 @@
 
 #define CONFIG_STORAGE STORAGE_NAND
 
+/* The flash controller DMAs straight into and out of the caller's buffer
+ * and only handles word-aligned ones: a read into a buffer 1-3 bytes off
+ * returns wrong data and writes past the buffer (measured). The FAT code
+ * bounces unaligned transfers, as on the Classic 6G. */
+#define STORAGE_NEEDS_BOUNCE_BUFFER
+
 // TODO
 //#define CONFIG_NAND NAND_SAMSUNG
 #define CONFIG_NAND 0
@@ -88,8 +94,17 @@
    needs to do cleanup on shutdown */
 #define HAVE_STORAGE_FLUSH
 
+/* Chips not validated are mounted read-only; USB hosts are told so */
+#define HAVE_STORAGE_READONLY
+
 /* The NAND flash has 2048-byte sectors, and is our only storage */
 #define SECTOR_SIZE 2048
+
+/* Apple's partition table on the NAND counts 4096-byte sectors */
+#define MAX_VIRT_SECTOR_SIZE 4096
+
+/* If we have no valid partitions, advertise this as our sector size */
+#define DEFAULT_VIRT_SECTOR_SIZE 4096
 
 /* LCD dimensions */
 #define LCD_WIDTH  320
@@ -122,8 +137,8 @@
 /* Define this to enable morse code input */
 #define HAVE_MORSE_INPUT
 
-// TODO
 /* define this if you have a real-time clock */
+// TODO
 //#define CONFIG_RTC RTC_NANO3G
 #define CONFIG_RTC  0
 
@@ -135,7 +150,7 @@
 // TODO
 #if 0
 /* Define the type of audio codec */
-#define HAVE_WM1870
+#define HAVE_WM8975
 #endif
 // XXX: dummy for preliminary build, WRONG CODEC!!!
 #define HAVE_CS42L55
@@ -238,8 +253,7 @@
 #define USB_VENDOR_ID 0x05AC
 #define USB_PRODUCT_ID 0x1262
 #define USB_DEVBSS_ATTR __attribute__((aligned(32)))
-// TODO
-//#define HAVE_BOOTLOADER_USB_MODE
+#define HAVE_BOOTLOADER_USB_MODE
 #ifdef BOOTLOADER
 #define USBPOWER_BTN_IGNORE (~0)
 #endif

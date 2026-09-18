@@ -45,6 +45,9 @@ int  nand_spinup_time(void); /* ticks */
 #ifdef STORAGE_GET_INFO
 void nand_get_info(IF_MD(int drive,) struct storage_info *info);
 #endif
+#ifdef HAVE_STORAGE_READONLY
+bool nand_readonly(IF_MD_NONVOID(int drive));
+#endif
 
 long nand_last_disk_activity(void);
 

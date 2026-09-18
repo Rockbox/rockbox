@@ -201,7 +201,8 @@ int pmu_firewire_present(void)
 }
 #endif
 
-#if defined(BOOTLOADER)   // XXX: from usb-s5l8702.c
+/* XXX: from usb-s5l8702.c */
+#if defined(BOOTLOADER) && !defined(HAVE_BOOTLOADER_USB_MODE)
 #include "usb.h"
 static int usb_status = USB_EXTRACTED;
 

@@ -266,6 +266,9 @@ static inline void storage_sleep(void) {};
             #define storage_removable(drive) nand_removable(IF_MD(drive))
             #define storage_present(drive) nand_present(IF_MD(drive))
         #endif
+        #ifdef HAVE_STORAGE_READONLY
+            #define storage_readonly(drive) nand_readonly(IF_MD(drive))
+        #endif
         #define storage_driver_type(drive) (STORAGE_NAND_NUM)
     #elif (CONFIG_STORAGE & STORAGE_RAMDISK)
         #define STORAGE_FUNCTION(NAME) (ramdisk_## NAME)
