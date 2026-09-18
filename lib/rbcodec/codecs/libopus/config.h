@@ -1,9 +1,14 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+/* rbcodecconfig.h pulls in the firmware config.h, which is assembly-safe and
+   is what the kernels under celt/arm come here for.  Everything below it is
+   C, so the .S files skip it. */
 #include "rbcodecconfig.h"
+#ifndef __ASSEMBLER__
 #include "codeclib.h"
 #include "ogg/ogg.h"
+#endif
 
 /* general stuff */
 #define OPUS_BUILD

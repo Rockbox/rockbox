@@ -38,6 +38,9 @@
 #include "bands.h"
 #include "rate.h"
 #include "pitch.h"
+#if defined(OPUS_ARM_ASM)
+#include "arm/vq_arm.h"
+#endif
 
 #ifndef OVERRIDE_vq_exp_rotation1
 static void exp_rotation1(celt_norm *X, int len, int stride, opus_val16 c, opus_val16 s)
@@ -130,10 +133,15 @@ static void normalise_residual(int * OPUS_RESTRICT iy, celt_norm * OPUS_RESTRICT
    t = VSHR32(Ryy, 2*(k-7));
    g = MULT16_16_P15(celt_rsqrt_norm(t),gain);
 
+#if defined(FIXED_POINT) && defined(OVERRIDE_NORMRES_SCALE)
+   (void)i;
+   NORMRES_SCALE(X, iy, N, g, k+1);
+#else
    i=0;
    do
       X[i] = EXTRACT16(PSHR32(MULT16_16(g, iy[i]), k+1));
    while (++i < N);
+#endif
 }
 
 static unsigned extract_collapse_mask(int *iy, int N, int B)

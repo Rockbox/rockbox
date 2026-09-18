@@ -42,6 +42,9 @@
 #include "rate.h"
 #include "quant_bands.h"
 #include "pitch.h"
+#if defined(OPUS_ARM_ASM)
+#include "arm/bands_arm.h"
+#endif
 
 int hysteresis_decision(opus_val16 val, const opus_val16 *thresholds, const opus_val16 *hysteresis, int N, int prev)
 {
@@ -256,9 +259,17 @@ void denormalise_bands(const CELTMode *m, const celt_norm * OPUS_RESTRICT X,
       } else
 #endif
          /* Be careful of the fixed-point "else" just above when changing this code */
+#if defined(FIXED_POINT) && defined(OVERRIDE_DENORM_BAND)
+      {
+         DENORM_BAND(f, x, band_end-j, g, shift);
+         f += band_end-j;
+         x += band_end-j;
+      }
+#else
          do {
             *f++ = SHR32(MULT16_16(*x++, g), shift);
          } while (++j<band_end);
+#endif
    }
    celt_assert(start <= end);
    OPUS_CLEAR(&freq[bound], N-bound);
@@ -629,6 +640,7 @@ static void interleave_hadamard(celt_norm *X, int N0, int stride, int hadamard)
    RESTORE_STACK;
 }
 
+#ifndef OVERRIDE_haar1
 void haar1(celt_norm *X, int N0, int stride)
 {
    int i, j;
@@ -643,6 +655,7 @@ void haar1(celt_norm *X, int N0, int stride)
          X[stride*(2*j+1)+i] = EXTRACT16(PSHR32(SUB32(tmp1, tmp2), 15));
       }
 }
+#endif
 
 static int compute_qn(int N, int b, int offset, int pulse_cap, int stereo)
 {
@@ -1461,6 +1474,7 @@ void quant_all_bands(int encode, const CELTMode *m, int start, int end,
    lowband_offset = 0;
    ctx.bandE = bandE;
    ctx.ec = ec;
+   
    ctx.encode = encode;
    ctx.intensity = intensity;
    ctx.m = m;
