@@ -34,6 +34,17 @@
 #include <math.h>
 #include "bands.h"
 #include "log2tan_table.h"
+
+/* Rockbox builds the decoder only: celt_encoder.c is not in SOURCES, and the
+   one caller of quant_all_bands passes encode=0.  Saying so lets gcc fold the
+   thirteen encoder-only branches in this file away -- and, worth more than the
+   branches, stops it keeping their live values in registers across the
+   recursive calls, which is where quant_partition was spilling. */
+#ifdef CELT_DECODE_ONLY
+# define CELT_ENCODE_FLAG(x) 0
+#else
+# define CELT_ENCODE_FLAG(x) (x)
+#endif
 #include "modes.h"
 #include "vq.h"
 #include "cwrs.h"
@@ -735,7 +746,7 @@ static void compute_theta(struct band_ctx *ctx, struct split_ctx *sctx,
    ec_ctx *ec;
    const celt_ener *bandE;
 
-   encode = ctx->encode;
+   encode = CELT_ENCODE_FLAG(ctx->encode);
    m = ctx->m;
    i = ctx->i;
    intensity = ctx->intensity;
@@ -954,7 +965,7 @@ static unsigned quant_band_n1(struct band_ctx *ctx, celt_norm *X, celt_norm *Y, 
 
    (void)b;
 
-   encode = ctx->encode;
+   encode = CELT_ENCODE_FLAG(ctx->encode);
    ec = ctx->ec;
 
    stereo = Y != NULL;
@@ -1004,7 +1015,7 @@ static unsigned quant_partition(struct band_ctx *ctx, celt_norm *X,
    int spread;
    ec_ctx *ec;
 
-   encode = ctx->encode;
+   encode = CELT_ENCODE_FLAG(ctx->encode);
    m = ctx->m;
    i = ctx->i;
    spread = ctx->spread;
@@ -1168,7 +1179,7 @@ static unsigned quant_band(struct band_ctx *ctx, celt_norm *X,
    int encode;
    int tf_change;
 
-   encode = ctx->encode;
+   encode = CELT_ENCODE_FLAG(ctx->encode);
    tf_change = ctx->tf_change;
 
    longBlocks = B0==1;
@@ -1294,7 +1305,7 @@ static unsigned quant_band_stereo(struct band_ctx *ctx, celt_norm *X, celt_norm 
    int encode;
    ec_ctx *ec;
 
-   encode = ctx->encode;
+   encode = CELT_ENCODE_FLAG(ctx->encode);
    ec = ctx->ec;
 
    /* Special case for one sample */
@@ -1503,7 +1514,7 @@ void quant_all_bands(int encode, const CELTMode *m, int start, int end,
    lowband_offset = 0;
    ctx.bandE = bandE;
    ctx.ec = ec;
-   
+   encode = CELT_ENCODE_FLAG(encode);
    ctx.encode = encode;
    ctx.intensity = intensity;
    ctx.m = m;

@@ -33,6 +33,10 @@
 
 #define CELT_ENCODER_C
 
+#if defined(CELT_DECODE_ONLY)
+#error "CELT_DECODE_ONLY is set in libopus/config.h because SOURCES lists no encoder.  Building celt_encoder.c means that is no longer true: remove the define, or the encoder halves of celt/bands.c will have been compiled out."
+#endif
+
 #include "cpu_support.h"
 #include "os_support.h"
 #include "mdct.h"

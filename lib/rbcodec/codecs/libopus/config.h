@@ -13,6 +13,16 @@
 /* general stuff */
 #define OPUS_BUILD
 
+/* Rockbox decodes Opus and never encodes it: neither celt_encoder.c nor
+   opus_encoder.c is listed in SOURCES.  Saying so lets gcc fold away the
+   encoder halves of the routines celt/bands.c shares between the two
+   directions, which is worth 2,976 bytes of code and, because those branches
+   were holding values live across quant_partition's recursive calls, a
+   measurable amount of its stack spill.  celt_encoder.c carries an #error
+   against this define, so adding an encoder back fails the build loudly
+   rather than miscompiling. */
+#define CELT_DECODE_ONLY
+
 /* alloc stuff */
 #define VAR_ARRAYS
 #define NORM_ALIASING_HACK
