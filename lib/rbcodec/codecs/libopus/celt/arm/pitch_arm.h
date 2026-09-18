@@ -66,6 +66,23 @@ extern void (*const DUAL_INNER_PROD_IMPL[OPUS_ARCHMASK+1])(const opus_val16 *x,
 #  endif
 # endif
 
+/* The decoder reaches dual_inner_prod from one place, stereo_merge.  The C
+   reads three signed halfwords per element and stalls on each of them, since
+   an LDRSH result lands two cycles late on this core; one LDR fetches two
+   coefficients instead and smlabb/smlatt take the halves apart with no sign
+   extension of their own.  Measured at 12.1 cycles per element before and
+   5.5 after.  ARMv4 is deliberately left alone: without the packed
+   multiplies the extraction would cost exactly what the saved loads buy.
+   Escape hatch OPUS_ARM_NO_PITCH_ASM. */
+# if defined(OPUS_ARM_INLINE_EDSP) && defined(FIXED_POINT) \
+  && !defined(OVERRIDE_DUAL_INNER_PROD) && !defined(OPUS_ARM_NO_PITCH_ASM)
+void dual_inner_prod_armv5e(const opus_val16 *x, const opus_val16 *y01,
+        const opus_val16 *y02, int N, opus_val32 *xy1, opus_val32 *xy2);
+#  define OVERRIDE_DUAL_INNER_PROD (1)
+#  define dual_inner_prod(x, y01, y02, N, xy1, xy2, arch) \
+     ((void)(arch), dual_inner_prod_armv5e(x, y01, y02, N, xy1, xy2))
+# endif
+
 # if defined(FIXED_POINT)
 
 #  if defined(OPUS_ARM_MAY_HAVE_NEON)

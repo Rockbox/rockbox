@@ -64,6 +64,7 @@
 #if (ARCH_PROFILE != ARM_PROFILE_CLASSIC)
 #define OPUS_ARM_NO_FFT_ASM
 #define OPUS_ARM_NO_MDCT_ASM
+#define OPUS_ARM_NO_PITCH_ASM
 #endif
 #endif
 
