@@ -13,12 +13,14 @@ celt/arm/kiss_fft_armv4_asm.S
 celt/arm/mdct_armv4_asm.S
 celt/arm/comb_filter_armv4_asm.S
 celt/arm/denorm_armv4_asm.S
+celt/arm/deemph_armv4_asm.S
 #elif defined(CPU_ARM) && (ARM_ARCH == 5)
 celt/arm/comb_filter_armv5e_asm.S
 celt/arm/denorm_armv5e_asm.S
 celt/arm/exp_rotation1_armv5e_asm.S
 celt/arm/haar1_armv5e_asm.S
 celt/arm/normres_armv5e_asm.S
+celt/arm/deemph_armv5e_asm.S
 #endif
 celt/laplace.c
 celt/mathops.c
