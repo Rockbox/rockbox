@@ -62,6 +62,13 @@
 #define OPUS_EC_DECODE_DIV
 #endif
 
+/* Exact lookup table for bitexact_log2tan.  Saves about 0.25 MHz if the
+   tables can live in IRAM, which only the ARMv4 PP5022/PP5024 have room for,
+   and nothing otherwise, so it is only built there. */
+#if CONFIG_CPU == PP5022 || CONFIG_CPU == PP5024
+#define OPUS_LOG2TAN_TABLE
+#endif
+
 #endif
 
 #if defined(CPU_COLDFIRE)
