@@ -14,3 +14,10 @@ audio starvation.
 
 The 8GB Hynix A555D5AD row's evidence is Robin Tschirschnitz's (delacor):
 measured and run on their own unit, not this one.
+
+## NAND check image
+
+Tested on the 4GB unit from DFU: host sees "Nano 3G NAND", 2113537 x
+2048-byte sectors, write protect on. `nandcheck.py collect` reads it in
+seven minutes on Linux and Windows, no ECC failures or timeouts, and the
+archive passes the host FTL suite.

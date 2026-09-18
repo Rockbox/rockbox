@@ -158,4 +158,26 @@ unsigned int nand_get_bank_count(void);
 /* Geometry of the attached chips, or NULL before nand_init() succeeded */
 const struct nand_geometry *nand_get_geometry(void);
 
+#ifdef NAND_CHECK
+/* Between the driver and the contributor check image
+ * (nand-check-nano3g.c), which in this build serves the raw NAND as the
+ * storage device in the FTL disk's place */
+
+/* The driver's: which row of Apple's chip table nand_init() matched, or -1 */
+int nand_get_chip_row(void);
+
+/* The driver's: hand the check the identified chip, so its raw pages stay
+ * readable whether or not the mount succeeded. A chip whose blocks do not
+ * hold pagesperblock pages does not suit the check's sector layout and is
+ * dropped. Returns the geometry to serve, or NULL if there is none. */
+const struct nand_geometry *nand_check_use_chip(unsigned int pagesperblock);
+
+/* The check's: build the report from nand_init()'s result */
+void nand_check_init(int rc);
+/* The check's report: what was identified and how the mount went */
+const char *nand_check_report(void);
+/* Add a line to the report */
+void nand_check_note(const char *line);
+#endif
+
 #endif /* __NAND_TARGET_H__ */

@@ -1636,6 +1636,9 @@ target/arm/s5l8702/ipodnano3g/powermgmt-nano3g.c
 target/arm/s5l8702/ipodnano3g/power-nano3g.c
 target/arm/s5l8702/ipodnano3g/nand-nano3g.c
 target/arm/s5l8702/ipodnano3g/ftl-nano3g.c
+#ifdef NAND_CHECK
+target/arm/s5l8702/ipodnano3g/nand-check-nano3g.c
+#endif
 #if (CONFIG_RTC == RTC_NANO3G)
 target/arm/s5l8702/ipodnano3g/rtc-nano3g.c              // TODO: -> drivers/rtc/rtc_xxx.c ???
 #endif

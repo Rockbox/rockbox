@@ -34,6 +34,10 @@
  *  - Only chips validated on hardware are driven; nand_init() refuses any
  *    other chip (see nand_chip_table).
  *  - Storage goes through Apple's FTL (ftl-nano3g.c).
+ *
+ * A build with -DNAND_CHECK is the contributor check image: it serves the
+ * raw NAND read-only instead of the FTL's disk, so the storage API below is
+ * left to nand-check-nano3g.c and this file keeps only the chip.
  */
 
 #include "config.h"
@@ -100,12 +104,42 @@ struct nand_chip_info
  *
  * The mode decides how the VFL groups physical blocks (nand_mode_planes()
  * and nand_mode_layout()) and which program writes two planes at once. Only
- * validated rows are driven; nand_init() refuses any other chip. */
+ * validated rows are driven; nand_init() refuses any other chip, except in
+ * the check image, which reads a chip without mounting it writable. */
 static const struct nand_chip_info nand_chip_table[] =
 {
     /* Hynix: the 4GB unit this port was developed on, and the 8GB one */
     { 0xA514D3AD, 4,  8, 4096, 128, 2048, 3872, true  },
     { 0xA555D5AD, 4,  8, 8192, 128, 2048, 7744, true  },
+#ifdef NAND_CHECK
+    /* The rest of the chips the original firmware knows. They are here for
+     * the check image alone, which identifies a chip and reads it to
+     * collect what validating it needs; a normal build does not carry them,
+     * so Rockbox cannot drive a chip nobody has tested. A row moves above
+     * this line, with its validated flag set, once someone has run the
+     * check and a write test on that chip. */
+    /* Micronas (ITT Intermetall, acquired by TDK 2016): 0xEC, not Samsung */
+    { 0xB614D5EC, 2,  8, 4096, 128, 4096, 3872, false },   /* reported */
+    { 0xB614D5EC, 4,  1, 4096, 128, 4096, 3872, false },
+    { 0x2555D5EC, 4,  9, 8192, 128, 2048, 7744, false },
+    /* Hynix */
+    { 0xB614D5AD, 4,  1, 4096, 128, 4096, 3872, false },
+    /* Toshiba */
+    { 0xA585D598, 2, 13, 8320, 128, 2048, 7744, false },
+    { 0xA585D598, 4, 13, 8320, 128, 2048, 7744, false },
+    { 0xBA94D598, 2, 12, 4096, 128, 4096, 3872, false },
+    { 0xBA94D598, 4,  1, 4096, 128, 4096, 3872, false },
+    /* Intel */
+    { 0xA5D5D589, 2,  4, 8192, 128, 2048, 7744, false },   /* reported */
+    { 0xA5D5D589, 4,  2, 8192, 128, 2048, 7744, false },   /* reported */
+    { 0x3E94D589, 2,  3, 4096, 128, 4096, 3872, false },   /* reported */
+    { 0x3ED5D789, 2,  2, 8192, 128, 4096, 7744, false },
+    /* Micron */
+    { 0xA5D5D52C, 2,  4, 8192, 128, 2048, 7744, false },
+    { 0xA5D5D52C, 4,  2, 8192, 128, 2048, 7744, false },
+    { 0x3E94D52C, 2,  3, 4096, 128, 4096, 3872, false },
+    { 0x3ED5D72C, 2,  2, 8192, 128, 4096, 7744, false },
+#endif
 };
 /* Physical blocks per bank in one VFL block: the original firmware's mode
  * switch uses 1 for mode 1, 4 for mode 4, and 2 for every other mode */
@@ -969,6 +1003,26 @@ unsigned int nand_get_bank_count(void)
     return nand_banks;
 }
 
+#ifdef NAND_CHECK
+/* Hooks for the contributor check image (nand-check-nano3g.c), which reads
+ * the raw NAND itself and serves the storage API in its place */
+
+int nand_get_chip_row(void)
+{
+    return nand_chip ? (int)(nand_chip - nand_chip_table) : -1;
+}
+
+const struct nand_geometry *nand_check_use_chip(unsigned int pagesperblock)
+{
+    /* Keep whatever was identified readable, mounted or not, but drop a
+     * chip whose blocks do not hold the pages the check's layout expects */
+    if (nand_chip && nand_chip->pagesperblock != pagesperblock)
+        nand_chip = NULL;
+    nand_ready = nand_chip != NULL;
+    return nand_get_geometry();
+}
+#endif /* NAND_CHECK */
+
 /* ---- Rockbox storage API ---- */
 
 static int nand_init_chip(void)
@@ -1029,6 +1083,7 @@ static int nand_init_chip(void)
     nand_ready = true;
     nand_touch();
 
+#ifndef NAND_CHECK
     /* The table can still hold a row that has not been through a write test
      * (a NAND_TEST_READONLY build makes every row look that way): leave that
      * chip alone too. The check image reads any chip it identifies. */
@@ -1039,6 +1094,7 @@ static int nand_init_chip(void)
         nand_ready = false;
         return NAND_ERR_UNSUPPORTED;
     }
+#endif
 
     rc = ftl_init();
     if (rc)
@@ -1054,6 +1110,12 @@ int nand_init(void)
 {
     int rc = nand_init_chip();
 
+#ifdef NAND_CHECK
+    /* The check image reports whatever happened and serves the raw NAND of
+     * any chip it identified, mounted or not, so init always succeeds */
+    nand_check_init(rc);
+    rc = 0;
+#endif
     return rc;
 }
 
@@ -1081,7 +1143,10 @@ int nand_flush(void)
 }
 #endif
 
-/* ---- the FTL's disk ---- */
+/* ---- the FTL's disk. A NAND_CHECK build serves the raw NAND instead, from
+ * nand-check-nano3g.c, which defines these five entry points in place of
+ * the ones below ---- */
+#ifndef NAND_CHECK
 #ifdef HAVE_STORAGE_READONLY
 bool nand_readonly(IF_MD_NONVOID(int drive))
 {
@@ -1136,6 +1201,7 @@ void nand_get_info(IF_MD(int drive,) struct storage_info *info)
     info->revision = "1.0";
 }
 #endif
+#endif /* !NAND_CHECK */
 
 long nand_last_disk_activity(void)
 {

@@ -48,6 +48,9 @@
 #ifdef IPOD_NANO3G
 #include "nand-target.h"
 #endif
+#ifdef NAND_CHECK
+#include "string-extra.h"
+#endif
 #ifdef HAVE_SERIAL
 #include "serial.h"
 #endif
@@ -146,6 +149,117 @@ static void usb_mode(void)
     printf("USB mode exit     ");
 }
 #endif /* HAVE_BOOTLOADER_USB_MODE */
+
+#if defined(NAND_CHECK) && defined(HAVE_BOOTLOADER_USB_MODE) \
+    && !defined(S5L87XX_DEVELOPMENT_BOOTLOADER)
+/* The contributor NAND check (build with -DNAND_CHECK, run from DFU): show
+ * what the driver identified and how the read-only mount went, add the
+ * unit's model and firmware version, then serve the raw NAND over USB for
+ * utils/ipodnano3g/nandcheck/nandcheck.py. Nothing is written to the NAND. */
+/* The bootloader's backlight calls are stubs, and the check's screen has
+ * come up too dim to read at the default level. Full brightness draws more
+ * than a battery-less unit's USB power alone can supply and can keep it
+ * from booting at all, so this stops at the default rather than the max. */
+static void nand_check_light(void)
+{
+    backlight_hw_brightness(DEFAULT_BRIGHTNESS_SETTING);
+    backlight_hw_on();
+}
+
+/* The report's key lines, short enough for the screen; the whole report
+ * goes to nandcheck.py */
+static void nand_check_print(const char *report)
+{
+    static const char *const keys[] = {
+        "banks", "row", "mode", "pagesize", "validated", "ftl", "verdict",
+        "model", "swvr",
+    };
+    static char text[SECTOR_SIZE];
+    char *p, *nl, *sp;
+    size_t i;
+
+    strlcpy(text, report, sizeof(text));
+    for (p = text; (nl = strchr(p, '\n')); p = nl + 1)
+    {
+        *nl = '\0';
+        sp = strchr(p, ' ');
+        if (!sp)
+            continue;
+        if (!strncmp(p, "ids ", 4))
+        {
+            /* bank 0's id; the others are in the report */
+            printf("id %.8s", sp + 1);
+            continue;
+        }
+        for (i = 0; i < ARRAYLEN(keys); i++)
+            if ((size_t)(sp - p) == strlen(keys[i])
+                && !strncmp(p, keys[i], sp - p))
+                printf("%s", p);
+    }
+}
+
+static void nand_check(void)
+{
+    static struct SysCfg syscfg;
+    char line[64];
+    int rc;
+    ssize_t n;
+
+    nand_check_light();
+    snprintf(line, sizeof(line), "battery %dmV", _battery_voltage());
+    rc = storage_init();
+    /* USB mode unmounts every volume when the host configures the device,
+     * through the file system's locks and object lists */
+    filesystem_init();
+
+    lcd_set_foreground(LCD_RBYELLOW);
+    printf("Nano 3G NAND check");
+    lcd_set_foreground(LCD_WHITE);
+    printf("%s", line);
+    nand_check_note(line);
+    nand_check_light();
+    if (rc)
+        printf("storage_init %d", rc);
+
+    /* Which unit this is, but not its serial number */
+    n = syscfg_read(&syscfg);
+    if (n != -1)
+    {
+        size_t i, count = MIN(syscfg.header.num_entries, SYSCFG_MAX_ENTRIES);
+
+        for (i = 0; i < count; i++)
+        {
+            const struct SysCfgEntry *e = &syscfg.entries[i];
+            const uint32_t *w = (const uint32_t *)e->data;
+
+            if (e->tag == SYSCFG_TAG_MODN)
+                snprintf(line, sizeof(line), "model %.16s", e->data);
+            else if (e->tag == SYSCFG_TAG_SWVR)
+                snprintf(line, sizeof(line), "swvr %.16s", e->data);
+            else if (e->tag == SYSCFG_TAG_HWVR)
+                snprintf(line, sizeof(line), "hwvr %08lx",
+                         (unsigned long)w[1]);
+            else
+                continue;
+            nand_check_note(line);
+        }
+    }
+
+    nand_check_print(nand_check_report());
+    lcd_set_foreground(LCD_RBYELLOW);
+    printf("Photo, then connect USB");
+    printf("and run nandcheck.py");
+    lcd_set_foreground(LCD_WHITE);
+    /* One USB session: usb_mode() starts power management each time, so it
+     * must not run twice */
+    usb_mode();
+    nand_check_light();
+    printf("Done. Hold MENU+SELECT");
+    printf("to restart");
+    while (1)
+        sleep(HZ);
+}
+#endif
 
 void fatal_error(int err)
 {
@@ -872,6 +986,11 @@ void main(void)
 
     devel_menu();
 #endif /* S5L87XX_DEVELOPMENT_BOOTLOADER */
+
+#if defined(NAND_CHECK) && defined(HAVE_BOOTLOADER_USB_MODE) \
+    && !defined(S5L87XX_DEVELOPMENT_BOOTLOADER)
+    nand_check();
+#endif
 
 #ifndef S5L87XX_DEVELOPMENT_BOOTLOADER
     if (rc == 0) {
