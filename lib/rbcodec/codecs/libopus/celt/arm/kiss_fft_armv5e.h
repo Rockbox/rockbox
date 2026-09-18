@@ -113,6 +113,33 @@
     } \
     while(0)
 
+/* Assembly radix-3, radix-4 and radix-5 passes, in kiss_fft_armv5e_asm.S.
+   The C_MUL above is already as tight as the core allows; what the assembly
+   recovers is the bookkeeping gcc cannot keep resident.  Measured over eight
+   packets of stereo decode, 16.0% of the instructions executed in the
+   compiled radix-4 pass are stack traffic, 11.4% of radix-3 and 23.0% of
+   radix-5, almost all of it output pointers spilled and reloaded around the
+   complex multiplies.  Radix-2 is left in C: it needs no twiddle pointers
+   and spills only 4.7%, so there is nothing to win.  The kernels take
+   st->twiddles rather than st, so the assembly needs no knowledge of the
+   layout of kiss_fft_state. */
+#ifndef OPUS_ARM_NO_FFT_ASM
+#define OVERRIDE_kf_bfly3
+#define OVERRIDE_kf_bfly4
+#define OVERRIDE_kf_bfly5
+
+void kf_bfly3_armv5e(kiss_fft_cpx *Fout, const kiss_twiddle_cpx *tw,
+                     int fstride, int m, int N, int mm);
+void kf_bfly4_armv5e(kiss_fft_cpx *Fout, const kiss_twiddle_cpx *tw,
+                     int fstride, int m, int N, int mm);
+void kf_bfly5_armv5e(kiss_fft_cpx *Fout, const kiss_twiddle_cpx *tw,
+                     int fstride, int m, int N, int mm);
+
+#define kf_bfly3(Fout, fstride, st, m, N, mm)    kf_bfly3_armv5e((Fout), (st)->twiddles, (int)(fstride), (m), (N), (mm))
+#define kf_bfly4(Fout, fstride, st, m, N, mm)    kf_bfly4_armv5e((Fout), (st)->twiddles, (int)(fstride), (m), (N), (mm))
+#define kf_bfly5(Fout, fstride, st, m, N, mm)    kf_bfly5_armv5e((Fout), (st)->twiddles, (int)(fstride), (m), (N), (mm))
+#endif /* OPUS_ARM_NO_FFT_ASM */
+
 #endif /* FIXED_POINT */
 
 #endif /* KISS_FFT_GUTS_H */
