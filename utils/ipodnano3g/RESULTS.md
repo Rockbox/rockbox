@@ -48,3 +48,8 @@ fault testing.
 - **NAND check tool update, 2026-09-17.** The rebuilt check image reads a
   4GB unit with no ECC failures or timeouts; two independent collections
   from it agree byte for byte.
+- **2-CE Micron A5D5D52C, enabled 2026-09-18.** A contributor's check
+  archive matches the table row exactly, including a derived `vflspares`
+  of 89. Replayed against the host suite: `test_ftl` agrees with the
+  oracle on all 1,982,464 sectors; `test_crash` survives 100 power cuts
+  (172 writes, 6 syncs, 0 sectors wrong). No on-device write test.

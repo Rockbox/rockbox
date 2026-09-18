@@ -111,6 +111,8 @@ static const struct nand_chip_info nand_chip_table[] =
     /* Hynix: the 4GB unit this port was developed on, and the 8GB one */
     { 0xA514D3AD, 4,  8, 4096, 128, 2048, 3872, true  },
     { 0xA555D5AD, 4,  8, 8192, 128, 2048, 7744, true  },
+    /* Micron, 2 chip enables */
+    { 0xA5D5D52C, 2,  4, 8192, 128, 2048, 7744, true  },
 #ifdef NAND_CHECK
     /* The rest of the chips the original firmware knows. They are here for
      * the check image alone, which identifies a chip and reads it to
@@ -135,7 +137,6 @@ static const struct nand_chip_info nand_chip_table[] =
     { 0x3E94D589, 2,  3, 4096, 128, 4096, 3872, false },   /* reported */
     { 0x3ED5D789, 2,  2, 8192, 128, 4096, 7744, false },
     /* Micron */
-    { 0xA5D5D52C, 2,  4, 8192, 128, 2048, 7744, false },
     { 0xA5D5D52C, 4,  2, 8192, 128, 2048, 7744, false },
     { 0x3E94D52C, 2,  3, 4096, 128, 4096, 3872, false },
     { 0x3ED5D72C, 2,  2, 8192, 128, 4096, 7744, false },
