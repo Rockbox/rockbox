@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 r"""Collect what is needed to validate an iPod Nano 3G's NAND for Rockbox.
 
-1. Put the iPod in DFU mode and run the check image:
-   mks5lboot --dfusend nano3g-check.dfu
+1. Build the check image (build.sh check), put the iPod in DFU mode and run
+   it: mks5lboot --dfusend nano3g-check.dfu
+   (With wInd3x, an external tool not part of Rockbox: wInd3x haxdfu, then
+   wInd3x run nano3g-check-wind3x.dfu, built the same way.)
    The screen shows the chip, its table row and how a read-only mount went.
    Nothing is written to the iPod.
 2. Connect USB. The iPod appears as a disk of 2048-byte sectors.
@@ -14,11 +16,11 @@ r"""Collect what is needed to validate an iPod Nano 3G's NAND for Rockbox.
    This writes nandcheck-<id>-x<banks>.tar.gz: the report, the spare
    metadata of every page and every page that is not file data - the VFL
    and FTL control structures and Apple's bad-block records. No file
-   contents are included. It takes about 7 minutes on a 4GB unit.
+   contents are included. It takes 10-20 minutes.
    Add --full to include every page's data as well (4-8 GB, and it contains
    whatever is stored on the iPod).
 
-The check image serves:
+The check image serves (nand-check-nano3g.c in the Nano 3G target):
     sector 0                        text report
     1 + block * banks + bank        128 records of 16 bytes: 3 spare words
                                     and a result word, little endian: -1 on

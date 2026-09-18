@@ -42,3 +42,9 @@ implemented layout and recovery order follow the decoded Apple FTL/VFL
 process documented in `decode/APPLE-FTL-WRITE.md`; that correspondence is
 evidence for the implementation, not a substitute for destructive hardware
 fault testing.
+
+## Later additions
+
+- **NAND check tool update, 2026-09-17.** The rebuilt check image reads a
+  4GB unit with no ECC failures or timeouts; two independent collections
+  from it agree byte for byte.

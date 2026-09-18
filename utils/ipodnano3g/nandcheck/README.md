@@ -1,9 +1,9 @@
 # Nano 3G NAND check
 
-Apple fitted many different NAND chips to the iPod Nano 3G. Rockbox's Nano
-3G NAND support is validated chip by chip: it writes only to chips that have
-been tested on hardware, and keeps the storage read-only on the rest. This
-check collects what we need to validate your chip. It **changes nothing on your
+Apple fitted many different NAND chips to the iPod Nano 3G. Rockbox runs on
+all of them, but it only writes to chips that have been validated on
+hardware; on the rest the player's storage is read-only. This check
+collects what we need to validate your chip. It **changes nothing on your
 iPod**: nothing is installed, and nothing is written to its NAND. The image
 runs from RAM and is gone when the iPod restarts.
 
@@ -13,7 +13,8 @@ Every Nano 3G is model A1236, whichever NAND it has, so the chip has to be
 read from the iPod itself:
 
 1. **Capacity** narrows it down: Settings > About in Apple's firmware
-   shows 4GB or 8GB, and each row below is one capacity.
+   shows 4GB or 8GB, and each row below is one capacity. Both Hynix
+   parts, the 4GB and the 8GB, are validated.
 2. **The check's screen** names it exactly, within seconds and without
    changing anything: run steps 1 and 2 below and read the `id` line (the
    chip, as in the table) and the `banks` line (how many chip enables
@@ -25,37 +26,42 @@ the iPod. Otherwise please carry on with steps 3 and 4.
 
 These are all the chips Apple's firmware (1.1.3) supports. Apple picks the
 row by the id and the number of chip enables, so one id can appear twice.
-Rockbox's NAND driver knows every row, but apart from the validated chip
-it has so far been tested only against simulated NAND on a computer, which
-is why the archives matter.
+Rockbox supports every row, but writes only to validated ones; on the
+others the storage is read-only. Apart from the validated chip, that
+support has so far been tested only against simulated NAND on a computer,
+which is why the archives matter.
 
 | id | maker | capacity | chip enables | page | status |
 |---|---|---|---|---|---|
 | `A514D3AD` | Hynix | 4GB | 4 | 2KiB | **validated** |
-| `A555D5AD` | Hynix | 8GB | 4 | 2KiB | reported, needs a check |
+| `A555D5AD` | Hynix | 8GB | 4 | 2KiB | **validated** |
 | `B614D5AD` | Hynix | 8GB | 4 | 4KiB | needed |
-| `B614D5EC` | Samsung | 4GB | 2 | 4KiB | reported, needs a check |
-| `B614D5EC` | Samsung | 8GB | 4 | 4KiB | needed |
-| `2555D5EC` | Samsung | 8GB | 4 | 2KiB | needed |
+| `B614D5EC` | Micronas | 4GB | 2 | 4KiB | checked |
+| `B614D5EC` | Micronas | 8GB | 4 | 4KiB | needed |
+| `2555D5EC` | Micronas | 8GB | 4 | 2KiB | needed |
 | `A585D598` | Toshiba | 4GB | 2 | 2KiB | needed |
 | `A585D598` | Toshiba | 8GB | 4 | 2KiB | needed |
 | `BA94D598` | Toshiba | 4GB | 2 | 4KiB | needed |
 | `BA94D598` | Toshiba | 8GB | 4 | 4KiB | needed |
-| `A5D5D589` | Intel | 4GB | 2 | 2KiB | reported, needs a check |
-| `A5D5D589` | Intel | 8GB | 4 | 2KiB | reported, needs a check |
-| `3E94D589` | Intel | 4GB | 2 | 4KiB | reported, needs a check |
+| `A5D5D589` | Intel | 4GB | 2 | 2KiB | checked |
+| `A5D5D589` | Intel | 8GB | 4 | 2KiB | checked |
+| `3E94D589` | Intel | 4GB | 2 | 4KiB | checked |
 | `3ED5D789` | Intel | 8GB | 2 | 4KiB | needed |
-| `A5D5D52C` | Micron | 4GB | 2 | 2KiB | needed |
+| `A5D5D52C` | Micron | 4GB | 2 | 2KiB | **validated** |
 | `A5D5D52C` | Micron | 8GB | 4 | 2KiB | needed |
 | `3E94D52C` | Micron | 4GB | 2 | 4KiB | needed |
 | `3ED5D72C` | Micron | 8GB | 2 | 4KiB | needed |
 
-"Reported" means someone has seen that chip in a unit, but no check archive
-has been collected from it yet. The id is the first four READ ID bytes read
-as one little-endian number: `A514D3AD` is the bytes `AD D3 14 A5`, and the
-last byte is the maker (`AD` Hynix, `EC` Samsung, `98` Toshiba, `89` Intel,
-`2C` Micron). When a chip is validated, the driver's chip table and this
-table are updated together.
+"Needed" means nobody has reported a unit with that chip yet. "Reported"
+means someone has, but no check archive has been collected from it.
+"Checked" means an archive has, and it mounts and replays correctly in the
+host FTL suite - short only of the on-device write test that validation
+needs. The id is the first four READ ID bytes read as one little-endian
+number: `A514D3AD` is the bytes `AD D3 14 A5`, and the last byte is the
+maker (`AD` Hynix, `EC` Micronas, `98` Toshiba, `89` Intel, `2C` Micron).
+When a chip is validated, its row in `nand_chip_table[]`
+(`firmware/target/arm/s5l8702/ipodnano3g/nand-nano3g.c`) and this table
+are updated together.
 
 ## What you need
 
@@ -67,10 +73,35 @@ table are updated together.
 
 ## 1. Get the image
 
-`nano3g-check.dfu` in this directory is ready to use. It is the Nano 3G
-bootloader built with `-DNAND_CHECK` from the Nano 3G NAND driver work,
-which is not in Rockbox yet; its build shows on the iPod's screen as
-"Version:" and in the report as `version`.
+`nano3g-check.dfu` in this directory is ready to use. Its build shows on
+the iPod's screen as "Version:" and in the report as `version`, which is
+the commit it was built from.
+
+To build it yourself instead (an ARM toolchain: `tools/rockboxdev.sh`, or
+your distribution's `arm-none-eabi-gcc`):
+
+```
+utils/ipodnano3g/nandcheck/build.sh check
+```
+
+This writes `nano3g-check.dfu` in the current directory (and
+`nano3g-check-wind3x.dfu` if `wInd3x` is installed).
+
+### Where the code is
+
+The image is the Nano 3G bootloader built with `-DNAND_CHECK`:
+
+| part | file |
+|---|---|
+| the screen, SysCfg and USB mode | `nand_check()` in `bootloader/ipod-s5l87xx.c` |
+| chip identification, the report and the raw USB view | the `NAND_CHECK` block of `firmware/target/arm/s5l8702/ipodnano3g/nand-nano3g.c` |
+| Apple's chip table | `nand_chip_table[]` in the same file |
+| the read-only mount it reports | `firmware/target/arm/s5l8702/ipodnano3g/ftl-nano3g.c` |
+| the build | `build.sh` in this directory |
+
+`nandcheck.py`'s module comment documents the disk layout the image
+serves, and `utils/ipodnano3g/README` describes the host tests that a
+collected archive feeds.
 
 ## 2. Run it
 
@@ -79,6 +110,8 @@ which is not in Rockbox yet; its build shows on the iPod's screen as
    ```
    utils/mks5lboot/mks5lboot --dfusend utils/ipodnano3g/nandcheck/nano3g-check.dfu
    ```
+   (With wInd3x instead: `wInd3x haxdfu`, then
+   `wInd3x run nano3g-check-wind3x.dfu`, built as above.)
 3. Within a few seconds the iPod shows "Nano 3G NAND check" and a short
    summary: `battery`, `id` (the chip), `banks`, `row`, `mode`, `pagesize`,
    `validated`, `ftl`, `verdict`, `model` and `swvr`. Then "Bootloader USB
@@ -126,7 +159,7 @@ If the verdict says the chip is not in Apple's table, the photo is enough.
 
 | file | contents |
 |---|---|
-| `report.txt` | chip ids (all eight id bytes, every chip enable), chip table row and derived geometry, read-only mount result, verdict, model, hardware and firmware version, battery voltage, backlight register |
+| `report.txt` | chip ids (all eight id bytes, every chip enable), chip table row and derived geometry, read-only mount result, verdict, model, hardware and firmware version, battery voltage |
 | `meta.bin` | every page's 12 spare bytes and read result, bank by bank (the host tests' dump format) |
 | `results.bin` | every page's full read result: ECC class, most bits corrected in a chunk, erased flag |
 | `pages.bin` | every page that is not user data or erased: FTL and VFL control structures, Apple's bad-block records |
