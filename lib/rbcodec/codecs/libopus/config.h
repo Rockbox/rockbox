@@ -47,6 +47,12 @@
 #elif ARM_ARCH > 4
 #define OPUS_ARM_INLINE_EDSP
 #endif
+
+/*optimization no hardware division support*/
+#if !defined(ARM_HAVE_HW_DIV)
+#define OPUS_EC_DECODE_DIV
+#endif
+
 #endif
 
 #if defined(CPU_COLDFIRE)
