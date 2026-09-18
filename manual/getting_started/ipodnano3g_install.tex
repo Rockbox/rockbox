@@ -1,0 +1,40 @@
+The third generation iPod Nano uses a DFU installer, \fname{mks5lboot},
+to install the bootloader in flash. Do not use \fname{ipodpatcher}.
+
+\warn{Rockbox supports the Nano 3G models fitted with Hynix NAND, the
+4~GB A514D3AD and the 8~GB A555D5AD. Apple fitted several other NAND
+chips to this player. Rockbox drives only chips that have been tested on
+hardware: on any other chip the bootloader says the NAND is not supported
+and starts Apple's firmware instead, leaving the player's storage
+untouched. The port is experimental: Apple's proactive
+refresh of blocks needing ECC correction is not implemented, and
+bad-block remapping has not been exercised on hardware. Keep a backup of
+all media.}
+
+If your player has another chip, you can help have it added. The NAND check in \fname{utils/ipodnano3g/nandcheck} of the
+source tree runs from DFU mode, installs nothing, writes nothing to the
+player, and collects what validating the chip needs: see that
+directory's \fname{README.md}.
+
+\caps{Rockbox Utility} can install the bootloader. To install it by hand
+instead, follow the steps below.
+
+Use \fname{mks5lboot} built from Rockbox sources
+with Nano 3G support, and the Nano 3G bootloader
+\fname{bootloader-ipodnano3g.ipod}. Older iPod Classic installers do not
+support this player. Build instructions and USB driver requirements are
+in \fname{utils/mks5lboot/README} in the source tree.
+
+\begin{enumerate}
+\item Install the Rockbox files on the player's FAT32 volume before
+installing the bootloader.
+\item Connect the player by USB. Close iTunes and stop iTunesHelper if
+they are running.
+\item Run \fname{mks5lboot --dfuscan --loop} in a terminal, then put the
+player in
+\href{https://freemyipod.org/wiki/Modes#DFU_mode}{DFU mode}.
+When it is detected, stop the scan with Ctrl+C.
+\item Run \fname{mks5lboot --bl-inst path/to/bootloader-ipodnano3g.ipod},
+replacing the path with the location of your Nano 3G bootloader.
+\item Wait for the installer to finish and the player to restart.
+\end{enumerate}
