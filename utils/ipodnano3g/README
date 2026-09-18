@@ -1,0 +1,94 @@
+# iPod Nano 3G storage validation
+
+Copyright (C) 2026 Andrew Rice.
+
+This directory contains the host-side evidence and reproducibility tools
+used to validate the Nano 3G NAND and FTL implementation. The source files
+here are distributed under the same GNU General Public License, version 2
+or later, as the Rockbox source tree.
+
+No Apple firmware, sequencer binary, NAND image, user data or block trace is
+included. The tests that need those inputs require the person running them
+to supply images obtained from their own device.
+
+## FTL tests
+
+`ftltest` builds `ftl-nano3g.c` against a copy-on-write NAND mock. It expects
+two files in a directory named on each test's command line:
+
+- `nand_data_4banks.bin`: page data from a four-bank A514D3AD device, stored
+  bank by bank;
+- `meta_all.bin`: 16 bytes per physical page, consisting of the three spare
+  words followed by the signed `nand_read_page()` result.
+
+The mock maps both inputs privately and cannot modify them. Run:
+
+```
+cd utils/ipodnano3g/ftltest
+make check DUMP=/path/to/dump
+make check-crash DUMP=/path/to/dump
+```
+
+`test_crash` provides deterministic power-cut and torn-write fault injection.
+`replay` accepts a separately supplied block trace.
+
+The tests also take a medium spec in place of a dump directory:
+`collected:DIR` is an archive from the NAND check below, and `blank:PRESET`
+formats an empty medium in one of the chip table's layouts (see
+`ftl_hooks.c`).
+
+## Validating a chip
+
+A chip's row in `nand_chip_table[]`
+(`firmware/target/arm/s5l8702/ipodnano3g/nand-nano3g.c`) says whether it
+has been proven on hardware. Rockbox drives only validated chips: on any
+other the bootloader says the NAND is not validated and starts Apple's
+firmware.
+
+Validating one takes, in order:
+
+1. a check archive from the unit (below), which identifies the chip and
+   records its structures;
+2. `test_ftl collected:DIR` and `test_crash collected:DIR 100 1 3000 0`
+   from `ftltest`, which mount that medium and exercise writes and power
+   cuts in its geometry on the host;
+3. a write test on the unit itself, with a firmware built
+   `-DNAND_WRITABLE_ID=0x<id>` (for example `-DNAND_WRITABLE_ID=0xA555D5AD`).
+   That mounts chips with this id writable without changing the table, so
+   an owner can copy a tree through Rockbox's USB mode, power off cleanly,
+   restart and check the files back.
+
+`-DNAND_TEST_READONLY` does the opposite: it treats every chip as
+unvalidated, which is how the refusal path is tested on a validated unit.
+
+Only then is the row marked validated.
+
+## NAND check for contributors
+
+`nandcheck` builds a one-shot image, run from DFU, that identifies an iPod's
+NAND chip, tries a read-only mount and serves the raw NAND read-only over
+USB; `nandcheck.py collect` turns that into a small archive for validating
+the chip with the tests above. Nothing is installed or written. See
+`nandcheck/README.md`.
+
+## Sequencer register comparison
+
+`regdiff` compares the controller-register writes made by the NAND driver
+with Apple's flash-controller sequencer programs. Set `NANO3G_OSOS` to a
+decrypted firmware image obtained from the user's own device, then run:
+
+```
+NANO3G_OSOS=/path/to/osos.bin python3 utils/ipodnano3g/regdiff/regdiff.py
+NANO3G_OSOS=/path/to/osos.bin python3 utils/ipodnano3g/regdiff/regdiff_read.py
+```
+
+The tools read the sequencer programs at their documented IRAM/file offsets;
+they do not contain or create copies of those programs. Expected results are
+recorded in `RESULTS.md`.
+
+## Decode notes
+
+`decode` records the independently decoded call structure, data formats and
+sequencer behavior. Addresses identify locations in firmware 1.1.3 so a
+reviewer with their own image can reproduce the analysis. Raw firmware and
+bulk disassembly listings are deliberately excluded.
