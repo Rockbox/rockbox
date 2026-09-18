@@ -64,6 +64,9 @@ static __inline int ec_bsr(unsigned long _x){
 # include "dsplib.h"
 # define EC_CLZ0    (31)
 # define EC_CLZ(_x) (_lnorm(_x))
+#elif defined(OPUS_ARM_INLINE_ASM) && !defined(OPUS_ARM_NO_ILOG_INLINE)
+/*ARMv4 has no CLZ instruction, so __builtin_clz compiles to a call to
+   libgcc's __clzsi2.  Leave EC_CLZ undefined and inline EC_ILOG below.*/
 #elif __GNUC_PREREQ(3,4)
 # if INT_MAX>=2147483647
 #  define EC_CLZ0    ((int)sizeof(unsigned)*CHAR_BIT)
@@ -80,6 +83,23 @@ static __inline int ec_bsr(unsigned long _x){
   The majority of the time we can never pass it zero.
   When we need to, it can be special cased.*/
 # define EC_ILOG(_x) (EC_CLZ0-EC_CLZ(_x))
+#elif defined(OPUS_ARM_INLINE_ASM) && !defined(OPUS_ARM_NO_ILOG_INLINE)
+/*Fifteen branchless instructions, no memory access.  The libgcc call it
+   replaces costs about half again once the call, its table load and the
+   caller's register saves are counted.  Compares against 0x10000, 0x100 and
+   0x10 because those are ARM immediates and the equivalent masks are not.
+  Returns 0 for 0, where the builtin form is undefined.*/
+static __inline__ int ec_ilog_armv4(opus_uint32 _v){
+  int ret;
+  ret=0;
+  if(_v>=0x10000){_v>>=16;ret=16;}
+  if(_v>=0x100){_v>>=8;ret+=8;}
+  if(_v>=0x10){_v>>=4;ret+=4;}
+  if(_v>=0x4){_v>>=2;ret+=2;}
+  /*_v is now 0..3, whose ilog is 0, 1, 2, 2.*/
+  return ret+(int)(_v&~(_v>>1));
+}
+# define EC_ILOG(_x) (ec_ilog_armv4(_x))
 #else
 int ec_ilog(opus_uint32 _v);
 # define EC_ILOG(_x) (ec_ilog(_x))
