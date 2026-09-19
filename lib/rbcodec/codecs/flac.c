@@ -209,8 +209,9 @@ static bool flac_init(FLACContext* fc, int first_frame_offset)
     }
 
    if (found_streaminfo) {
-       fc->bitrate = ((int64_t) (fc->filesize-fc->metadatalength) * 8)
-                     / fc->length;
+       /* length is 0 when STREAMINFO has no total sample count */
+       fc->bitrate = fc->length ? ((int64_t) (fc->filesize-fc->metadatalength) * 8)
+                     / fc->length : 0;
        return true;
    } else {
        return false;
