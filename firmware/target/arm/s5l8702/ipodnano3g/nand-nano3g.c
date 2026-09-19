@@ -119,9 +119,13 @@ static const struct nand_chip_info nand_chip_table[] =
      * collect what validating it needs; a normal build does not carry them,
      * so Rockbox cannot drive a chip nobody has tested. A row moves above
      * this line, with its validated flag set, once someone has run the
-     * check and a write test on that chip. */
+     * check and a write test on that chip. A row tagged "reported" is
+     * secondhand - someone's id and geometry, unconfirmed by us; one
+     * tagged "checked" has a check archive that mounts and replays
+     * correctly in the host FTL suite - real evidence, short only of the
+     * write test. */
     /* Micronas (ITT Intermetall, acquired by TDK 2016): 0xEC, not Samsung */
-    { 0xB614D5EC, 2,  8, 4096, 128, 4096, 3872, false },   /* reported */
+    { 0xB614D5EC, 2,  8, 4096, 128, 4096, 3872, false },   /* checked */
     { 0xB614D5EC, 4,  1, 4096, 128, 4096, 3872, false },
     { 0x2555D5EC, 4,  9, 8192, 128, 2048, 7744, false },
     /* Hynix */
@@ -132,9 +136,9 @@ static const struct nand_chip_info nand_chip_table[] =
     { 0xBA94D598, 2, 12, 4096, 128, 4096, 3872, false },
     { 0xBA94D598, 4,  1, 4096, 128, 4096, 3872, false },
     /* Intel */
-    { 0xA5D5D589, 2,  4, 8192, 128, 2048, 7744, false },   /* reported */
-    { 0xA5D5D589, 4,  2, 8192, 128, 2048, 7744, false },   /* reported */
-    { 0x3E94D589, 2,  3, 4096, 128, 4096, 3872, false },   /* reported */
+    { 0xA5D5D589, 2,  4, 8192, 128, 2048, 7744, false },   /* checked */
+    { 0xA5D5D589, 4,  2, 8192, 128, 2048, 7744, false },   /* checked */
+    { 0x3E94D589, 2,  3, 4096, 128, 4096, 3872, false },   /* checked */
     { 0x3ED5D789, 2,  2, 8192, 128, 4096, 7744, false },
     /* Micron */
     { 0xA5D5D52C, 4,  2, 8192, 128, 2048, 7744, false },

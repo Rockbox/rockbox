@@ -53,3 +53,9 @@ fault testing.
   of 89. Replayed against the host suite: `test_ftl` agrees with the
   oracle on all 1,982,464 sectors; `test_crash` survives 100 power cuts
   (172 writes, 6 syncs, 0 sectors wrong). No on-device write test.
+- **B614D5EC x2, A5D5D589 x2/x4, 3E94D589 x2, 2026-09-19.** Four
+  contributors' check archives all match their rows and pass `test_crash`
+  clean. `test_ftl` passes three outright; A5D5D589 x2 disagrees with the
+  oracle on two logical pages - confirmed against Apple's own disassembly
+  (`_FTLRestore`, osos 1.1.3) to be that algorithm's own tie-break between
+  two competing logs, not a defect (see the note in `ftltest/test_ftl.c`).

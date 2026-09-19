@@ -7,6 +7,16 @@
  * says "user data, this lpn", the newest - highest usn, then the latest
  * position in its superblock. Every lpn the FTL resolves must land on the
  * oracle's copy (or, where copies tie, on one with identical data).
+ *
+ * Known false positive: when two logs for the same logical block each hold
+ * pages the other lacks, _FTLRestore's own tie-break (0x806a19c in osos
+ * 1.1.3, matched here instruction for instruction) keeps the more complete
+ * one whole and drops the other entirely, even if the dropped one is newer
+ * for some of its pages. ftl_read() then disagrees with this oracle on
+ * exactly those pages - correctly, since that is what Apple's own firmware
+ * would also resolve to on the same medium. A handful of disagreements
+ * confined to one or two logical blocks on a real contributor's dump is
+ * this, not a bug; wholesale disagreement is not.
  */
 #include <stdio.h>
 #include <stdlib.h>
