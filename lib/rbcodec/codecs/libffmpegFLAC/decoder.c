@@ -165,7 +165,8 @@ static int decode_residuals(FLACContext *s, int32_t *decoded, int pred_order)
             for (; i < samples; i++)
                 *decoded++ = tmp ? get_sbits(&gb, tmp) : 0;
         } else {
-            int real_limit = tmp ? (INT_MAX >> tmp) + 2 : INT_MAX;
+            unsigned lim = tmp ? (UINT_MAX >> tmp) + 2 : INT_MAX;
+            int real_limit = lim > INT_MAX ? INT_MAX : lim;
             for (; i < samples; i++) {
                 int v = get_sr_golomb_flac(&gb, tmp, real_limit, 0);
                 if ((unsigned) v == 0x80000000){

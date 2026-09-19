@@ -85,7 +85,7 @@ static inline int get_ur_golomb_jpegls(GetBitContext *gb, int k, int limit,
                 buf = 0;
             }
 
-            buf += ((int32_t)i << k);
+            buf += ((unsigned int)i << k);
         } else if (i == limit - 1) {
             buf = SHOW_UBITS(re, gb, esc_len);
             LAST_SKIP_BITS(re, gb, esc_len);
@@ -103,8 +103,9 @@ static inline int get_ur_golomb_jpegls(GetBitContext *gb, int k, int limit,
  * read signed golomb rice code (flac).
  */
 static inline int get_sr_golomb_flac(GetBitContext *gb, int k, int limit, int esc_len){
-    int v= get_ur_golomb_jpegls(gb, k, limit, esc_len);
-    return (v>>1) ^ -(v&1);
+    /* The folded value can use all 32 bits, so unfold it as unsigned. */
+    unsigned int v= get_ur_golomb_jpegls(gb, k, limit, esc_len);
+    return (int)((v>>1) ^ -(v&1));
 }
 
 /**
