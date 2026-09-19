@@ -161,8 +161,9 @@ static int decode_residuals(FLACContext *s, int32_t *decoded, int pred_order)
         tmp = get_bits(&gb, rice_bits);
         if (tmp == rice_esc) {
             tmp = get_bits(&gb, 5);
+            /* An escape width of 0 means all residuals are zero. */
             for (; i < samples; i++)
-                *decoded++ = get_sbits(&gb, tmp);
+                *decoded++ = tmp ? get_sbits(&gb, tmp) : 0;
         } else {
             int real_limit = tmp ? (INT_MAX >> tmp) + 2 : INT_MAX;
             for (; i < samples; i++) {
