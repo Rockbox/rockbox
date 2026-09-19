@@ -839,6 +839,9 @@ static void decode_file(const char *input_fn)
 
     /* Set up ci */
     struct mp3entry id3;
+    /* get_metadata() doesn't set every field; don't leave stack garbage in the
+       pointers that print_mp3entry() dereferences */
+    memset(&id3, 0, sizeof(id3));
     if (!get_metadata(&id3, input_fd, input_fn)) {
         fprintf(stderr, "error: metadata parsing failed\n");
         exit(1);
