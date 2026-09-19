@@ -228,6 +228,7 @@ const struct button_mapping* target_get_context_mapping(int context)
         case CONTEXT_BOOKMARKSCREEN:            { return button_context_bmark; }
         case CONTEXT_QUICKSCREEN:               { return button_context_quickscreen; }
         case CONTEXT_PITCHSCREEN:               { return button_context_pitchscreen; }
+        case CONTEXT_YESNOSCREEN:                { return button_context_yesno; }
         case CONTEXT_CUSTOM | CONTEXT_SETTINGS:
         case CONTEXT_SETTINGS_RECTRIGGER:       { return button_context_settings_right_is_inc; }
         case CONTEXT_TREE:
