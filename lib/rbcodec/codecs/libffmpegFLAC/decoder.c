@@ -238,8 +238,16 @@ int decode_subframe_fixed(FLACContext *s, int32_t* decoded, int pred_order, int 
 }
 
 #if !defined(CPU_COLDFIRE)
+/* The assembler kernels in arm.S implement flac_lpc_32_c exactly; keep the C
+   version compiled anyway when they are in use, so that a build can A/B the
+   two by defining FLAC_NO_LPC32_ASM. */
+#if defined(CPU_ARM_CLASSIC) && !defined(FLAC_NO_LPC32_ASM)
+#define FLAC_LPC32_ASM
+#endif
+
 static void flac_lpc_32_c(int32_t *decoded, int coeffs[],
-                          int pred_order, int qlevel, int len) ICODE_ATTR_FLAC;
+                          int pred_order, int qlevel, int len)
+                          ICODE_ATTR_FLAC UNUSED_ATTR;
 static void flac_lpc_32_c(int32_t *decoded, int coeffs[],
                           int pred_order, int qlevel, int len)
 {
@@ -340,7 +348,20 @@ static int decode_subframe_lpc(FLACContext *s, int32_t* decoded, int pred_order,
         lpc_decode_emac_wide(s->blocksize - pred_order, qlevel, pred_order,
                              decoded + pred_order, coeffs);
         #else
+        #if defined(FLAC_LPC32_ASM)
+        /* The 16-bit multiply kernel needs every history sample to fit a
+           signed halfword, which bps <= 16 guarantees, and checks its other
+           precondition itself. */
+        #if (ARM_ARCH >= 5) && defined(FLAC_LPC32_NARROW_ASM)
+        if (bps <= 16)
+            flac_lpc_32_arm_narrow(decoded, coeffs, pred_order, qlevel,
+                                   s->blocksize);
+        else
+        #endif
+        flac_lpc_32_arm(decoded, coeffs, pred_order, qlevel, s->blocksize);
+        #else
         flac_lpc_32_c(decoded, coeffs, pred_order, qlevel, s->blocksize);
+        #endif
 
         if (bps <= 16)
             lpc_analyze_remodulate(decoded, coeffs, pred_order, qlevel, s->blocksize, bps);
