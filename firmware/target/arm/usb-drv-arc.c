@@ -621,7 +621,10 @@ void usb_drv_stall(int endpoint, bool stall, bool in)
             REG_ENDPTCTRL(ep_num) |= EPCTRL_TX_EP_STALL;
         }
         else {
-            REG_ENDPTCTRL(ep_num) &= ~EPCTRL_TX_EP_STALL;
+            /* CLEAR_FEATURE(ENDPOINT_HALT) also resets the data toggle.
+             * EP0 owns its toggle through SETUP, not these register bits. */
+            REG_ENDPTCTRL(ep_num) = (REG_ENDPTCTRL(ep_num) & ~EPCTRL_TX_EP_STALL) |
+                (ep_num ? EPCTRL_TX_DATA_TOGGLE_RST : 0);
         }
     }
     else {
@@ -629,7 +632,8 @@ void usb_drv_stall(int endpoint, bool stall, bool in)
             REG_ENDPTCTRL(ep_num) |= EPCTRL_RX_EP_STALL;
         }
         else {
-            REG_ENDPTCTRL(ep_num) &= ~EPCTRL_RX_EP_STALL;
+            REG_ENDPTCTRL(ep_num) = (REG_ENDPTCTRL(ep_num) & ~EPCTRL_RX_EP_STALL) |
+                (ep_num ? EPCTRL_RX_DATA_TOGGLE_RST : 0);
         }
     }
 }
