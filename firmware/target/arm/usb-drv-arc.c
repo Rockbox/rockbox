@@ -553,6 +553,15 @@ void usb_drv_int(void)
     unsigned int usbintr = REG_USBINTR; /* Only watch enabled ints */
     unsigned int status = REG_USBSTS & usbintr;
 
+    /* Reset invalidates all old completions, including the audio ring.
+     * Do not dispatch a simultaneous SOF or IOC using stale descriptors. */
+    if (status & USBSTS_RESET) {
+        REG_USBSTS = status;
+        bus_reset();
+        usb_core_bus_reset();
+        return;
+    }
+
 #if 0
     if (status & USBSTS_INT) logf("int: usb ioc");
     if (status & USBSTS_ERR) logf("int: usb err");
@@ -577,13 +586,6 @@ void usb_drv_int(void)
     if (status & USBSTS_ERR) {
         REG_USBSTS = USBSTS_ERR;
         logf("usb error int");
-    }
-
-    /* reset interrupt */
-    if (status & USBSTS_RESET) {
-        REG_USBSTS = USBSTS_RESET;
-        bus_reset();
-        usb_core_bus_reset(); /* tell mom */
     }
 
     /* port change */
@@ -1154,6 +1156,9 @@ static void bus_reset(void)
 {
     int i;
     logf("usb bus_reset");
+
+    REG_USBINTR &= ~USBINTR_SOF_EN;
+    batch_stopped = true;
 
     REG_DEVICEADDR = 0;
     pending_device_address = -1;
