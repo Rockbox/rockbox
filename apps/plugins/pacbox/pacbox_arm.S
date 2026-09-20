@@ -25,6 +25,7 @@
 
     .section .icode,"ax",%progbits
     .global blit_display
+    .type blit_display, %function
 
 /* void blit_display(fb_data* lcd_framebuffer, unsigned char* vbuf)
 
