@@ -191,6 +191,7 @@ channel_mode_proc_karaoke:
  */
     .section    .text, "ax",%progbits
     .global crossfeed_process
+    .type crossfeed_process, %function
 crossfeed_process:
     @ input: r0 = this, r1 = buf_p
     @ unfortunately, we ended up in a bit of a register squeeze here, and need
@@ -256,6 +257,7 @@ crossfeed_process:
  */
     .section .text
     .global crossfeed_meier_process
+    .type crossfeed_meier_process, %function
 crossfeed_meier_process:
     @ input: r0 = this, r1 = buf_p
     ldr     r1, [r1]                   @ r1 = buf = *buf_p;
@@ -296,6 +298,7 @@ crossfeed_meier_process:
  */
     .section    .text, "ax",%progbits
     .global     resample_hermite
+    .type       resample_hermite, %function
 resample_hermite:
     @input: r0 = data, r1 = src, r2 = dst
     stmfd   sp!, { r0-r2, r4-r11, lr }  @ stack parms, modified regs
@@ -575,6 +578,7 @@ pga_process:
     .section    .text, "ax",%progbits
 #endif
     .global filter_process
+    .type   filter_process, %function
 filter_process:
     @input: r0 = f, r1 = buf, r2 = count, r3 = channels
     stmfd   sp!, { r4-r11, lr }     @ save all clobbered regs
