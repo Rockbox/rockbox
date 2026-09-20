@@ -225,6 +225,7 @@ enum {
     EP0_EXPECT_RX_STATUS_COMP,      /* sending status */
 };
 static volatile int ep0_state;
+static bool control_cancelled;
 
 #define TRACE_EP0_STATE 0
 #if TRACE_EP0_STATE == 1
@@ -1193,6 +1194,7 @@ static void signal_xfer_complete(int ep, struct usb_ctrlrequest* req, int status
 }
 
 static void process_setup_request(struct usb_ctrlrequest* req) {
+    control_cancelled = false;
     set_ep0_state(req->bRequestType & USB_DIR_IN ? EP0_HANDLING_TX_CONTROL : EP0_HANDLING_RX_CONTROL);
 
     if(ep0_state == EP0_HANDLING_TX_CONTROL || req->wLength == 0) {
@@ -1204,6 +1206,7 @@ static void process_setup_request(struct usb_ctrlrequest* req) {
     if(req->wLength > sizeof(usb_control_data)) {
         logf("usb_core: control write too large %u > %u", req->wLength, sizeof(usb_control_data));
         usb_drv_stall(EP_CONTROL, true, false);
+        set_ep0_state(EP0_READY);
         return;
     }
     set_ep0_state(EP0_EXPECT_RX_DATA_COMP);
@@ -1320,17 +1323,32 @@ void usb_core_handle_notify(long id, intptr_t data)
     }
 }
 
+void usb_core_control_cancelled(void)
+{
+    /* A newer SETUP supersedes even a request deferred behind a handler. */
+    have_pending_request = false;
+    /* A queued/running handler still owns handling_request and the shared
+     * buffer. Suppress its response; a later SETUP may replace it on return. */
+    if(ep0_state == EP0_HANDLING_TX_CONTROL || ep0_state == EP0_HANDLING_RX_CONTROL)
+        control_cancelled = true;
+    else
+        set_ep0_state(EP0_READY);
+}
+
 void usb_core_setup_received(struct usb_ctrlrequest* req) {
     if(bus_reset_pending) {
         logf("usb_core: bus resetting tick=%lu", current_tick);
         return;
     }
+    /* Drivers cancel abandoned EP0 transfers before delivering replacement
+     * SETUP. A handler may still own the request buffer; defer until it returns. */
     if(ep0_state != EP0_READY) {
         logf("usb_core: control pending tick=%lu", current_tick);
         pending_request = *req;
         have_pending_request = true;
         return;
     }
+    have_pending_request = false;
     handling_request = *req;
     process_setup_request(&handling_request);
 }
@@ -1338,13 +1356,27 @@ void usb_core_setup_received(struct usb_ctrlrequest* req) {
 void usb_core_control_response(enum usb_control_response response, const void* data, size_t size) {
     logf("usb_core: response ack=%d size=%u ep0_state=%d tick=%lu", response, size, ep0_state, current_tick);
 
+    int oldlevel = disable_irq_save();
+    if(bus_reset_pending) {
+        restore_irq(oldlevel);
+        return;
+    }
     if((ep0_state == EP0_HANDLING_TX_CONTROL || ep0_state == EP0_HANDLING_RX_CONTROL) && check_for_new_setup()) {
+        restore_irq(oldlevel);
+        return;
+    }
+
+    if(control_cancelled) {
+        control_cancelled = false;
+        set_ep0_state(EP0_READY);
+        restore_irq(oldlevel);
         return;
     }
 
     if(response == USB_CONTROL_STALL) {
         set_ep0_state(EP0_READY);
         usb_drv_stall(EP_CONTROL, true, true);
+        restore_irq(oldlevel);
         return;
     }
 
@@ -1381,6 +1413,7 @@ void usb_core_control_response(enum usb_control_response response, const void* d
         panicf("usb_core: invalid control response ep_state=%d", ep0_state);
         break;
     }
+    restore_irq(oldlevel);
 }
 
 void usb_core_notify_set_address(uint8_t addr)

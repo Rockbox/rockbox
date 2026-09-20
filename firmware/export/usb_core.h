@@ -55,6 +55,9 @@ struct usb_class_driver;
 
 void usb_core_init(void);
 void usb_core_exit(void);
+/* IRQ context, after both EP0 directions and their stale completions have
+ * been cancelled. Does not release a request buffer still owned by a handler. */
+void usb_core_control_cancelled(void);
 void usb_core_setup_received(struct usb_ctrlrequest* req);
 void usb_core_control_response(enum usb_control_response response, const void* data, size_t size);
 void usb_core_transfer_complete(int endpoint,int dir,int status,int length);

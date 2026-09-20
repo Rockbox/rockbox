@@ -1102,6 +1102,8 @@ static void setup_received(void)
         }
     }
 
+    usb_core_control_cancelled();
+
     struct usb_ctrlrequest *req = (struct usb_ctrlrequest*)tmp;
 
     /* A new setup packet supersedes any unfinished SET_ADDRESS request. */

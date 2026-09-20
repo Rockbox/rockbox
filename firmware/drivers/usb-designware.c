@@ -901,7 +901,11 @@ static void usb_dw_handle_setup_received(void)
 #endif
     struct usb_ctrlrequest req;
     memcpy(&req, ep0_buffer, sizeof(struct usb_ctrlrequest));
+    /* Abort both old data/status directions before delivering the new SETUP.
+     * Flush does not report completions, so notify the core explicitly once. */
     usb_dw_flush_endpoint(0, USB_DW_EPDIR_IN);
+    usb_dw_flush_endpoint(0, USB_DW_EPDIR_OUT);
+    usb_core_control_cancelled();
     usb_dw_ep0_recv();
 
     if(!handle_set_address(&req))
@@ -1004,6 +1008,9 @@ static void usb_dw_oepint(int ep)
         if (epints & STUP)
         {
             usb_dw_handle_setup_received();
+            /* SETUP cancelled the old transfer, including any XFRC captured
+             * in this interrupt snapshot. Do not complete the new request. */
+            return;
         }
 
         if (epints & XFRC)
