@@ -134,7 +134,7 @@ static const struct nand_chip_info nand_chip_table[] =
     { 0xA585D598, 2, 13, 8320, 128, 2048, 7744, false },
     { 0xA585D598, 4, 13, 8320, 128, 2048, 7744, false },
     { 0xBA94D598, 2, 12, 4096, 128, 4096, 3872, false },
-    { 0xBA94D598, 4,  1, 4096, 128, 4096, 3872, false },
+    { 0xBA94D598, 4,  1, 4096, 128, 4096, 3872, false },   /* checked */
     /* Intel */
     { 0xA5D5D589, 2,  4, 8192, 128, 2048, 7744, false },   /* checked */
     { 0xA5D5D589, 4,  2, 8192, 128, 2048, 7744, false },   /* checked */

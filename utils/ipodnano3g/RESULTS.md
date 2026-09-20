@@ -59,3 +59,8 @@ fault testing.
   oracle on two logical pages - confirmed against Apple's own disassembly
   (`_FTLRestore`, osos 1.1.3) to be that algorithm's own tie-break between
   two competing logs, not a defect (see the note in `ftltest/test_ftl.c`).
+- **BA94D598 x4, 2026-09-20.** A contributor's check archive matches the
+  row exactly (Toshiba, mode 1, vflspares 201 by our own formula). Clean
+  on both host tests: `test_ftl` agrees with the oracle on all 3,964,928
+  sectors; `test_crash` survives 100 power cuts (344 writes, 11 syncs, 0
+  sectors wrong). No on-device write test.

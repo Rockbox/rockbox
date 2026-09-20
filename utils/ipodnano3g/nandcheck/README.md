@@ -42,7 +42,7 @@ which is why the archives matter.
 | `A585D598` | Toshiba | 4GB | 2 | 2KiB | needed |
 | `A585D598` | Toshiba | 8GB | 4 | 2KiB | needed |
 | `BA94D598` | Toshiba | 4GB | 2 | 4KiB | needed |
-| `BA94D598` | Toshiba | 8GB | 4 | 4KiB | needed |
+| `BA94D598` | Toshiba | 8GB | 4 | 4KiB | checked |
 | `A5D5D589` | Intel | 4GB | 2 | 2KiB | checked |
 | `A5D5D589` | Intel | 8GB | 4 | 2KiB | checked |
 | `3E94D589` | Intel | 4GB | 2 | 4KiB | checked |
