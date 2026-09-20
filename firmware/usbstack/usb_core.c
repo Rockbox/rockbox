@@ -922,13 +922,18 @@ static int usb_core_do_set_config(uint8_t new_config)
     }
 
     if(require_exclusive) {
-        if(!usb_exclusive_storage()) {
-            usb_release_exclusive_storage();
-            usb_request_exclusive_storage();
-        }
-    } else {
+        /* Also preserve a pending handover across repeated SET_CONFIG.
+         * Restarting it discards acknowledgements and races the USB UI. */
+        usb_request_exclusive_storage();
+    } else if(!bus_reset_pending) {
         usb_release_exclusive_storage();
     }
+    /* A bus reset is not a physical disconnect. Keep the storage handover
+     * (and its acknowledgement epoch) until the host selects a new config
+     * or the cable is removed; remounting here races re-enumeration.
+     * If the host never sends SET_CONFIGURATION again, local storage stays
+     * unavailable until unplug. We expect reconfiguration promptly after a
+     * reset, but deliberately do not remount on a timer. */
     if(require_cpu_boost) {
         trigger_cpu_boost();
         thread_set_priority(thread_self(), PRIORITY_REALTIME);
@@ -936,6 +941,7 @@ static int usb_core_do_set_config(uint8_t new_config)
         thread_set_priority(thread_self(), PRIORITY_SYSTEM);
         cancel_cpu_boost();
     }
+
 
     #ifdef HAVE_USB_CHARGING_ENABLE
     usb_charging_maxcurrent_change(usb_charging_maxcurrent());

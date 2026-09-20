@@ -862,10 +862,17 @@ bool usb_exclusive_storage(void)
 
 void usb_request_exclusive_storage(void)
 {
+    if(exclusive_storage_requested)
+        return;
+
     exclusive_storage_requested = true;
     usb_broadcast_seqnum += 1;
     usb_num_acks_to_expect = queue_broadcast(SYS_USB_CONNECTED, usb_broadcast_seqnum) - 1;
     DEBUGF("usb: waiting for %d acks...\n", usb_num_acks_to_expect);
+    if(usb_num_acks_to_expect == 0 && usb_host_present) {
+        usb_slave_mode(true);
+        exclusive_storage_enabled = true;
+    }
 }
 
 void usb_release_exclusive_storage(void)
@@ -875,6 +882,7 @@ void usb_release_exclusive_storage(void)
         return;
     }
     exclusive_storage_requested = false;
+    usb_num_acks_to_expect = 0;
 
     if(exclusive_storage_enabled) {
         usb_slave_mode(false);
