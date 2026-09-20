@@ -133,6 +133,13 @@ target_compile_definitions(ipodpatcher-bin PRIVATE VERSION="none")
 set_target_properties(ipodpatcher-bin PROPERTIES OUTPUT_NAME ipodpatcher)
 if(APPLE)
     target_link_libraries(ipodpatcher-bin ${FRAMEWORK_IOKIT} ${FRAMEWORK_COREFOUNDATION})
+
+    add_custom_command(TARGET ipodpatcher-bin POST_BUILD
+        COMMAND codesign --force --options runtime
+                --sign "${CODESIGN_IDENTITY}"
+                "$<TARGET_FILE:ipodpatcher-bin>"
+        VERBATIM
+    )
 endif()
 
 add_library(ipodpatcher
@@ -163,6 +170,15 @@ add_executable(sansapatcher-bin
 target_link_libraries(sansapatcher-bin sansapatcher)
 target_compile_definitions(sansapatcher-bin PRIVATE VERSION="none")
 set_target_properties(sansapatcher-bin PROPERTIES OUTPUT_NAME sansapatcher)
+
+if(APPLE)
+    add_custom_command(TARGET sansapatcher-bin POST_BUILD
+        COMMAND codesign --force --options runtime
+                --sign "${CODESIGN_IDENTITY}"
+                "$<TARGET_FILE:sansapatcher-bin>"
+        VERBATIM
+    )
+endif()
 
 add_library(sansapatcher
     sansapatcher/parttypes.h

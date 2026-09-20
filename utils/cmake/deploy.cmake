@@ -153,7 +153,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
             COMMENT "Running macdeployqt and creating dmg ${deploy_TARGET}"
             COMMAND ${MACDEPLOYQT_EXECUTABLE} ${deploy_TARGET}.app
 
-            COMMAND codesign --force --deep --sign "${CODESIGN_IDENTITY}" ${deploy_TARGET}.app
+            COMMAND codesign --force --options runtime --deep --sign "${CODESIGN_IDENTITY}" ${deploy_TARGET}.app
 
             COMMAND ${DMGBUILD} -s ${deploy_DMGBUILDCFG}
                     -Dappbundle=${deploy_TARGET}.app
