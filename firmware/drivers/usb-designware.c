@@ -147,6 +147,17 @@ static uint32_t epmis_msk;
 static uint32_t ep_periodic_msk;
 #endif
 
+static bool address_status;
+static bool handle_set_address(struct usb_ctrlrequest *req);
+
+/* SET_ADDRESS status belongs to this driver, not the core EP0 machine. */
+static void complete_transfer(int ep, int dir, int status, int length)
+{
+    if(ep == EP_CONTROL && address_status)
+        return;
+    usb_core_transfer_complete(ep, dir, status, length);
+}
+
 static struct usb_dw_ep *usb_dw_get_ep(int epnum, enum usb_dw_epdir epdir)
 {
     return &usb_dw_ep_list[epnum][epdir];
@@ -794,7 +805,7 @@ static void usb_dw_abort_endpoint(int epnum, enum usb_dw_epdir epdir)
     if (dw_ep->busy)
     {
         usb_dw_flush_endpoint(epnum, epdir);
-        usb_core_transfer_complete(epnum, (epdir == USB_DW_EPDIR_OUT) ?
+        complete_transfer(epnum, (epdir == USB_DW_EPDIR_OUT) ?
                                         USB_DIR_OUT : USB_DIR_IN, -1, 0);
     }
 }
@@ -879,7 +890,7 @@ static void usb_dw_handle_xfer_complete(int epnum, enum usb_dw_epdir epdir)
     semaphore_release(&dw_ep->complete);
 
     int total_bytes = dw_ep->req_size - dw_ep->sizeleft;
-    usb_core_transfer_complete(epnum, (epdir == USB_DW_EPDIR_OUT) ?
+    complete_transfer(epnum, (epdir == USB_DW_EPDIR_OUT) ?
                 USB_DIR_OUT : USB_DIR_IN, dw_ep->status, total_bytes);
 }
 
@@ -893,12 +904,8 @@ static void usb_dw_handle_setup_received(void)
     usb_dw_flush_endpoint(0, USB_DW_EPDIR_IN);
     usb_dw_ep0_recv();
 
-    if ((req.bRequestType & USB_RECIP_MASK) == USB_RECIP_DEVICE &&
-        (req.bRequestType & USB_TYPE_MASK) == USB_TYPE_STANDARD &&
-        (req.bRequest == USB_REQ_SET_ADDRESS))
-        usb_dw_set_address(req.wValue);
-
-    usb_core_setup_received(&req);
+    if(!handle_set_address(&req))
+        usb_core_setup_received(&req);
 }
 
 #ifdef USB_DW_SHARED_FIFO
@@ -1103,6 +1110,7 @@ static void usb_dw_irq(void)
         DWC_GINTSTS = USBRST;
         usb_dw_set_address(0);
         usb_dw_reset_endpoints();
+        address_status = false;
         usb_core_bus_reset();
     }
 
@@ -1362,21 +1370,6 @@ void usb_drv_stall(int endpoint, bool stall, bool in)
     usb_dw_target_enable_irq();
 }
 
-void usb_drv_set_address(int address)
-{
-#if 1
-    /* Ignored intentionally, because the controller requires us to set the
-       new address before sending the response for some reason. So we'll
-       already set it when the control request arrives, before passing that
-       into the USB core, which will then call this dummy function. */
-    (void)address;
-#else
-    usb_dw_target_disable_irq();
-    usb_dw_set_address(address);
-    usb_dw_target_enable_irq();
-#endif
-}
-
 int usb_drv_port_speed(void)
 {
     return ((DWC_DSTS & 0x6) == 0);
@@ -1543,4 +1536,26 @@ int usb_drv_get_frame_number(void)
         return (DWC_DSTS >> 11) & 0x7FF;
     else
         return (DWC_DSTS >> 8) & 0x3FFF;
+}
+
+static bool handle_set_address(struct usb_ctrlrequest *req)
+{
+    address_status = false;
+    if(!usb_drv_is_set_address(req))
+        return false;
+
+    const uint8_t address = req->wValue & 0x7f;
+    address_status = true;
+    /* Already in the IRQ handler: avoid the public IRQ-mask wrappers. */
+    for(int ep = 1; ep < USB_NUM_ENDPOINTS; ep++)
+        for(int dir = 0; dir < USB_DW_NUM_DIRS; dir++)
+            if((usb_endpoints & (1 << (ep + USB_DW_DIR_OFF(dir)))) &&
+               usb_dw_get_ep(ep, dir)->active) {
+                usb_dw_abort_endpoint(ep, dir);
+                DWC_EPCTL(ep, dir) |= SETD0PIDEF;
+            }
+    usb_dw_set_address(address);
+    usb_dw_transfer(0, USB_DW_EPDIR_IN, NULL, 0);
+    usb_core_notify_set_address(address);
+    return true;
 }

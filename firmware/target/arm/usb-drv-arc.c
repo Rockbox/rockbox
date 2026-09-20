@@ -370,6 +370,17 @@ static void prepare_td(struct transfer_descriptor* td,
 static void bus_reset(void);
 static void init_control_queue_heads(void);
 /*-------------------------------------------------------------------------*/
+static bool address_status;
+static bool handle_set_address(struct usb_ctrlrequest *req);
+
+/* SET_ADDRESS status belongs to this driver, not the core EP0 machine. */
+static void complete_transfer(int ep, int dir, int status, int length)
+{
+    if(ep == EP_CONTROL && address_status)
+        return;
+    usb_core_transfer_complete(ep, dir, status, length);
+}
+
 static void usb_drv_stop(void)
 {
     /* disable interrupts */
@@ -558,6 +569,7 @@ void usb_drv_int(void)
     if (status & USBSTS_RESET) {
         REG_USBSTS = status;
         bus_reset();
+        address_status = false;
         usb_core_bus_reset();
         return;
     }
@@ -681,13 +693,6 @@ bool usb_drv_powered(void)
 {
     /* true = bus 4V4 ok */
     return (REG_OTGSC & OTGSC_A_VBUS_VALID) ? true : false;
-}
-
-void usb_drv_set_address(int address)
-{
-    /* SET_ADDRESS is captured when the setup packet arrives and applied
-     * after the EP0 IN status stage completes. */
-    (void)address;
 }
 
 void usb_drv_reset_endpoint(int endpoint, bool send)
@@ -1102,12 +1107,8 @@ static void setup_received(void)
     /* A new setup packet supersedes any unfinished SET_ADDRESS request. */
     pending_device_address = -1;
 
-    if ((req->bRequestType & (USB_TYPE_MASK | USB_RECIP_MASK)) ==
-            (USB_TYPE_STANDARD | USB_RECIP_DEVICE) &&
-        req->bRequest == USB_REQ_SET_ADDRESS)
-        pending_device_address = req->wValue;
-
-    usb_core_setup_received(req);
+    if(!handle_set_address(req))
+        usb_core_setup_received(req);
 }
 
 static void transfer_completed(void)
@@ -1145,6 +1146,7 @@ static void transfer_completed(void)
                     qh->status == 0 && length == 0) {
                     REG_DEVICEADDR =
                         pending_device_address << USBDEVICEADDRESS_BIT_POS;
+                    usb_core_notify_set_address(pending_device_address);
                     pending_device_address = -1;
                 }
 
@@ -1153,7 +1155,7 @@ static void transfer_completed(void)
                     semaphore_release(&transfer_completion_signal[pipe]);
                 }
 
-                usb_core_transfer_complete(ep, dir?USB_DIR_IN:USB_DIR_OUT,
+                complete_transfer(ep, dir?USB_DIR_IN:USB_DIR_OUT,
                         qh->status, length);
                 Lskip:
                 continue;
@@ -1208,4 +1210,20 @@ static void init_control_queue_heads(void)
     qh_array[EP_CONTROL].dtd.next_td_ptr = QH_NEXT_TERMINATE;
     qh_array[EP_CONTROL+1].max_pkt_length = 64 << QH_MAX_PKT_LEN_POS | QH_ZLT_SEL;
     qh_array[EP_CONTROL+1].dtd.next_td_ptr = QH_NEXT_TERMINATE;
+}
+
+static bool handle_set_address(struct usb_ctrlrequest *req)
+{
+    address_status = false;
+    if(!usb_drv_is_set_address(req))
+        return false;
+
+    const uint8_t address = req->wValue & 0x7f;
+    address_status = true;
+    /* Capture before sending; the completion IRQ writes DEVICEADDR and
+     * notifies the core after the successful zero-length status packet. */
+    pending_device_address = address;
+    usb_drv_cancel_all_transfers();
+    usb_drv_send_nonblocking(EP_CONTROL, NULL, 0);
+    return true;
 }

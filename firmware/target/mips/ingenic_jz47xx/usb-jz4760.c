@@ -115,6 +115,17 @@ struct usb_drv_ep_spec usb_drv_ep_specs[USB_NUM_ENDPOINTS] = {
 };
 uint8_t usb_drv_ep_specs_flags = 0;
 
+static bool address_status;
+static bool handle_set_address(struct usb_ctrlrequest *req);
+
+/* SET_ADDRESS status belongs to this driver, not the core EP0 machine. */
+static void complete_transfer(int ep, int dir, int status, int length)
+{
+    if(ep == EP_CONTROL && address_status)
+        return;
+    usb_core_transfer_complete(ep, dir, status, length);
+}
+
 static inline void select_endpoint(int ep)
 {
     REG_USB_INDEX = ep;
@@ -236,7 +247,7 @@ static void EP0_send(void)
     if (ep->sent >= ep->length) {
         REG_USB_CSR0 = (csr0 | USB_CSR0_INPKTRDY | USB_CSR0_DATAEND); /* Set data end! */
         if (!ep->wait) {
-            usb_core_transfer_complete(EP_CONTROL, USB_DIR_IN, 0, ep->sent);
+            complete_transfer(EP_CONTROL, USB_DIR_IN, 0, ep->sent);
 	}
         ep->rc = 0;
         ep_transfer_completed(ep);
@@ -277,11 +288,11 @@ static void EP0_handler(void)
         ep0_data_requested = false;
         if (ep_send->busy) {
             if (!ep_send->wait)
-                usb_core_transfer_complete(EP_CONTROL, USB_DIR_IN, -1, 0);
+                complete_transfer(EP_CONTROL, USB_DIR_IN, -1, 0);
             ep_transfer_completed(ep_send);
         }
         if (ep_recv->busy) {
-            usb_core_transfer_complete(EP_CONTROL, USB_DIR_OUT, -1, 0);
+            complete_transfer(EP_CONTROL, USB_DIR_OUT, -1, 0);
             ep_transfer_completed(ep_recv);
         }
     }
@@ -290,7 +301,7 @@ static void EP0_handler(void)
     if (csr0 & USB_CSR0_OUTPKTRDY) { /* There is a packet in the fifo */
         if (ep_send->busy) {
             if (!ep_send->wait) {
-                usb_core_transfer_complete(EP_CONTROL, USB_DIR_IN, -1, 0);
+                complete_transfer(EP_CONTROL, USB_DIR_IN, -1, 0);
             }
             ep_transfer_completed(ep_send);
         }
@@ -300,7 +311,7 @@ static void EP0_handler(void)
             ep_recv->received += size;
             if (size < ep_recv->fifo_size || ep_recv->received >= ep_recv->length) {
                 REG_USB_CSR0 = csr0 | USB_CSR0_SVDOUTPKTRDY | USB_CSR0_DATAEND; /* Set data end! */
-                usb_core_transfer_complete(EP_CONTROL, USB_DIR_OUT, 0, ep_recv->received);
+                complete_transfer(EP_CONTROL, USB_DIR_OUT, 0, ep_recv->received);
                 ep_transfer_completed(ep_recv);
             } else {
                 REG_USB_CSR0 = csr0 | USB_CSR0_SVDOUTPKTRDY; /* clear OUTPKTRDY bit */
@@ -319,7 +330,8 @@ static void EP0_handler(void)
         	ep0_data_supplied = true;
 	    }
             REG_USB_CSR0 = csr0;
-            usb_core_setup_received(&ep0_rx.request);
+            if(!handle_set_address(&ep0_rx.request))
+                usb_core_setup_received(&ep0_rx.request);
             ep_transfer_completed(ep_recv);
         }
     }
@@ -479,7 +491,7 @@ static void EPIN_complete(unsigned int endpoint)
 
     if (ep->sent >= ep->length) {
         if (!ep->wait)
-            usb_core_transfer_complete(endpoint, USB_DIR_IN, 0, ep->sent);
+            complete_transfer(endpoint, USB_DIR_IN, 0, ep->sent);
         ep->rc = 0;
         ep_transfer_completed(ep);
         logf("send complete");
@@ -577,7 +589,7 @@ static void EPOUT_handler(unsigned int endpoint)
             logf("received: %d max length: %d", ep->received, ep->length);
 
             if (size < ep->fifo_size || ep->received >= ep->length) {
-                usb_core_transfer_complete(endpoint, USB_DIR_OUT, 0, ep->received);
+                complete_transfer(endpoint, USB_DIR_OUT, 0, ep->received);
                 ep_transfer_completed(ep);
                 logf("receive transfer_complete");
             }
@@ -633,7 +645,7 @@ static void EPOUT_ready(unsigned int endpoint)
         /* It we're done, clean up */
         if (size < ep->fifo_size || ep->received >= ep->length) {
             ep->use_dma = -1;
-            usb_core_transfer_complete(endpoint, USB_DIR_OUT, 0, ep->received);
+            complete_transfer(endpoint, USB_DIR_OUT, 0, ep->received);
             ep_transfer_completed(ep);
             logf("DMA RX transfer_complete");
             return;
@@ -704,9 +716,9 @@ static void setup_endpoint(struct usb_endpoint *ep)
             if (ep->wait)
                 semaphore_release(&ep->complete);
             else
-                usb_core_transfer_complete(endpoint, USB_DIR_IN, -1, 0);
+                complete_transfer(endpoint, USB_DIR_IN, -1, 0);
         } else {
-             usb_core_transfer_complete(endpoint, USB_DIR_OUT, -1, 0);
+             complete_transfer(endpoint, USB_DIR_OUT, -1, 0);
         }
     }
 
@@ -796,7 +808,7 @@ static void udc_reset(void)
         if (endpoints[0].wait)
             semaphore_release(&endpoints[0].complete);
         else
-            usb_core_transfer_complete(EP_CONTROL, USB_DIR_IN, -1, 0);
+            complete_transfer(EP_CONTROL, USB_DIR_IN, -1, 0);
     }
 
     endpoints[0].busy = false;
@@ -806,7 +818,7 @@ static void udc_reset(void)
     endpoints[0].allocated = true;
 
     if (endpoints[1].busy)
-        usb_core_transfer_complete(EP_CONTROL, USB_DIR_OUT, -1, 0);
+        complete_transfer(EP_CONTROL, USB_DIR_OUT, -1, 0);
 
     endpoints[1].busy = false;
     endpoints[1].wait = false;
@@ -825,7 +837,8 @@ static void udc_reset(void)
     REG_USB_INTRINE  |= USB_INTR_EP(0);
     REG_USB_INTRUSBE |= USB_INTR_RESET;
 
-    usb_core_bus_reset();
+    address_status = false;
+        usb_core_bus_reset();
 }
 
 /* Interrupt handler */
@@ -1018,13 +1031,6 @@ void usb_drv_exit(void)
     REG_USB_POWER &= ~USB_POWER_SOFTCONN;
 }
 
-void usb_drv_set_address(int address)
-{
-    logf("%s(%d)", __func__, address);
-
-    REG_USB_FADDR = address;
-}
-
 static void usb_drv_send_internal(struct usb_endpoint* ep, void* ptr, int length, bool blocking)
 {
     int flags = disable_irq_save();
@@ -1171,11 +1177,11 @@ void usb_drv_cancel_all_transfers(void)
         if (endpoints[i].busy)
         {
             if (i & 1)
-                usb_core_transfer_complete(i >> 1, USB_DIR_OUT, -1, 0);
+                complete_transfer(i >> 1, USB_DIR_OUT, -1, 0);
             else if (endpoints[i].wait)
                 semaphore_release(&endpoints[i].complete);
             else
-                usb_core_transfer_complete(i >> 1, USB_DIR_IN, -1, 0);
+                complete_transfer(i >> 1, USB_DIR_IN, -1, 0);
         }
 
         if(i != 1) /* ep0 out needs special handling */
@@ -1216,4 +1222,19 @@ void usb_drv_ep_deinit(const struct usb_drv_ep_alloc_ctx* ctx, int ep)
         REG_USB_INTRINE &= ~USB_INTR_EP(num);
     else
         REG_USB_INTROUTE &= ~USB_INTR_EP(num);
+}
+
+static bool handle_set_address(struct usb_ctrlrequest *req)
+{
+    address_status = false;
+    if(!usb_drv_is_set_address(req))
+        return false;
+
+    const uint8_t address = req->wValue & 0x7f;
+    address_status = true;
+    usb_drv_cancel_all_transfers();
+    usb_drv_send_nonblocking(EP_CONTROL, NULL, 0);
+    REG_USB_FADDR = address;
+    usb_core_notify_set_address(address);
+    return true;
 }

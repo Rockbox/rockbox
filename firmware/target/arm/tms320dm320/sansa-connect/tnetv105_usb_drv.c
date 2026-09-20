@@ -37,6 +37,17 @@
 #ifdef SANSA_CONNECT
 #define SDRAM_SIZE 0x04000000
 
+static bool address_status;
+static bool handle_set_address(struct usb_ctrlrequest *req);
+
+/* SET_ADDRESS status belongs to this driver, not the core EP0 machine. */
+static void complete_transfer(int ep, int dir, int status, int length)
+{
+    if(ep == EP_CONTROL && address_status)
+        return;
+    usb_core_transfer_complete(ep, dir, status, length);
+}
+
 static void set_tnetv_reset(bool high)
 {
     if (high)
@@ -655,7 +666,7 @@ static void tnetv_gadget_req_nuke(int epn, bool in)
         tnetv_usb_reg_write(TNETV_USB_EPx_IN_CNT(epn), 0x80008000);
         if (ep->tx_remaining > 0)
         {
-            usb_core_transfer_complete(epn, USB_DIR_IN, -1, 0);
+            complete_transfer(epn, USB_DIR_IN, -1, 0);
         }
         ep->tx_buf = NULL;
         ep->tx_remaining = 0;
@@ -674,7 +685,7 @@ static void tnetv_gadget_req_nuke(int epn, bool in)
         tnetv_usb_reg_write(TNETV_USB_EPx_OUT_CNT(epn), 0x80008000);
         if (ep->rx_remaining > 0)
         {
-            usb_core_transfer_complete(epn, USB_DIR_OUT, -1, 0);
+            complete_transfer(epn, USB_DIR_OUT, -1, 0);
         }
         ep->rx_buf = NULL;
         ep->rx_remaining = 0;
@@ -865,7 +876,7 @@ static void in_interrupt(int epn)
 
     if (ep->tx_remaining <= 0)
     {
-        usb_core_transfer_complete(epn, USB_DIR_IN, 0, ep->tx_size);
+        complete_transfer(epn, USB_DIR_IN, 0, ep->tx_size);
         /* release semaphore for blocking transfer */
         if (ep->block)
         {
@@ -925,7 +936,7 @@ static void out_interrupt(int epn)
         is_short = rcv_len && (rcv_len < ep->max_packet_size);
         if (is_short || (ep->rx_remaining == 0))
         {
-            usb_core_transfer_complete(epn, USB_DIR_OUT, 0, ep->rx_size - ep->rx_remaining);
+            complete_transfer(epn, USB_DIR_OUT, 0, ep->rx_size - ep->rx_remaining);
             ep->rx_remaining = 0;
             ep->rx_size = 0;
             ep->rx_buf = 0;
@@ -955,7 +966,7 @@ static void out_interrupt(int epn)
          */
         if ((ret == 0) && (ep->rx_remaining != ep->rx_size))
         {
-            usb_core_transfer_complete(epn, USB_DIR_OUT, 0, ep->rx_size - ep->rx_remaining);
+            complete_transfer(epn, USB_DIR_OUT, 0, ep->rx_size - ep->rx_remaining);
             ep->rx_remaining = 0;
             ep->rx_size = 0;
             ep->rx_buf = 0;
@@ -1072,7 +1083,8 @@ void VLYNQ(void)
             tnetv_usb_reg_write(TNETV_USB_STATUS, sysIntClear.val);
 
             tnetv_udc_handle_reset();
-            usb_core_bus_reset();
+            address_status = false;
+        usb_core_bus_reset();
         }
 
         if (sysIntrStatus.f.suspend)
@@ -1161,18 +1173,9 @@ void VLYNQ(void)
             sysIntClear.f.setup = 1;
             tnetv_usb_reg_write(TNETV_USB_STATUS, sysIntClear.val);
 
-            if (((setup.bRequestType & USB_RECIP_MASK) == USB_RECIP_DEVICE) &&
-                (setup.bRequest == USB_REQ_SET_ADDRESS))
+            if (usb_drv_is_set_address(&setup))
             {
-                /* Rockbox USB core works according to USB specification, i.e.
-                 * it first acknowledges the control transfer and then sets
-                 * the address. However, Linux TNETV105 driver first sets the
-                 * address and then acknowledges the transfer. At first,
-                 * it seemed that Linux driver was wrong, but it seems that
-                 * TNETV105 simply requires such order. It might be documented
-                 * in the datasheet and thus there is no comment in the Linux
-                 * driver about this.
-                 */
+                /* Defer endpoint cancellation until the driver handles the address. */
                 setup_is_set_address = true;
             }
             else
@@ -1181,7 +1184,8 @@ void VLYNQ(void)
             }
 
             /* Process control packet */
-            usb_core_setup_received(&setup);
+            if(!handle_set_address(&setup))
+                usb_core_setup_received(&setup);
         }
 
         if (sysIntrStatus.f.ep0_in_ack)
@@ -1363,7 +1367,7 @@ int usb_drv_send(int endpoint, void* ptr, int length)
     {
         if (setup_is_set_address)
         {
-            /* usb_drv_set_address() will call us later */
+            /* The driver control-request handler will send the status. */
             return 0;
         }
         /* HACK: Do not wait for status stage ZLP
@@ -1395,19 +1399,6 @@ int usb_drv_recv_nonblocking(int endpoint, void* ptr, int length)
     restore_irq(flags);
 
     return 0;
-}
-
-void usb_drv_set_address(int address)
-{
-    UsbCtrlType usbCtrl;
-    usbCtrl.val = tnetv_usb_reg_read(TNETV_USB_CTRL);
-    usbCtrl.f.func_addr = address;
-    tnetv_usb_reg_write(TNETV_USB_CTRL, usbCtrl.val);
-
-    /* This seems to be the only working order */
-    setup_is_set_address = false;
-    usb_drv_send(EP_CONTROL, NULL, 0);
-    usb_drv_cancel_all_transfers();
 }
 
 /* return port speed FS=0, HS=1 */
@@ -1505,4 +1496,23 @@ void usb_drv_ep_deinit(const struct usb_drv_ep_alloc_ctx* ctx, int ep)
     int num = EP_NUM(ep);
     int dir = EP_DIR(ep);
     tnetv_gadget_ep_disable(num, dir == DIR_IN);
+}
+
+static bool handle_set_address(struct usb_ctrlrequest *req)
+{
+    address_status = false;
+    if(!usb_drv_is_set_address(req))
+        return false;
+
+    const uint8_t address = req->wValue & 0x7f;
+    address_status = true;
+    UsbCtrlType usbCtrl;
+    usbCtrl.val = tnetv_usb_reg_read(TNETV_USB_CTRL);
+    usbCtrl.f.func_addr = address;
+    tnetv_usb_reg_write(TNETV_USB_CTRL, usbCtrl.val);
+    setup_is_set_address = false;
+    usb_drv_cancel_all_transfers();
+    usb_drv_send_nonblocking(EP_CONTROL, NULL, 0);
+    usb_core_notify_set_address(address);
+    return true;
 }

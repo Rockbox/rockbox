@@ -93,6 +93,17 @@ static volatile unsigned short * pipe_ctrl_addr(int pipe) {
     }
 }
 
+static bool address_status;
+static bool handle_set_address(struct usb_ctrlrequest *req);
+
+/* SET_ADDRESS status belongs to this driver, not the core EP0 machine. */
+static void complete_transfer(int ep, int dir, int status, int length)
+{
+    if(ep == EP_CONTROL && address_status)
+        return;
+    usb_core_transfer_complete(ep, dir, status, length);
+}
+
 static void pipe_init(int pipe) {
     volatile unsigned short *pipe_cfg;
     pipe_cfg = pipe_ctrl_addr(pipe);
@@ -209,7 +220,8 @@ static void control_received(void) {
     /* acknowledge packet recieved (clear valid) */
     M66591_INTSTAT_MAIN &= ~(1<<3);
 
-    usb_core_setup_received(&temp);
+    if(!handle_set_address(&temp))
+        usb_core_setup_received(&temp);
 }
 
 /* This is a helper function, it is used to notife the stack that a transfer is
@@ -219,7 +231,7 @@ static void transfer_complete(int endpoint) {
     M66591_INTCFG_EMP &= ~(1 << endpoint);
     logf("mxx: ep %d transfer complete", endpoint);
     int temp=M66591_eps[endpoint].dir ? USB_DIR_IN : USB_DIR_OUT;
-    usb_core_transfer_complete(endpoint, temp, 0,
+    complete_transfer(endpoint, temp, 0,
         M66591_eps[endpoint].count);
 }
 
@@ -626,9 +638,7 @@ void USB_DEVICE(void) {
  ******************************************************************************/
 
 /* The M55691 handles this automatically, nothing to do */
-void usb_drv_set_address(int address) {
-    (void) address;
-}
+
 
 /* This function sets the standard test modes, it is not required, but might as
  *  well implement it since the hardware supports it
@@ -934,4 +944,18 @@ void usb_drv_cancel_all_transfers(void)
     }
 
     restore_irq(flags);
+}
+
+static bool handle_set_address(struct usb_ctrlrequest *req)
+{
+    address_status = false;
+    if(!usb_drv_is_set_address(req))
+        return false;
+
+    const uint8_t address = req->wValue & 0x7f;
+    address_status = true;
+    usb_drv_cancel_all_transfers();
+    usb_drv_send_nonblocking(EP_CONTROL, NULL, 0);
+    usb_core_notify_set_address(address);
+    return true;
 }

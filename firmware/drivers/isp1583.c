@@ -66,6 +66,17 @@ static struct usb_endpoint endpoints[USB_NUM_ENDPOINTS];
 
 static bool high_speed_mode = false;
 
+static bool address_status;
+static bool handle_set_address(struct usb_ctrlrequest *req);
+
+/* SET_ADDRESS status belongs to this driver, not the core EP0 machine. */
+static void complete_transfer(int ep, int dir, int status, int length)
+{
+    if(ep == EP_CONTROL && address_status)
+        return;
+    usb_core_transfer_complete(ep, dir, status, length);
+}
+
 static inline void or_int_value(volatile unsigned short *a, volatile unsigned short *b, unsigned long r, unsigned long value)
 {
     set_int_value(*a, *b, (r | value));
@@ -342,7 +353,8 @@ static void usb_handle_setup_rx(void)
     if (len == 8)
     {
         ISP1583_DFLOW_CTRLFUN |= DFLOW_CTRLFUN_STATUS; /* Acknowledge packet */
-        usb_core_setup_received((struct usb_ctrlrequest*)setup_pkt_buf);
+        if(!handle_set_address((struct usb_ctrlrequest*)setup_pkt_buf))
+            usb_core_setup_received((struct usb_ctrlrequest*)setup_pkt_buf);
     }
     else
     {
@@ -529,7 +541,7 @@ static void out_callback(int ep, unsigned char *buf, int len)
     (void)buf;
     logf("out_callback(%d, 0x%x, %d)", ep, (int)buf, len);
     usb_status_ack(ep, DIR_RX);
-    usb_core_transfer_complete(ep, true, 0, len); /* 0=>status succeeded, haven't worked out status failed yet... */
+    complete_transfer(ep, true, 0, len); /* 0=>status succeeded, haven't worked out status failed yet... */
 }
 
 static void in_callback(int ep, unsigned char *buf, int len)
@@ -537,7 +549,7 @@ static void in_callback(int ep, unsigned char *buf, int len)
     (void)buf;
     logf("in_callback(%d, 0x%x, %d)", ep, (int)buf, len);
     usb_status_ack(ep, DIR_TX);
-    usb_core_transfer_complete(ep, false, 0, len);
+    complete_transfer(ep, false, 0, len);
 }
 
 int usb_drv_recv_nonblocking(int ep, void* ptr, int length)
@@ -679,6 +691,7 @@ void IRAM_ATTR usb_drv_int(void)
         logf("BRESET");
         high_speed_mode = false;
         bus_reset();
+        address_status = false;
         usb_core_bus_reset();
         /* Mask bus reset interrupt */
         set_int_value(ISP1583_GEN_INT_A, ISP1583_GEN_INT_B, INT_IEBRST);
@@ -732,14 +745,6 @@ void IRAM_ATTR usb_drv_int(void)
     }
     /* Mask all (enabled) interrupts */
     set_int_value(ISP1583_GEN_INT_A, ISP1583_GEN_INT_B, ints);
-
-    ZVM_SPECIFIC;
-}
-
-void usb_drv_set_address(int address)
-{
-    logf("usb_drv_set_address(0x%x)", address);
-    ISP1583_INIT_ADDRESS = (address & 0x7F) | INIT_ADDRESS_DEVEN;
 
     ZVM_SPECIFIC;
 }
@@ -819,3 +824,19 @@ const char* dbg_usb_item(int selected_item, void *data,
     (void)data;
 }
 #endif
+
+static bool handle_set_address(struct usb_ctrlrequest *req)
+{
+    address_status = false;
+    if(!usb_drv_is_set_address(req))
+        return false;
+
+    const uint8_t address = req->wValue & 0x7f;
+    address_status = true;
+    usb_drv_cancel_all_transfers();
+    usb_drv_send_nonblocking(EP_CONTROL, NULL, 0);
+    ISP1583_INIT_ADDRESS = address | INIT_ADDRESS_DEVEN;
+    ZVM_SPECIFIC;
+    usb_core_notify_set_address(address);
+    return true;
+}

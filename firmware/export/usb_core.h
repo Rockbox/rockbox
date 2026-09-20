@@ -67,7 +67,8 @@ void usb_core_handle_transfer_completion(
 #endif
 void usb_core_handle_notify(long id, intptr_t data);
 /* For controllers which handle SET ADDR and/or SET CONFIG in hardware */
-void usb_core_notify_set_address(uint8_t addr);
+/* Address state only; hardware programming and status timing belong to drivers. */
+void usb_core_notify_set_address(uint8_t addr); /* IRQ-safe notification */
 void usb_core_notify_set_config(uint8_t config);
 
 #ifdef HAVE_HOTSWAP

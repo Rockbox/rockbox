@@ -108,6 +108,17 @@ static volatile bool set_configuration = false;
 
 #undef ENDPOINT
 
+static bool address_status;
+static bool handle_set_address(struct usb_ctrlrequest *req);
+
+/* SET_ADDRESS status belongs to this driver, not the core EP0 machine. */
+static void complete_transfer(int ep, int dir, int status, int length)
+{
+    if(ep == EP_CONTROL && address_status)
+        return;
+    usb_core_transfer_complete(ep, dir, status, length);
+}
+
 static void setup_received(void)
 {
     static uint32_t setup_data[2];
@@ -118,7 +129,8 @@ static void setup_received(void)
     setup_data[1] = SETUP2;
 
     /* pass setup data to the upper layer */
-    usb_core_setup_received((struct usb_ctrlrequest*)setup_data);
+    if(!handle_set_address((struct usb_ctrlrequest*)setup_data))
+        usb_core_setup_received((struct usb_ctrlrequest*)setup_data);
 }
 
 static int max_pkt_size(struct endpoint_t *endp)
@@ -185,7 +197,7 @@ static void in_intr(struct endpoint_t *endp)
         /* finished ? */
         if(endp->cnt <= 0)
         {
-            usb_core_transfer_complete(endp->ep_num, endp->dir, 0, endp->len);
+            complete_transfer(endp->ep_num, endp->dir, 0, endp->len);
             /* release semaphore for blocking transfer */
             if(endp->block)
                 semaphore_release(&endp->complete);
@@ -214,7 +226,7 @@ static void out_intr(struct endpoint_t *endp)
         logf("udc: ack(%d) -> %d/%d", endp->ep_num, xfer_size, endp->cnt);
         /* finished ? */
         if(endp->cnt <= 0 || xfer_size < max_pkt_size(endp))
-            usb_core_transfer_complete(endp->ep_num, endp->dir, 0, endp->len);
+            complete_transfer(endp->ep_num, endp->dir, 0, endp->len);
         else
             ep_read(endp);
     }
@@ -304,18 +316,6 @@ void usb_drv_ep_deinit(const struct usb_drv_ep_alloc_ctx* ctx, int ep)
 
     /* disable interrupt from this endpoint */
     EN_INT &= ~(1 << (num + 7));
-}
-
-/* Set the address (usually it's in a register).
- * There is a problem here: some controller want the address to be set between
- * control out and ack and some want to wait for the end of the transaction.
- * In the first case, you need to write some code special code when getting
- * setup packets and ignore this function (have a look at other drives)
- */
-void usb_drv_set_address(int address)
-{
-    (void)address;
-    /* UDC seems to set this automaticaly */
 }
 
 static int _usb_drv_send(int endpoint, void *ptr, int length, bool block)
@@ -540,4 +540,18 @@ void INT_UDC(void)
         else
             out_intr(endp);
     }
+}
+
+static bool handle_set_address(struct usb_ctrlrequest *req)
+{
+    address_status = false;
+    if(!usb_drv_is_set_address(req))
+        return false;
+
+    const uint8_t address = req->wValue & 0x7f;
+    address_status = true;
+    usb_drv_cancel_all_transfers();
+    usb_drv_send_nonblocking(EP_CONTROL, NULL, 0);
+    usb_core_notify_set_address(address);
+    return true;
 }

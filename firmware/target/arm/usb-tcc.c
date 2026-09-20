@@ -99,6 +99,17 @@ static struct tcc_ep tcc_endpoints[] = {
 static bool usb_drv_write_ep(struct tcc_ep *ep);
 static void usb_set_speed(int);
 
+static bool address_status;
+static bool handle_set_address(struct usb_ctrlrequest *req);
+
+/* SET_ADDRESS status belongs to this driver, not the core EP0 machine. */
+static void complete_transfer(int ep, int dir, int status, int length)
+{
+    if(ep == EP_CONTROL && address_status)
+        return;
+    usb_core_transfer_complete(ep, dir, status, length);
+}
+
 void usb_drv_ep_init(const struct usb_drv_ep_alloc_ctx* ctx, int ep)
 {
     /* FIXME: support max packet size override */
@@ -228,7 +239,8 @@ void handle_control(void)
         DEBUG(2, "req: %02x %02d", req->bRequestType, req->bRequest);
     }
 
-    usb_core_setup_received(req);
+    if(!handle_set_address(req))
+        usb_core_setup_received(req);
 }
 
 static
@@ -280,7 +292,7 @@ void handle_ep_in(struct tcc_ep *tcc_ep, uint16_t stat)
 
     TCC7xx_USB_EP_CTRL |= TCC7xx_USB_EP_CTRL_OUTHD;
 
-    usb_core_transfer_complete(tcc_ep->id, USB_DIR_OUT, 0, count);
+    complete_transfer(tcc_ep->id, USB_DIR_OUT, 0, count);
 }
 
 static
@@ -306,7 +318,7 @@ void handle_ep_out(struct tcc_ep *tcc_ep, uint16_t stat)
         TCC7xx_USB_EPIE &= ~tcc_ep->mask;
         global_ep_irq_mask &= ~tcc_ep->mask;
 
-//        usb_core_transfer_complete(tcc_ep->id, USB_DIR_IN, 0, tcc_ep->count);
+//        complete_transfer(tcc_ep->id, USB_DIR_IN, 0, tcc_ep->count);
     }
 }
 
@@ -408,7 +420,8 @@ static void usb_reset(void)
     global_ep_irq_mask = 0x1;
     TCC7xx_USB_EPIE = global_ep_irq_mask;
 
-    usb_core_bus_reset();
+    address_status = false;
+        usb_core_bus_reset();
 }
 
 /* IRQ handler */
@@ -462,12 +475,6 @@ void USB_DEVICE(void)
     TCC7xx_USB_INDEX = index_save;
 }
 
-void usb_drv_set_address(int address)
-{
-    (void) address;
-    DEBUG(2, "setting address %d %d", address, TCC7xx_USB_FUNC);
-}
-
 int usb_drv_port_speed(void)
 {
     return (TCC7xx_USB_SYS_STAT & 0x10) ? 1 : 0;
@@ -504,7 +511,7 @@ static bool usb_drv_write_ep(struct tcc_ep *ep)
     ep->max_len -= count;
 
     if (ep->max_len == 0) {
-        usb_core_transfer_complete(ep->id, USB_DIR_IN, 0, ep->count);
+        complete_transfer(ep->id, USB_DIR_IN, 0, ep->count);
         ep->buf = NULL;
 //        return true;
     }
@@ -632,7 +639,7 @@ void usb_drv_cancel_all_transfers(void)
     flags = disable_irq_save();
     for (endpoint = 0; endpoint < 4; endpoint++) {
         if (tcc_endpoints[endpoint].buf) {
-/*            usb_core_transfer_complete(tcc_endpoints[endpoint].id,
+/*            complete_transfer(tcc_endpoints[endpoint].id,
                                         tcc_endpoints[endpoint].dir, -1, 0); */
             tcc_endpoints[endpoint].buf = NULL;
         }
@@ -755,6 +762,20 @@ void usb_test(void)
     }
 }
 #endif
+static bool handle_set_address(struct usb_ctrlrequest *req)
+{
+    address_status = false;
+    if(!usb_drv_is_set_address(req))
+        return false;
+
+    const uint8_t address = req->wValue & 0x7f;
+    address_status = true;
+    usb_drv_cancel_all_transfers();
+    usb_drv_send_nonblocking(EP_CONTROL, NULL, 0);
+    usb_core_notify_set_address(address);
+    return true;
+}
+
 #else
 void usb_init_device(void)
 {

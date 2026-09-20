@@ -58,7 +58,19 @@ static struct usb_dev_dma_desc dmadescs[USB_NUM_EPS][2] __attribute__((aligned(3
 /* reuse unused EP2 OUT descriptor here */
 static struct usb_dev_setup_buf *setup_desc = (void*)&dmadescs[2][1];
 
+static bool address_status;
+static bool handle_set_address(struct usb_ctrlrequest *req);
+
+/* SET_ADDRESS status belongs to this driver, not the core EP0 machine. */
+static void complete_transfer(int ep, int dir, int status, int length)
+{
+    if(ep == EP_CONTROL && address_status)
+        return;
+    usb_core_transfer_complete(ep, dir, status, length);
+}
+
 #if AS3525_MCLK_SEL != AS3525_CLK_PLLB
+
 static inline void usb_enable_pll(void)
 {
     CGU_COUNTB = CGU_LOCK_CNT;
@@ -181,7 +193,7 @@ static void reset_endpoints(int init)
                     endpoints[i][0].rc = -1;
                     semaphore_release(&endpoints[i][0].complete);
                 } else {
-                    usb_core_transfer_complete(i, USB_DIR_IN, -1, 0);
+                    complete_transfer(i, USB_DIR_IN, -1, 0);
                 }
             }
             endpoints[i][0].state = 0;
@@ -189,7 +201,7 @@ static void reset_endpoints(int init)
 
             if (i != 2) { /* Skip the OUT EP0 alias */
                 if (endpoints[i][1].state & EP_STATE_BUSY)
-                    usb_core_transfer_complete(i, USB_DIR_OUT, -1, 0);
+                    complete_transfer(i, USB_DIR_OUT, -1, 0);
                 endpoints[i][1].state = 0;
                 semaphore_wait(&endpoints[i][1].complete, TIMEOUT_NOBLOCK);
                 USB_OEP_SUP_PTR(i)    = 0;
@@ -555,7 +567,7 @@ static void handle_in_ep(int ep)
              endpoints[ep][0].uc_desc->status);
         if (endpoints[ep][0].state & EP_STATE_ASYNC) {
             endpoints[ep][0].state &= ~EP_STATE_ASYNC;
-            usb_core_transfer_complete(ep, USB_DIR_IN, 0, endpoints[ep][0].len);
+            complete_transfer(ep, USB_DIR_IN, 0, endpoints[ep][0].len);
         } else {
             semaphore_release(&endpoints[ep][0].complete);
         }
@@ -606,7 +618,7 @@ static void handle_out_ep(int ep)
         if (endpoints[ep][1].state & EP_STATE_BUSY) {
             endpoints[ep][1].state &= ~EP_STATE_BUSY;
             endpoints[ep][1].rc = 0;
-            usb_core_transfer_complete(ep, USB_DIR_OUT, 0, dma_len);
+            complete_transfer(ep, USB_DIR_OUT, 0, dma_len);
         } else {
             logf("EP%d OUT, but no one was listening?\n", ep);
         }
@@ -628,7 +640,8 @@ static void handle_out_ep(int ep)
              req->wIndex,
              req->wLength);
 
-        usb_core_setup_received(&req_copy);
+        if(!handle_set_address(&req_copy))
+            usb_core_setup_received(&req_copy);
         setup_desc_init(setup_desc);
 
         ep_sts &= ~USB_EP_STAT_SETUP_RCVD;
@@ -733,7 +746,8 @@ void INT_USB_FUNC(void)
             got_set_configuration = 1;
 
             set_config.wValue = USB_DEV_STS & USB_DEV_STS_MASK_CFG;
-            usb_core_setup_received(&set_config);
+            if(!handle_set_address(&set_config))
+                usb_core_setup_received(&set_config);
             intr &= ~USB_DEV_INTR_SET_CONFIG;
         }
         if (intr & USB_DEV_INTR_EARLY_SUSPEND) {/* idle >3ms detected */
@@ -743,7 +757,8 @@ void INT_USB_FUNC(void)
         if (intr & USB_DEV_INTR_USB_RESET) {/* usb reset from host? */
             logf("usb reset\n");
             reset_endpoints(1);
-            usb_core_bus_reset();
+            address_status = false;
+        usb_core_bus_reset();
             intr &= ~USB_DEV_INTR_USB_RESET;
         }
         if (intr & USB_DEV_INTR_USB_SUSPEND) {/* suspend req from host? */
@@ -791,10 +806,7 @@ void usb_drv_set_test_mode(int mode)
 }
 
 /* handled internally by controller */
-void usb_drv_set_address(int address)
-{
-    (void)address;
-}
+
 
 void usb_drv_stall(int ep, bool stall, bool in)
 {
@@ -805,4 +817,18 @@ void usb_drv_stall(int ep, bool stall, bool in)
 bool usb_drv_stalled(int ep, bool in)
 {
     return USB_EP_CTRL(ep, in) & USB_EP_CTRL_STALL;
+}
+
+static bool handle_set_address(struct usb_ctrlrequest *req)
+{
+    address_status = false;
+    if(!usb_drv_is_set_address(req))
+        return false;
+
+    const uint8_t address = req->wValue & 0x7f;
+    address_status = true;
+    usb_drv_cancel_all_transfers();
+    usb_drv_send_nonblocking(EP_CONTROL, NULL, 0);
+    usb_core_notify_set_address(address);
+    return true;
 }

@@ -105,7 +105,12 @@ int usb_drv_send(int endpoint, void* ptr, int length);
 int usb_drv_send_nonblocking(int endpoint, void* ptr, int length);
 int usb_drv_recv_blocking(int endpoint, void* ptr, int length);
 int usb_drv_recv_nonblocking(int endpoint, void* ptr, int length);
-void usb_drv_set_address(int address);
+/* SET_ADDRESS is owned by the driver, including its status stage. */
+static inline bool usb_drv_is_set_address(const struct usb_ctrlrequest *req)
+{
+    return req->bRequestType == (USB_TYPE_STANDARD | USB_RECIP_DEVICE) &&
+           req->bRequest == USB_REQ_SET_ADDRESS;
+}
 void usb_drv_reset_endpoint(int endpoint, bool send);
 bool usb_drv_powered(void);
 int usb_drv_port_speed(void);
