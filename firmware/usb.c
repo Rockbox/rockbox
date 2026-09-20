@@ -504,6 +504,9 @@ static void NORETURN_ATTR usb_thread(void)
             if(usb_host_present && exclusive_storage_requested) {
                 usb_slave_mode(true);
                 exclusive_storage_enabled = true;
+#ifdef USB_ENABLE_STORAGE
+                usb_signal_class_notify(USB_DRIVER_MASS_STORAGE, 0);
+#endif
             }
             break;
             /* SYS_USB_CONNECTED_ACK */
@@ -872,6 +875,9 @@ void usb_request_exclusive_storage(void)
     if(usb_num_acks_to_expect == 0 && usb_host_present) {
         usb_slave_mode(true);
         exclusive_storage_enabled = true;
+#ifdef USB_ENABLE_STORAGE
+        usb_signal_class_notify(USB_DRIVER_MASS_STORAGE, 0);
+#endif
     }
 }
 

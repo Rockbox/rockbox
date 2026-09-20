@@ -351,6 +351,7 @@ static unsigned char* ramdisk_buffer;
 
 static enum {
     WAITING_FOR_COMMAND,
+    WAITING_FOR_STORAGE,
     SENDING_BLOCKS,
     SENDING_RESULT,
     SENDING_FAILED_RESULT,
@@ -520,6 +521,9 @@ static void usb_storage_transfer_complete(int ep,int dir,int status,int length)
     account_data_transfer(dir, status, length);
 
     switch(state) {
+        case WAITING_FOR_STORAGE:
+            /* The CBW is retained until usb_storage_notify_event(). */
+            break;
         case RECEIVING_BLOCKS:
             if(dir==USB_DIR_IN) {
                 logf("IN received in RECEIVING");
@@ -734,6 +738,11 @@ static bool usb_storage_control_request(struct usb_ctrlrequest* req, uint8_t* re
 
         case USB_BULK_RESET_REQUEST:
             logf("ums: bulk reset");
+            if(state == WAITING_FOR_STORAGE) {
+                /* Discard the retained CBW on host reset and accept a new
+                 * one; do not replay the cancelled command when ready. */
+                usb_drv_recv_nonblocking(EP_OUT, cbw_buffer, MAX_CBW_SIZE);
+            }
             state = WAITING_FOR_COMMAND;
             /* UMS BOT 3.1 says The device shall preserve the value of its bulk
                data toggle bits and endpoint STALL conditions despite
@@ -786,7 +795,7 @@ static void send_and_read_next(void)
 }
 /****************************************************************************/
 
-static void handle_scsi(struct command_block_wrapper* cbw)
+static void handle_scsi_ready(struct command_block_wrapper* cbw)
 {
     struct storage_info info;
     unsigned int length = cbw->data_transfer_length;
@@ -841,13 +850,6 @@ static void handle_scsi(struct command_block_wrapper* cbw)
     switch (cbw->command_block[0]) {
         case SCSI_TEST_UNIT_READY:
             logf("scsi test_unit_ready %d",lun);
-            if(!usb_exclusive_storage()) {
-                send_csw(UMS_STATUS_FAIL);
-                cur_sense_data.sense_key=SENSE_NOT_READY;
-                cur_sense_data.asc=ASC_MEDIUM_NOT_PRESENT;
-                cur_sense_data.ascq=0;
-                break;
-            }
             if(lun_present) {
                 send_csw(UMS_STATUS_GOOD);
             }
@@ -1424,6 +1426,27 @@ static void handle_scsi(struct command_block_wrapper* cbw)
     }
 }
 
+/* SET_CONFIGURATION now precedes the storage handover. Keep the first
+ * CBW pending until all Rockbox clients have acknowledged/unmounted. This
+ * avoids falsely reporting an absent disk to a fast host and, importantly,
+ * prevents READ/WRITE commands from racing Rockbox filesystem users. The
+ * OUT endpoint is not rearmed until this CBW has received its CSW. */
+static void handle_scsi(struct command_block_wrapper* cbw)
+{
+    if(!usb_exclusive_storage()) {
+        state = WAITING_FOR_STORAGE;
+        return;
+    }
+    handle_scsi_ready(cbw);
+}
+
+static void usb_storage_notify_event(intptr_t data)
+{
+    (void)data;
+    if(state == WAITING_FOR_STORAGE && usb_exclusive_storage())
+        handle_scsi((struct command_block_wrapper*)cbw_buffer);
+}
+
 /* Count data only, never the CBW or CSW. A short result must report the
  * untransferred bytes instead of claiming that the whole request succeeded. */
 static void account_data_transfer(int dir, int status, int length)
@@ -1554,6 +1577,7 @@ struct usb_class_driver usb_cdrv_storage = {
     .disconnect = usb_storage_disconnect,
     .transfer_complete = usb_storage_transfer_complete,
     .control_request = usb_storage_control_request,
+    .notify_event = usb_storage_notify_event,
 #ifdef HAVE_HOTSWAP
     .notify_hotswap = usb_storage_notify_hotswap,
 #endif
