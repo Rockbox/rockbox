@@ -362,7 +362,7 @@ static const unsigned int pipe2mask[USB_NUM_ENDPOINTS*2] = {
 
 /*-------------------------------------------------------------------------*/
 static void transfer_completed(void);
-static void control_received(void);
+static void setup_received(void);
 static void sof_received(void);
 static int prime_transfer(int ep_num, void* ptr, int len, bool send, bool wait);
 static void prepare_td(struct transfer_descriptor* td,
@@ -575,7 +575,7 @@ void usb_drv_int(void)
 
         /* a control packet? */
         if (REG_ENDPTSETUPSTAT & EPSETUP_STATUS_EP0) {
-            control_received();
+            setup_received();
         }
 
         if (REG_ENDPTCOMPLETE)
@@ -1070,7 +1070,7 @@ static void prepare_td(struct transfer_descriptor* td,
     }
 }
 
-static void control_received(void)
+static void setup_received(void)
 {
     int i;
     /* copy setup data from packet */
@@ -1080,6 +1080,13 @@ static void control_received(void)
 
     /* acknowledge packet recieved */
     REG_ENDPTSETUPSTAT = EPSETUP_STATUS_EP0;
+
+    /* A new SETUP cancels both halves of the old control transfer. Flush
+     * only EP0: cancelling storage/HID here would lose unrelated traffic.
+     * Discard its completion bits before the core primes the new request. */
+    usb_drv_reset_endpoint(EP_CONTROL, false);
+    usb_drv_reset_endpoint(EP_CONTROL, true);
+    REG_ENDPTCOMPLETE = pipe2mask[0] | pipe2mask[1];
 
     /* Stop pending control transfers */
     for(i=0;i<2;i++) {
