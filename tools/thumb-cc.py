@@ -31,7 +31,11 @@ if '-o' in args and args.index('-o') < len(args) - 1:
     if len(args[args.index('-o') + 1].rsplit('.o', 1)) == 1:
         execv(args[0], args) # output doesn't end in .o
 
-args.append('-mthumb-interwork') # thumb-interwork is required
+# thumb-interwork is required; add if not present
+if '-mthumb-interwork' not in args:
+    args += ['-mthumb-interwork'];
+
+# Try to compile in thumb mode first
 gcc = Popen(args + ['-mthumb'], stdout=PIPE, stderr=PIPE)
 (out, err) = gcc.communicate()
 
