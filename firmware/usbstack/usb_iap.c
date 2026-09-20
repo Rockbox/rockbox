@@ -119,23 +119,16 @@ static struct usb_as_interface ipod_audio_stream_1_uac_header = {
     .wFormatTag         = USB_AS_FORMAT_TYPE_I_PCM,
 };
 
-/* TODO: remove unsupported freqs */
 static struct usb_as_format_type_i_discrete ipod_audio_stream_1_uac_discrete = {
-    .bLength            = USB_AS_SIZEOF_FORMAT_TYPE_I_DISCRETE(9),
+    .bLength            = USB_AS_SIZEOF_FORMAT_TYPE_I_DISCRETE(3),
     .bDescriptorType    = USB_DT_CS_INTERFACE,
     .bDescriptorSubType = USB_AS_FORMAT_TYPE,
     .bFormatType        = USB_AS_FORMAT_TYPE_I,
     .bNrChannels        = 2,
     .bSubframeSize      = 2, /* bBitResolution / 8 */
     .bBitResolution     = 16,
-    .bSamFreqType       = 9,
+    .bSamFreqType       = 3,
     .tSamFreq           = {
-        {0x40, 0x1F, 0x00}, /* 8000  */
-        {0x11, 0x2B, 0x00}, /* 11025 */
-        {0xE0, 0x2E, 0x00}, /* 12000 */
-        {0x80, 0x3E, 0x00}, /* 16000 */
-        {0x22, 0x56, 0x00}, /* 22050 */
-        {0xC0, 0x5D, 0x00}, /* 24000 */
         {0x00, 0x7D, 0x00}, /* 32000 */
         {0x44, 0xAC, 0x00}, /* 44100 */
         {0x80, 0xBB, 0x00}, /* 48000 */
@@ -339,7 +332,8 @@ static int usb_iap_get_config_descriptor(unsigned char* dest, int max_packet_siz
     PACK_DESC(ipod_audio_control_desc);
     ipod_audio_control_uac_header.baInterfaceNr[0] = stream.interface;
     ipod_audio_control_uac_header.wTotalLength =
-        sizeof(ipod_audio_control_uac_header) +
+        /* sizeof omits the flexible baInterfaceNr array. */
+        ipod_audio_control_uac_header.bLength +
         sizeof(ipod_audio_control_uac_input_terminal) +
         sizeof(ipod_audio_control_uac_output_terminal);
     PACK_DESC(ipod_audio_control_uac_header);
@@ -375,6 +369,7 @@ static int usb_iap_get_config_descriptor(unsigned char* dest, int max_packet_siz
 
 static int usb_iap_init_connection(void) {
     stream.sample_rate     = 48000;
+    stream.alt             = 0;
     last_charge_state      = -1;
     last_minute            = -1;
     last_hold_switch_state = -1;
@@ -424,6 +419,8 @@ cleanup_audio:
 
 static int usb_iap_set_interface(int intf, int alt) {
     LOG("set interface interface=%d alt=%d", intf, alt);
+    if(intf == ctrl.interface || intf == hid.interface)
+        return alt == 0 ? 0 : -1;
     check_act(intf == stream.interface, return -1);
     if(alt == 0) {
         check_act(iap_audio_disable(), return -1);
@@ -433,11 +430,14 @@ static int usb_iap_set_interface(int intf, int alt) {
         ERROR("invalid alt %d", alt);
         return -1;
     }
+    stream.alt = alt;
     return 0;
 }
 
 static int usb_iap_get_interface(int intf) {
     LOG("get interface interface=%d", intf);
+    if(intf == ctrl.interface || intf == hid.interface)
+        return 0;
     check_act(intf == stream.interface, return -1);
     return stream.alt;
 }
@@ -572,9 +572,10 @@ static bool control_request_if_endpoint(struct usb_ctrlrequest* req, uint8_t* re
             switch(control_selector) {
             case USB_AS_EP_CS_SAMPLING_FREQ_CTL:
                 check_act(req->wLength == 3, goto stall);
-                stream.sample_rate = reqdata[0] | (reqdata[1] << 8) | (reqdata[2] << 16);
+                uint32_t sample_rate = reqdata[0] | (reqdata[1] << 8) | (reqdata[2] << 16);
+                check_act(iap_audio_set_sampr(sample_rate), goto stall);
+                stream.sample_rate = sample_rate;
                 LOG("audio stream sampling rate %lu", stream.sample_rate);
-                check_act(iap_audio_set_sampr(stream.sample_rate), goto stall);
                 break;
             }
             usb_core_control_response(USB_CONTROL_ACK, NULL, 0);

@@ -33,6 +33,7 @@
 static const unsigned long samprs[] = {
     SAMPR_48,
     SAMPR_44,
+    SAMPR_32,
 };
 
 struct StagingBuffer {
@@ -83,6 +84,9 @@ static size_t calc_packet_size(uint8_t cur_sampr, uint8_t packet_count) {
     if(cur_sampr == 0) {
         /*48k*/
         return 192;
+    } else if(cur_sampr == 2) {
+        /*32k*/
+        return 128;
     } else {
         /*44.1k*/
         return packet_count % 10 == 0 ? 180 : 176;
@@ -100,7 +104,7 @@ start:
     if(exhausted || cur_freq != set_freq) {
         *ptr = zero_buffer.buf.ptr;
         *len = packet_size;
-        packet_count += 1;
+        packet_count = (packet_count + 1) % 10;
         return;
     }
 
@@ -134,7 +138,7 @@ start:
         *len                 = stage->cursor;
         stage->cursor        = 0;
         staging_buffer_index = (staging_buffer_index + 1) % USB_BATCH_SLOTS;
-        packet_count += 1;
+        packet_count = (packet_count + 1) % 10;
 #if AUDIO_STAT == 1
         sample += packet_size / 4;
         if(current_tick >= last_hz + HZ) {
