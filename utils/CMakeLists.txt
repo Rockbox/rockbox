@@ -124,6 +124,22 @@ else()
     set(QUAZIP_LIBRARY quazip)
 endif()
 
+# Setup code signing for macOS
+if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+    set(CODESIGN_IDENTITY "-" CACHE STRING
+            "Code signing identity to use for macOS signing")
+
+    if(DEFINED ENV{CODESIGN_IDENTITY})
+        set(CODESIGN_IDENTITY "$ENV{CODESIGN_IDENTITY}")
+    endif()
+
+    if("${CODESIGN_IDENTITY}" STREQUAL "-")
+        message("-- Using ad-hoc Apple code signing")
+    else()
+        message("-- Using Apple code signing identity: ${CODESIGN_IDENTITY}")
+    endif()
+endif()
+
 add_executable(ipodpatcher-bin
     ipodpatcher/main.c
     ipodpatcher/ipodpatcher_aupd.c
