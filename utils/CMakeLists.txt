@@ -126,6 +126,7 @@ endif()
 
 # Setup code signing for macOS
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+    # Signing the binaries
     set(CODESIGN_IDENTITY "-" CACHE STRING
             "Code signing identity to use for macOS signing")
 
@@ -137,6 +138,21 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
         message("-- Using ad-hoc Apple code signing")
     else()
         message("-- Using Apple code signing identity: ${CODESIGN_IDENTITY}")
+    endif()
+
+    # Submitting the .dmg file to Apple's service to get a
+    # notarization ticket for distributing outside the App store
+    set(KEYCHAIN_PROFILE "" CACHE STRING
+            "Code signing identity to use for macOS signing")
+
+    if(DEFINED ENV{KEYCHAIN_PROFILE})
+        set(KEYCHAIN_PROFILE "$ENV{KEYCHAIN_PROFILE}")
+    endif()
+
+    if("${KEYCHAIN_PROFILE}" STREQUAL "")
+        message("-- Skipping Apple notarization")
+    else()
+        message("-- Using Apple notarization keychain profile: ${KEYCHAIN_PROFILE}")
     endif()
 endif()
 
