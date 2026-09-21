@@ -126,7 +126,7 @@ static const struct nand_chip_info nand_chip_table[] =
      * write test. */
     /* Micronas (ITT Intermetall, acquired by TDK 2016): 0xEC, not Samsung */
     { 0xB614D5EC, 2,  8, 4096, 128, 4096, 3872, false },   /* checked */
-    { 0xB614D5EC, 4,  1, 4096, 128, 4096, 3872, false },
+    { 0xB614D5EC, 4,  1, 4096, 128, 4096, 3872, false },   /* checked */
     { 0x2555D5EC, 4,  9, 8192, 128, 2048, 7744, false },
     /* Hynix */
     { 0xB614D5AD, 4,  1, 4096, 128, 4096, 3872, false },

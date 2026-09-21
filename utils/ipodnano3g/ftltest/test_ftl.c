@@ -8,15 +8,29 @@
  * position in its superblock. Every lpn the FTL resolves must land on the
  * oracle's copy (or, where copies tie, on one with identical data).
  *
- * Known false positive: when two logs for the same logical block each hold
- * pages the other lacks, _FTLRestore's own tie-break (0x806a19c in osos
- * 1.1.3, matched here instruction for instruction) keeps the more complete
- * one whole and drops the other entirely, even if the dropped one is newer
- * for some of its pages. ftl_read() then disagrees with this oracle on
- * exactly those pages - correctly, since that is what Apple's own firmware
- * would also resolve to on the same medium. A handful of disagreements
- * confined to one or two logical blocks on a real contributor's dump is
- * this, not a bug; wholesale disagreement is not.
+ * Known false positive #1: when two logs for the same logical block each
+ * hold pages the other lacks, _FTLRestore's own tie-break (0x806a19c in
+ * osos 1.1.3, matched here instruction for instruction) keeps the more
+ * complete one whole and drops the other entirely, even if the dropped one
+ * is newer for some of its pages. ftl_read() then disagrees with this
+ * oracle on exactly those pages - correctly, since that is what Apple's
+ * own firmware would also resolve to on the same medium.
+ *
+ * Known false positive #2: a superblock whose last page reads
+ * SPARE_DATA_LAST is classified a closed data block from that one page
+ * alone ("closed blocks -> map" in decode/APPLE-FTL-WRITE.md) and every
+ * lpn in it is then addressed purely by position, offset == lpn % sbpages,
+ * with no per-page check. If one physical page in such a block is stale -
+ * left over from before the block closed, still carrying an older lpn's
+ * spare - the oracle credits that spare's lpn with the newest copy at the
+ * position it actually holds data, while the FTL (like Apple's own
+ * firmware) trusts the position instead: it lands on the stale page for
+ * the lpn that owns that spare, and finds nothing at the position the
+ * oracle expected for the lpn that really belongs there.
+ *
+ * Both are confined to a handful of pages on one or two logical blocks on
+ * a real contributor's dump; wholesale disagreement is not either of
+ * these, and is a bug.
  */
 #include <stdio.h>
 #include <stdlib.h>

@@ -64,3 +64,12 @@ fault testing.
   on both host tests: `test_ftl` agrees with the oracle on all 3,964,928
   sectors; `test_crash` survives 100 power cuts (344 writes, 11 syncs, 0
   sectors wrong). No on-device write test.
+- **B614D5EC x4, 2026-09-21.** A contributor's check archive matches the
+  row exactly (mode 1, vflspares 201 by our own formula). `test_crash` is
+  clean (100 power cuts, 349 writes, 9 syncs, 0 sectors wrong). `test_ftl`
+  disagrees with the oracle on two logical pages in one block; traced to a
+  second, distinct false positive from the one already documented for
+  A5D5D589 x2 - a closed data block addressed purely by position, with one
+  stale leftover page - confirmed against the decode notes
+  (`_FTLRestore`'s "closed blocks -> map" step) and not a defect (see
+  `ftltest/test_ftl.c`).
