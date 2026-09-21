@@ -14,4 +14,9 @@ void flac_lpc_32_arm(int32_t *decoded, int coeffs[], int pred_order,
 void flac_lpc_32_arm_narrow(int32_t *decoded, int coeffs[], int pred_order,
                             int qlevel, int len);
 
+/* Decodes up to n Rice residuals with parameter k, returns how many it
+   produced, and leaves gb->index where the C reader would have.  Handles only
+   the common case; the caller decodes the remainder in C. */
+int flac_rice_decode_arm(int32_t *out, int n, int k, GetBitContext *gb);
+
 #endif

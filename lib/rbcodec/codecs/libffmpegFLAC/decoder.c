@@ -167,13 +167,28 @@ static int decode_residuals(FLACContext *s, int32_t *decoded, int pred_order)
         } else {
             unsigned lim = tmp ? (UINT_MAX >> tmp) + 2 : INT_MAX;
             int real_limit = lim > INT_MAX ? INT_MAX : lim;
-            for (; i < samples; i++) {
+            while (i < samples) {
+#if defined(CPU_ARM_CLASSIC) && !defined(FLAC_NO_RICE_ASM)
+                /* The assembly decodes the common case and falls through
+                   anything it does not handle. Every unusual code still goes
+                   through the C reader, and k <= 17 keeps a code inside the
+                   25 bits one refill guarantees. */
+                if (tmp <= 17) {
+                    int got = flac_rice_decode_arm(decoded, samples - i, tmp,
+                                                   &gb);
+                    decoded += got;
+                    i       += got;
+                    if (i >= samples)
+                        break;
+                }
+#endif
                 int v = get_sr_golomb_flac(&gb, tmp, real_limit, 0);
                 if ((unsigned) v == 0x80000000){
                     return -3;
                 }
 
                 *decoded++ = v;
+                i++;
             }
         }
         i= 0;

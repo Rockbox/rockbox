@@ -333,7 +333,11 @@ lpc_decode_arm:
 #else
 #define LPC32_HOT  .text
 #endif
-#define LPC32_COLD .text
+/* Its own section, not plain .text: plugin.lds takes *(.text*) so placement is
+   unchanged, but the link map then reports the cold half as a range of its
+   own, which is what lets a profile charge it to this filter instead of to
+   whichever C function the linker happened to put in front of it. */
+#define LPC32_COLD .section .text.flac_lpc_32_cold,"ax",%progbits
 
     /* Shift the accumulator down by qlevel, add the residual waiting at
        p[order], store it back, and step the window on by one sample.  The
@@ -808,3 +812,179 @@ flac_lpc_32_arm_narrow:
 .Ln_ret:
     ldmpc   regs=r4-r11
 #endif /* ARM_ARCH >= 5 */
+
+/* ---------------------------------------------------------------------------
+   Rice residual decoding, the inner loop of decode_residuals.
+
+   int flac_rice_decode_arm(int32_t *out, int n, int k, GetBitContext *gb);
+
+   Decodes up to n residuals with Rice parameter k, returns how many it
+   actually produced and leaves gb->index exactly where C would have left it.
+   The caller decodes whatever is left -- so every case this does not handle
+   is handled by the C it was extracted from, and nothing here can change what
+   a stream decodes to.
+
+   Why it is worth writing.  ALT_BITSTREAM_READER keeps no cache: every
+   UPDATE_CACHE rebuilds the 32-bit window out of four unaligned byte loads,
+   once per residual, which measured 13.97 cycles per sample on ARM7TDMI --
+   24% of decode_residuals and the single largest line left in the decoder.
+   This keeps the window in two registers and refills it from *aligned* words,
+   which is what upstream FFmpeg's A32_BITSTREAM_READER does and what it
+   selects for ARCH_ARM && !HAVE_FAST_UNALIGNED; Rockbox has that selection
+   commented out.
+
+   It decodes only the case that occurs, and bails out otherwise:
+
+     - the leading-zero run must be 7 or fewer.  Measured over four streams,
+       99.91% to 99.97% of residuals qualify; the distribution is 43% zero,
+       74% one or fewer, 96% three or fewer.
+     - k must be 17 or less, which the caller checks once per partition.  With
+       both, a code is at most 25 bits, so one refill to 25 bits serves any
+       single residual.
+     - it stops rather than read past buffer_end.
+
+   Registers through the loop:
+
+     r0 out      r1 residuals left   r2 k          r3 scratch
+     r4 cache high   r5 cache low    r6 valid bits (0..64)
+     r7 word pointer, aligned        r8 leading-zero table
+     r9 31-k     r10 k+1             r11 buffer_end-4    ip, lr scratch
+ */
+
+/* PP502x has 96 bytes of codec IRAM spare, so this lives in DRAM by default;
+   a dense loop like this one is cache-resident in any case (§8).  Define
+   FLAC_RICE_IRAM to move it, once there is room. */
+#if defined(USE_IRAM) && defined(FLAC_RICE_IRAM)
+    .section .icode,"ax",%progbits
+#else
+    .section .text.flac_rice_decode,"ax",%progbits
+#endif
+    .align  2
+    .global flac_rice_decode_arm
+flac_rice_decode_arm:
+    stmfd   sp!, { r4-r11, lr }
+    subs    r1, r1, #0
+    ble     .Lr_none
+    cmp     r2, #17                   @ above this a code can exceed the 25
+    bhi     .Lr_none                  @ bits one refill guarantees; the caller
+                                      @ checks too, but do not depend on it
+    ldr     r12, [r3, #8]             @ gb->index, in bits
+    ldr     lr, [r3]                  @ gb->buffer
+    stmfd   sp!, { r1, r3, lr }       @ n, gb, buffer
+    ldr     r11, [r3, #4]             @ gb->buffer_end
+    sub     r11, r11, #4              @ last address a word load may start at
+
+    add     r7, lr, r12, lsr #3       @ byte holding the next bit
+    and     r3, r7, #3                @ ... and how far into its word it is
+    bic     r7, r7, #3
+    and     r9, r12, #7               @ (r9, not ip: the refill uses ip)
+    add     r9, r9, r3, lsl #3        @ bit offset within that word
+    add     r3, r7, #4                @ both of the fills below must fit
+    cmp     r3, r11                   @ inside the buffer, and until the
+    bhi     .Lr_abort                 @ discard below they leave gb->index
+                                      @ inconsistent, so leave it untouched
+    mov     r4, #0                    @ cache empty; the two refills fill it
+    mov     r5, #0                    @ and the shift then drops the bits
+    mov     r6, #0                    @ that precede the starting position
+    bl      .Lr_fill
+    bl      .Lr_fill
+    rsb     r3, r9, #32               @ drop r9 bits from the front
+    mov     r4, r4, lsl r9
+    orr     r4, r4, r5, lsr r3
+    mov     r5, r5, lsl r9
+    sub     r6, r6, r9
+
+    rsb     r9, r2, #31               @ 31-k
+    add     r10, r2, #1               @ k+1
+#if ARM_ARCH < 5
+    adr     r8, .Lr_lztab
+#endif
+    cmp     r6, #25
+    blt     .Lr_done                  @ not enough data to start
+
+.Lr_loop:
+#if ARM_ARCH >= 5
+    clz     lr, r4                    @ leading zeros, the unary run
+#else
+    mov     ip, r4, lsr #24
+    ldrb    lr, [r8, ip]              @ 8 means "8 or more": bail
+#endif
+    cmp     lr, #7
+    bhi     .Lr_done
+    rsb     ip, lr, r9                @ 31 - k - z
+    mov     ip, r4, lsr ip            @ the 1 bit, then the k low bits
+    sub     r3, lr, #1
+    add     ip, ip, r3, lsl r2        @ + (z-1) << k  == quotient<<k | rest
+    and     r3, ip, #1                @ fold the sign back out
+    rsb     r3, r3, #0
+    eor     ip, r3, ip, lsr #1
+    str     ip, [r0], #4              @ z<=7 and k<=17 bound the code at 2^20,
+                                      @ so the 0x80000000 the caller rejects
+                                      @ cannot arise here
+
+    add     lr, lr, r10               @ bits this code used: z + 1 + k
+    rsb     ip, lr, #32
+    mov     r4, r4, lsl lr
+    orr     r4, r4, r5, lsr ip
+    mov     r5, r5, lsl lr
+    subs    r6, r6, lr
+    subs    r1, r1, #1
+    beq     .Lr_done
+    cmp     r6, #25
+    bge     .Lr_loop
+    cmp     r7, r11                   @ refill, if there is a word to read
+    bhi     .Lr_done
+    bl      .Lr_fill
+    cmp     r6, #25
+    bge     .Lr_loop
+
+.Lr_done:
+    ldmfd   sp!, { r2, r3, lr }       @ n, gb, buffer
+    sub     r0, r7, lr                @ bits consumed = 8*(wp-buffer) - valid
+    mov     r0, r0, lsl #3
+    sub     r0, r0, r6
+    str     r0, [r3, #8]              @ gb->index
+    sub     r0, r2, r1                @ residuals decoded
+    ldmpc   regs=r4-r11
+.Lr_abort:                            @ nothing decoded, gb untouched
+    add     sp, sp, #12
+.Lr_none:
+    mov     r0, #0
+    ldmpc   regs=r4-r11
+
+    /* One aligned word into the back of the cache, big-endian.  r6 <= 32 on
+       entry, so the word splits between the two halves; a register shift by
+       32 yields zero on ARM, which covers both ends of that range. */
+.Lr_fill:
+    ldr     ip, [r7], #4
+    eor     r3, ip, ip, ror #16
+    bic     r3, r3, #0xff0000
+    mov     ip, ip, ror #8
+    eor     ip, ip, r3, lsr #8
+    mov     r3, ip, lsr r6
+    orr     r4, r4, r3
+    rsb     r3, r6, #32
+    mov     r3, ip, lsl r3
+    orr     r5, r5, r3
+    add     r6, r6, #32
+    bx      lr
+
+#if ARM_ARCH < 5
+.Lr_lztab:
+    .byte  8, 7, 6, 6, 5, 5, 5, 5, 4, 4, 4, 4, 4, 4, 4, 4
+    .byte  3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3
+    .byte  2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2
+    .byte  2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2
+    .byte  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
+    .byte  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
+    .byte  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
+    .byte  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
+    .byte  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    .byte  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    .byte  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    .byte  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    .byte  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    .byte  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    .byte  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    .byte  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+#endif
