@@ -887,6 +887,74 @@ static void devel_menu(void)
 }
 #endif /* S5L87XX_DEVELOPMENT_BOOTLOADER */
 
+static void lcd_qr_code(const char *data, unsigned int row_stride,
+    int x, int y, unsigned int qr_cols, unsigned int qr_rows,
+    unsigned int modules_scale, unsigned int margin_thickness)
+{
+    const unsigned int margin_size = margin_thickness * 2;
+    const unsigned int width = qr_cols * modules_scale + margin_size;
+    const unsigned int height = qr_rows * modules_scale + margin_size;
+
+    // -1 = align right, -2 = align center
+    const unsigned int x0 = x >= 0 ? (unsigned int)x : (LCD_WIDTH - width) / abs(x);
+    const unsigned int y0 = y >= 0 ? (unsigned int)y : (LCD_HEIGHT - height) / abs(y);
+
+    lcd_set_foreground(LCD_WHITE);
+    lcd_fillrect(x0, y0, width, height);
+
+    lcd_set_foreground(LCD_BLACK);
+    for (unsigned int row = 0; row < qr_rows; row++) {
+        for (unsigned int col = 0; col < qr_cols; col++) {
+            if (data[row * row_stride + col] != ' ') {
+                lcd_fillrect(
+                    x0 + margin_thickness + col * modules_scale,
+                    y0 + margin_thickness + row * modules_scale,
+                    modules_scale,
+                    modules_scale
+                );
+            }
+        }
+    }
+
+    lcd_update();
+}
+
+static const char qr_code_data[][22] = {
+    /*
+     * qrencode -o - -t ascii -s 1 -m 0 -i 'https://rockbox.org/IPNBL' | \
+     * cut -c 1,3,5,7,9,11,13,15,17,19,21,23,25,27,29,31,33,35,37,39,41 | \
+     * awk '{ print "\"" $0 "\"," }'
+     */
+
+    "#######  #    #######",
+    "#     # ## #  #     #",
+    "# ### #  ## # # ### #",
+    "# ### # # # # # ### #",
+    "# ### #  # ## # ### #",
+    "#     # ####  #     #",
+    "####### # # # #######",
+    "         ##          ",
+    "##### ######## # # # ",
+    "#   #   #### # #    #",
+    "      #    #  #     #",
+    "## # # # # ##   #### ",
+    "# ### ##  ###        ",
+    "        ## #  #  ####",
+    "####### ##  #   ### #",
+    "#     #   ###  # ##  ",
+    "# ### # # ####    ###",
+    "# ### # ### ###  ##  ",
+    "# ### # ####  # #    ",
+    "#     # # ## ##   # #",
+    "####### #    ## ##   ",
+};
+
+enum {
+    QR_COLS = sizeof(qr_code_data[0]) - 1,
+    QR_ROWS = sizeof(qr_code_data) / sizeof(qr_code_data[0]),
+    QR_STRIDE = sizeof(qr_code_data[0]),
+};
+
 void main(void)
 {
     int rc = 0;
@@ -1013,8 +1081,10 @@ void main(void)
             printf("Rockbox does not write to");
             printf("chips it has not been");
             printf("tested on.");
-            printf("Starting Apple firmware...");
-            sleep(8 * HZ);      /* long enough to read the message */
+            printf("Starting Apple firmware in 60s...");
+            lcd_qr_code(&qr_code_data[0][0], QR_STRIDE, -2, LCD_HEIGHT / 2, QR_COLS, QR_ROWS, 4, 8);
+            sleep(60 * HZ);      /* long enough to read the message and scan the QR code */
+            lcd_set_foreground(LCD_WHITE);
             rc = kernel_launch_onb();
             /* Only reached if the ONB could not be read from NOR */
             printf("Apple firmware failed: %d", rc);
