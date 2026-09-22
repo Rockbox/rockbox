@@ -143,7 +143,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     # Submitting the .dmg file to Apple's service to get a
     # notarization ticket for distributing outside the App store
     set(KEYCHAIN_PROFILE "" CACHE STRING
-            "Code signing identity to use for macOS signing")
+            "Apple Keychain profile name to use for notarization")
 
     if(DEFINED ENV{KEYCHAIN_PROFILE})
         set(KEYCHAIN_PROFILE "$ENV{KEYCHAIN_PROFILE}")
