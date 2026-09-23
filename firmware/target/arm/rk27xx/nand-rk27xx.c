@@ -19,46 +19,28 @@
  ****************************************************************************/
  
  #include "config.h"
+ #include "system.h"
+ #include "string.h"
  #include "nand-target.h"
+ #include "rk27xx.h"
 
-#if 0
-/* This is for documentation purpose as FTL has not been reverse engineered yet
- * Raw nand handling functions based on OF disassembly and partially inspired
- * by Rockchip patent
+/* Raw nand handling functions based on OF disassembly and partially inspired
+ * by Rockchip patent.
+ *
+ * This was written as documentation while the FTL was still unknown and sat
+ * under `#if 0` for years. The Scheme A FTL is now reconstructed
+ * (ftl-scheme-a.c) and needs exactly what this provides: chip detection and
+ * the geometry derived from it, plus chip select. Enabled.
  */
 
-#define MAX_FLASH_NUM 4
+/* MAX_FLASH_NUM now in nand-target.h */
 #define CMD_READ_STATUS 0x70
 #define CMD_RESET       0xFF
 #define CMD_READ_ID     0x90
 #define READ_PAGE_CMD   0x30
 
-/* this is the struct OF uses */
-struct flashspec_t
-{
-    uint8_t  cache_prog;
-    uint8_t  mul_plane;
-    uint8_t  interleave;
-    uint8_t  large;
-    uint8_t  five;
-    uint8_t  mlc;
-    uint8_t  vendor;
-    uint8_t  access_time;
-    uint8_t  sec_per_page;
-    uint8_t  sec_per_page_raw;
-    uint16_t sec_per_block;
-    uint16_t sec_per_block_raw;
-    uint16_t page_per_block;
-    uint16_t page_per_block_raw;
-
-    uint32_t tot_logic_sec;
-    uint32_t total_phy_sec;
-    uint32_t total_bloks;
-
-    uint32_t cmd;
-    uint32_t addr;
-    uint32_t data;
-};
+/* struct flashspec_t now lives in nand-target.h - the Scheme A FTL's flash
+ * primitives (flash-rk27xx.c) need the geometry flash_init() derives here. */
 
 /* holds nand chips characteristics */
 struct flashspec_t flash_spec[MAX_FLASH_NUM];
@@ -110,6 +92,31 @@ const uint32_t device_info[] =
     0x400000,     /*   2G, large page */
     0x800000      /*   4G, large page */
 };
+
+/* State the OF keeps across flash operations.
+ *
+ * These were referenced by flash_init() but never transcribed - the block was
+ * under `#if 0`, so nothing caught it. They are defined here with the values
+ * flash_init() assigns, which is all the current code needs:
+ *
+ *  - mlc_refresh_row: row scheduled for refresh after a sector needed
+ *    BCH_REFRESH_THRESHOLD corrected bits; 0xffffffff means "none pending".
+ *  - flash_pend_cmd: the OF defers a program command so it can be merged with
+ *    the next one (cache programming). Nothing issues one yet.
+ *  - flash_read_status_cmd: READ STATUS opcode, which differs on some
+ *    multi-plane parts.
+ */
+uint32_t mlc_refresh_row;
+
+struct flash_pend_cmd_t
+{
+    uint8_t  valid;
+    uint32_t row;
+};
+
+struct flash_pend_cmd_t flash_pend_cmd;
+
+uint8_t flash_read_status_cmd;
 
 static int flash_delay(int n)
 {
@@ -196,7 +203,7 @@ void flash_init(void)
         for (j=0; j<sizeof(manufacture_id_tbl); j++)
         {
             /* store Manufacturer index */
-            if (ManufactureIDTbl[j] == buff[0])
+            if (manufacture_id_tbl[j] == buff[0])
             {
                 flash_spec[i].vendor = j;
             }
@@ -207,7 +214,7 @@ void flash_init(void)
             /* look for matching device code
              * and store total phys sectors
              */
-            if (DeviceCode[j] == buff[1])
+            if (device_code[j] == buff[1])
             {
                 flash_spec[i].total_phy_sec = device_info[j];
                 break;
@@ -309,7 +316,7 @@ void flash_init(void)
 }
 
 /* read single page in unbuffered mode */
-void flash_read_page(int page, unsigned char *pgbuff)
+void flash_read_page_raw(int page, unsigned char *pgbuff)
 {
     unsigned int i;
 
@@ -414,7 +421,6 @@ void flash_read_sector(int page, unsigned char *secbuf, int nsec)
     flash_chip_deselect();
 }
 
-#endif
 const struct nand_device_info_type* nand_get_device_type(uint32_t bank);
 
 

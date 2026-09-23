@@ -24,6 +24,47 @@
 #include "config.h"
 #include "inttypes.h"
 
+#define MAX_FLASH_NUM 4
+
+/* Per-chip geometry, as the OF derives it from the READ_ID response.
+ *
+ * The "_raw" fields describe one physical plane; the others are the
+ * multi-plane view the FTL addresses (sec_per_page = sec_per_page_raw *
+ * mul_plane, and likewise for blocks). The Scheme A FTL's address mapping
+ * depends on exactly this distinction, so both are kept. Populated by
+ * flash_init(). */
+struct flashspec_t
+{
+    uint8_t  cache_prog;
+    uint8_t  mul_plane;
+    uint8_t  interleave;
+    uint8_t  large;
+    uint8_t  five;
+    uint8_t  mlc;
+    uint8_t  vendor;
+    uint8_t  access_time;
+    uint8_t  sec_per_page;
+    uint8_t  sec_per_page_raw;
+    uint16_t sec_per_block;
+    uint16_t sec_per_block_raw;
+    uint16_t page_per_block;
+    uint16_t page_per_block_raw;
+
+    uint32_t tot_logic_sec;
+    uint32_t total_phy_sec;
+    uint32_t total_bloks;
+
+    uint32_t cmd;
+    uint32_t addr;
+    uint32_t data;
+};
+
+extern struct flashspec_t flash_spec[MAX_FLASH_NUM];
+extern uint32_t total_phy_sec;
+
+void flash_init(void);
+void flash_chip_select(uint8_t chip);
+void flash_chip_deselect(void);
 
 struct nand_device_info_type
 {
