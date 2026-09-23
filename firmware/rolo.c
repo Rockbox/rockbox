@@ -28,7 +28,6 @@
 #include "kernel.h"
 #include "button.h"
 #include "file.h"
-#include "audio.h"
 #include "system.h"
 #include "i2c.h"
 #include "adc.h"
@@ -219,6 +218,7 @@ extern unsigned long loadaddress;
  * Name: rolo_load(const char *filename)
  * Filename must be a fully defined filename including the path and extension
  *
+ * Must call audio_hard_stop() before calling us!
  ***************************************************************************/
 int rolo_load(const char* filename)
 {
@@ -237,8 +237,6 @@ int rolo_load(const char* filename)
     lcd_remote_puts(0, 1, "Loading...");
     lcd_remote_update();
 #endif
-
-    audio_hard_stop();
 
     /* get the system buffer. release only in case of error, otherwise
      * we don't return anyway */
