@@ -83,9 +83,7 @@ int plugin_open(const char *plugin, const char *parameter);
 #include "metadata.h"
 #include "sound.h"
 #include "audio.h"
-#ifdef HAVE_HW_H264
 #include "hw_h264.h"
-#endif
 #include "voice_thread.h"
 #include "root_menu.h"
 #include "talk.h"

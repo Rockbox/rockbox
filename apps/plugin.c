@@ -49,9 +49,6 @@
 #include "language.h"
 #include "statusbar-skinned.h"
 #include "panic.h"
-#ifdef HAVE_HW_H264
-#include "hw_h264.h"
-#endif
 
 #if CONFIG_CHARGING
 #include "power.h"

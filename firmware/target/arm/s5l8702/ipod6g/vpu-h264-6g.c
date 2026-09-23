@@ -19,11 +19,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-
 #include "config.h"
-
-#ifdef HAVE_HW_H264
-
 #include "system.h"
 #include "kernel.h"
 #include "s5l87xx.h"
@@ -1077,5 +1073,3 @@ const struct hw_h264_api target_hw_h264_api = {
     .get_frame = vpu_h264_get_frame,
     .close = vpu_h264_close,
 };
-
-#endif /* HAVE_HW_H264 */
