@@ -58,7 +58,10 @@ enum vendor_t {
     ST
 };
 
-/* taken from OF */
+/* taken from OF - one entry per device_info[] row. The OF's table is
+ * 76 79 f1 da dc d3 d5 d7; 0xd5 was once missing here, which shifted every
+ * later code onto the capacity one row up and sized a 4 GiB 0xd7 part as
+ * 2 GiB. */
 const uint8_t device_code[] = {
     0x76,
     0x79,
@@ -66,6 +69,7 @@ const uint8_t device_code[] = {
     0xda,
     0xdc,
     0xd3,
+    0xd5,
     0xd7
 };
 
@@ -92,6 +96,11 @@ const uint32_t device_info[] =
     0x400000,     /*   2G, large page */
     0x800000      /*   4G, large page */
 };
+
+/* device_code[j] is looked up and device_info[j] used - a length mismatch
+ * silently mis-sizes every chip after the gap */
+extern char device_tables_match[(sizeof(device_code) ==
+    sizeof(device_info) / sizeof(device_info[0])) ? 1 : -1];
 
 /* State the OF keeps across flash operations.
  *
@@ -183,8 +192,8 @@ void flash_init(void)
          * just for reference what OF does
          */
         flash_spec[i].cmd = 0x180E8200 + (i<<9);
-        flash_spec[i].addr = 0x180E204 + (i<<9);
-        flash_spec[i].data = 0x180E208 + (i<<9);
+        flash_spec[i].addr = 0x180E8204 + (i<<9);
+        flash_spec[i].data = 0x180E8208 + (i<<9);
 
         flash_chip_select(i);
         FLASH_CMD(i) = CMD_RESET; /* write cmd to flash chip */
