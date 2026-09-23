@@ -1,8 +1,10 @@
 /***************************************************************************
- * H.264 player audio decode service.
- *
- * Decodes AAC audio via Rockbox's aac.codec and feeds a PCM ring buffer.
- * Uses the audio clock from video_pcm for A/V synchronization.
+ *             __________               __   ___.
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
  *
  * Copyright (C) 2025-2026 David Cormier
  *
@@ -10,9 +12,21 @@
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
+ *
  ****************************************************************************/
 #ifndef VIDEO_AUDIO_H
 #define VIDEO_AUDIO_H
+
+/*
+ * H.264 player audio decode service.
+ *
+ * Decodes AAC audio via Rockbox's aac.codec and feeds a PCM ring buffer.
+ * Uses the audio clock from video_pcm for A/V synchronization.
+ *
+ */
 
 #include <stdint.h>
 #include <stdbool.h>

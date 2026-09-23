@@ -1,11 +1,10 @@
 /***************************************************************************
- * AAC audio service for the native S5L8702 H.264 player.
- *
- * The decoder itself remains Rockbox's normal dynamically-loaded aac.codec.
- * That is important on iPod 6G: FAAD's hot code and working state are an IRAM
- * overlay and cannot be linked into the permanent core without overflowing
- * IRAM. This file borrows the existing codec thread, supplies file-buffer
- * callbacks for the MP4, and sends decoded PCM to video_pcm.
+ *             __________               __   ___.
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
  *
  * Copyright (C) 2025-2026 David Cormier
  *
@@ -13,7 +12,22 @@
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
+ *
  ****************************************************************************/
+
+/*
+ * AAC audio service for the native S5L8702 H.264 player.
+ *
+ * The decoder itself remains Rockbox's normal dynamically-loaded aac.codec.
+ * That is important on iPod 6G: FAAD's hot code and working state are an IRAM
+ * overlay and cannot be linked into the permanent core without overflowing
+ * IRAM. This file borrows the existing codec thread, supplies file-buffer
+ * callbacks for the MP4, and sends decoded PCM to video_pcm.
+ */
+
 #include "plugin.h"
 
 #ifdef HAVE_HW_H264

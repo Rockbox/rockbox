@@ -1,11 +1,10 @@
 /***************************************************************************
- * PCM ring buffer for video player audio output.
- *
- * Simplified version of mpegplayer's pcm_output.c.
- * Single-producer (audio decode thread), single-consumer (DMA ISR).
- * Audio-master clock via monotonic sample counter.
- *
- * get_more() runs in DMA ISR context: no yield, sleep, mutex, or file I/O.
+ *             __________               __   ___.
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
  *
  * Copyright (C) 2025-2026 David Cormier
  *
@@ -13,7 +12,22 @@
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
+ *
  ****************************************************************************/
+
+/*
+ * PCM ring buffer for video player audio output.
+ *
+ * Simplified version of mpegplayer's pcm_output.c.
+ * Single-producer (audio decode thread), single-consumer (DMA ISR).
+ * Audio-master clock via monotonic sample counter.
+ *
+ * get_more() runs in DMA ISR context: no yield, sleep, mutex, or file I/O.
+ */
+
 #include "plugin.h"
 
 #ifdef HAVE_HW_H264
