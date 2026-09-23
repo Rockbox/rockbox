@@ -27,6 +27,7 @@
 #include "core_alloc.h"
 #include "sound.h"
 #include "pcm_sink.h"
+#include "pcm-internal.h"
 #include "codecs.h"
 #include "codec_thread.h"
 #include "voice_thread.h"
@@ -3996,8 +3997,11 @@ void audio_hard_stop(void)
     LOGFQUEUE("audio >| audio Q_AUDIO_STOP: 1");
     audio_queue_send(Q_AUDIO_STOP, 1);
 #ifdef PLAYBACK_VOICE
+    /* Stop voice */
     voice_stop();
 #endif
+    /* Stop PCM */
+    pcm_play_stop();
     audiobuf_handle = core_free(audiobuf_handle);
 }
 
