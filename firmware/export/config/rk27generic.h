@@ -56,7 +56,6 @@
 #define HAVE_FLASH_STORAGE
 
 #define CONFIG_STORAGE (STORAGE_SD | STORAGE_NAND)
-#define NUM_DRIVES 1  /* NAND doesn't work yet */
 
 #define CONFIG_NAND NAND_RK27XX
 #define HAVE_SW_TONE_CONTROLS
@@ -64,6 +63,31 @@
 /* commented for now */
 /* #define HAVE_HOTSWAP */
 
+/* The NAND holds two volumes (ftl-scheme-a.c): SYS, ~94 MB, where the
+ * original firmware keeps itself - on a Rockbox device that includes the
+ * BASE.RKW that chainloads the Rockbox bootloader - and USER, the rest of the
+ * chip. The split is recorded in the boot area, so they are separate drives
+ * rather than partitions of one.
+ *
+ * SYS is hidden: nothing in it is the user's, and deleting or overfilling it
+ * stops the device booting. Define HAVE_RK27XX_NAND_SYS - here, or in a
+ * purpose build - to present it as a drive of its own, readable and, with
+ * FTL_ALLOW_WRITE, writable like USER.
+ *
+ * storage.c numbers drives by driver, SD first:
+ *
+ *                      default             HAVE_RK27XX_NAND_SYS
+ *   drive 0            SD                  SD
+ *   drive 1            NAND USER           NAND SYS
+ *   drive 2                                NAND USER
+ */
+/* #define HAVE_RK27XX_NAND_SYS */
+
+#ifdef HAVE_RK27XX_NAND_SYS
+#define NUM_DRIVES 3
+#else
+#define NUM_DRIVES 2
+#endif
 #define SECTOR_SIZE 512
 
 /* for small(ish) SD cards */
