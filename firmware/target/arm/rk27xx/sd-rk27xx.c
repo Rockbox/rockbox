@@ -464,11 +464,14 @@ int sd_read_sectors(IF_MD(int drive,) sector_t start, int count,
     int cnt, ret = 0;
     unsigned char *dst;
 
-    mutex_lock(&sd_mtx);
-    enable_controller(true);
-
+    /* Checked before taking the lock: returning from after it left sd_mtx
+     * held and the controller powered. With no card numblocks is 0, so
+     * that was every request. */
     if (count <= 0 || start + count > card_info.numblocks)
         return -1;
+
+    mutex_lock(&sd_mtx);
+    enable_controller(true);
 
     if(!(card_info.ocr & (1<<30)))
         start <<= 9; /* not SDHC */
@@ -602,11 +605,14 @@ int sd_write_sectors(IF_MD(int drive,) sector_t start, int count,
     unsigned char *src;
     /* bool card_selected = false; */
 
-    mutex_lock(&sd_mtx);
-    enable_controller(true);
-
+    /* Checked before taking the lock: returning from after it left sd_mtx
+     * held and the controller powered. With no card numblocks is 0, so
+     * that was every request. */
     if (count <= 0 || start + count > card_info.numblocks)
         return -1;
+
+    mutex_lock(&sd_mtx);
+    enable_controller(true);
 
     if(!(card_info.ocr & (1<<30)))
         start <<= 9; /* not SDHC */
