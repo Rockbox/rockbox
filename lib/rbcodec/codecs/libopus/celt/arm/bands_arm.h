@@ -42,7 +42,7 @@ void denorm_band_armv4(celt_sig *f, const celt_norm *x, int n, int g,
                        int shift);
 #  define DENORM_BAND denorm_band_armv4
 
-# elif defined(OPUS_ARM_INLINE_EDSP) && (ARM_ARCH == 5)
+# elif defined(OPUS_ARM_INLINE_EDSP) && (ARM_ARCH >= 5)
 
 #  define OVERRIDE_DENORM_BAND
 void denorm_band_armv5e(celt_sig *f, const celt_norm *x, int n, int g,

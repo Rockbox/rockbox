@@ -87,6 +87,8 @@
 #define OPUS_ARM_NO_MDCT_ASM
 #define OPUS_ARM_NO_PITCH_ASM
 #define OPUS_NO_PFA
+#define OPUS_ARM_NO_COMB_ASM
+#define OPUS_ARM_NO_BANDS_ASM
 #endif
 #endif /* ARM_ARCH */
 

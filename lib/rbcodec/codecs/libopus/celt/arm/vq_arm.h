@@ -36,7 +36,7 @@
    Shares OPUS_ARM_NO_BANDS_ASM with arm/bands_arm.h as the escape hatch. */
 
 #if defined(FIXED_POINT) && !defined(OPUS_ARM_NO_BANDS_ASM) \
- && defined(OPUS_ARM_INLINE_EDSP) && (ARM_ARCH == 5)
+ && defined(OPUS_ARM_INLINE_EDSP) && (ARM_ARCH >= 5)
 
 #define OVERRIDE_vq_exp_rotation1
 void exp_rotation1_armv5e(celt_norm *X, int len, int stride, opus_val16 c,
