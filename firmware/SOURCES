@@ -1711,6 +1711,7 @@ target/arm/rk27xx/backlight-rk27xx.c
 target/arm/rk27xx/adc-rk27xx.c
 target/arm/rk27xx/sd-rk27xx.c
 target/arm/rk27xx/ftl-rk27xx.c
+target/arm/rk27xx/ftl-scheme-a.c
 target/arm/rk27xx/flash-rk27xx.c
 target/arm/rk27xx/nand-rk27xx.c
 target/arm/rk27xx/usb-rk27xx.c

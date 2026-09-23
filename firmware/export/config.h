@@ -893,6 +893,14 @@ Lyre prototype 1 */
 
 /* Storage related config handling */
 
+/* The rk27xx NAND's flash translation layer holds part-written pages in RAM
+ * (ftl-scheme-a.c) until a later write completes them; storage_flush()
+ * commits them at shutdown, ROLO and wherever else it is called. */
+#if (CONFIG_STORAGE & STORAGE_NAND) && (CONFIG_NAND == NAND_RK27XX) \
+    && !defined(HAVE_STORAGE_FLUSH)
+#define HAVE_STORAGE_FLUSH
+#endif
+
 #if (CONFIG_STORAGE & (CONFIG_STORAGE - 1)) != 0
 /* Multiple storage drivers */
 #define CONFIG_STORAGE_MULTI

@@ -28,26 +28,29 @@
 #include "ftl-target.h"
 #include "nand-target.h"
 
-uint32_t ftl_banks;
-const struct nand_device_info_type* ftl_nand_type;
-/* This file provides only STUBS for now */
-
 /** static, private data **/
 static bool initialized = false;
+
+/* The NAND is FTL_NUM_DRIVES drives - USER, and SYS when the target exposes
+ * it. storage.c hands us a drive index relative to our first, which is the
+ * FTL_DRIVE_* number. */
+#ifdef HAVE_MULTIDRIVE
+#define NAND_DRIVE(d)  (d)
+#else
+#define NAND_DRIVE(d)  FTL_DRIVE_USER
+#endif
 
 /* API Functions */
 int nand_read_sectors(IF_MD(int drive,) sector_t start, int incount,
                      void* inbuf)
 {
-    (void)drive;
-    return ftl_read(start, incount, inbuf);
+    return ftl_read(NAND_DRIVE(IF_MD_DRV(drive)), start, incount, inbuf);
 }
 
 int nand_write_sectors(IF_MD(int drive,) sector_t start, int count,
                       const void* outbuf)
 {
-    (void)drive;
-    return ftl_write(start, count, outbuf);
+    return ftl_write(NAND_DRIVE(IF_MD_DRV(drive)), start, count, outbuf);
 }
 
 void nand_spindown(int seconds)
@@ -72,13 +75,20 @@ void nand_enable(bool on)
 
 void nand_get_info(IF_MD(int drive,) struct storage_info *info)
 {
-    (void)drive;
-    uint32_t ppb = ftl_banks * (*ftl_nand_type).pagesperblock;
+    int d = NAND_DRIVE(IF_MD_DRV(drive));
+
+    /* Capacity comes from the FTL's own tables, not from raw block
+     * geometry: Scheme A's usable size depends on the per-zone valid-block
+     * counts and on the system/user split recorded in ID block 1. */
     (*info).sector_size = SECTOR_SIZE;
-    (*info).num_sectors = (*ftl_nand_type).userblocks * ppb;
-    (*info).vendor = "";
-    (*info).product = "";
-    (*info).revision = "";
+    (*info).num_sectors = ftl_get_sectors(d);
+    (*info).vendor = "Rockchip";
+#ifdef HAVE_RK27XX_NAND_SYS
+    (*info).product = (d == FTL_DRIVE_SYS) ? "NAND SYS" : "NAND USER";
+#else
+    (*info).product = "NAND USER";
+#endif
+    (*info).revision = "1.0";
 }
 
 long nand_last_disk_activity(void)
@@ -109,7 +119,11 @@ int nand_num_drives(int first_drive)
     /* We don't care which logical drive number(s) we have been assigned */
     (void)first_drive;
 
+#ifdef HAVE_MULTIDRIVE
+    return FTL_NUM_DRIVES;
+#else
     return 1;
+#endif
 }
 #endif
 
