@@ -26,33 +26,22 @@
 #include "spfd5420a.h"
 #include "lcdif-rk27xx.h"
 
-/* TODO: convert to udelay() */
-static inline void delay_nop(int cycles)
-{
-    asm volatile ("1: subs %[n], %[n], #1     \n\t"
-                  "   bne  1b"
-                  :  
-                  : [n] "r" (cycles));
-}
-
-
-/* not tested */
 static void lcd_sleep(bool sleep)
 {
     if (sleep)
     {
         /* enter sleep mode */
         lcd_write_reg(DISPLAY_CTRL1, 0x0170);
-        delay_nop(50);
+        udelay(5);
         lcd_write_reg(DISPLAY_CTRL1, 0x0000);
-        delay_nop(50);
+        udelay(5);
         lcd_write_reg(PWR_CTRL1,     0x14B4);
     }
     else
     {
          /* return to normal operation */
         lcd_write_reg(PWR_CTRL1,     0x14B0);
-        delay_nop(50);
+        udelay(5);
         lcd_write_reg(DISPLAY_CTRL1, 0x0173);
     }
 
@@ -64,9 +53,9 @@ void lcd_display_init(void)
     unsigned int x, y;
 
     lcd_write_reg(RESET, 0x0001);
-    delay_nop(10000);
+    udelay(200);
     lcd_write_reg(RESET, 0x0000);
-    delay_nop(10000);
+    udelay(200);
     lcd_write_reg(IF_ENDIAN,       0x0000); /* order of receiving data */
     lcd_write_reg(DRIVER_OUT_CTRL, 0x0000);
     lcd_write_reg(ENTRY_MODE,      0x1038);
@@ -88,10 +77,10 @@ void lcd_display_init(void)
     lcd_write_reg(PART2_END,       0x0000);
 
     lcd_write_reg(PANEL_IF_CTRL1,  0x0011);
-    delay_nop(10000);
+    udelay(200);
     lcd_write_reg(PANEL_IF_CTRL2,  0x0202);
     lcd_write_reg(PANEL_IF_CTRL3,  0x0300);
-    delay_nop(10000);
+    udelay(200);
     lcd_write_reg(PANEL_IF_CTRL4,  0x021E);
     lcd_write_reg(PANEL_IF_CTRL5,  0x0202);
     lcd_write_reg(PANEL_IF_CTRL6,  0x0100);
@@ -119,20 +108,20 @@ void lcd_display_init(void)
     lcd_write_reg(DISPLAY_CTRL1,   0x0001);
     lcd_write_reg(PWR_CTRL6,       0x0001);
     lcd_write_reg(PWR_CTRL7,       0x0060);
-    delay_nop(50000);
+    udelay(1000);
     lcd_write_reg(PWR_CTRL1,       0x16B0);
-    delay_nop(10000);
+    udelay(200);
     lcd_write_reg(PWR_CTRL2,       0x0147);
-    delay_nop(10000);
+    udelay(200);
     lcd_write_reg(PWR_CTRL3,       0x0117);
-    delay_nop(10000);
+    udelay(200);
     lcd_write_reg(PWR_CTRL4,       0x2F00);
-    delay_nop(50000);
+    udelay(1000);
     lcd_write_reg(VCOM_HV2,        0x0000); /* src 0x0090 */
-    delay_nop(10000);
+    udelay(200);
     lcd_write_reg(VCOM_HV1,        0x0008); /* src 0x000A */
     lcd_write_reg(PWR_CTRL3,       0x01BE);
-    delay_nop(10000);
+    udelay(200);
 
     /* addresses setup */
     lcd_write_reg(WINDOW_H_START,  0x0000);
@@ -144,11 +133,11 @@ void lcd_display_init(void)
 
     /* display on */
     lcd_write_reg(DISPLAY_CTRL1,   0x0021);
-    delay_nop(40000);
+    udelay(800);
     lcd_write_reg(DISPLAY_CTRL1,   0x0061);
-    delay_nop(100000);
+    udelay(2000);
     lcd_write_reg(DISPLAY_CTRL1,   0x0173);
-    delay_nop(300000);
+    udelay(6000);
    
  
     /* clear screen */
