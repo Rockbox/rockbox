@@ -919,14 +919,35 @@
 #define FL_RST                 (1<<0)
 
 #define BCHCTL                 (*(volatile unsigned long *)(AHB0_NANDC + 0x0C))
-/* bit 13 is used but unknown */
+/* ECC strength select: clear = t=8, set = t=14. Both are m=13, poly 0x25af.
+ * The OF uses t=8 for the boot region and for Samsung media, t=14 for the
+ * data area on some devices. Established by decoding both modes against real
+ * media until the stored ECC bytes reproduced. */
+#define BCH_T14                (1<<13)
 /* bit 12 is used but unknown */
 #define BCH_WR                 (1<<1)
 #define BCH_RST                (1<<0)
 
 #define BCHST                  (*(volatile unsigned long *)(AHB0_NANDC + 0xD0))
-/* bit 2 ERR ?? */
-/* bit 0 ?? */
+/* Read once FLCTL reports FL_RDY for the sector:
+ *
+ *   bit 0     result valid
+ *   bit 2     error - UNCORRECTABLE when set together with bit 0
+ *   bits 6:3  number of corrected bit errors
+ *
+ * From the rk2705 NAND bootloader's ECC read loop:
+ *     tst r0,#1 ; tst r0,#4     both set -> sector is uncorrectable
+ *     lsl r0,#25 ; lsr r0,#28   -> (BCHST >> 3) & 0xf, corrected bits
+ *     cmp r0,#3                 >= 3 triggers a block refresh
+ * The threshold agrees with MlcRefreshHook in the Samsung OF's flash.o, i.e.
+ * two independent firmwares. */
+#define BCH_VALID              (1<<0)
+#define BCH_ERR                (1<<2)
+#define BCH_CORRECTED(st)      (((st) >> 3) & 0xf)
+#define BCH_UNCORRECTABLE(st)  \
+    (((st) & (BCH_VALID|BCH_ERR)) == (BCH_VALID|BCH_ERR))
+/* corrected-bit count at which the OF schedules a block refresh */
+#define BCH_REFRESH_THRESHOLD  3
 
 #define FLASH_DATA(n)          (*(volatile unsigned char *)(AHB0_NANDC + 0x200 + (n<<9)))
 #define FLASH_ADDR(n)          (*(volatile unsigned char *)(AHB0_NANDC + 0x204 + (n<<9)))
