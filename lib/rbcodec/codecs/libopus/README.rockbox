@@ -18,6 +18,10 @@ Celt:
   silk, since config.h defines exactly one of them per core
 * add #define ABS(a)(((a) < 0) ? - (a) :(a)) to mathops.h
 
+Silk:
+* added fixed-phase interpolation paths for the 8, 12 and 16 kHz to 48 kHz
+  steps in resampler_private_IIR_FIR.c (disable with OPUS_NO_SILK_FIXED_PHASE)
+
 Opus-tools:
 * copied src/opus_header.h and src/opus_header.c to lib/rbcodec/codecs/libopus
 * changed #include <ogg/ogg.h> to #include "ogg/ogg.h" in opus_header.h

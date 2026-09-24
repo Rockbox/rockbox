@@ -33,6 +33,83 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "resampler_private.h"
 #include "stack_alloc.h"
 
+#ifndef OPUS_NO_SILK_FIXED_PHASE
+/* One output at phase p from eight consecutive samples: the same sum as the
+   generic loop below, but as plain 16x16 C multiplies the compiler can
+   schedule, where silk_SMLABB is inline asm on ARMv5E. */
+static OPUS_INLINE opus_int16 silk_IIR_FIR_tap8(
+    opus_int16 x0, opus_int16 x1, opus_int16 x2, opus_int16 x3,
+    opus_int16 x4, opus_int16 x5, opus_int16 x6, opus_int16 x7,
+    opus_int p
+)
+{
+    const opus_int16 *a = silk_resampler_frac_FIR_12[ p ];
+    const opus_int16 *b = silk_resampler_frac_FIR_12[ 11 - p ];
+    opus_int32 res_Q15;
+
+    res_Q15  = (opus_int32)x0 * a[ 0 ];
+    res_Q15 += (opus_int32)x1 * a[ 1 ];
+    res_Q15 += (opus_int32)x2 * a[ 2 ];
+    res_Q15 += (opus_int32)x3 * a[ 3 ];
+    res_Q15 += (opus_int32)x4 * b[ 3 ];
+    res_Q15 += (opus_int32)x5 * b[ 2 ];
+    res_Q15 += (opus_int32)x6 * b[ 1 ];
+    res_Q15 += (opus_int32)x7 * b[ 0 ];
+    return (opus_int16)silk_SAT16( silk_RSHIFT_ROUND( res_Q15, 15 ) );
+}
+
+/* The steps silk_resampler_init produces for 16 and 8 kHz to 48 kHz visit
+   only three phases, in a fixed cycle, for any batch up to
+   RESAMPLER_MAX_BATCH_SIZE_IN: the rounding in the step never drifts across
+   a phase boundary before the index restarts.  Checked exhaustively over
+   every batch length.  The third output's window starts off2 samples later,
+   and each cycle advances adv samples. */
+static OPUS_INLINE opus_int16 *silk_IIR_FIR_cycle3(
+    opus_int16 *out, const opus_int16 *buf, opus_int32 max_index_Q16,
+    opus_int32 inc, opus_int p0, opus_int p1, opus_int p2, opus_int off2,
+    opus_int adv
+)
+{
+    opus_int32 index_Q16 = 0;
+
+    while( index_Q16 < max_index_Q16 ) {
+        opus_int16 x0 = buf[ 0 ], x1 = buf[ 1 ], x2 = buf[ 2 ], x3 = buf[ 3 ];
+        opus_int16 x4 = buf[ 4 ], x5 = buf[ 5 ], x6 = buf[ 6 ], x7 = buf[ 7 ];
+        *out++ = silk_IIR_FIR_tap8( x0, x1, x2, x3, x4, x5, x6, x7, p0 );
+        if( ( index_Q16 += inc ) >= max_index_Q16 ) break;
+        *out++ = silk_IIR_FIR_tap8( x0, x1, x2, x3, x4, x5, x6, x7, p1 );
+        if( ( index_Q16 += inc ) >= max_index_Q16 ) break;
+        if( off2 ) {
+            *out++ = silk_IIR_FIR_tap8( x1, x2, x3, x4, x5, x6, x7, buf[ 8 ], p2 );
+        } else {
+            *out++ = silk_IIR_FIR_tap8( x0, x1, x2, x3, x4, x5, x6, x7, p2 );
+        }
+        index_Q16 += inc;
+        buf += adv;
+    }
+    return out;
+}
+
+/* 12 kHz to 48 kHz steps by exactly half a sample: phases 0 and 6. */
+static OPUS_INLINE opus_int16 *silk_IIR_FIR_cycle2(
+    opus_int16 *out, const opus_int16 *buf, opus_int32 max_index_Q16
+)
+{
+    opus_int32 index_Q16 = 0;
+
+    while( index_Q16 < max_index_Q16 ) {
+        opus_int16 x0 = buf[ 0 ], x1 = buf[ 1 ], x2 = buf[ 2 ], x3 = buf[ 3 ];
+        opus_int16 x4 = buf[ 4 ], x5 = buf[ 5 ], x6 = buf[ 6 ], x7 = buf[ 7 ];
+        *out++ = silk_IIR_FIR_tap8( x0, x1, x2, x3, x4, x5, x6, x7, 0 );
+        if( ( index_Q16 += 32768 ) >= max_index_Q16 ) break;
+        *out++ = silk_IIR_FIR_tap8( x0, x1, x2, x3, x4, x5, x6, x7, 6 );
+        index_Q16 += 32768;
+        buf += 1;
+    }
+    return out;
+}
+#endif
+
 static OPUS_INLINE opus_int16 *silk_resampler_private_IIR_FIR_INTERPOL(
     opus_int16  *out,
     opus_int16  *buf,
@@ -43,6 +120,17 @@ static OPUS_INLINE opus_int16 *silk_resampler_private_IIR_FIR_INTERPOL(
     opus_int32 index_Q16, res_Q15;
     opus_int16 *buf_ptr;
     opus_int32 table_index;
+
+#ifndef OPUS_NO_SILK_FIXED_PHASE
+    switch( index_increment_Q16 ) {
+    case 43691: /* 16 kHz */
+        return silk_IIR_FIR_cycle3( out, buf, max_index_Q16, 43691, 0, 8, 4, 1, 2 );
+    case 21846: /* 8 kHz */
+        return silk_IIR_FIR_cycle3( out, buf, max_index_Q16, 21846, 0, 4, 8, 0, 1 );
+    case 32768: /* 12 kHz */
+        return silk_IIR_FIR_cycle2( out, buf, max_index_Q16 );
+    }
+#endif
 
     /* Interpolate upsampled signal and store in output array */
     for( index_Q16 = 0; index_Q16 < max_index_Q16; index_Q16 += index_increment_Q16 ) {
