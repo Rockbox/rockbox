@@ -173,9 +173,9 @@ static OPUS_INLINE opus_int16 SAT16(opus_int32 x) {
 
 #ifdef OPUS_ARM_PRESUME_AARCH64_NEON_INTR
 #include "arm/fixed_arm64.h"
-#elif defined (OPUS_ARM_INLINE_EDSP)
+#elif defined (OPUS_ARM_ASM_ARMV5E_AND_LATER)
 #include "arm/fixed_armv5e.h"
-#elif defined (OPUS_ARM_INLINE_ASM)
+#elif defined (OPUS_ARM_ASM_ARMV4_ONLY)
 #include "arm/fixed_armv4.h"
 #elif defined (BFIN_ASM)
 #include "fixed_bfin.h"

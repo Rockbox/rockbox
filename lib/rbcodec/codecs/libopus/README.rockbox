@@ -13,6 +13,9 @@ Opus:
 Celt:
 * changed #if FIXED_POINT to #ifdef FIXED_POINT in bands.c
 * changed #elif OPUS_ARM_INLINE_EDSP to #elif defined (OPUS_ARM_INLINE_EDSP)
+* renamed OPUS_ARM_INLINE_ASM to OPUS_ARM_ASM_ARMV4_ONLY and
+  OPUS_ARM_INLINE_EDSP to OPUS_ARM_ASM_ARMV5E_AND_LATER throughout celt and
+  silk, since config.h defines exactly one of them per core
 * add #define ABS(a)(((a) < 0) ? - (a) :(a)) to mathops.h
 
 Opus-tools:

@@ -135,11 +135,11 @@ static OPUS_INLINE opus_int32 silk_CLZ32(opus_int32 in32)
     (*((Matrix_base_adr) + ((row)+(M)*(column))))
 #endif
 
-#ifdef OPUS_ARM_INLINE_ASM
+#ifdef OPUS_ARM_ASM_ARMV4_ONLY
 #include "arm/macros_armv4.h"
 #endif
 
-#ifdef OPUS_ARM_INLINE_EDSP
+#ifdef OPUS_ARM_ASM_ARMV5E_AND_LATER
 #include "arm/macros_armv5e.h"
 #endif
 

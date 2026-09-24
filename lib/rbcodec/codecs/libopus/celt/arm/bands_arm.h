@@ -35,14 +35,14 @@
 
 #if defined(FIXED_POINT) && !defined(OPUS_ARM_NO_BANDS_ASM)
 
-# if defined(OPUS_ARM_INLINE_ASM) && (ARM_ARCH == 4)
+# if defined(OPUS_ARM_ASM_ARMV4_ONLY) && (ARM_ARCH == 4)
 
 #  define OVERRIDE_DENORM_BAND
 void denorm_band_armv4(celt_sig *f, const celt_norm *x, int n, int g,
                        int shift);
 #  define DENORM_BAND denorm_band_armv4
 
-# elif defined(OPUS_ARM_INLINE_EDSP) && (ARM_ARCH >= 5)
+# elif defined(OPUS_ARM_ASM_ARMV5E_AND_LATER) && (ARM_ARCH >= 5)
 
 #  define OVERRIDE_DENORM_BAND
 void denorm_band_armv5e(celt_sig *f, const celt_norm *x, int n, int g,

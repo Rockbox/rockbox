@@ -64,7 +64,7 @@ static __inline int ec_bsr(unsigned long _x){
 # include "dsplib.h"
 # define EC_CLZ0    (31)
 # define EC_CLZ(_x) (_lnorm(_x))
-#elif defined(OPUS_ARM_INLINE_ASM) && !defined(OPUS_ARM_NO_ILOG_INLINE)
+#elif defined(OPUS_ARM_ASM_ARMV4_ONLY) && !defined(OPUS_ARM_NO_ILOG_INLINE)
 /*ARMv4 has no CLZ instruction, so __builtin_clz compiles to a call to
    libgcc's __clzsi2.  Leave EC_CLZ undefined and inline EC_ILOG below.*/
 #elif __GNUC_PREREQ(3,4)
@@ -83,7 +83,7 @@ static __inline int ec_bsr(unsigned long _x){
   The majority of the time we can never pass it zero.
   When we need to, it can be special cased.*/
 # define EC_ILOG(_x) (EC_CLZ0-EC_CLZ(_x))
-#elif defined(OPUS_ARM_INLINE_ASM) && !defined(OPUS_ARM_NO_ILOG_INLINE)
+#elif defined(OPUS_ARM_ASM_ARMV4_ONLY) && !defined(OPUS_ARM_NO_ILOG_INLINE)
 /*Fifteen branchless instructions, no memory access.  The libgcc call it
    replaces costs about half again once the call, its table load and the
    caller's register saves are counted.  Compares against 0x10000, 0x100 and

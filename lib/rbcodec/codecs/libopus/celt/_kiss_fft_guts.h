@@ -90,11 +90,11 @@
     do {(res).r = ADD32_ovflw((res).r,(a).r);  (res).i = SUB32_ovflw((res).i,(a).i); \
     }while(0)
 
-#if defined(OPUS_ARM_INLINE_ASM)
+#if defined(OPUS_ARM_ASM_ARMV4_ONLY)
 #include "arm/kiss_fft_armv4.h"
 #endif
 
-#if defined(OPUS_ARM_INLINE_EDSP)
+#if defined(OPUS_ARM_ASM_ARMV5E_AND_LATER)
 #include "arm/kiss_fft_armv5e.h"
 #endif
 #if defined(OPUS_CF_INLINE_ASM)

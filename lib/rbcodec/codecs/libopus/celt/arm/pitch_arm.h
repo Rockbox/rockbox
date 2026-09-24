@@ -74,7 +74,7 @@ extern void (*const DUAL_INNER_PROD_IMPL[OPUS_ARCHMASK+1])(const opus_val16 *x,
    5.5 after.  ARMv4 is deliberately left alone: without the packed
    multiplies the extraction would cost exactly what the saved loads buy.
    Escape hatch OPUS_ARM_NO_PITCH_ASM. */
-# if defined(OPUS_ARM_INLINE_EDSP) && defined(FIXED_POINT) \
+# if defined(OPUS_ARM_ASM_ARMV5E_AND_LATER) && defined(FIXED_POINT) \
   && !defined(OVERRIDE_DUAL_INNER_PROD) && !defined(OPUS_ARM_NO_PITCH_ASM)
 void dual_inner_prod_armv5e(const opus_val16 *x, const opus_val16 *y01,
         const opus_val16 *y02, int N, opus_val32 *xy1, opus_val32 *xy2);

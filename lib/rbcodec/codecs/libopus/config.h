@@ -78,10 +78,12 @@
 
 #if defined(CPU_ARM)
 #define OPUS_ARM_ASM
+/* Upstream's OPUS_ARM_INLINE_ASM and OPUS_ARM_INLINE_EDSP, renamed: upstream
+   layers EDSP on top of ASM, but here exactly one is defined per core. */
 #if ARM_ARCH == 4
-#define OPUS_ARM_INLINE_ASM
+#define OPUS_ARM_ASM_ARMV4_ONLY
 #elif ARM_ARCH > 4
-#define OPUS_ARM_INLINE_EDSP
+#define OPUS_ARM_ASM_ARMV5E_AND_LATER
 #if (ARCH_PROFILE == ARM_PROFILE_MICRO)
 #define OPUS_ARM_NO_FFT_ASM
 #define OPUS_ARM_NO_MDCT_ASM

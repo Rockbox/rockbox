@@ -34,7 +34,7 @@
    Building with OPUS_ARM_NO_MDCT_ASM selects the C loops instead, which is
    how the two are compared. */
 
-#if defined(OPUS_ARM_INLINE_ASM) && defined(FIXED_POINT) \
+#if defined(OPUS_ARM_ASM_ARMV4_ONLY) && defined(FIXED_POINT) \
  && !defined(OPUS_ARM_NO_MDCT_ASM)
 
 #define OVERRIDE_MDCT_PREROT

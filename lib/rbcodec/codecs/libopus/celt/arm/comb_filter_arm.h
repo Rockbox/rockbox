@@ -38,7 +38,7 @@
 #if defined(FIXED_POINT) && !defined(CUSTOM_MODES) \
  && !defined(OPUS_ARM_NO_COMB_ASM)
 
-# if defined(OPUS_ARM_INLINE_ASM) && (ARM_ARCH == 4)
+# if defined(OPUS_ARM_ASM_ARMV4_ONLY) && (ARM_ARCH == 4)
 
 #  define OVERRIDE_COMB_FILTER_CONST
 void comb_filter_const_armv4(opus_val32 *y, opus_val32 *x, int T, int N,
@@ -61,7 +61,7 @@ void deemph_stereo_armv4(celt_sig *x0, celt_sig *x1, opus_val16 *pcm, int N,
 #  define deemphasis_stereo_simple(in, pcm, N, coef0, mem) \
      deemph_stereo_armv4((in)[0], (in)[1], (pcm), (N), (coef0), (mem))
 
-# elif defined(OPUS_ARM_INLINE_EDSP) && (ARM_ARCH >= 5)
+# elif defined(OPUS_ARM_ASM_ARMV5E_AND_LATER) && (ARM_ARCH >= 5)
 
 #  define OVERRIDE_COMB_FILTER_CONST
 void comb_filter_const_armv5e(opus_val32 *y, opus_val32 *x, int T, int N,
