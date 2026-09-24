@@ -468,6 +468,28 @@ void usb_drv_init(void)
         semaphore_init(&endpoints[ep_num].complete, 1, 0);
 }
 
+/* Present ourselves to the host. Called by usb_enable() once usb_core_init()
+ * has finished - not from usb_drv_init(), which usb_core_init() calls FIRST,
+ * before the class drivers are set up and before it sets its own state. A
+ * host quick enough to enumerate in that window had its requests handled
+ * against state usb_core_init() then overwrote: the descriptor read timed
+ * out, and whether it did depended on timing.
+ *
+ * Connecting only on CONN_INTR, as the interrupt handler does, needs a
+ * cable-insert edge after the stack is up - and there is none when the cable
+ * was already in: booting with it plugged, or taking the controller over
+ * from the ROM loader or hwstub, which leaves it enumerated as a different
+ * device the host has no reason to re-enumerate. So drop off the bus, reset
+ * the PHY and reconnect: the host sees a fresh device either way. */
+void usb_drv_connect(void)
+{
+    DEV_CTL &= ~DEV_SOFT_CN;
+    udelay(20000);
+    udc_phy_reset();
+    udelay(10000);
+    udc_soft_connect();
+}
+
 /* turn off usb core */
 void usb_drv_exit(void)
 {

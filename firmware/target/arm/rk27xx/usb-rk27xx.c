@@ -54,10 +54,16 @@ void usb_attach(void)
     usb_enable(true);
 }
 
+void usb_drv_connect(void);   /* usb-drv-rk27xx.c */
+
 void usb_enable(bool on)
 {
     if(on)
+    {
         usb_core_init();
+        /* attach only once the core is fully set up - see usb_drv_connect() */
+        usb_drv_connect();
+    }
     else
         usb_core_exit();
 }
