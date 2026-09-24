@@ -49,7 +49,7 @@
 #define OPUS_ARM_ASM
 #if ARM_ARCH == 4
 #define OPUS_ARM_INLINE_ASM
-#elif ARM_ARCH > 4
+#elif (ARM_ARCH > 4) && (ARCH_PROFILE == ARM_PROFILE_CLASSIC)
 #define OPUS_ARM_INLINE_EDSP
 #endif
 

@@ -14,7 +14,7 @@ celt/arm/mdct_armv4_asm.S
 celt/arm/comb_filter_armv4_asm.S
 celt/arm/denorm_armv4_asm.S
 celt/arm/deemph_armv4_asm.S
-#elif defined(CPU_ARM) && (ARM_ARCH == 5)
+#elif defined(CPU_ARM) && (ARM_ARCH >= 5) && (ARCH_PROFILE == ARM_PROFILE_CLASSIC)
 celt/arm/kiss_fft_armv5e_asm.S
 celt/arm/mdct_armv5e_asm.S
 celt/arm/comb_filter_armv5e_asm.S
