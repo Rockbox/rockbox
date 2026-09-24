@@ -49,8 +49,12 @@
 #define OPUS_ARM_ASM
 #if ARM_ARCH == 4
 #define OPUS_ARM_INLINE_ASM
-#elif (ARM_ARCH > 4) && (ARCH_PROFILE == ARM_PROFILE_CLASSIC)
+#elif ARM_ARCH > 4
 #define OPUS_ARM_INLINE_EDSP
+#if (ARCH_PROFILE != ARM_PROFILE_CLASSIC)
+#define OPUS_ARM_NO_FFT_ASM
+#define OPUS_ARM_NO_MDCT_ASM
+#endif
 #endif
 
 /*optimization no hardware division support*/
@@ -65,4 +69,3 @@
 #endif
 
 #endif /* CONFIG_H */
-
