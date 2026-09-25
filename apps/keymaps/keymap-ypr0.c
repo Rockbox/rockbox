@@ -239,6 +239,9 @@ static const struct button_mapping button_context_radio[]  = {
     { ACTION_FM_PLAY,            BUTTON_SELECT | BUTTON_REL,    BUTTON_SELECT },
     { ACTION_FM_NEXT_PRESET,     BUTTON_USER | BUTTON_RIGHT,    BUTTON_NONE },
     { ACTION_FM_PREV_PRESET,     BUTTON_USER | BUTTON_LEFT,     BUTTON_NONE },
+#ifdef HAVE_RECORDING
+    { ACTION_FM_RECORD,          BUTTON_USER | BUTTON_REL,      BUTTON_USER },
+#endif
 
     /* Volume */
     { ACTION_SETTINGS_INC,       BUTTON_UP | BUTTON_REPEAT,     BUTTON_NONE },
@@ -251,6 +254,22 @@ static const struct button_mapping button_context_radio[]  = {
     { ACTION_STD_NEXT,           BUTTON_RIGHT,                  BUTTON_NONE },
     { ACTION_STD_NEXTREPEAT,     BUTTON_RIGHT | BUTTON_REPEAT,  BUTTON_NONE },
 }; /* button_context_radio */
+
+#ifdef HAVE_RECORDING
+/* User - the Rec key on the YP-CP3 - starts and pauses, held opens a new
+ * file; left/right set the gain of the selected line */
+static const struct button_mapping button_context_recscreen[]  = {
+    { ACTION_REC_PAUSE,          BUTTON_USER|BUTTON_REL,        BUTTON_USER },
+    { ACTION_REC_NEWFILE,        BUTTON_USER|BUTTON_REPEAT,     BUTTON_USER },
+    { ACTION_STD_MENU,           BUTTON_MENU|BUTTON_REL,        BUTTON_MENU },
+    { ACTION_SETTINGS_INC,       BUTTON_RIGHT,                  BUTTON_NONE },
+    { ACTION_SETTINGS_INCREPEAT, BUTTON_RIGHT|BUTTON_REPEAT,    BUTTON_NONE },
+    { ACTION_SETTINGS_DEC,       BUTTON_LEFT,                   BUTTON_NONE },
+    { ACTION_SETTINGS_DECREPEAT, BUTTON_LEFT|BUTTON_REPEAT,     BUTTON_NONE },
+
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
+}; /* button_context_recscreen */
+#endif
 
 const struct button_mapping* get_context_mapping(int context)
 {
@@ -296,6 +315,10 @@ const struct button_mapping* get_context_mapping(int context)
             return button_context_pitchscreen;
         case CONTEXT_KEYBOARD:
             return button_context_keyboard;
+#ifdef HAVE_RECORDING
+        case CONTEXT_RECSCREEN:
+            return button_context_recscreen;
+#endif
     }
     return button_context_standard;
 }

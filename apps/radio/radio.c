@@ -106,6 +106,7 @@
 #define FM_PLAY
 #define FM_PREV_PRESET
 #define FM_NEXT_PRESET
+#define FM_RECORD
 
 #elif (CONFIG_KEYPAD == SANSA_FUZEPLUS_PAD)
 #define FM_PRESET_ADD
