@@ -339,6 +339,7 @@ Lyre prototype 1 */
 #define RTC_MR100  12
 #define RTC_MC13783  13 /* Freescale MC13783 PMIC */
 #define RTC_S5L8700  14
+#define RTC_S35390A  15
 #define RTC_JZ4740   16 /* Ingenic Jz4740 */
 #define RTC_NANO2G   17 /* This seems to be a PCF5063x */
 #define RTC_D2       18 /* Either PCF50606 or PCF50635 */
