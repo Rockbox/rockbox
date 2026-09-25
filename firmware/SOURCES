@@ -1736,6 +1736,9 @@ target/arm/rk27xx/ypcp3/button-ypcp3.c
 target/arm/rk27xx/ypcp3/powermgmt-ypcp3.c
 target/arm/rk27xx/ypcp3/power-ypcp3.c
 target/arm/rk27xx/ypcp3/lcd-ypcp3.c
+#ifndef BOOTLOADER
+target/arm/rk27xx/ypcp3/wmcodec-ypcp3.c
+#endif
 #endif
 
 #if CONFIG_CPU == JZ4732

@@ -44,7 +44,6 @@
 #define CONFIG_STORAGE (STORAGE_SD | STORAGE_NAND)
 
 #define CONFIG_NAND NAND_RK27XX
-#define HAVE_SW_TONE_CONTROLS
 
 /* commented for now */
 /* #define HAVE_HOTSWAP */
@@ -93,8 +92,17 @@
 
 #define CONFIG_LCD LCD_SPFD5420A
 
-/* Define the type of audio codec */
-#define HAVE_RK27XX_CODEC
+/* Wolfson WM8750 on I2C, headphones on its OUT2. The codec is the I2S
+ * slave: the rk27xx drives the bus and clocks the codec from its codec PLL
+ * at 256 fs for every rate (pcm-rk27xx.c), so the codec's CLOCKING register
+ * is its normal-mode 256 fs setting throughout. The original firmware runs
+ * the codec as master off a fixed 12 MHz instead, in USB mode, which puts
+ * 44.1 kHz at 44.118. */
+#define HAVE_WM8750
+#define CODEC_SLAVE
+#define CODEC_SRCTRL_11025HZ 0
+#define CODEC_SRCTRL_22050HZ 0
+#define CODEC_SRCTRL_44100HZ 0
 
 /* Seiko S-35390A real-time clock on I2C, left in 12-hour mode by the
  * original firmware */

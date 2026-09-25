@@ -187,6 +187,10 @@ void audiohw_preinit(void)
     and_l(~(1<<5), &GPIO1_OUT);
     or_l((1<<5), &GPIO1_ENABLE);
     or_l((1<<5), &GPIO1_FUNCTION);
+#elif defined(SAMSUNG_YPCP3)
+    /* headphone amplifier enable, GPIO F2 active high: off for now */
+    GPIO_PFDR &= ~(1<<2);
+    GPIO_PFCON |= (1<<2);
 #endif
 
     /*
@@ -233,6 +237,9 @@ void audiohw_postinit(void)
     /* headphones + line-out */
     wmcodec_set_bits(PWRMGMT2, PWRMGMT2_LOUT1 | PWRMGMT2_ROUT1 | 
                      PWRMGMT2_LOUT2 | PWRMGMT2_ROUT2);
+#elif defined(SAMSUNG_YPCP3)
+    /* headphones, on OUT2 */
+    wmcodec_set_bits(PWRMGMT2, PWRMGMT2_LOUT2 | PWRMGMT2_ROUT2);
 #else
     /* headphones */
     wmcodec_set_bits(PWRMGMT2, PWRMGMT2_LOUT1 | PWRMGMT2_ROUT1);
@@ -286,6 +293,8 @@ void audiohw_postinit(void)
    or_l((1<<25), &GPIO1_OUT);
 #elif defined(MPIO_HD300)
    or_l((1<<5), &GPIO1_OUT);
+#elif defined(SAMSUNG_YPCP3)
+    GPIO_PFDR |= (1<<2);
 #endif
 }
 
@@ -293,10 +302,18 @@ void audiohw_set_volume(int vol_l, int vol_r)
 {
     vol_l = vol_tenthdb2hw(vol_l);
     vol_r = vol_tenthdb2hw(vol_r);   
+#if defined(SAMSUNG_YPCP3)
+    /* headphones on OUT2 */
+    wmcodec_set_masked(LOUT2, LOUT2_LOUT2VOL(vol_l),
+                       LOUT2_LOUT2VOL_MASK);
+    wmcodec_set_masked(ROUT2, ROUT2_RO2VU | ROUT2_ROUT2VOL(vol_r),
+                       ROUT2_ROUT2VOL_MASK);
+#else
     wmcodec_set_masked(LOUT1, LOUT1_LOUT1VOL(vol_l),
                        LOUT1_LOUT1VOL_MASK);
     wmcodec_set_masked(ROUT1, ROUT1_RO1VU | ROUT1_ROUT1VOL(vol_r),
                        ROUT1_ROUT1VOL_MASK);
+#endif
 }
 
 #ifdef AUDIOHW_HAVE_LINEOUT
@@ -353,6 +370,8 @@ void audiohw_close(void)
     and_l(~(1<<25), &GPIO1_OUT);
 #elif defined(MPIO_HD300)
     and_l(~(1<<5), &GPIO1_OUT);
+#elif defined(SAMSUNG_YPCP3)
+    GPIO_PFDR &= ~(1<<2);
 #endif
 
     /* 2. Disable all output buffers. */
