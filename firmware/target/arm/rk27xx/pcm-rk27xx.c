@@ -190,16 +190,16 @@ static void set_codec_freq(unsigned int freq)
     /* {CLKR, CLKF, CLKOD, CODECPLL_DIV} */
     static const unsigned int pcm_freq_params[HW_NUM_FREQ][4] = 
     {
-        [HW_FREQ_96] = {24, 255, 4, 1},
-        [HW_FREQ_48] = {24, 127, 4, 1},
-        [HW_FREQ_44] = {24, 293, 4, 4},
-        [HW_FREQ_32] = {24, 127, 4, 2},
-        [HW_FREQ_24] = {24, 127, 4, 3},
-        [HW_FREQ_22] = {24, 146, 4, 4},
-        [HW_FREQ_16] = {24, 127, 5, 4},
-        [HW_FREQ_12] = {24, 127, 4, 7},
-        [HW_FREQ_11] = {24, 146, 4, 9},
-        [HW_FREQ_8]  = {24, 127, 5, 9},
+        HW_HAVE_96_([HW_FREQ_96] = {24, 255, 4, 1},)
+        HW_HAVE_48_([HW_FREQ_48] = {24, 127, 4, 1},)
+        HW_HAVE_44_([HW_FREQ_44] = {24, 293, 4, 4},)
+        HW_HAVE_32_([HW_FREQ_32] = {24, 127, 4, 2},)
+        HW_HAVE_24_([HW_FREQ_24] = {24, 127, 4, 3},)
+        HW_HAVE_22_([HW_FREQ_22] = {24, 146, 4, 4},)
+        HW_HAVE_16_([HW_FREQ_16] = {24, 127, 5, 4},)
+        HW_HAVE_12_([HW_FREQ_12] = {24, 127, 4, 7},)
+        HW_HAVE_11_([HW_FREQ_11] = {24, 146, 4, 9},)
+        HW_HAVE_8_([HW_FREQ_8]  = {24, 127, 5, 9},)
     };
     /* select divider output from codec pll */
     SCU_DIVCON1 &= ~((1<<9) | (0xF<<5));
