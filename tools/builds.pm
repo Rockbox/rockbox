@@ -235,6 +235,10 @@ $releasenotes="/wiki/ReleaseNotes400";
         name => 'Rockchip rk27xx',
         status => 1,
     },
+    'samsungypcp3' => {
+        name => 'Samsung YP-CP3',
+        status => 3,
+    },
     'samsungyh820' => {
         name => 'Samsung YH-820',
         status => 3,

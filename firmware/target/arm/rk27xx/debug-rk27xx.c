@@ -29,8 +29,10 @@
 #include "storage.h"
 #include "lcd-target.h"
 
-#ifdef RK27_GENERIC
+#if defined(RK27_GENERIC)
 #define DEBUG_CANCEL BUTTON_VOL
+#elif defined(SAMSUNG_YPCP3)
+#define DEBUG_CANCEL BUTTON_BACK
 #elif defined(HM60X) || defined(HM801) || (CONFIG_KEYPAD == MA_PAD) || \
     (CONFIG_KEYPAD == IHIFI_PAD)
 #define DEBUG_CANCEL BUTTON_LEFT

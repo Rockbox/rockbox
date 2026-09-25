@@ -1729,6 +1729,13 @@ target/arm/rk27xx/rk27generic/lcd-rk27generic.c
 target/arm/rk27xx/rk27generic/fmradio-i2c-rk27generic.c
 #endif
 
+#if defined(SAMSUNG_YPCP3)
+target/arm/rk27xx/ypcp3/button-ypcp3.c
+target/arm/rk27xx/ypcp3/powermgmt-ypcp3.c
+target/arm/rk27xx/ypcp3/power-ypcp3.c
+target/arm/rk27xx/ypcp3/lcd-ypcp3.c
+#endif
+
 #if CONFIG_CPU == JZ4732
 target/mips/ingenic_jz47xx/ata-nand-jz4740.c
 target/mips/ingenic_jz47xx/ata-sd-jz4740.c

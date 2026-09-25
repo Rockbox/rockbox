@@ -142,7 +142,8 @@ static void mmu_buff_reset(void)
 
 static inline bool card_detect_target(void)
 {
-#if defined(RK27_GENERIC) || defined(IHIFI770) || defined(IHIFI770C) || defined(IHIFI800)
+#if defined(RK27_GENERIC) || defined(IHIFI770) || defined(IHIFI770C) || defined(IHIFI800) || \
+    defined(SAMSUNG_YPCP3)
     /* PC7, active low */
     return !(GPIO_PCDR & 0x80);
 #elif defined(HM60X) || defined(HM801)

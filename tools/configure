@@ -1710,35 +1710,36 @@ cat <<EOF
  142) YH-925               120) VX747
  144) YP-R0                122) VX747+           ==ROCKCHIP==
  145) YP-R1 (WIP)          121) VX767            180) rk27xx generic
-                           123) VX777
- ==HiFiMAN==                                     ==HiFi E.T.==
- 190) HM-60x               ==MPIO==              210) MA9
- 191) HM-801               170) HD200            211) MA9C
-                           171) HD300            212) MA8
- ==Sony==                                        213) MA8C
- 219) NWZ-E350 series      ==Application==
- 220) NWZ-E370/E380 series 200) SDL (Generic)    ==IHIFI==
- 221) NWZ-E360 series      201) Android (ARM)    230) 760
- 222) NWZ-E450 series      202) Android (MIPS)   231) 770
- 223) NWZ-E460 series      203) Android (x86)    232) 770C
- 224) NWZ-E470 series      209) Anbernic RG Nano 233) 800
- 225) NWZ-E580 series                            234) 960
- 226) NWZ-A10 series       ==AgpTek==
- 227) NW-A20 series        240) Rocker           ==AIGO==
- 228) NWZ-A860 series                            245) Eros Q / K (hosted)
- 229) NWZ-S750 series      ==iBasso==            247) Eros Q / K native
-                           250) DX50                   (hw1/hw2 bl, all hw rb)
- ==FiiO==                  251) DX90             248) Eros Q / K native
- 244) M3K Linux                                        (hw3 bl only)
- 246) M3K baremetal        ==xDuoo==             249) Eros Q / K native
-                           241) X3                     (hw4 bl only)
- ==Shanling==              242) X3II
- 260) Q1                   243) X20              ==HiBy==
-                                                 300) R3 Pro II
- ==Echo project==          ==Surfans==           301) R1
- 270) Echo R1 (WIP)        280) F28 (WIP)
-                                                 ==Hidizs==
- ==Nintendo==                                    302) AP80 Pro Max (WIP)
+ 146) YP-CP3               123) VX777
+                                                 ==HiFi E.T.==
+ ==HiFiMAN==               ==MPIO==              210) MA9
+ 190) HM-60x               170) HD200            211) MA9C
+ 191) HM-801               171) HD300            212) MA8
+                                                 213) MA8C
+ ==Sony==                  ==Application==                      
+ 219) NWZ-E350 series      200) SDL (Generic)    ==IHIFI==
+ 220) NWZ-E370/E380 series 201) Andorid (ARM)    230) 760
+ 221) NWZ-E360 series      202) Android (MIPS)   231) 770
+ 222) NWZ-E450 series      203) Android (x86)    232) 770C
+ 223) NWZ-E460 series      209) Anbernic RG Nano 233) 800
+ 224) NWZ-E470 series                            234) 960
+ 225) NWZ-E580 series      ==AgpTek==                      
+ 226) NWZ-A10 series       240) Rocker           ==AIGO==
+ 227) NW-A20 series                              245) Eros Q / K (hosted)
+ 228) NWZ-A860 series      ==iBasso==            247) Eros Q / K native
+ 229) NWZ-S750 series      250) DX50                  (hw1/hw2 bl, all hw rb)
+			   251) DX90             248) Eros Q / K native     
+ ==FiiO==                                             (hw3 bl only)
+ 244) M3K Linux            ==xDuoo==             249) Eros Q / K native
+ 246) M3K baremetal        241) X3                    (hw4 bl only)
+                           242) X3II                     
+ ==Shanling==              243) X20              ==HiBy==
+ 260) Q1                                         300) R3 Pro II
+			   ==Surfans==           301) R1
+ ==Echo project==          280) F28 (WIP)
+ 270) Echo R1 (WIP)                              ==Hidizs==
+						 302) AP80 Pro Max (WIP)
+ ==Nintendo==
  290) Nintendo 3DS (WIP)
 
 EOF
@@ -3036,6 +3037,28 @@ fi
     t_soc="pp"
     t_manufacturer="samsung"
     t_model="yh925"
+    ;;
+
+   146|samsungypcp3)
+    target_id=117
+    modelname="samsungypcp3"
+    target="SAMSUNG_YPCP3"
+    memory=16 # always
+    arm7ejscc
+    tool="$rootdir/tools/scramble -rkw -modelnum=132"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    output="rockbox.rkw"
+    bootoutput="bootloader.rkw"
+    appextra="recorder:gui"
+    plugins=""
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
+    toolset="$genericbitmaptools"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="arm"
+    t_manufacturer="rk27xx"
+    t_model="ypcp3"
     ;;
 
    160|vibe500)

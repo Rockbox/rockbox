@@ -483,6 +483,8 @@ Lyre prototype 1 */
 #include "config/mpiohd300.h"
 #elif defined(RK27_GENERIC)
 #include "config/rk27generic.h"
+#elif defined(SAMSUNG_YPCP3)
+#include "config/samsungypcp3.h"
 #elif defined(HM60X)
 #include "config/hifimanhm60x.h"
 #elif defined(HM801)
