@@ -20,6 +20,7 @@
 
 #include "config.h"
 #include "usb.h"
+#include "usb-rk27xx.h"
 #include "usb_drv.h"
 
 #include "cpu.h"
@@ -30,6 +31,7 @@
 #include "usb_ch9.h"
 #include "usb_core.h"
 #include <inttypes.h>
+#include <string.h>
 #include "power.h"
 
 #define LOGF_ENABLE
@@ -99,9 +101,6 @@ static struct endpoint_t endpoints[16] =
     ENDPOINT(14, BULK, IN,  &TX14STAT), /* BIN14 */
     ENDPOINT(15, INT,  IN,  &TX15STAT), /* IIN15 */
 };
-
-struct usb_drv_ep_spec usb_drv_ep_specs[16]; /* filled in usb_drv_startup */
-uint8_t usb_drv_ep_specs_flags = 0;
 
 static volatile bool set_address = false;
 static volatile bool set_configuration = false;
@@ -273,16 +272,51 @@ static void udc_helper(void)
         }
 }
 
-void usb_drv_startup(void) {
-    /* fill the endpoint spec table */
-    usb_drv_ep_specs[0].type[DIR_OUT] = USB_ENDPOINT_XFER_CONTROL;
-    usb_drv_ep_specs[0].type[DIR_IN] = USB_ENDPOINT_XFER_CONTROL;
-    for(int ep_num = 1; ep_num < 16; ep_num++) {
-        int dir = endpoints[ep_num].dir;
-        int type = endpoints[ep_num].type;
-        usb_drv_ep_specs[ep_num].type[dir] = type;
-        usb_drv_ep_specs[ep_num].type[!dir] = USB_ENDPOINT_TYPE_NONE;
+/* The UDC's endpoints come in groups of three - bulk OUT, bulk IN,
+ * interrupt IN: 1-3, 4-6 and so on - each endpoint with one fixed type and
+ * direction. An interrupt endpoint in the same group as bulk endpoints in
+ * use slows the bulk transfers down: every IN token the host polls it with
+ * and it NAKs costs the group's bulk traffic. With HID on endpoint 3 beside
+ * mass storage on 1 and 2, writes ran at 0.03 MB/s, and polled every 125 us
+ * instead of every 16 ms they all but stopped; on endpoint 6 they ran at
+ * 2.3 MB/s, as with no HID at all. So interrupt and bulk endpoints never
+ * share a group - which depends on what else is allocated, hence the
+ * driver's own allocator (usb_drv.h, option 2). */
+void usb_drv_ep_reset_alloc_ctx(struct usb_drv_ep_alloc_ctx* ctx)
+{
+    memset(ctx->type, -1, sizeof(ctx->type));
+    memset(ctx->max_packet_size, 0, sizeof(ctx->max_packet_size));
+}
+
+bool usb_drv_ep_allocate(struct usb_drv_ep_alloc_ctx* ctx, int ep, int type,
+                         int max_packet_size)
+{
+    int ep_num = EP_NUM(ep);
+    int dir = EP_DIR(ep);
+    struct endpoint_t *endp = &endpoints[ep_num];
+
+    if(ep_num == 0 || endp->type != type ||
+       endp->dir != (dir == DIR_IN ? USB_DIR_IN : USB_DIR_OUT))
+        return false;
+
+    int first = (ep_num - 1) / 3 * 3 + 1;
+    for(int i = first; i < first + 3 && i < USB_NUM_ENDPOINTS; i++)
+    {
+        for(int d = 0; d < 2; d++)
+        {
+            if(ctx->type[i][d] != -1 && ctx->type[i][d] != type)
+                return false;
+        }
     }
+
+    ctx->type[ep_num][dir] = type;
+    ctx->max_packet_size[ep_num][dir] = max_packet_size;
+    return true;
+}
+
+/* one-time init: nothing to do, the endpoints are fixed in endpoints[] */
+void usb_drv_startup(void)
+{
 }
 
 /* return port speed FS=0, HS=1 */

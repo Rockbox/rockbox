@@ -58,6 +58,8 @@
 /* include order matters, include driver header before usb_drv.h */
 #if CONFIG_USBOTG == USBOTG_DESIGNWARE
 #include "usb-designware.h"
+#elif CONFIG_USBOTG == USBOTG_RK27XX
+#include "usb-rk27xx.h"
 #endif
 #include "usb_drv.h"
 
