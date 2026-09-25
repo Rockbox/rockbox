@@ -116,19 +116,6 @@ void system_init(void)
     WDTCON &= ~(1<<3);
 
 #ifndef BOOTLOADER
-    /* SDRAM tweaks.  Note this assumes 100MHz AHB+SDRAM clock. */
-
-#if !(defined(HM60X) || defined(HM801))
-    MCSDR_MODE = (3<<4)|3;         /* CAS=3, burst=8(2^3) -- Safe but slower */
-#else
-    MCSDR_MODE = (2<<4)|3;         /* CAS=2, burst=8(2^3) -- Ideal but causes startup issues on (some?) IHIFI devices */
-#endif
-
-    MCSDR_T_REF = (125*100) >> 3;  /* 125/8 = 15.625 autorefresh interval */
-    MCSDR_T_RFC = (64*100) / 1000; /* autorefresh period */
-    MCSDR_T_RP = 1;                /* precharge period */
-    MCSDR_T_RCD = 1;               /* active to RD/WR delay */
-
     /* turn off clock for unused modules - not the NAND controller's: the
      * FTL uses it, and a register access with its HCLK gated aborts */
     SCU_CLKCFG |= CLKCFG_WDT        |        /* WDT pclk */
@@ -245,12 +232,8 @@ void commit_discard_dcache_range (const void *base, unsigned int size)
 #if !defined(BOOTLOADER) && defined(HAVE_ADJUSTABLE_CPU_FREQ)
 static inline void set_sdram_timing(int ahb_freq)
 {
-#if 1
-    if (ahb_freq > 100000000)
-        MCSDR_MODE = (3<<4)|3;         /* CAS=3, burst=8(2^3) */
-    else
-        MCSDR_MODE = (2<<4)|3;         /* CAS=2, burst=8(2^3) */
-#endif
+    /* refresh only: the mode register - CAS latency - stays as the boot set
+     * it (see system_init()) */
     MCSDR_T_REF = (125*ahb_freq/1000000) >> 3;
     MCSDR_T_RFC = (64*ahb_freq/1000000)/1000;
 }
