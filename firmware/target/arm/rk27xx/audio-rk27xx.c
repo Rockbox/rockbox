@@ -29,10 +29,15 @@ static int output_source = AUDIO_SRC_PLAYBACK;
 
 static void select_audio_path(void)
 {
+#ifdef HAVE_RECORDING
+    /* the codec routes the source for listening and recording both */
+    audiohw_set_recsrc(input_source, input_flags & SRCF_RECORDING);
+#else
     if(input_source == AUDIO_SRC_PLAYBACK)
         audiohw_set_monitor(false);
     else
         audiohw_set_monitor(true);
+#endif
 }
 
 void audio_input_mux(int source, unsigned flags)
