@@ -3050,7 +3050,7 @@ fi
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox.rkw"
     bootoutput="bootloader.rkw"
-    appextra="recorder:gui"
+    appextra="recorder:gui:radio"
     plugins=""
     # toolset is the tools within the tools directory that we build for
     # this particular target.

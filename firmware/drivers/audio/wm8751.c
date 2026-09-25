@@ -427,6 +427,43 @@ void audiohw_set_depth_3d(int val)
 }
 #endif
 
+#if defined(HAVE_WM8750) && defined(HAVE_FMRADIO_IN) && !defined(HAVE_RECORDING)
+/* The FM tuner, on LINPUT1/RINPUT1, played through the analog bypass into
+ * the output mixers - for a target that plays the radio but cannot record
+ * it. As on the YP-CP3's original firmware, the signal goes through the
+ * input PGA at +12 dB, which the tuner's low line level needs. The DAC
+ * stays in the mix. */
+void audiohw_set_monitor(bool enable)
+{
+    if (enable)
+    {
+        wmcodec_set_masked(ADCL, ADCL_LINSEL_LINPUT1, ADCL_LINSEL_MASK);
+        wmcodec_set_masked(ADCR, ADCR_RINSEL_RINPUT1, ADCR_RINSEL_MASK);
+        wmcodec_set_reg(LINVOL, LINVOL_LIZC | LINVOL_LINVOL(0x27));
+        wmcodec_set_reg(RINVOL, RINVOL_RIVU | RINVOL_RIZC |
+                        RINVOL_RINVOL(0x27));
+        wmcodec_set_bits(PWRMGMT1, PWRMGMT1_AINL | PWRMGMT1_AINR);
+
+        wmcodec_set_masked(LEFTMIX1, LEFTMIX1_LMIXSEL_ADCLIN |
+                           LEFTMIX1_LI2LOVOL(0x20),
+                           0x7 | LEFTMIX1_LI2LOVOL_MASK);
+        wmcodec_set_bits(LEFTMIX1, LEFTMIX1_LI2LO);
+        wmcodec_set_masked(RIGHTMIX1, RIGHTMIX1_RMIXSEL_ADCRIN, 0x7);
+        wmcodec_set_masked(RIGHTMIX2, RIGHTMIX2_RI2ROVOL(0x20),
+                           RIGHTMIX2_RI2ROVOL_MASK);
+        wmcodec_set_bits(RIGHTMIX2, RIGHTMIX2_RI2RO);
+    }
+    else
+    {
+        wmcodec_clear_bits(LEFTMIX1, LEFTMIX1_LI2LO);
+        wmcodec_clear_bits(RIGHTMIX2, RIGHTMIX2_RI2RO);
+        wmcodec_set_bits(LINVOL, LINVOL_LINMUTE);
+        wmcodec_set_bits(RINVOL, RINVOL_RIVU | RINVOL_RINMUTE);
+        wmcodec_clear_bits(PWRMGMT1, PWRMGMT1_AINL | PWRMGMT1_AINR);
+    }
+}
+#endif
+
 #ifdef HAVE_RECORDING
 #if 0
 static void audiohw_set_ngat(int ngath, int type, bool enable)

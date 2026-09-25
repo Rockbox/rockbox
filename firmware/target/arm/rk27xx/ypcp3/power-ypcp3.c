@@ -44,6 +44,21 @@ void power_off(void)
     }
 }
 
+#if CONFIG_TUNER
+/* The tuner has no power switch; the original firmware does not switch it
+ * either, it only puts the chip to sleep over I2C. */
+bool tuner_power(bool status)
+{
+    (void)status;
+    return true;
+}
+
+bool tuner_powered(void)
+{
+    return true;
+}
+#endif
+
 unsigned int power_input_status(void)
 {
     return (usb_detect() == USB_INSERTED) ? POWER_INPUT_MAIN_CHARGER : POWER_INPUT_NONE;

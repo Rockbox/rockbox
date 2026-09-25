@@ -108,6 +108,15 @@
  * original firmware */
 #define CONFIG_RTC RTC_S35390A
 
+/* Silicon Labs Si4703 FM tuner on I2C, with RDS. It has no power control -
+ * the original firmware has none either - and its audio reaches the codec
+ * on LINPUT1/RINPUT1. RDS is polled, which needs no interrupt line. */
+#define CONFIG_TUNER SI4700
+#define HAVE_RDS_CAP
+#define CONFIG_RDS (RDS_CFG_POLL | RDS_CFG_PROCESS)
+#define CONFIG_RDS_POLL_TICKS 4
+#define INPUT_SRC_CAPS SRC_CAP_FMRADIO
+
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT
 #define HAVE_BACKLIGHT_BRIGHTNESS

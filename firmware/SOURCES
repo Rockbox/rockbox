@@ -1739,6 +1739,9 @@ target/arm/rk27xx/ypcp3/lcd-ypcp3.c
 #ifndef BOOTLOADER
 target/arm/rk27xx/ypcp3/wmcodec-ypcp3.c
 #endif
+#if CONFIG_TUNER
+target/arm/rk27xx/rk27generic/fmradio-i2c-rk27generic.c
+#endif
 #endif
 
 #if CONFIG_CPU == JZ4732
