@@ -427,43 +427,6 @@ void audiohw_set_depth_3d(int val)
 }
 #endif
 
-#if defined(HAVE_WM8750) && defined(HAVE_FMRADIO_IN) && !defined(HAVE_RECORDING)
-/* The FM tuner, on LINPUT1/RINPUT1, played through the analog bypass into
- * the output mixers - for a target that plays the radio but cannot record
- * it. As on the YP-CP3's original firmware, the signal goes through the
- * input PGA at +12 dB, which the tuner's low line level needs. The DAC
- * stays in the mix. */
-void audiohw_set_monitor(bool enable)
-{
-    if (enable)
-    {
-        wmcodec_set_masked(ADCL, ADCL_LINSEL_LINPUT1, ADCL_LINSEL_MASK);
-        wmcodec_set_masked(ADCR, ADCR_RINSEL_RINPUT1, ADCR_RINSEL_MASK);
-        wmcodec_set_reg(LINVOL, LINVOL_LIZC | LINVOL_LINVOL(0x27));
-        wmcodec_set_reg(RINVOL, RINVOL_RIVU | RINVOL_RIZC |
-                        RINVOL_RINVOL(0x27));
-        wmcodec_set_bits(PWRMGMT1, PWRMGMT1_AINL | PWRMGMT1_AINR);
-
-        wmcodec_set_masked(LEFTMIX1, LEFTMIX1_LMIXSEL_ADCLIN |
-                           LEFTMIX1_LI2LOVOL(0x20),
-                           0x7 | LEFTMIX1_LI2LOVOL_MASK);
-        wmcodec_set_bits(LEFTMIX1, LEFTMIX1_LI2LO);
-        wmcodec_set_masked(RIGHTMIX1, RIGHTMIX1_RMIXSEL_ADCRIN, 0x7);
-        wmcodec_set_masked(RIGHTMIX2, RIGHTMIX2_RI2ROVOL(0x20),
-                           RIGHTMIX2_RI2ROVOL_MASK);
-        wmcodec_set_bits(RIGHTMIX2, RIGHTMIX2_RI2RO);
-    }
-    else
-    {
-        wmcodec_clear_bits(LEFTMIX1, LEFTMIX1_LI2LO);
-        wmcodec_clear_bits(RIGHTMIX2, RIGHTMIX2_RI2RO);
-        wmcodec_set_bits(LINVOL, LINVOL_LINMUTE);
-        wmcodec_set_bits(RINVOL, RINVOL_RIVU | RINVOL_RINMUTE);
-        wmcodec_clear_bits(PWRMGMT1, PWRMGMT1_AINL | PWRMGMT1_AINR);
-    }
-}
-#endif
-
 #ifdef HAVE_RECORDING
 #if 0
 static void audiohw_set_ngat(int ngath, int type, bool enable)
@@ -502,6 +465,70 @@ static void audiohw_set_alc(unsigned char level,  /* signal level at ADC */
 }
 #endif
 
+#if defined(SAMSUNG_YPCP3)
+/* Samsung YP-CP3: the FM tuner on LINPUT1/RINPUT1, the microphone - mono -
+ * on RINPUT2, the headphones on OUT2. The rk27xx cannot send received
+ * samples straight back out, so what is heard of an input goes through the
+ * codec's analog bypass, the input PGA into the output mixers: the radio
+ * always, the microphone never. As in the original firmware, the radio
+ * passes the PGA at +12 dB when only listened to, and the microphone gets
+ * +13 dB of boost and is recorded by the right ADC onto both channels.
+ * While recording, the gain setting drives the PGA. */
+void audiohw_set_recsrc(int source, bool recording)
+{
+    audiohw_mute(true);
+
+    /* inputs off */
+    wmcodec_clear_bits(LEFTMIX1, LEFTMIX1_LI2LO);
+    wmcodec_clear_bits(RIGHTMIX2, RIGHTMIX2_RI2RO);
+    wmcodec_clear_bits(PWRMGMT1, PWRMGMT1_AINL | PWRMGMT1_AINR |
+                       PWRMGMT1_ADCL | PWRMGMT1_ADCR);
+    wmcodec_set_masked(ADCR, ADCR_RMICBOOST_DISABLED, 0x3 << 4);
+    wmcodec_set_masked(ADDITIONAL1, ADDITIONAL1_DATSEL_LR,
+                       ADDITIONAL1_DATSEL_MASK);
+
+    switch (source)
+    {
+    case AUDIO_SRC_FMRADIO:
+        wmcodec_set_masked(ADCL, ADCL_LINSEL_LINPUT1, ADCL_LINSEL_MASK);
+        wmcodec_set_masked(ADCR, ADCR_RINSEL_RINPUT1, ADCR_RINSEL_MASK);
+        wmcodec_set_bits(PWRMGMT1, PWRMGMT1_AINL | PWRMGMT1_AINR);
+        if (recording)
+        {
+            wmcodec_set_bits(PWRMGMT1, PWRMGMT1_ADCL | PWRMGMT1_ADCR);
+        }
+        else
+        {
+            wmcodec_set_reg(LINVOL, LINVOL_LIZC | LINVOL_LINVOL(0x27));
+            wmcodec_set_reg(RINVOL, RINVOL_RIVU | RINVOL_RIZC |
+                            RINVOL_RINVOL(0x27));
+        }
+
+        wmcodec_set_masked(LEFTMIX1, LEFTMIX1_LMIXSEL_ADCLIN |
+                           LEFTMIX1_LI2LOVOL(0x20),
+                           0x7 | LEFTMIX1_LI2LOVOL_MASK);
+        wmcodec_set_bits(LEFTMIX1, LEFTMIX1_LI2LO);
+        wmcodec_set_masked(RIGHTMIX1, RIGHTMIX1_RMIXSEL_ADCRIN, 0x7);
+        wmcodec_set_masked(RIGHTMIX2, RIGHTMIX2_RI2ROVOL(0x20),
+                           RIGHTMIX2_RI2ROVOL_MASK);
+        wmcodec_set_bits(RIGHTMIX2, RIGHTMIX2_RI2RO);
+        break;
+
+    case AUDIO_SRC_MIC:
+        wmcodec_set_masked(ADCR, ADCR_RINSEL_RINPUT2 | ADCR_RMICBOOST_13DB,
+                           ADCR_RINSEL_MASK | (0x3 << 4));
+        wmcodec_set_bits(PWRMGMT1, PWRMGMT1_AINR | PWRMGMT1_ADCR);
+        wmcodec_set_masked(ADDITIONAL1, ADDITIONAL1_DATSEL_RR,
+                           ADDITIONAL1_DATSEL_MASK);
+        break;
+
+    default: /* playback */
+        break;
+    }
+
+    audiohw_mute(false);
+}
+#else /* !SAMSUNG_YPCP3 */
 void audiohw_set_recsrc(int source, bool recording)
 {
     /* INPUT1 - FM radio
@@ -674,6 +701,7 @@ void audiohw_set_recsrc(int source, bool recording)
 #endif
     } /* switch(source) */
 }
+#endif /* SAMSUNG_YPCP3 */
 
 static int digital_gain2hw(int value)
 {

@@ -8,7 +8,7 @@
 #define MODEL_NAME   "Samsung YP-CP3"
 
 /* define this if you have recording possibility */
-/* #define HAVE_RECORDING */
+#define HAVE_RECORDING
 
 /* define the bitmask of hardware sample rates */
 #define HW_SAMPR_CAPS   (SAMPR_CAP_44 | SAMPR_CAP_22 | SAMPR_CAP_11 \
@@ -115,7 +115,8 @@
 #define HAVE_RDS_CAP
 #define CONFIG_RDS (RDS_CFG_POLL | RDS_CFG_PROCESS)
 #define CONFIG_RDS_POLL_TICKS 4
-#define INPUT_SRC_CAPS SRC_CAP_FMRADIO
+/* inputs: the microphone (mono, on RINPUT2) and the tuner */
+#define INPUT_SRC_CAPS (SRC_CAP_MIC | SRC_CAP_FMRADIO)
 
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT

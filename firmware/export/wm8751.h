@@ -183,6 +183,14 @@ AUDIOHW_SETTING(TREBLE_CUTOFF, "kHz", 0,  4,    4,    8,    4)
 #define ADDITIONAL1                 0x17
 #define ADDITIONAL1_TOEN            (1 << 0)
 #define ADDITIONAL1_DACINV          (1 << 1)
+#if defined(HAVE_WM8750)
+/* which ADC feeds the left and right channels of the output data */
+#define ADDITIONAL1_DATSEL_LR       (0 << 2)
+#define ADDITIONAL1_DATSEL_LL       (1 << 2)
+#define ADDITIONAL1_DATSEL_RR       (2 << 2)
+#define ADDITIONAL1_DATSEL_RL       (3 << 2)
+#define ADDITIONAL1_DATSEL_MASK     (3 << 2)
+#endif
 #define ADDITIONAL1_DMONOMIX_LLRR   (0 << 4)
 #define ADDITIONAL1_DMONOMIX_ML0R   (1 << 4)
 #define ADDITIONAL1_DMONOMIX_0LMR   (2 << 4)
