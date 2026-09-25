@@ -323,10 +323,11 @@ static int sd_init_card(void)
     if (!sd_wait_card_busy())
         return -21;
 
-    /* CMD6 */
-    if(!send_cmd(SD_SWITCH_FUNC, 0x80fffff1, RES_R1, &response))
-        return -8;
-    sleep(HZ/10);
+    /* No CMD6 switch to high-speed mode: this is an SD 1.01 host, with a
+     * card clock of at most 25 MHz, and a card switched to high speed does
+     * not take the data it drives - every write failed, the card waiting in
+     * receive-data state for a block it never saw, while reads worked. The
+     * original firmware leaves the card at default speed too. */
 
     /*  Card back to full speed  25MHz*/
     SD_CTRL = (SD_CTRL & ~0x7FF);
