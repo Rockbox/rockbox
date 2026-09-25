@@ -1036,6 +1036,13 @@ static void handle_scsi_ready(struct command_block_wrapper* cbw)
                 logf("scsi load/eject");
                 if((cbw->command_block[4] & 0x01) == 0) /* Don't start */
                 {
+#ifdef HAVE_STORAGE_FLUSH
+                    /* The host stops or ejects the unit when it is done with
+                     * it - "safely remove" - and may cut power next. Commit
+                     * what the storage driver still holds in RAM, such as a
+                     * flash translation layer's part-written pages. */
+                    storage_flush();
+#endif
                     if((cbw->command_block[4] & 0x02) != 0) /* eject */
                     {
                         logf("scsi eject");
