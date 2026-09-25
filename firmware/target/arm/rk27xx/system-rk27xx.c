@@ -129,7 +129,8 @@ void system_init(void)
     MCSDR_T_RP = 1;                /* precharge period */
     MCSDR_T_RCD = 1;               /* active to RD/WR delay */
 
-    /* turn off clock for unused modules */
+    /* turn off clock for unused modules - not the NAND controller's: the
+     * FTL uses it, and a register access with its HCLK gated aborts */
     SCU_CLKCFG |= CLKCFG_WDT        |        /* WDT pclk */
                   CLKCFG_RTC        |        /* RTC pclk */
                   CLKCFG_HSADC      |        /* HS_ADC clock */
@@ -140,7 +141,6 @@ void system_init(void)
                   CLKCFG_VIP        |        /* VIP clock */
                   CLKCFG_HCLK_VIP   |        /* VIP HCLK */
                   CLKCFG_LCDC       |        /* LCDC clock */
-                  CLKCFG_NAND       |        /* NAND HCLK */
                   CLKCFG_UHC        |        /* USB host HCLK */
                   CLKCFG_DSP        |        /* DSP clock */
                   CLKCFG_OTP;                /* OTP clock (dunno what it is */
