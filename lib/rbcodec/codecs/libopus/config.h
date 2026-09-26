@@ -61,12 +61,13 @@
 #define OPUS_ARM_INLINE_ASM
 #elif ARM_ARCH > 4
 #define OPUS_ARM_INLINE_EDSP
-#if (ARCH_PROFILE != ARM_PROFILE_CLASSIC)
+#if (ARCH_PROFILE == ARM_PROFILE_MICRO)
 #define OPUS_ARM_NO_FFT_ASM
 #define OPUS_ARM_NO_MDCT_ASM
 #define OPUS_ARM_NO_PITCH_ASM
+#define OPUS_NO_PFA
 #endif
-#endif
+#endif /* ARM_ARCH */
 
 /*optimization no hardware division support*/
 #if !defined(ARM_HAVE_HW_DIV)
@@ -79,7 +80,6 @@
 #if CONFIG_CPU == PP5022 || CONFIG_CPU == PP5024
 #define OPUS_LOG2TAN_TABLE
 #endif
-
 #endif
 
 /* Good-Thomas FFT for the backward MDCT.  Every 48 kHz CELT transform length

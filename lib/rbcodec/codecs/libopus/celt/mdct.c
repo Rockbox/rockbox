@@ -55,6 +55,11 @@
 #include "pfa.h"
 #include "pfa_tables.h"
 
+#if defined(OPUS_ARM_ASM)
+#include "arm/mdct_armv4.h"
+#include "arm/mdct_armv5e.h"
+#endif
+
 /* The pre-rotation already scatters through a table; for the prime factor
    transform it reads this one instead of the bit-reversal, which is why the
    gather costs nothing. */
@@ -69,6 +74,7 @@ static const opus_int16 *pfa_gather(int n)
    }
 }
 
+#ifdef OVERRIDE_MDCT_POSTROT_PFA
 /* Where the post-rotation finds X[k], as a byte offset. */
 static const opus_int16 *pfa_postmap(int n)
 {
@@ -80,15 +86,12 @@ static const opus_int16 *pfa_postmap(int n)
       default:  return pfa_post_480;
    }
 }
+#endif
 
 /* Walk p(k) = M*(k mod 15) + (k mod M) by one step.  Both residues are
    running counters, so the post-rotation needs no index table. */
 #define PFA_ADV_UP(p, k1, k2, M) do {    (p) += (M)+1;    if (++(k1) == 15) { (k1) = 0;     (p) -= 15*(M); }    if (++(k2) == (M)) { (k2) = 0;    (p) -= (M); } } while (0)
 #define PFA_ADV_DN(p, k1, k2, M) do {    (p) -= (M)+1;    if ((k1)-- == 0) { (k1) = 14;     (p) += 15*(M); }    if ((k2)-- == 0) { (k2) = (M)-1;  (p) += (M); } } while (0)
-#endif
-#if defined(OPUS_ARM_ASM)
-#include "arm/mdct_armv4.h"
-#include "arm/mdct_armv5e.h"
 #endif
 #include "stack_alloc.h"
 
