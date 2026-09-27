@@ -467,9 +467,12 @@ int choice_screen(const char *title, bool center, int nr_choices, const char *ch
 
 void run_file(const char *name)
 {
-    char *dirname = BASE_DIR;
-    char *buf = malloc(strlen(dirname) + strlen(name) + 1);
-    sprintf(buf, "%s%s", dirname, name);
+    const char *dirname = BASE_DIR;
+    size_t path_size = strlen(dirname) + strlen(name) + 2;
+    char *buf = malloc(path_size);
+    if (!buf)
+        return;
+    snprintf(buf, path_size, "%s/%s", dirname, name);
 
     lcd_clear_display();
     lcd_set_foreground(LCD_RGBPACK(255, 201, 0));
@@ -484,6 +487,7 @@ void run_file(const char *name)
     }
     int status;
     waitpid(pid, &status, 0);
+    free(buf);
     if(WIFEXITED(status))
     {
         lcd_set_foreground(LCD_RGBPACK(255, 201, 0));
