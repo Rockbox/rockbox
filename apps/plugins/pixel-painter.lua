@@ -90,7 +90,7 @@ function calculate_par(board)
             return moves
         end
         --Manual garbage collection is needed so it doesn't eat into the
-        --audio buffer, see http://forums.rockbox.org/index.php/topic,27120.msg177434.html
+        --audio buffer, see https://www.rockbox.org/forums/index.php/topic,27120.msg177434.html
         collectgarbage("collect")
         moves = moves + 1
     until false

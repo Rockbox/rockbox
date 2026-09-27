@@ -18,7 +18,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-see https://forums.rockbox.org/index.php/topic,55820.0.html for an example
+see https://www.rockbox.org/forums/index.php/topic,55820.0.html for an example
 see rocklib.c for definitive list of supported settings
 rb.global_settings()
 rb.global_status()
