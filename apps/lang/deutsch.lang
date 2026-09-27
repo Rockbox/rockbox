@@ -17126,10 +17126,10 @@
     *: "Filter %d"
   </source>
   <dest>
-    *: "Filter %d"
+    *: "~Filter %d"
   </dest>
   <voice>
-    *: "Filter"
+    *: "~Filter"
   </voice>
 </phrase>
 <phrase>
