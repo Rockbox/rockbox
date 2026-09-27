@@ -1258,7 +1258,7 @@ void allocate_playback_log(void)
         playback_log_handle = core_alloc(PLAYBACK_LOG_BUFSZ);
         if (playback_log_handle > 0)
         {
-            DEBUGF("%s Allocated %d bytes\n", __func__, PLAYBACK_LOG_BUFSZ); 
+            DEBUGF("%s Allocated %d bytes\n", __func__, PLAYBACK_LOG_BUFSZ);
             char *buf = core_get_data(playback_log_handle);
             buf[0] = '\0';
         }
@@ -2995,7 +2995,7 @@ static void audio_on_track_changed(void)
 static void audio_start_playback(const struct audio_resume_info *resume_info,
                                  unsigned int flags)
 {
-/* 
+/*
  * Refuse to start playback if usb audio is active. See gui_wps_show() for
  * a splash message to the user.
  * NOTE: if USBAudio ever gets its own DSP channel, this block can go away!
@@ -4270,7 +4270,8 @@ static unsigned long audio_guess_frequency(struct mp3entry *id3)
             have_44 = true;
         if (caps->samprs[i] == SAMPR_48)
             have_48 = true;
-        if (id3->frequency == caps->samprs[i])
+        /* Always upscale to 44.1 or better */
+        if (id3->frequency >= SAMPR_44 && id3->frequency == caps->samprs[i])
             return id3->frequency;
     }
     unsigned long fallback = (id3->frequency % 4000) ? SAMPR_44 : SAMPR_48;
