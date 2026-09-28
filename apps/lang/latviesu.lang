@@ -1006,10 +1006,10 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: "Peak Filter %d"
+    *: "Peak Filter"
   </source>
   <dest>
-    *: "Pīķa filtrs %d"
+    *: "Pīķa filtrs"
   </dest>
   <voice>
     *: "Pīķa filtrs"
@@ -17096,5 +17096,67 @@
   </dest>
   <voice>
     *: "Iestatīt konteksta vienumu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BAND
+  desc: in the equalizer settings menu
+  user: core
+  <source>
+    *: "Filter %d"
+  </source>
+  <dest>
+    *: "Filtrs %d"
+  </dest>
+  <voice>
+    *: "Filtrs"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_FILTER_TYPE
+  desc: in the equalizer settings menu
+  user: core
+  <source>
+    *: "Filter Type"
+  </source>
+  <dest>
+    *: "Filtra veids"
+  </dest>
+  <voice>
+    *: "Filtra veids"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPOSITE_VIDEO_OUTPUT
+  desc: Enables composite video framebuffer mirroring on supported targets
+  user: core
+  <source>
+    *: none
+    videoout: "Composite Video Output"
+  </source>
+  <dest>
+    *: none
+    videoout: "Kompozītvideo izeja"
+  </dest>
+  <voice>
+    *: none
+    videoout: "Kompozītvideo izeja"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_FLICK_SHORTCUTS
+  desc: in settings menu
+  user: core
+  <source>
+    *: none
+    touchscreen: "Touchscreen Flick Shortcuts"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Skārienekrāna žestu saīsnes"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Skārienekrāna žestu saīsnes"
   </voice>
 </phrase>
