@@ -1,0 +1,12 @@
+diff -aur glibc-2.27/configure glibc-2.27-patch/configure
+--- glibc-2.27/configure	2018-02-01 11:17:18.000000000 -0500
++++ glibc-2.27-patch/configure	2026-09-28 12:36:55.593733872 -0400
+@@ -4814,7 +4814,7 @@
+   ac_prog_version=`$MAKEINFO --version 2>&1 | sed -n 's/^.*GNU texinfo.* \([0-9][0-9.]*\).*$/\1/p'`
+   case $ac_prog_version in
+     '') ac_prog_version="v. ?.??, bad"; ac_verc_fail=yes;;
+-    4.[7-9]*|4.[1-9][0-9]*|[5-9].*)
++    4.[5-9]*|4.[1-9][0-9]*|[5-6].*|7.[2-9]*|[8-9].*)
+        ac_prog_version="$ac_prog_version, ok"; ac_verc_fail=no;;
+     *) ac_prog_version="$ac_prog_version, bad"; ac_verc_fail=yes;;
+ 

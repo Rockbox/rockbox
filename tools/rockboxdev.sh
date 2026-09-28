@@ -852,7 +852,7 @@ do
 	    #
             glibcopts="--enable-kernel=2.6.23 --enable-oldest-abi=2.4"
             build_linux_toolchain "arm-rockbox-linux-gnueabi" "2.38" "" "" "9.5.0" \
-                "$gccopts" "2.6.32.71" "" "2.20" "$glibcopts" "glibc-220-make44.patch glibc-2.20-gcc10.patch"
+                "$gccopts" "2.6.32.71" "" "2.20" "$glibcopts" "glibc-220-make44.patch glibc-2.20-gcc10.patch glibc-220-texinfo.patch"
             # build alsa-lib
             # we need to set the prefix to how it is on device (/usr) and then
             # tweak install dir at make install step
@@ -882,7 +882,7 @@ do
             glibcopts="--enable-kernel=3.2 --enable-oldest-abi=2.16 --disable-werror"
             # FIXME: maybe add -mhard-float?
             build_linux_toolchain "mipsel-rockbox-linux-gnu" "2.38" "" "binutils-c23.patch" "9.5.0" \
-                "$gccopts" "3.10.108" "linux-c23.patch" "2.27" "$glibcopts" "glibc-227-make44.patch"
+                "$gccopts" "3.10.108" "linux-c23.patch" "2.27" "$glibcopts" "glibc-227-make44.patch glibc-227-texinfo.patch"
             # build alsa-lib
             # we need to set the prefix to how it is on device (/usr) and then
             # tweak install dir at make install step
