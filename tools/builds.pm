@@ -237,7 +237,7 @@ $releasenotes="/wiki/ReleaseNotes400";
     },
     'samsungypcp3' => {
         name => 'Samsung YP-CP3',
-        status => 3,
+        status => 1,
     },
     'samsungyh820' => {
         name => 'Samsung YH-820',
