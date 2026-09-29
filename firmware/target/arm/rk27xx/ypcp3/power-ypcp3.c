@@ -23,18 +23,22 @@
 #include "system.h"
 #include "usb.h"
 
-/* TODO: the YP-CP3's power-hold line is not known yet. The rk27xx generic
- * board holds power on PC0; driving a pin whose job on this board is unknown
- * could do anything, so nothing is touched. Whatever the boot ROM or the
- * original firmware left holding power stays holding it, and power_off()
- * cannot switch the player off. */
+/* Power is held on by GPIO C0, active high - as on the rk27xx generic
+ * board. The original firmware raises it at boot and, to switch off,
+ * drives it low and waits for the supply to go. */
+#define POWER_HOLD_PIN      (1 << 0)    /* GPIO C0 */
+
 void power_init(void)
 {
+    GPIO_PCDR |= POWER_HOLD_PIN;
+    GPIO_PCCON |= POWER_HOLD_PIN;       /* output */
 }
 
 void power_off(void)
 {
     disable_irq();
+    GPIO_PCCON |= POWER_HOLD_PIN;
+    GPIO_PCDR &= ~POWER_HOLD_PIN;
     while (1)
     {
     }
