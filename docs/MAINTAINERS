@@ -37,16 +37,16 @@ specific to that target.
 :Iriver H100/H115: Linus Nielsen Feltzing
 :Iriver H120/H140: Miika Pekkarinen, Linus Nielsen Feltzing
 :Iriver H320/H340: Peter D'Hoye
-:Ipod 1st Gen: Jens Arnold
-:Ipod 2nd Gen: Jens Arnold
-:Ipod 3rd Gen:
-:Ipod 4th Gen Grayscale:
-:Ipod Color/Photo: Dave Chapman
-:Ipod Video:
-:Ipod Classic:
-:Ipod Mini 1st Gen:
-:Ipod Mini 2nd Gen: Jens Arnold
-:Ipod Nano 1st Gen: Thom Johansen
+:iPod 1st Gen: Jens Arnold
+:iPod 2nd Gen: Jens Arnold
+:iPod 3rd Gen:
+:iPod 4th Gen Grayscale:
+:iPod Color/Photo: Dave Chapman
+:iPod Video:
+:iPod Classic:
+:iPod Mini 1st Gen:
+:iPod Mini 2nd Gen: Jens Arnold
+:iPod Nano 1st Gen: Thom Johansen
 :Iriver H10 20GB: Barry Wardell
 :Iriver H10 5GB/6GB:
 :Iaudio X5: Linus Nielsen Feltzing
@@ -290,8 +290,8 @@ Bootloaders
 :HibyOS: Solomon Peachy
 :Iriver H1xx/H3xx: Miika Pekkarinen, Linus Nielsen Feltzing
 :Iaudio X5/M5: Linus Nielsen Feltzing
-:PortalPlayer (not ipod): Barry Wardell
-:Ipod: Dave Chapman
+:PortalPlayer (not iPod): Barry Wardell
+:iPod: Dave Chapman
 :Gigabeat F/X: Barry Wardell
 :xDuoo X3: Solomon Peachy
 :x1000: Aidan MacDonald
