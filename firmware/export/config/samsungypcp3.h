@@ -1,10 +1,5 @@
 /*
  * This config file is for the Samsung YP-CP3 (rk27xx)
- *
- * Bring-up state: LCD, backlight, NAND (Scheme A FTL), SD and USB are the
- * rk27xx drivers, the LCD with this panel's init sequence; the keys are
- * mapped. Power hold, battery measurement, the audio path and any tuner
- * are not - see the TODOs in firmware/target/arm/rk27xx/ypcp3/.
  */
 
 /* For Rolo and boot loader */
@@ -100,6 +95,10 @@
 
 /* Define the type of audio codec */
 #define HAVE_RK27XX_CODEC
+
+/* Seiko S-35390A real-time clock on I2C, left in 12-hour mode by the
+ * original firmware */
+#define CONFIG_RTC RTC_S35390A
 
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT
