@@ -80,9 +80,9 @@ void usage(void)
            "\t-iaudiox5v iAudio X5V format\n"
            "\t-iaudiom5 iAudio M5 format\n"
            "\t-iaudiom3 iAudio M3 format\n");
-    printf("\t-ipod3g ipod firmware partition format (3rd Gen)\n"
-           "\t-ipod4g ipod firmware partition format (4th Gen, Mini, Nano, Photo/Color)\n"
-           "\t-ipod5g ipod firmware partition format (5th Gen - aka Video)\n"
+    printf("\t-ipod3g iPod firmware partition format (3rd Gen)\n"
+           "\t-ipod4g iPod firmware partition format (4th Gen, Mini, Nano, Photo/Color)\n"
+           "\t-ipod5g iPod firmware partition format (5th Gen - aka Video)\n"
            "\t-creative=X [-no-ciff] Creative firmware structure format\n"
            "\t            (X values: zenv, zen, zenxfi, zenmozaic)\n");
     printf("\t-gigabeat Toshiba Gigabeat F/X format\n"

@@ -42,7 +42,7 @@
 static void usage(void)
 {
     fprintf(stderr, "bin2c [options] infile cfile\n");
-    fprintf(stderr, "       -i    ipod mode\n");
+    fprintf(stderr, "       -i    iPod mode\n");
 }
 
 

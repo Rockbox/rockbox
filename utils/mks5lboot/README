@@ -81,7 +81,7 @@ Prerequisites:
     Nano 3G 4GB:                        1.0.1 to 1.1.3
 
   - If your iPod is formated using Apple partitions you must convert this
-    ipod to FAT32 format (aka a "winpod"), see http://www.rockbox.org/
+    iPod to FAT32 format (aka a "winpod"), see http://www.rockbox.org/
     wiki/IpodConversionToFAT32
 
   - It is recommended to install the RB firmware before installing the dual
