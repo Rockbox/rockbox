@@ -37,6 +37,9 @@ struct jpeg
     int blocks; /* blocks per MB */
     int restart_interval; /* number of MCUs between RSTm markers */
     int store_pos[4]; /* for Y block ordering */
+    bool jfif; /* saw a JFIF APP0 marker */
+    unsigned char adobe; /* Adobe APP14 transform flag + 1, 0 if none */
+    bool rgb; /* the components are R, G, B rather than Y, Cb, Cr */
 
     unsigned char* p_entropy_data;
     unsigned char* p_entropy_end;

@@ -674,6 +674,16 @@ int process_markers(unsigned char* p_src, long size, struct jpeg* p_jpeg)
                         return (-5); /* Huffman table index out of range */
                     }
                 }
+                p_jpeg->rgb = n == 3 && jpeg_is_rgb(p_jpeg->jfif, p_jpeg->adobe,
+                    p_jpeg->frameheader[0].ID, p_jpeg->frameheader[1].ID,
+                    p_jpeg->frameheader[2].ID);
+                /* RGB needs every component in one block per MCU: the
+                   planes are converted to YCbCr in place (colour) or
+                   combined per block (greyscale) */
+                if (p_jpeg->rgb
+                 && (p_jpeg->frameheader[0].horizontal_sampling != 1
+                  || p_jpeg->frameheader[0].vertical_sampling != 1))
+                    return -3; /* Unsupported SOF0 subsampling */
                 p_src += 3; /* skip spectral information */
                 p_jpeg->p_entropy_data = p_src;
                 p_end = p_src; /* exit while loop */
@@ -713,7 +723,6 @@ int process_markers(unsigned char* p_src, long size, struct jpeg* p_jpeg)
         case 0xDC: /* Define Number of Lines */
         case 0xDE: /* Define Hierarchical progression */
         case 0xDF: /* Expand Reference Component(s) */
-        case 0xE0: /* Application Field 0*/
         case 0xE1: /* Application Field 1*/
         case 0xE2: /* Application Field 2*/
         case 0xE3: /* Application Field 3*/
@@ -727,12 +736,24 @@ int process_markers(unsigned char* p_src, long size, struct jpeg* p_jpeg)
         case 0xEB: /* Application Field 11*/
         case 0xEC: /* Application Field 12*/
         case 0xED: /* Application Field 13*/
-        case 0xEE: /* Application Field 14*/
         case 0xEF: /* Application Field 15*/
         case 0xFE: /* Comment */
             {
                 marker_size = *p_src++ << 8; /* Highbyte */
                 marker_size |= *p_src++; /* Lowbyte */
+                p_src += marker_size-2; /* skip segment */
+            }
+            break;
+
+        case 0xE0: /* Application Field 0 (JFIF) */
+        case 0xEE: /* Application Field 14 (Adobe) */
+            {
+                int marker = p_src[-1];
+                marker_size = *p_src++ << 8; /* Highbyte */
+                marker_size |= *p_src++; /* Lowbyte */
+                n = MIN(marker_size - 2, p_end - p_src);
+                jpeg_app_colorspace(marker, p_src, MIN(n, 12), &p_jpeg->jfif,
+                                    &p_jpeg->adobe);
                 p_src += marker_size-2; /* skip segment */
             }
             break;
@@ -1387,6 +1408,20 @@ int jpeg_decode(struct jpeg* p_jpeg, unsigned char* p_pixel[3],
             pf_progress(y, p_jpeg->y_mbl-1); /* notify about decoding progress */
     } /* for y */
 
+    if (p_jpeg->rgb)
+    {   /* the display expects YCbCr: convert the equal sized R, G and B
+           planes in place (JFIF equations) */
+        unsigned char *pr = p_pixel[0], *pg = p_pixel[1], *pb = p_pixel[2];
+        unsigned char *end = pr + width * height;
+        for (; pr < end; pr++, pg++, pb++)
+        {
+            int r = *pr, g = *pg, b = *pb;
+            *pr = (77 * r + 150 * g + 29 * b + 128) >> 8;
+            *pg = clamp_component((-43 * r - 85 * g + 128 * b + 32896) >> 8);
+            *pb = clamp_component((128 * r - 107 * g - 21 * b + 32896) >> 8);
+        }
+    }
+
     return 0; /* success */
 }
 #else /* !HAVE_LCD_COLOR */
@@ -1411,7 +1446,8 @@ int jpeg_decode(struct jpeg* p_jpeg, unsigned char* p_pixel[1], int downscale,
     int k_need; /* AC coefficients needed up to here */
     int zero_need; /* init the block with this many zeros */
 
-    int last_dc_val = 0;
+    int last_dc_val[3] = {0, 0, 0};
+    unsigned char rgb_tmp[2][64]; /* R and G of an RGB MCU */
     int store_offs[4]; /* memory offsets: order of Y11 Y12 Y21 Y22 U V */
     int restart = p_jpeg->restart_interval; /* MCUs until restart marker */
 
@@ -1482,10 +1518,10 @@ int jpeg_decode(struct jpeg* p_jpeg, unsigned char* p_pixel[1], int downscale,
                 /* Section F.2.2.1: decode the DC coefficient difference */
                 s = huff_decode_dc(&bs, dctbl);
 
-                if (ci == 0) /* only for Y component */
+                if (ci == 0 || p_jpeg->rgb) /* Y, or all of R, G, B */
                 {
-                    last_dc_val += s;
-                    block[0] = last_dc_val; /* output it (assumes zag[0] = 0) */
+                    last_dc_val[ci] += s;
+                    block[0] = last_dc_val[ci]; /* output it (zag[0] = 0) */
 
                     /* coefficient buffer must be cleared */
                     MEMSET(block+1, 0, zero_need*sizeof(block[0]));
@@ -1536,10 +1572,26 @@ int jpeg_decode(struct jpeg* p_jpeg, unsigned char* p_pixel[1], int downscale,
                     }
                 }  /* for k */
 
-                if (ci == 0)
+                if (ci == 0 && !p_jpeg->rgb)
                 {   /* only for Y component */
                     pf_idct(p_byte+store_offs[blkn], block, p_jpeg->qt_idct[ci],
                         skip_line);
+                }
+                else if (p_jpeg->rgb && ci < 2)
+                {   /* keep R and G until B is decoded */
+                    pf_idct(rgb_tmp[ci], block, p_jpeg->qt_idct[ci], 8);
+                }
+                else if (p_jpeg->rgb)
+                {   /* luma from R, G and B (JFIF weights) */
+                    int n = 8 / downscale;
+                    int xi, yi;
+                    unsigned char *p = p_byte;
+                    pf_idct(p, block, p_jpeg->qt_idct[ci], skip_line);
+                    for (yi = 0; yi < n; yi++, p += skip_line)
+                        for (xi = 0; xi < n; xi++)
+                            p[xi] = (77 * rgb_tmp[0][yi * 8 + xi]
+                                + 150 * rgb_tmp[1][yi * 8 + xi]
+                                + 29 * p[xi] + 128) >> 8;
                 }
             } /* for blkn */
             p_byte += skip_mcu;
@@ -1547,7 +1599,8 @@ int jpeg_decode(struct jpeg* p_jpeg, unsigned char* p_pixel[1], int downscale,
             {   /* if a restart marker is due: */
                 restart = p_jpeg->restart_interval; /* count again */
                 search_restart(&bs); /* align the bitstream */
-                last_dc_val = 0; /* reset decoder */
+                last_dc_val[0] = last_dc_val[1] =
+                                 last_dc_val[2] = 0; /* reset decoder */
             }
         } /* for x */
         if (pf_progress != NULL)

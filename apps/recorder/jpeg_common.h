@@ -27,6 +27,7 @@
 #ifndef _JPEG_COMMON_H
 #define _JPEG_COMMON_H
 
+#include <stdbool.h>
 #include "bmp.h"
 
 #define HUFF_LOOKAHEAD 8 /* # of bits of lookahead */
@@ -79,6 +80,40 @@ union uint8_rgbyuv {
     struct uint8_yuv yuv;
     struct uint8_rgb rgb;
 };
+
+/* Record what an APP0 (JFIF) or APP14 (Adobe) segment says about the
+ * colour space, given its first n bytes (at most 12 are needed). *adobe gets
+ * the Adobe transform flag + 1. */
+static inline void jpeg_app_colorspace(int marker, const unsigned char *id,
+                                       int n, bool *jfif, unsigned char *adobe)
+{
+    bool is_jfif = marker == 0xE0;
+    const char *sig = is_jfif ? "JFIF" : "Adobe"; /* 5 bytes with the NUL */
+    int i;
+
+    if (n < (is_jfif ? 5 : 12))
+        return;
+    for (i = 0; i < 5; i++)
+        if (id[i] != (unsigned char)sig[i])
+            return;
+    if (is_jfif)
+        *jfif = true;
+    else
+        *adobe = id[11] + 1;
+}
+
+/* Whether a 3-component image holds RGB rather than YCbCr, decided as
+ * libjpeg does: a JFIF marker means YCbCr; otherwise an Adobe marker's
+ * transform flag decides (0 is RGB); otherwise component IDs 'R', 'G', 'B'
+ * mean RGB. adobe is the transform flag + 1, or 0 without an Adobe marker. */
+static inline bool jpeg_is_rgb(bool jfif, int adobe, int id0, int id1, int id2)
+{
+    if (jfif)
+        return false;
+    if (adobe)
+        return adobe == 1;
+    return id0 == 'R' && id1 == 'G' && id2 == 'B';
+}
 
 static inline int clamp_component(int x)
 {
