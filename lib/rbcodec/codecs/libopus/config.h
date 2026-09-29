@@ -91,6 +91,7 @@
 #define OPUS_NO_PFA
 #define OPUS_ARM_NO_COMB_ASM
 #define OPUS_ARM_NO_BANDS_ASM
+#define OPUS_ARM_NO_SILK_ASM
 #endif
 #endif /* ARM_ARCH */
 

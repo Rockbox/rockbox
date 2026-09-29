@@ -116,12 +116,24 @@ static OPUS_INLINE opus_int16 *silk_IIR_FIR_cycle2(
 #define SILK_IIR_FIR_16K    silk_IIR_FIR_16k_armv4, 43691, 3, 1, 2
 #define SILK_IIR_FIR_8K     silk_IIR_FIR_8k_armv4, 21846, 3, 1, 1
 #define SILK_IIR_FIR_12K    silk_IIR_FIR_12k_armv4, 32768, 2, 1, 1
+#elif defined(OPUS_ARM_ASM_ARMV5E_AND_LATER) && !defined(OPUS_ARM_NO_SILK_ASM)
+/* Packed 16x16 multiply-accumulates, in silk/arm/resampler_armv5e_asm.S.
+   Each loads two samples a word, so the buffer must be word aligned, and
+   at 8 and 12 kHz an iteration is two cycles, one word further on. */
+#define SILK_IIR_FIR_ASM
+#define SILK_IIR_FIR_ALIGNED
+#define SILK_IIR_FIR_16K    silk_IIR_FIR_16k_armv5e, 43691, 3, 1, 2
+#define SILK_IIR_FIR_8K     silk_IIR_FIR_8k_armv5e, 21846, 3, 2, 2
+#define SILK_IIR_FIR_12K    silk_IIR_FIR_12k_armv5e, 32768, 2, 2, 2
 #endif
 
 #ifdef SILK_IIR_FIR_ASM
 opus_int16 *silk_IIR_FIR_16k_armv4( opus_int16 *out, const opus_int16 *buf, opus_int32 iters );
 opus_int16 *silk_IIR_FIR_8k_armv4( opus_int16 *out, const opus_int16 *buf, opus_int32 iters );
 opus_int16 *silk_IIR_FIR_12k_armv4( opus_int16 *out, const opus_int16 *buf, opus_int32 iters );
+opus_int16 *silk_IIR_FIR_16k_armv5e( opus_int16 *out, const opus_int16 *buf, opus_int32 iters );
+opus_int16 *silk_IIR_FIR_8k_armv5e( opus_int16 *out, const opus_int16 *buf, opus_int32 iters );
+opus_int16 *silk_IIR_FIR_12k_armv5e( opus_int16 *out, const opus_int16 *buf, opus_int32 iters );
 
 /* Run the kernel over every whole iteration of cyc cycles of n outputs at
    step inc, each advancing adv samples, and leave the C the rest.  Cycle j
@@ -199,10 +211,21 @@ void silk_resampler_private_IIR_FIR(
     silk_resampler_state_struct *S = (silk_resampler_state_struct *)SS;
     opus_int32 nSamplesIn;
     opus_int32 max_index_Q16, index_increment_Q16;
+#ifdef SILK_IIR_FIR_ALIGNED
+    VARDECL( opus_int16, buf_alloc );
+    opus_int16 *buf;
+#else
     VARDECL( opus_int16, buf );
+#endif
     SAVE_STACK;
 
+#ifdef SILK_IIR_FIR_ALIGNED
+    /* One sample spare, to start on a word */
+    ALLOC( buf_alloc, 2 * S->batchSize + RESAMPLER_ORDER_FIR_12 + 1, opus_int16 );
+    buf = buf_alloc + ( ( (size_t)buf_alloc >> 1 ) & 1 );
+#else
     ALLOC( buf, 2 * S->batchSize + RESAMPLER_ORDER_FIR_12, opus_int16 );
+#endif
 
     /* Copy buffered samples to start of buffer */
     silk_memcpy( buf, S->sFIR.i16, RESAMPLER_ORDER_FIR_12 * sizeof( opus_int16 ) );
