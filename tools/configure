@@ -4777,7 +4777,7 @@ fi
 # We generally want utf8proc.  Exceptions are:
 #   Bootloaders, checkwps, warble, <4MB RAM
 #   and (temporarily) imx233
-if [ "$apps" = "bootloader" -o "$app_type" = "checkwps" -o "$app_type" = "warble" -o "$memory" -lt "4" -o "$t_manufacturer" = "imx233" ]; then
+if [ "$apps" = "bootloader" -o "$app_type" = "checkwps" -o "$app_type" = "warble" -o "$memory" -lt "4" ]; then
     no_utf8proc=1
 fi
 
