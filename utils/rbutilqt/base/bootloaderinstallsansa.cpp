@@ -218,7 +218,7 @@ BootloaderInstallBase::BootloaderType BootloaderInstallSansa::installed(void)
 
 bool BootloaderInstallSansa::sansaInitialize(struct sansa_t *sansa)
 {
-    // if the ipod was already opened make sure to close it first.
+    // if the player was already opened make sure to close it first.
 #if defined(Q_OS_WIN32)
     if(sansa->dh != INVALID_HANDLE_VALUE)
 #else

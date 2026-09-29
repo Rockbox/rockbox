@@ -661,7 +661,7 @@
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="86"/>
         <location filename="../base/bootloaderinstallipod.cpp" line="155"/>
-        <source>Could not open Ipod in R/W mode</source>
+        <source>Could not open iPod in R/W mode</source>
         <translation>Не удалось открыть iPod в режиме записи</translation>
     </message>
     <message>
@@ -686,7 +686,7 @@
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="266"/>
-        <source>Could not open Ipod</source>
+        <source>Could not open iPod</source>
         <translation>Не удалось открыть iPod</translation>
     </message>
     <message>
@@ -706,7 +706,7 @@
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="271"/>
-        <source>Error reading partition table - possibly not an Ipod</source>
+        <source>Error reading partition table - possibly not an iPod</source>
         <translation>Сбой чтения таблицы разделов - возможно, это не iPod</translation>
     </message>
     <message>
@@ -738,7 +738,7 @@ See https://www.rockbox.org/wiki/IpodConversionToFAT32</source>
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="262"/>
-        <source>Could not open Ipod: permission denied</source>
+        <source>Could not open iPod: permission denied</source>
         <translation>Не удалось открыть iPod: доступ запрещён</translation>
     </message>
     <message>
@@ -1402,7 +1402,7 @@ Please configure TTS engine.</source>
     <message>
         <location filename="../configure.cpp" line="787"/>
         <source>%1 &quot;MacPod&quot; found!
-Rockbox needs a FAT formatted Ipod (so-called &quot;WinPod&quot;) to run. </source>
+Rockbox needs a FAT formatted iPod (so-called &quot;WinPod&quot;) to run. </source>
         <translation>%1 является MacPod&apos;ом!
 Для работы, Rockbox нужен iPod форматированный в FAT (так называемый &quot;WinPod&quot;).</translation>
     </message>

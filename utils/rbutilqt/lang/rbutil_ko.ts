@@ -663,7 +663,7 @@ https://www.rockbox.org/wiki/IpodConversionToFAT32 참고</translation>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="86"/>
         <location filename="../base/bootloaderinstallipod.cpp" line="155"/>
-        <source>Could not open Ipod in R/W mode</source>
+        <source>Could not open iPod in R/W mode</source>
         <translation>R/W 모드에서 iPod을 열 수 없음</translation>
     </message>
     <message>
@@ -703,13 +703,13 @@ https://www.rockbox.org/wiki/IpodConversionToFAT32 참고</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="262"/>
-        <source>Could not open Ipod: permission denied</source>
+        <source>Could not open iPod: permission denied</source>
         <translation>iPod을 열 수 없음: 권한이 거부됨</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="266"/>
-        <source>Could not open Ipod</source>
-        <translation>Ipod을 열 수 없음</translation>
+        <source>Could not open iPod</source>
+        <translation>iPod을 열 수 없음</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="277"/>
@@ -744,8 +744,8 @@ See https://www.rockbox.org/wiki/IpodConversionToFAT32</source>
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="271"/>
-        <source>Error reading partition table - possibly not an Ipod</source>
-        <translation>파티션 테이블을 읽는 중 오류 발생 - 아마도 Ipod이 아닐 수도 있음</translation>
+        <source>Error reading partition table - possibly not an iPod</source>
+        <translation>파티션 테이블을 읽는 중 오류 발생 - 아마도 iPod이 아닐 수도 있음</translation>
     </message>
 </context>
 <context>
@@ -1260,7 +1260,7 @@ Select your device and Mountpoint manually.</source>
     <message>
         <location filename="../configure.cpp" line="787"/>
         <source>%1 &quot;MacPod&quot; found!
-Rockbox needs a FAT formatted Ipod (so-called &quot;WinPod&quot;) to run. </source>
+Rockbox needs a FAT formatted iPod (so-called &quot;WinPod&quot;) to run. </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1441,7 +1441,7 @@ Rockbox Utility can&apos;t work with this proxy settings. Make sure the system p
     </message>
     <message>
         <source>%1 &quot;MacPod&quot;를 찾았습니다!
-Rockbox needs a FAT formatted Ipod (so-called &quot;WinPod&quot;) to run. </source>
+Rockbox needs a FAT formatted iPod (so-called &quot;WinPod&quot;) to run. </source>
         <translation type="vanished">%1 &quot;MacPod&quot; gefunden!
 록박스를 실행하려면 FAT 형식의 아이팟(소위 &quot;WinPod&quot;)이 필요합니다.</translation>
     </message>

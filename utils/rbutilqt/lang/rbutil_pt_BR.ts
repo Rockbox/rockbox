@@ -658,8 +658,8 @@
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="86"/>
         <location filename="../base/bootloaderinstallipod.cpp" line="155"/>
-        <source>Could not open Ipod in R/W mode</source>
-        <translation>Não foi possível abrir o Ipod em modo R/W (Leitura/Escrita)</translation>
+        <source>Could not open iPod in R/W mode</source>
+        <translation>Não foi possível abrir o iPod em modo R/W (Leitura/Escrita)</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="96"/>
@@ -693,13 +693,13 @@
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="266"/>
-        <source>Could not open Ipod</source>
-        <translation>Não foi possível abrir o Ipod</translation>
+        <source>Could not open iPod</source>
+        <translation>Não foi possível abrir o iPod</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="271"/>
-        <source>Error reading partition table - possibly not an Ipod</source>
-        <translation>Erro lendo tabela de partição - possivelmente não é um Ipod</translation>
+        <source>Error reading partition table - possibly not an iPod</source>
+        <translation>Erro lendo tabela de partição - possivelmente não é um iPod</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="277"/>
@@ -730,8 +730,8 @@ Veja https://www.rockbox.org/wiki/IpodConversionToFAT32</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="262"/>
-        <source>Could not open Ipod: permission denied</source>
-        <translation>Não foi possível abrir o Ipod: permissão negada</translation>
+        <source>Could not open iPod: permission denied</source>
+        <translation>Não foi possível abrir o iPod: permissão negada</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="241"/>
@@ -1399,9 +1399,9 @@ Por favor, configure o motor TTS.</translation>
     <message>
         <location filename="../configure.cpp" line="787"/>
         <source>%1 &quot;MacPod&quot; found!
-Rockbox needs a FAT formatted Ipod (so-called &quot;WinPod&quot;) to run. </source>
+Rockbox needs a FAT formatted iPod (so-called &quot;WinPod&quot;) to run. </source>
         <translation>%1 encontrado &quot;MacPod&quot;!
-O Rockbox precisa de um Ipod formatado como FAT (chamado de &quot;WinPod&quot;) para funcionar.</translation>
+O Rockbox precisa de um iPod formatado como FAT (chamado de &quot;WinPod&quot;) para funcionar.</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="528"/>

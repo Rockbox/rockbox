@@ -663,7 +663,7 @@ See https://www.rockbox.org/wiki/IpodConversionToFAT32</source>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="86"/>
         <location filename="../base/bootloaderinstallipod.cpp" line="155"/>
-        <source>Could not open Ipod in R/W mode</source>
+        <source>Could not open iPod in R/W mode</source>
         <translation>无法打开iPod读写模式</translation>
     </message>
     <message>
@@ -713,12 +713,12 @@ See https://www.rockbox.org/wiki/IpodConversionToFAT32</source>
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="262"/>
-        <source>Could not open Ipod: permission denied</source>
+        <source>Could not open iPod: permission denied</source>
         <translation>无法打开iPod：拒绝访问</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="266"/>
-        <source>Could not open Ipod</source>
+        <source>Could not open iPod</source>
         <translation>无法打开iPod</translation>
     </message>
     <message>
@@ -745,7 +745,7 @@ See https://www.rockbox.org/wiki/IpodConversionToFAT32</source>
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="271"/>
-        <source>Error reading partition table - possibly not an Ipod</source>
+        <source>Error reading partition table - possibly not an iPod</source>
         <translation>读取分区表时出错 - 可能不是 iPod</translation>
     </message>
 </context>
@@ -1268,7 +1268,7 @@ Rockbox Utility 无法使用此代理设置。请确保系统代理设置正确�
     <message>
         <location filename="../configure.cpp" line="787"/>
         <source>%1 &quot;MacPod&quot; found!
-Rockbox needs a FAT formatted Ipod (so-called &quot;WinPod&quot;) to run. </source>
+Rockbox needs a FAT formatted iPod (so-called &quot;WinPod&quot;) to run. </source>
         <translation>%1 发现Mac格式的iPod！！
 Rockbox需要FAT格式的iPod才能运行。 </translation>
     </message>

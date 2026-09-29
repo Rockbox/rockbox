@@ -668,8 +668,8 @@ Zie https://www.rockbox.org/wiki/IpodConversionToFAT32</translation>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="86"/>
         <location filename="../base/bootloaderinstallipod.cpp" line="155"/>
-        <source>Could not open Ipod in R/W mode</source>
-        <translation>Kon Ipod niet openen in R/W modus</translation>
+        <source>Could not open iPod in R/W mode</source>
+        <translation>Kon iPod niet openen in R/W modus</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="96"/>
@@ -718,18 +718,18 @@ Zie https://www.rockbox.org/wiki/IpodConversionToFAT32</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="262"/>
-        <source>Could not open Ipod: permission denied</source>
-        <translation>Kon Ipod niet openen: toestemming geweigerd</translation>
+        <source>Could not open iPod: permission denied</source>
+        <translation>Kon iPod niet openen: toestemming geweigerd</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="266"/>
-        <source>Could not open Ipod</source>
-        <translation>Kon Ipod niet openen</translation>
+        <source>Could not open iPod</source>
+        <translation>Kon iPod niet openen</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="271"/>
-        <source>Error reading partition table - possibly not an Ipod</source>
-        <translation>Fout tijdens lezen van de partitie tabel - mogelijks geen Ipod</translation>
+        <source>Error reading partition table - possibly not an iPod</source>
+        <translation>Fout tijdens lezen van de partitie tabel - mogelijks geen iPod</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="277"/>
@@ -1254,9 +1254,9 @@ Rockbox Utility kan niet werken met deze instellingen. Stel de systeemproxy-inst
     <message>
         <location filename="../configure.cpp" line="787"/>
         <source>%1 &quot;MacPod&quot; found!
-Rockbox needs a FAT formatted Ipod (so-called &quot;WinPod&quot;) to run. </source>
+Rockbox needs a FAT formatted iPod (so-called &quot;WinPod&quot;) to run. </source>
         <translation>%1 &quot;MacPod&quot; gevonden!
-Rockbox heeft een FAT-geformattered Ipod (een zogenaamde &quot;WinPod&quot;) nodig om te kunnen draaien.</translation>
+Rockbox heeft een FAT-geformattered iPod (een zogenaamde &quot;WinPod&quot;) nodig om te kunnen draaien.</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="778"/>

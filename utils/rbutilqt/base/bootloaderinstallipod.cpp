@@ -83,7 +83,7 @@ void BootloaderInstallIpod::installStage2(void)
     QCoreApplication::processEvents();
 
     if(ipod_reopen_rw(&ipod) < 0) {
-        emit logItem(tr("Could not open Ipod in R/W mode"), LOGERROR);
+        emit logItem(tr("Could not open iPod in R/W mode"), LOGERROR);
         emit done(true);
         return;
     }
@@ -152,7 +152,7 @@ bool BootloaderInstallIpod::uninstall(void)
     }
 
     if (ipod_reopen_rw(&ipod) < 0) {
-        emit logItem(tr("Could not open Ipod in R/W mode"), LOGERROR);
+        emit logItem(tr("Could not open iPod in R/W mode"), LOGERROR);
         emit done(true);
         return false;
     }
@@ -259,16 +259,16 @@ bool BootloaderInstallIpod::ipodInitialize(struct ipod_t *ipod)
     }
     int result = ipod_open(ipod, 1);
     if(result == -2) {
-        emit logItem(tr("Could not open Ipod: permission denied"), LOGERROR);
+        emit logItem(tr("Could not open iPod: permission denied"), LOGERROR);
         return false;
     }
     else if(result < 0) {
-        emit logItem(tr("Could not open Ipod"), LOGERROR);
+        emit logItem(tr("Could not open iPod"), LOGERROR);
         return false;
     }
 
     if(read_partinfo(ipod, 1) < 0) {
-        emit logItem(tr("Error reading partition table - possibly not an Ipod"), LOGERROR);
+        emit logItem(tr("Error reading partition table - possibly not an iPod"), LOGERROR);
         ipod_close(ipod);
         return false;
     }

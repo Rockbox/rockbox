@@ -664,8 +664,8 @@ Siehe https://www.rockbox.org/wiki/IpodConversionToFAT32</translation>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="86"/>
         <location filename="../base/bootloaderinstallipod.cpp" line="155"/>
-        <source>Could not open Ipod in R/W mode</source>
-        <translation>Kann Ipod nicht im R/W-Modus öffnen</translation>
+        <source>Could not open iPod in R/W mode</source>
+        <translation>Kann iPod nicht im R/W-Modus öffnen</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="96"/>
@@ -704,13 +704,13 @@ Siehe https://www.rockbox.org/wiki/IpodConversionToFAT32</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="262"/>
-        <source>Could not open Ipod: permission denied</source>
-        <translation>Konnte Ipod nicht öffnen: Zugriff verweigert</translation>
+        <source>Could not open iPod: permission denied</source>
+        <translation>Konnte iPod nicht öffnen: Zugriff verweigert</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="266"/>
-        <source>Could not open Ipod</source>
-        <translation>Konnte Ipod nicht öffnen</translation>
+        <source>Could not open iPod</source>
+        <translation>Konnte iPod nicht öffnen</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="277"/>
@@ -739,8 +739,8 @@ Siehe https://www.rockbox.org/wiki/IpodConversionToFAT32</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="271"/>
-        <source>Error reading partition table - possibly not an Ipod</source>
-        <translation>Fehler beim Lesen der Partitionstabelle - möglicherweise kein Ipod</translation>
+        <source>Error reading partition table - possibly not an iPod</source>
+        <translation>Fehler beim Lesen der Partitionstabelle - möglicherweise kein iPod</translation>
     </message>
 </context>
 <context>
@@ -1425,9 +1425,9 @@ Rockbox Utility kann mit diesen Proxy-Einstellungen nicht arbeiten. Bitte sicher
     <message>
         <location filename="../configure.cpp" line="787"/>
         <source>%1 &quot;MacPod&quot; found!
-Rockbox needs a FAT formatted Ipod (so-called &quot;WinPod&quot;) to run. </source>
+Rockbox needs a FAT formatted iPod (so-called &quot;WinPod&quot;) to run. </source>
         <translation>%1 &quot;MacPod&quot; gefunden!
-Rockbox benötigt einen mit dem Dateisystem FAT formatierten Ipod (sogenannter &quot;WinPod&quot;).</translation>
+Rockbox benötigt einen mit dem Dateisystem FAT formatierten iPod (sogenannter &quot;WinPod&quot;).</translation>
     </message>
     <message>
         <location filename="../configure.cpp" line="778"/>

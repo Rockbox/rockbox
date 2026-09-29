@@ -259,7 +259,7 @@ void Autodetection::mergePatcher(void)
     n = ipod_scan(&ipod);
     // FIXME: handle more than one Ipod connected in ipodpatcher.
     if(n == 1) {
-        LOG_INFO() << "Ipod found:" << ipod.modelstr << "at" << ipod.diskname;
+        LOG_INFO() << "iPod found:" << ipod.modelstr << "at" << ipod.diskname;
         // since resolveMountPoint is doing exact matches we need to select
         // the correct partition.
         QString mp(ipod.diskname);
@@ -280,7 +280,7 @@ void Autodetection::mergePatcher(void)
         updateDetectedDevice(d);
     }
     else {
-        LOG_INFO() << "ipodpatcher: no Ipod found." << n;
+        LOG_INFO() << "ipodpatcher: no iPod found." << n;
     }
     ipod_dealloc_buffer(&ipod);
 

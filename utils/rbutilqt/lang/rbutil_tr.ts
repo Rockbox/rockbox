@@ -660,7 +660,7 @@ See https://www.rockbox.org/wiki/IpodConversionToFAT32</source>
     <message>
         <location line="+4"/>
         <location line="+69"/>
-        <source>Could not open Ipod in R/W mode</source>
+        <source>Could not open iPod in R/W mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -715,17 +715,17 @@ See https://www.rockbox.org/wiki/IpodConversionToFAT32</source>
     </message>
     <message>
         <location line="+5"/>
-        <source>Could not open Ipod: permission denied</source>
+        <source>Could not open iPod: permission denied</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+4"/>
-        <source>Could not open Ipod</source>
+        <source>Could not open iPod</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+5"/>
-        <source>Error reading partition table - possibly not an Ipod</source>
+        <source>Error reading partition table - possibly not an iPod</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1293,19 +1293,19 @@ See https://www.rockbox.org/wiki/SansaE200Install
         <translation type="obsolete">Orijinal bellenim (firmware) mevcut değil: %1</translation>
     </message>
     <message>
-        <source>Searching for ipods</source>
+        <source>Searching for iPods</source>
         <translation type="obsolete">iPod&apos;lar aranıyor</translation>
     </message>
     <message>
-        <source>No Ipods found</source>
+        <source>No iPods found</source>
         <translation type="obsolete">Herhangi bir iPod bulunamadı</translation>
     </message>
     <message>
-        <source>Too many Ipods found</source>
+        <source>Too many iPods found</source>
         <translation type="obsolete">Çok sayıda iPod bulundu</translation>
     </message>
     <message>
-        <source>could not open ipod</source>
+        <source>could not open iPod</source>
         <translation type="obsolete">iPod açılamadı</translation>
     </message>
     <message>
@@ -1341,7 +1341,7 @@ See https://www.rockbox.org/wiki/IpodConversionToFAT32</source>
 Ayrıntılı bilgi için: https://www.rockbox.org/wiki/IpodConversionToFAT32</translation>
     </message>
     <message>
-        <source>Could not open Ipod in RW mode</source>
+        <source>Could not open iPod in RW mode</source>
         <translation type="obsolete">iPod RW modunda açılamadı</translation>
     </message>
     <message>
@@ -1711,7 +1711,7 @@ You need to change your player to MSC mode for installation. </source>
     <message>
         <location line="+9"/>
         <source>%1 &quot;MacPod&quot; found!
-Rockbox needs a FAT formatted Ipod (so-called &quot;WinPod&quot;) to run. </source>
+Rockbox needs a FAT formatted iPod (so-called &quot;WinPod&quot;) to run. </source>
         <translation type="unfinished"></translation>
     </message>
     <message>

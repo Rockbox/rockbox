@@ -673,7 +673,7 @@ Zobacz https://www.rockbox.org/wiki/IpodConversionToFAT32</translation>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="86"/>
         <location filename="../base/bootloaderinstallipod.cpp" line="155"/>
-        <source>Could not open Ipod in R/W mode</source>
+        <source>Could not open iPod in R/W mode</source>
         <translation>Nie można otworzyć iPoda w trybie odczytu/zapisu</translation>
     </message>
     <message>
@@ -728,17 +728,17 @@ Zobacz https://www.rockbox.org/wiki/IpodConversionToFAT32</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="262"/>
-        <source>Could not open Ipod: permission denied</source>
+        <source>Could not open iPod: permission denied</source>
         <translation>Nie można otworzyć iPoda: dostęp zabroniony</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="266"/>
-        <source>Could not open Ipod</source>
+        <source>Could not open iPod</source>
         <translation>Nie można otworzyć iPoda</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallipod.cpp" line="271"/>
-        <source>Error reading partition table - possibly not an Ipod</source>
+        <source>Error reading partition table - possibly not an iPod</source>
         <translation>Błąd odczytu tablicy partycji - możliwe że urządzenie nie jest iPodem</translation>
     </message>
     <message>
@@ -1366,9 +1366,9 @@ Rockbox Utility nie może pracować z tymi ustawieniami. Proszę sprawdź, że u
     <message>
         <location filename="../configure.cpp" line="787"/>
         <source>%1 &quot;MacPod&quot; found!
-Rockbox needs a FAT formatted Ipod (so-called &quot;WinPod&quot;) to run. </source>
+Rockbox needs a FAT formatted iPod (so-called &quot;WinPod&quot;) to run. </source>
         <translation>znaleziono \&quot;MaxPod\&quot; %1!
-Rockbox obsługuje wyłącznie Ipody z systemem plików FAT (tak zwane \&quot;WinPod\&quot;).</translation>
+Rockbox obsługuje wyłącznie iPody z systemem plików FAT (tak zwane \&quot;WinPod\&quot;).</translation>
     </message>
     <message>
         <source>Fatal error</source>

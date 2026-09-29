@@ -797,7 +797,7 @@ void Config::autodetect()
                 if(PlayerBuildInfo::instance()->value(
                             PlayerBuildInfo::BootloaderMethod, detected.at(0).device) == "ipod") {
                     msg = tr("%1 \"MacPod\" found!\n"
-                            "Rockbox needs a FAT formatted Ipod (so-called \"WinPod\") "
+                            "Rockbox needs a FAT formatted iPod (so-called \"WinPod\") "
                             "to run. ").arg(PlayerBuildInfo::instance()->value(
                                                 PlayerBuildInfo::DisplayName,
                                                 detected.at(0).device).toString());
