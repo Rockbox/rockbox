@@ -257,7 +257,7 @@ int read_partinfo(struct ipod_t* ipod, int silent)
     if ((ipod->pinfo[0].type != 0) || (ipod->pinfo[0].size == 0) ||
         ((ipod->pinfo[1].type != 0xb) && (ipod->pinfo[1].type != 0xc) &&
          (ipod->pinfo[1].type != PARTTYPE_HFS))) {
-        if (!silent) fprintf(stderr,"[ERR]  Partition layout is not an ipod\n");
+        if (!silent) fprintf(stderr,"[ERR]  Partition layout is not an iPod\n");
         return -1;
     }
 
@@ -650,7 +650,7 @@ int add_new_image(struct ipod_t* ipod, char* imagename, char* filename, int type
             }
 
             if (memcmp(header+4, ipod->modelname,4)!=0) {
-                fprintf(stderr,"[ERR]  Model name in input file (%c%c%c%c) doesn't match ipod model (%s)\n",
+                fprintf(stderr,"[ERR]  Model name in input file (%c%c%c%c) doesn't match iPod model (%s)\n",
                         header[4],header[5],header[6],header[7], ipod->modelname);
                 close(infile);
                 return -1;
@@ -936,7 +936,7 @@ int add_bootloader(struct ipod_t* ipod, char* filename, int type)
             }
 
             if (memcmp(header+4, ipod->modelname,4)!=0) {
-                fprintf(stderr,"[ERR]  Model name in input file (%c%c%c%c) doesn't match ipod model (%s)\n",
+                fprintf(stderr,"[ERR]  Model name in input file (%c%c%c%c) doesn't match iPod model (%s)\n",
                         header[4],header[5],header[6],header[7], ipod->modelname);
                 close(infile);
                 return -1;
@@ -1233,7 +1233,7 @@ int write_firmware(struct ipod_t* ipod, char* filename, int type)
             }
 
             if (memcmp(header+4, ipod->modelname,4)!=0) {
-                fprintf(stderr,"[ERR]  Model name in input file (%c%c%c%c) doesn't match ipod model (%s)\n",
+                fprintf(stderr,"[ERR]  Model name in input file (%c%c%c%c) doesn't match iPod model (%s)\n",
                         header[4],header[5],header[6],header[7], ipod->modelname);
                 close(infile);
                 return -1;
@@ -1810,10 +1810,10 @@ int ipod_scan(struct ipod_t* ipod)
          }
 
 #ifdef __WIN32__
-         printf("[INFO] Ipod found - %s (\"%s\") - disk device %d\n",
+         printf("[INFO] iPod found - %s (\"%s\") - disk device %d\n",
              ipod->modelstr,ipod->macpod ? "macpod" : "winpod",i);
 #else
-         printf("[INFO] Ipod found - %s (\"%s\") - %s\n",
+         printf("[INFO] iPod found - %s (\"%s\") - %s\n",
              ipod->modelstr,ipod->macpod ? "macpod" : "winpod",ipod->diskname);
 #endif
          n++;
@@ -1828,7 +1828,7 @@ int ipod_scan(struct ipod_t* ipod)
         memcpy(ipod, &ipod_found, sizeof(struct ipod_t));
     }
     else if(n == 0 && denied) {
-        printf("[ERR]  FATAL: Permission denied on %d device(s) and no ipod detected.\n", denied);
+        printf("[ERR]  FATAL: Permission denied on %d device(s) and no iPod detected.\n", denied);
 #ifdef __WIN32__
         printf("[ERR]  You need to run this program with administrator priviledges!\n");
 #else
@@ -1855,7 +1855,7 @@ int write_dos_partition_table(struct ipod_t* ipod)
     /* Only support 512-byte sectors at the moment */
     if ( ipod->sector_size != 512 )
     {
-        fprintf(stderr,"[ERR]  Only ipods with 512 bytes per sector are supported.\n");
+        fprintf(stderr,"[ERR]  Only iPods with 512 bytes per sector are supported.\n");
         return -1;
     }
     if(ipod->sectorbuf == NULL) {

@@ -61,8 +61,8 @@ void print_macpod_warning(void)
 {
     printf("[INFO] ************************************************************************\n");
     printf("[INFO] *** WARNING FOR ROCKBOX USERS\n");
-    printf("[INFO] *** You must convert this ipod to FAT32 format (aka a \"winpod\")\n");
-    printf("[INFO] *** if you want to run Rockbox.  Rockbox WILL NOT work on this ipod.\n");
+    printf("[INFO] *** You must convert this iPod to FAT32 format (aka a \"winpod\")\n");
+    printf("[INFO] *** if you want to run Rockbox.  Rockbox WILL NOT work on this iPod.\n");
     printf("[INFO] *** See http://www.rockbox.org/wiki/IpodConversionToFAT32\n");
     printf("[INFO] ************************************************************************\n");
 }
@@ -103,21 +103,21 @@ void print_usage(void)
     fprintf(stderr,"The .ipodx extension is used for encrypted images for the 2nd Gen Nano.\n\n");
 
 #ifdef __WIN32__
-    fprintf(stderr,"DISKNO is the number (e.g. 2) Windows has assigned to your ipod's hard disk.\n");
+    fprintf(stderr,"DISKNO is the number (e.g. 2) Windows has assigned to your iPod's hard disk.\n");
     fprintf(stderr,"The first hard disk in your computer (i.e. C:\\) will be disk 0, the next disk\n");
     fprintf(stderr,"will be disk 1 etc.  ipodpatcher will refuse to access a disk unless it\n");
-    fprintf(stderr,"can identify it as being an ipod.\n");
+    fprintf(stderr,"can identify it as being an iPod.\n");
     fprintf(stderr,"\n");
 #else
 #if defined(linux) || defined (__linux)
-    fprintf(stderr,"\"device\" is the device node (e.g. /dev/sda) assigned to your ipod.\n");
+    fprintf(stderr,"\"device\" is the device node (e.g. /dev/sda) assigned to your iPod.\n");
 #elif defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
-    fprintf(stderr,"\"device\" is the device node (e.g. /dev/da1) assigned to your ipod.\n");
+    fprintf(stderr,"\"device\" is the device node (e.g. /dev/da1) assigned to your iPod.\n");
 #elif defined(__APPLE__) && defined(__MACH__)
-    fprintf(stderr,"\"device\" is the device node (e.g. /dev/disk1) assigned to your ipod.\n");
+    fprintf(stderr,"\"device\" is the device node (e.g. /dev/disk1) assigned to your iPod.\n");
 #endif
     fprintf(stderr,"ipodpatcher will refuse to access a disk unless it can identify it as being\n");
-    fprintf(stderr,"an ipod.\n");
+    fprintf(stderr,"an iPod.\n");
 #endif
 }
 
@@ -169,7 +169,7 @@ int main(int argc, char* argv[])
 
     if ((argc > 1) && (strcmp(argv[1],"--scan")==0)) {
         if (ipod_scan(&ipod) == 0)
-            fprintf(stderr,"[ERR]  No ipods found.\n");
+            fprintf(stderr,"[ERR]  No iPods found.\n");
         return IPOD_NOT_FOUND;
     }
 
@@ -186,10 +186,10 @@ int main(int argc, char* argv[])
         /* Autoscan for ipods */
         n = ipod_scan(&ipod);
         if (n==0) {
-            fprintf(stderr,"[ERR]  No ipods found, aborting\n");
-            fprintf(stderr,"[ERR]  Please connect your ipod and ensure it is in disk mode\n");
+            fprintf(stderr,"[ERR]  No iPods found, aborting\n");
+            fprintf(stderr,"[ERR]  Please connect your iPod and ensure it is in disk mode\n");
 #if defined(__APPLE__) && defined(__MACH__)
-            fprintf(stderr,"[ERR]  Also ensure that itunes is closed, and that your ipod is not mounted.\n");
+            fprintf(stderr,"[ERR]  Also ensure that itunes is closed, and that your iPod is not mounted.\n");
 #elif !defined(__WIN32__)
             if (geteuid()!=0) {
                 fprintf(stderr,"[ERR]  You may also need to run ipodpatcher as root.\n");
@@ -197,8 +197,8 @@ int main(int argc, char* argv[])
 #endif
             fprintf(stderr,"[ERR]  Please refer to the Rockbox manual if you continue to have problems.\n");
         } else if (n > 1) {
-            fprintf(stderr,"[ERR]  %d ipods found, aborting\n",n);
-            fprintf(stderr,"[ERR]  Please connect only one ipod and re-run ipodpatcher.\n");
+            fprintf(stderr,"[ERR]  %d iPods found, aborting\n",n);
+            fprintf(stderr,"[ERR]  Please connect only one iPod and re-run ipodpatcher.\n");
             return IPOD_MULTIPLE_DEVICES;
         } else if (n == 1 && ipod.macpod) {
             return IPOD_WRONG_TYPE;
@@ -396,7 +396,7 @@ int main(int argc, char* argv[])
         ipod_get_ramsize(&ipod);
     }
 
-    printf("[INFO] Ipod model: %s ",ipod.modelstr);
+    printf("[INFO] iPod model: %s ",ipod.modelstr);
     if (ipod.ramsize > 0) { printf("(%dMB RAM) ",ipod.ramsize); }
     printf("(\"%s\")\n",ipod.macpod ? "macpod" : "winpod");
 
@@ -564,7 +564,7 @@ int main(int argc, char* argv[])
     } else if (action==FORMAT_PARTITION) {
         printf("WARNING!!! YOU ARE ABOUT TO USE AN EXPERIMENTAL FEATURE.\n");
         printf("ALL DATA ON YOUR IPOD WILL BE ERASED.\n");
-        printf("Are you sure you want to format your ipod? (y/n):");
+        printf("Are you sure you want to format your iPod? (y/n):");
 
         if (fgets(yesno,4,stdin)) {
             if (yesno[0]=='y') {
@@ -581,11 +581,11 @@ int main(int argc, char* argv[])
         }
     } else if (action==CONVERT_TO_FAT32) {
         if (!ipod.macpod) {
-            printf("[ERR]  Ipod is already FAT32, aborting\n");
+            printf("[ERR]  iPod is already FAT32, aborting\n");
         } else {
             printf("WARNING!!! YOU ARE ABOUT TO USE AN EXPERIMENTAL FEATURE.\n");
             printf("ALL DATA ON YOUR IPOD WILL BE ERASED.\n");
-            printf("Are you sure you want to convert your ipod to FAT32? (y/n):");
+            printf("Are you sure you want to convert your iPod to FAT32? (y/n):");
 
             if (fgets(yesno,4,stdin)) {
                 if (yesno[0]=='y') {
