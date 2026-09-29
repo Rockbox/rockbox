@@ -1050,6 +1050,14 @@ static int process_markers(struct jpeg* p_jpeg)
                     return -3; /* Unsupported SOF0 subsampling */
                 }
                 p_jpeg->blocks = n;
+                for (i=1; i<n; i++)
+                {   /* chroma must be one block per MCU */
+                    if (p_jpeg->frameheader[i].horizontal_sampling != 1
+                     || p_jpeg->frameheader[i].vertical_sampling != 1)
+                        return -3; /* Unsupported SOF0 subsampling */
+                }
+                if (p_jpeg->x_size == 0 || p_jpeg->y_size == 0)
+                    return -12; /* Height defined by DNL not supported */
                 /* A single-component scan is non-interleaved: the MCU is one
                    8x8 block regardless of the sampling factors (T.81 A.2.2) */
                 if (n == 1)
@@ -1160,7 +1168,10 @@ static int process_markers(struct jpeg* p_jpeg)
                 marker_size -= 2;
 
                 n = (marker_size-1-3)/2;
-                if (e_getc(p_jpeg, -1) != n || (n != 1 && n != 3))
+                if (e_getc(p_jpeg, -1) != n || (n != 1 && n != 3)
+                    /* one scan with all components; multi-scan files and
+                       SOS before SOF are not supported (blocks = Nf here) */
+                    || n != p_jpeg->blocks)
                 {
                     return (-7); /* Unsupported SOS component specification */
                 }
@@ -1168,6 +1179,10 @@ static int process_markers(struct jpeg* p_jpeg)
                 for (i=0; i<n; i++)
                 {
                     p_jpeg->scanheader[i].ID = e_getc(p_jpeg, -1);
+                    if (p_jpeg->scanheader[i].ID != p_jpeg->frameheader[i].ID)
+                    {
+                        return (-7); /* components out of frame order */
+                    }
                     p_jpeg->scanheader[i].DC_select = (c = e_getc(p_jpeg, -1))
                         >> 4;
                     p_jpeg->scanheader[i].AC_select = c & 0x0F;
