@@ -1043,6 +1043,8 @@ static int process_markers(struct jpeg* p_jpeg)
                     p_jpeg->frameheader[i].vertical_sampling = c & 0x0F;
                     p_jpeg->frameheader[i].quanttable_select =
                         e_getc(p_jpeg, -1);
+                    if (p_jpeg->frameheader[i].quanttable_select > 3)
+                        return -8; /* Unsupported quantization table */
                     if (p_jpeg->frameheader[i].horizontal_sampling > 2
                      || p_jpeg->frameheader[i].vertical_sampling > 2)
                     return -3; /* Unsupported SOF0 subsampling */
@@ -1567,23 +1569,60 @@ INLINE void fix_huff_tables(struct jpeg *p_jpeg)
  * quantization table when one of these IDCT routines is used, rather than
  * have the IDCT shift each value it processes.
  */
+/* Pre-scale the quantization tables for the IDCT. Luma and chroma can use
+ * different IDCT scales, so a table that both select is copied to a slot no
+ * component selects before scaling; each component's quanttable_select is
+ * rewritten to the slot it should use. There are 4 slots and at most 3
+ * components, so when a table is shared a free slot always exists. */
 INLINE void fix_quant_tables(struct jpeg *p_jpeg)
 {
-    int shift, i, j;
+    int want[4] = { -1, -1, -1, -1 }; /* scale shift wanted for each slot */
+    int orig[4] = { 0, 1, 2, 3 }; /* table each slot holds */
+    int c, c2, f, j;
 
 #ifdef HAVE_LCD_COLOR
-    const int k = 2;
+    const int nc = p_jpeg->blocks > 1 ? 3 : 1;
 #else
-    const int k = 1;
+    const int nc = 1; /* chroma is not decoded */
 #endif
 
-    for (i = 0; i < k; i++)
+    for (c = 0; c < nc; c++)
     {
-        shift = idct_tbl[p_jpeg->v_scale[i]].scale;
-        if (shift)
+        int t = p_jpeg->frameheader[c].quanttable_select;
+        int shift = idct_tbl[p_jpeg->v_scale[!!c]].scale;
+
+        for (f = 0; f < 4; f++) /* a slot already holding t at this scale? */
+            if (orig[f] == t && want[f] == shift)
+                break;
+        if (f == 4 && want[t] < 0)
+            f = t; /* first use of t */
+        if (f == 4)
+        {   /* t is in use at another scale: copy it to a free slot that no
+               later component still needs */
+            for (f = 0; f < 4; f++)
+            {
+                if (want[f] >= 0)
+                    continue;
+                for (c2 = c + 1; c2 < nc; c2++)
+                    if (p_jpeg->frameheader[c2].quanttable_select == f)
+                        break;
+                if (c2 == nc)
+                    break;
+            }
+            MEMCPY(p_jpeg->quanttable[f], p_jpeg->quanttable[t],
+                sizeof(p_jpeg->quanttable[f]));
+            orig[f] = t;
+        }
+        want[f] = shift;
+        p_jpeg->frameheader[c].quanttable_select = f;
+    }
+
+    for (f = 0; f < 4; f++)
+    {
+        if (want[f] > 0)
         {
             for (j = 0; j < 64; j++)
-                p_jpeg->quanttable[i][j] <<= shift;
+                p_jpeg->quanttable[f][j] <<= want[f];
         }
     }
 }
@@ -1841,6 +1880,8 @@ static struct img_part *store_row_jpeg(void *jpeg_args)
                     &p_jpeg->dc_derived_tbls[p_jpeg->scanheader[ci].DC_select];
                 struct derived_tbl* actbl =
                     &p_jpeg->ac_derived_tbls[p_jpeg->scanheader[ci].AC_select];
+                const int16_t *qt = p_jpeg->quanttable[
+                    p_jpeg->frameheader[ci].quanttable_select];
 
                 /* Section F.2.2.1: decode the DC coefficient difference */
                 huff_decode_dc(p_jpeg, dctbl, s, r);
@@ -1853,13 +1894,11 @@ static struct img_part *store_row_jpeg(void *jpeg_args)
 #ifdef HAVE_LCD_COLOR
                     p_jpeg->last_dc_val[ci] += s;
                     /* output it (assumes zag[0] = 0) */
-                    block[0] = MULTIPLY16(p_jpeg->last_dc_val[ci],
-                        p_jpeg->quanttable[!!ci][0]);
+                    block[0] = MULTIPLY16(p_jpeg->last_dc_val[ci], qt[0]);
 #else
                     p_jpeg->last_dc_val += s;
                     /* output it (assumes zag[0] = 0) */
-                    block[0] = MULTIPLY16(p_jpeg->last_dc_val,
-                        p_jpeg->quanttable[0][0]);
+                    block[0] = MULTIPLY16(p_jpeg->last_dc_val, qt[0]);
 #endif
                     /* coefficient buffer must be cleared */
                     MEMSET(block+1, 0, p_jpeg->zero_need[!!ci] * sizeof(int));
@@ -1877,7 +1916,7 @@ static struct img_part *store_row_jpeg(void *jpeg_args)
                                 goto skip_rest;
                             r = get_bits(p_jpeg, s);
                             r = HUFF_EXTEND(r, s);
-                            r = MULTIPLY16(r, p_jpeg->quanttable[!!ci][k]);
+                            r = MULTIPLY16(r, qt[k]);
 #ifdef JPEG_IDCT_TRANSPOSE
                             block[zag[transpose ? k : k + 64]] = r ;
 #else

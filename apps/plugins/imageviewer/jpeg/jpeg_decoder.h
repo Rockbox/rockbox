@@ -42,7 +42,7 @@ struct jpeg
     unsigned char* p_entropy_end;
 
     int quanttable[4][QUANT_TABLE_LENGTH]; /* raw quantization tables 0-3 */
-    int qt_idct[2][QUANT_TABLE_LENGTH]; /* quantization tables for IDCT */
+    int qt_idct[3][QUANT_TABLE_LENGTH]; /* per component, for IDCT */
 
     struct huffman_table hufftable[2]; /* Huffman tables  */
     struct derived_tbl dc_derived_tbls[2]; /* Huffman-LUTs */
@@ -52,7 +52,6 @@ struct jpeg
     struct scan_component scanheader[3]; /* Huffman tables per component */
 
     int mcu_membership[6]; /* info per block */
-    int tab_membership[6];
     int subsample_x[3]; /* info per component */
     int subsample_y[3];
 };
