@@ -922,7 +922,7 @@ void build_lut(struct jpeg* p_jpeg)
         p_jpeg->subsample_y[1] = 1;
         p_jpeg->subsample_y[2] = 1;
     }
-    if (p_jpeg->frameheader[0].horizontal_sampling == 1
+    else if (p_jpeg->frameheader[0].horizontal_sampling == 1
         && p_jpeg->frameheader[0].vertical_sampling == 2)
     {   /* 4:2:2 vertically subsampled */
         p_jpeg->store_pos[1] = 2; /* block positions are mirrored */
