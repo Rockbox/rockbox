@@ -130,9 +130,8 @@ struct jpeg
     struct frame_component frameheader[3]; /* Component descriptor */
     struct scan_component scanheader[3]; /* Huffman tables per component */
 
-    int mcu_membership[6]; /* info per block */
-    int subsample_x[3]; /* info per component */
-    int subsample_y[3];
+    int mcu_membership[6]; /* component of each block */
+    unsigned char mcu_pos[6]; /* position of each block in its component */
     bool resize;
     unsigned char buf[JPEG_READ_BUF_SIZE];
     struct img_part part;
@@ -1051,9 +1050,15 @@ static int process_markers(struct jpeg* p_jpeg)
                 }
                 p_jpeg->blocks = n;
                 for (i=1; i<n; i++)
-                {   /* chroma must be one block per MCU */
-                    if (p_jpeg->frameheader[i].horizontal_sampling != 1
-                     || p_jpeg->frameheader[i].vertical_sampling != 1)
+                {   /* chroma must be one block per MCU, or sampled like
+                       luma when that is 1x2 or 2x1 (2x2 on all components
+                       would exceed 10 blocks per MCU) */
+                    int h = p_jpeg->frameheader[i].horizontal_sampling;
+                    int v = p_jpeg->frameheader[i].vertical_sampling;
+                    if ((h != 1 || v != 1)
+                     && (h != p_jpeg->frameheader[0].horizontal_sampling
+                      || v != p_jpeg->frameheader[0].vertical_sampling
+                      || h == v))
                         return -3; /* Unsupported SOF0 subsampling */
                 }
                 if (p_jpeg->x_size == 0 || p_jpeg->y_size == 0)
@@ -1475,96 +1480,39 @@ static const unsigned char zig[] =
 /* Reformat some image header data so that the decoder can use it properly. */
 INLINE void fix_headers(struct jpeg* p_jpeg)
 {
-    int i;
+    int h = p_jpeg->frameheader[0].horizontal_sampling;
+    int v = p_jpeg->frameheader[0].vertical_sampling;
+    int ncomp = p_jpeg->blocks; /* still the component count here */
+    int i, c, b;
 
     for (i=0; i<4; i++)
         p_jpeg->store_pos[i] = i; /* default ordering */
-
-    /* assignments for the decoding of blocks */
-    if (p_jpeg->frameheader[0].horizontal_sampling == 2
-        && p_jpeg->frameheader[0].vertical_sampling == 1)
-    {   /* 4:2:2 */
-        p_jpeg->blocks = 4;
-        p_jpeg->x_mbl = (p_jpeg->x_size+15) / 16;
-        p_jpeg->x_phys = p_jpeg->x_mbl * 16;
-        p_jpeg->y_mbl = (p_jpeg->y_size+7) / 8;
-        p_jpeg->y_phys = p_jpeg->y_mbl * 8;
-        p_jpeg->mcu_membership[0] = 0; /* Y1=Y2=0, U=1, V=2 */
-        p_jpeg->mcu_membership[1] = 0;
-        p_jpeg->mcu_membership[2] = 1;
-        p_jpeg->mcu_membership[3] = 2;
-        p_jpeg->subsample_x[0] = 1;
-        p_jpeg->subsample_x[1] = 2;
-        p_jpeg->subsample_x[2] = 2;
-        p_jpeg->subsample_y[0] = 1;
-        p_jpeg->subsample_y[1] = 1;
-        p_jpeg->subsample_y[2] = 1;
-    }
-    else if (p_jpeg->frameheader[0].horizontal_sampling == 1
-        && p_jpeg->frameheader[0].vertical_sampling == 2)
-    {   /* 4:2:2 vertically subsampled */
-        p_jpeg->store_pos[1] = 2; /* block positions are mirrored */
+    if (h == 1 && v == 2)
+    {   /* the second block of a component goes below the first */
+        p_jpeg->store_pos[1] = 2;
         p_jpeg->store_pos[2] = 1;
-        p_jpeg->blocks = 4;
-        p_jpeg->x_mbl = (p_jpeg->x_size+7) / 8;
-        p_jpeg->x_phys = p_jpeg->x_mbl * 8;
-        p_jpeg->y_mbl = (p_jpeg->y_size+15) / 16;
-        p_jpeg->y_phys = p_jpeg->y_mbl * 16;
-        p_jpeg->mcu_membership[0] = 0; /* Y1=Y2=0, U=1, V=2 */
-        p_jpeg->mcu_membership[1] = 0;
-        p_jpeg->mcu_membership[2] = 1;
-        p_jpeg->mcu_membership[3] = 2;
-        p_jpeg->subsample_x[0] = 1;
-        p_jpeg->subsample_x[1] = 1;
-        p_jpeg->subsample_x[2] = 1;
-        p_jpeg->subsample_y[0] = 1;
-        p_jpeg->subsample_y[1] = 2;
-        p_jpeg->subsample_y[2] = 2;
-    }
-    else if (p_jpeg->frameheader[0].horizontal_sampling == 2
-        && p_jpeg->frameheader[0].vertical_sampling == 2)
-    {   /* 4:2:0 */
-        p_jpeg->blocks = 6;
-        p_jpeg->x_mbl = (p_jpeg->x_size+15) / 16;
-        p_jpeg->x_phys = p_jpeg->x_mbl * 16;
-        p_jpeg->y_mbl = (p_jpeg->y_size+15) / 16;
-        p_jpeg->y_phys = p_jpeg->y_mbl * 16;
-        p_jpeg->mcu_membership[0] = 0;
-        p_jpeg->mcu_membership[1] = 0;
-        p_jpeg->mcu_membership[2] = 0;
-        p_jpeg->mcu_membership[3] = 0;
-        p_jpeg->mcu_membership[4] = 1;
-        p_jpeg->mcu_membership[5] = 2;
-        p_jpeg->subsample_x[0] = 1;
-        p_jpeg->subsample_x[1] = 2;
-        p_jpeg->subsample_x[2] = 2;
-        p_jpeg->subsample_y[0] = 1;
-        p_jpeg->subsample_y[1] = 2;
-        p_jpeg->subsample_y[2] = 2;
-    }
-    else if (p_jpeg->frameheader[0].horizontal_sampling == 1
-        && p_jpeg->frameheader[0].vertical_sampling == 1)
-    {   /* 4:4:4 */
-        /* don't overwrite p_jpeg->blocks */
-        p_jpeg->x_mbl = (p_jpeg->x_size+7) / 8;
-        p_jpeg->x_phys = p_jpeg->x_mbl * 8;
-        p_jpeg->y_mbl = (p_jpeg->y_size+7) / 8;
-        p_jpeg->y_phys = p_jpeg->y_mbl * 8;
-        p_jpeg->mcu_membership[0] = 0;
-        p_jpeg->mcu_membership[1] = 1;
-        p_jpeg->mcu_membership[2] = 2;
-        p_jpeg->subsample_x[0] = 1;
-        p_jpeg->subsample_x[1] = 1;
-        p_jpeg->subsample_x[2] = 1;
-        p_jpeg->subsample_y[0] = 1;
-        p_jpeg->subsample_y[1] = 1;
-        p_jpeg->subsample_y[2] = 1;
-    }
-    else
-    {
-        /* error */
     }
 
+    p_jpeg->x_mbl = (p_jpeg->x_size + 8*h - 1) / (8*h);
+    p_jpeg->x_phys = p_jpeg->x_mbl * 8*h;
+    p_jpeg->y_mbl = (p_jpeg->y_size + 8*v - 1) / (8*v);
+    p_jpeg->y_phys = p_jpeg->y_mbl * 8*v;
+
+    /* Blocks in MCU order: each component's blocks in turn, H x V of them.
+       Chroma is either 1x1 or sampled like luma (checked in SOF), so an MCU
+       holds at most 6 blocks. */
+    b = 0;
+    for (c = 0; c < ncomp; c++)
+    {
+        int n = p_jpeg->frameheader[c].horizontal_sampling
+              * p_jpeg->frameheader[c].vertical_sampling;
+        for (i = 0; i < n; i++, b++)
+        {
+            p_jpeg->mcu_membership[b] = c;
+            p_jpeg->mcu_pos[b] = i;
+        }
+    }
+    p_jpeg->blocks = b;
 }
 
 INLINE void fix_huff_tables(struct jpeg *p_jpeg)
@@ -1852,15 +1800,10 @@ static void search_restart(struct jpeg *p_jpeg)
 static struct img_part *store_row_jpeg(void *jpeg_args)
 {
     struct jpeg *p_jpeg = (struct jpeg*) jpeg_args;
-#ifdef HAVE_LCD_COLOR
-    int mcu_hscale = p_jpeg->h_scale[1];
-    int mcu_vscale = p_jpeg->v_scale[1];
-#else
     int mcu_hscale = (p_jpeg->h_scale[0] +
         p_jpeg->frameheader[0].horizontal_sampling - 1);
     int mcu_vscale = (p_jpeg->v_scale[0] +
         p_jpeg->frameheader[0].vertical_sampling - 1);
-#endif
     unsigned int width = p_jpeg->x_mbl << mcu_hscale;
     unsigned int b_width = width * JPEG_PIX_SZ;
     int height = BIT_N(mcu_vscale);
@@ -1974,7 +1917,8 @@ block_end:
                 {
                     int idct_cols = BIT_N(MIN(p_jpeg->h_scale[!!ci], 3));
                     int idct_rows = BIT_N(p_jpeg->v_scale[!!ci]);
-                    unsigned char *b_out = out + (ci ? ci : store_offs[blkn]);
+                    unsigned char *b_out = out + ci
+                        + store_offs[p_jpeg->mcu_pos[blkn]];
                     if (idct_tbl[p_jpeg->v_scale[!!ci]].v_idct)
 #ifdef JPEG_IDCT_TRANSPOSE
                         idct_tbl[p_jpeg->v_scale[!!ci]].v_idct(block,
@@ -2225,10 +2169,16 @@ int clip_jpeg_fd(int fd, int flags,
         (p_jpeg->y_size << p_jpeg->v_scale[0]) >> 3 == bm->height)
         resize = false;
 #ifdef HAVE_LCD_COLOR
-    p_jpeg->h_scale[1] = p_jpeg->h_scale[0] +
-        p_jpeg->frameheader[0].horizontal_sampling - 1;
-    p_jpeg->v_scale[1] = p_jpeg->v_scale[0] +
-        p_jpeg->frameheader[0].vertical_sampling - 1;
+    {   /* chroma blocks are scaled up by the luma:chroma sampling ratio */
+        struct frame_component *chroma =
+            &p_jpeg->frameheader[p_jpeg->blocks > 1 ? 1 : 0];
+        p_jpeg->h_scale[1] = p_jpeg->h_scale[0] +
+            p_jpeg->frameheader[0].horizontal_sampling -
+            chroma->horizontal_sampling;
+        p_jpeg->v_scale[1] = p_jpeg->v_scale[0] +
+            p_jpeg->frameheader[0].vertical_sampling -
+            chroma->vertical_sampling;
+    }
     JDEBUGF("chroma IDCT size: %dx%d\n", BIT_N(p_jpeg->h_scale[1]),
         BIT_N(p_jpeg->v_scale[1]));
 #endif
@@ -2279,15 +2229,10 @@ int clip_jpeg_fd(int fd, int flags,
     buf_start += sizeof(struct jpeg);
 #endif
     maxsize = buf_end - buf_start;
-#ifdef HAVE_LCD_COLOR
-    int decode_buf_size = (p_jpeg->x_mbl << p_jpeg->h_scale[1])
-        << p_jpeg->v_scale[1];
-#else
     int decode_buf_size = (p_jpeg->x_mbl << p_jpeg->h_scale[0])
         << p_jpeg->v_scale[0];
     decode_buf_size <<= p_jpeg->frameheader[0].horizontal_sampling +
         p_jpeg->frameheader[0].vertical_sampling - 2;
-#endif
     decode_buf_size *= JPEG_PIX_SZ;
     JDEBUGF("decode buffer size: %d\n", decode_buf_size);
     if (return_size)
