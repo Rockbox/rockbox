@@ -1026,26 +1026,31 @@ void build_lut(struct jpeg* p_jpeg)
 * is evaluated multiple times.
 */
 
+/* Fetch the next entropy-coded byte. Past the end of the data this returns
+ * zero without reading, but still advances so the caller's end check stops
+ * the decode. */
+INLINE unsigned char fetch_byte(struct bitstream* pb)
+{
+    unsigned char byte = 0;
+
+    if (pb->next_input_byte < pb->input_end)
+    {
+        byte = *pb->next_input_byte;
+        if (byte == 0xFF) /* legal marker can be byte stuffing or RSTm */
+        {   /* simplification: just skip the (one-byte) marker code */
+            pb->next_input_byte++;
+        }
+    }
+    pb->next_input_byte++;
+    return byte;
+}
+
 INLINE void check_bit_buffer(struct bitstream* pb, int nbits)
 {
     if (pb->bits_left < nbits)
     {   /* nbits is <= 16, so I can always refill 2 bytes in this case */
-        unsigned char byte;
-
-        byte = *pb->next_input_byte++;
-        if (byte == 0xFF) /* legal marker can be byte stuffing or RSTm */
-        {   /* simplification: just skip the (one-byte) marker code */
-            pb->next_input_byte++;
-        }
-        pb->get_buffer = (pb->get_buffer << 8) | byte;
-
-        byte = *pb->next_input_byte++;
-        if (byte == 0xFF) /* legal marker can be byte stuffing or RSTm */
-        {   /* simplification: just skip the (one-byte) marker code */
-            pb->next_input_byte++;
-        }
-        pb->get_buffer = (pb->get_buffer << 8) | byte;
-
+        pb->get_buffer = (pb->get_buffer << 8) | fetch_byte(pb);
+        pb->get_buffer = (pb->get_buffer << 8) | fetch_byte(pb);
         pb->bits_left += 16;
     }
 }
