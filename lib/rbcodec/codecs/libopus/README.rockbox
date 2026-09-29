@@ -17,6 +17,8 @@ Celt:
   OPUS_ARM_INLINE_EDSP to OPUS_ARM_ASM_ARMV5E_AND_LATER throughout celt and
   silk, since config.h defines exactly one of them per core
 * add #define ABS(a)(((a) < 0) ? - (a) :(a)) to mathops.h
+* celt_decode_lost() in celt_decoder.c filters the PLC excitation in place
+  (celt_fir_inplace) instead of through a copy, to fit the codec stack
 
 Silk:
 * added fixed-phase interpolation paths for the 8, 12 and 16 kHz to 48 kHz

@@ -504,6 +504,19 @@ static int celt_plc_pitch_search(celt_sig *decode_mem[2], int C, int arch)
    return pitch_index;
 }
 
+/* Same output as celt_fir(), but running in place reduces stack use. */
+static void celt_fir_inplace(opus_val16 *x, const opus_val16 *num, int N, int ord)
+{
+   int i, j;
+   for (i=N-1;i>=0;i--)
+   {
+      opus_val32 sum = SHL32(EXTEND32(x[i]), SIG_SHIFT);
+      for (j=0;j<ord;j++)
+         sum = MAC16_16(sum, num[ord-j-1], x[i+j-ord]);
+      x[i] = ROUND16(sum, SIG_SHIFT);
+   }
+}
+
 static void celt_decode_lost(CELTDecoder * OPUS_RESTRICT st, int N, int LM)
 {
    int c;
@@ -605,7 +618,6 @@ static void celt_decode_lost(CELTDecoder * OPUS_RESTRICT st, int N, int LM)
       int pitch_index;
       VARDECL(opus_val32, etmp);
       VARDECL(opus_val16, _exc);
-      VARDECL(opus_val16, fir_tmp);
 
       if (loss_count == 0)
       {
@@ -621,7 +633,6 @@ static void celt_decode_lost(CELTDecoder * OPUS_RESTRICT st, int N, int LM)
 
       ALLOC(etmp, overlap, opus_val32);
       ALLOC(_exc, MAX_PERIOD+LPC_ORDER, opus_val16);
-      ALLOC(fir_tmp, exc_length, opus_val16);
       exc = _exc+LPC_ORDER;
       window = mode->window;
       c=0; do {
@@ -682,11 +693,9 @@ static void celt_decode_lost(CELTDecoder * OPUS_RESTRICT st, int N, int LM)
          /* Initialize the LPC history with the samples just before the start
             of the region for which we're computing the excitation. */
          {
-            /* Compute the excitation for exc_length samples before the loss. We need the copy
-               because celt_fir() cannot filter in-place. */
-            celt_fir(exc+MAX_PERIOD-exc_length, lpc+c*LPC_ORDER,
-                  fir_tmp, exc_length, LPC_ORDER, st->arch);
-            OPUS_COPY(exc+MAX_PERIOD-exc_length, fir_tmp, exc_length);
+            /* Compute the excitation for exc_length samples before the loss. */
+            celt_fir_inplace(exc+MAX_PERIOD-exc_length, lpc+c*LPC_ORDER,
+                  exc_length, LPC_ORDER);
          }
 
          /* Check if the waveform is decaying, and if so how fast.
