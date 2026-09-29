@@ -1716,23 +1716,23 @@ cat <<EOF
  190) HM-60x               170) HD200            211) MA9C
  191) HM-801               171) HD300            212) MA8
                                                  213) MA8C
- ==Sony==                  ==Application==                      
+ ==Sony==                  ==Application==
  219) NWZ-E350 series      200) SDL (Generic)    ==IHIFI==
  220) NWZ-E370/E380 series 201) Andorid (ARM)    230) 760
  221) NWZ-E360 series      202) Android (MIPS)   231) 770
  222) NWZ-E450 series      203) Android (x86)    232) 770C
  223) NWZ-E460 series      209) Anbernic RG Nano 233) 800
  224) NWZ-E470 series                            234) 960
- 225) NWZ-E580 series      ==AgpTek==                      
+ 225) NWZ-E580 series      ==AgpTek==
  226) NWZ-A10 series       240) Rocker           ==AIGO==
  227) NW-A20 series                              245) Eros Q / K (hosted)
  228) NWZ-A860 series      ==iBasso==            247) Eros Q / K native
  229) NWZ-S750 series      250) DX50                  (hw1/hw2 bl, all hw rb)
-			   251) DX90             248) Eros Q / K native     
+                           251) DX90             248) Eros Q / K native
  ==FiiO==                                             (hw3 bl only)
  244) M3K Linux            ==xDuoo==             249) Eros Q / K native
  246) M3K baremetal        241) X3                    (hw4 bl only)
-                           242) X3II                     
+                           242) X3II
  ==Shanling==              243) X20              ==HiBy==
  260) Q1                                         300) R3 Pro II
 			   ==Surfans==           301) R1
@@ -1787,8 +1787,7 @@ fi
   #            file for your target (or blank to use $tool)
   # bootoutput:the final output file name for the bootloader (or blank to use
   #            $output)
-  # appextra:  passed to the APPEXTRA variable in the Makefiles.
-  #            TODO: add proper explanation
+  # appextra:  Extra directories under apps/ to be added to INCLUDES
   # flash:     name of output for flashing, for targets where there's a special
   #            file output for this.
   # plugins:   set to 'yes' to build the plugins. Early development builds can
@@ -1817,7 +1816,7 @@ fi
     bmp2rb_remotenative="$rootdir/tools/bmp2rb -f 0"
     output="rockbox.iriver"
     bootoutput="bootloader.iriver"
-    appextra="recorder:gui:radio"
+    appextra=""
     flash="$pwd/rombox.iriver"
     plugins="yes"
     # toolset is the tools within the tools directory that we build for
@@ -1841,7 +1840,7 @@ fi
     bmp2rb_remotenative="$rootdir/tools/bmp2rb -f 0"
     output="rockbox.iriver"
     bootoutput="bootloader.iriver"
-    appextra="recorder:gui:radio"
+    appextra=""
     flash="$pwd/rombox.iriver"
     plugins="yes"
     # toolset is the tools within the tools directory that we build for
@@ -1865,7 +1864,7 @@ fi
     bmp2rb_remotenative="$rootdir/tools/bmp2rb -f 0"
     output="rockbox.iriver"
     bootoutput="bootloader.iriver"
-    appextra="recorder:gui:radio"
+    appextra=""
     flash="$pwd/rombox.iriver"
     plugins="yes"
     # toolset is the tools within the tools directory that we build for
@@ -1886,7 +1885,7 @@ fi
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 5"
     output="rockbox.mi4"
-    appextra="recorder:gui:radio"
+    appextra=""
     plugins="yes"
     boottool="$rootdir/tools/scramble -mi4v3 -model=h10 -type=RBBL"
     bootoutput="H10_20GC.mi4"
@@ -1910,7 +1909,7 @@ fi
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 5"
     output="rockbox.mi4"
-    appextra="recorder:gui:radio"
+    appextra=""
     plugins="yes"
     boottool="$rootdir/tools/scramble -mi4v2 -model=h105 -type=RBBL"
     bootoutput="H10.mi4"
@@ -1934,7 +1933,7 @@ fi
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 5"
     output="rockbox.ipod"
-    appextra="recorder:gui:radio"
+    appextra=""
     plugins="yes"
     bootoutput="bootloader-$modelname.ipod"
     # toolset is the tools within the tools directory that we build for
@@ -1957,7 +1956,7 @@ fi
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 5"
     output="rockbox.ipod"
-    appextra="recorder:gui:radio"
+    appextra=""
     plugins="yes"
     bootoutput="bootloader-$modelname.ipod"
     # toolset is the tools within the tools directory that we build for
@@ -1980,7 +1979,7 @@ fi
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox.ipod"
-    appextra="recorder:gui:radio"
+    appextra=""
     plugins="yes"
     bootoutput="bootloader-$modelname.ipod"
     # toolset is the tools within the tools directory that we build for
@@ -2003,7 +2002,7 @@ fi
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 6"
     output="rockbox.ipod"
-    appextra="recorder:gui:radio"
+    appextra=""
     plugins="yes"
     bootoutput="bootloader-$modelname.ipod"
     # toolset is the tools within the tools directory that we build for
@@ -2026,7 +2025,7 @@ fi
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 6"
     output="rockbox.ipod"
-    appextra="recorder:gui:radio"
+    appextra=""
     plugins="yes"
     bootoutput="bootloader-$modelname.ipod"
     # toolset is the tools within the tools directory that we build for
@@ -2049,7 +2048,7 @@ fi
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 6"
     output="rockbox.ipod"
-    appextra="recorder:gui:radio"
+    appextra=""
     plugins="yes"
     bootoutput="bootloader-$modelname.ipod"
     # toolset is the tools within the tools directory that we build for
@@ -2072,7 +2071,7 @@ fi
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 6"
     output="rockbox.ipod"
-    appextra="recorder:gui:radio"
+    appextra=""
     plugins="yes"
     bootoutput="bootloader-$modelname.ipod"
     # toolset is the tools within the tools directory that we build for
@@ -2095,7 +2094,7 @@ fi
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 6"
     output="rockbox.ipod"
-    appextra="recorder:gui:radio"
+    appextra=""
     plugins="yes"
     bootoutput="bootloader-$modelname.ipod"
     # toolset is the tools within the tools directory that we build for
@@ -2118,7 +2117,7 @@ fi
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox.ipod"
-    appextra="recorder:gui:radio"
+    appextra=""
     plugins="yes"
     bootoutput="bootloader-$modelname.ipod"
     # toolset is the tools within the tools directory that we build for
@@ -2140,7 +2139,7 @@ fi
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox.ipod"
-    appextra="recorder:gui:radio"
+    appextra=""
     plugins="yes"
     bootoutput="bootloader-$modelname.ipod"
     # toolset is the tools within the tools directory that we build for
@@ -2166,7 +2165,7 @@ fi
     bmp2rb_remotenative="$rootdir/tools/bmp2rb -f 7"
     output="rockbox.iaudio"
     bootoutput="x5_fw.bin"
-    appextra="recorder:gui:radio"
+    appextra=""
     plugins="yes"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
@@ -2191,7 +2190,7 @@ fi
     bmp2rb_remotenative="$rootdir/tools/bmp2rb -f 7"
     output="rockbox.iaudio"
     bootoutput="m5_fw.bin"
-    appextra="recorder:gui:radio"
+    appextra=""
     plugins="yes"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
@@ -2214,7 +2213,7 @@ fi
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox.d2"
     bootoutput="bootloader-cowond2.bin"
-    appextra="recorder:gui:radio"
+    appextra=""
     plugins="yes"
     toolset="$tccbitmaptools"
     # architecture, manufacturer and model for the target-tree build
@@ -2235,7 +2234,7 @@ fi
     bmp2rb_native="$rootdir/tools/bmp2rb -f 7"
     output="rockbox.iaudio"
     bootoutput="cowon_m3.bin"
-    appextra="recorder:gui:radio"
+    appextra=""
     plugins="yes"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
@@ -2256,7 +2255,7 @@ fi
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox.gigabeat"
-    appextra="recorder:gui:radio"
+    appextra=""
     plugins="yes"
     toolset=$gigabeatbitmaptools
     boottool="$rootdir/tools/scramble -gigabeat"
@@ -2277,7 +2276,7 @@ fi
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox.gigabeat"
-    appextra="recorder:gui:radio"
+    appextra=""
     plugins="yes"
     toolset="$gigabeatbitmaptools"
     boottool="$rootdir/tools/scramble -gigabeats"
@@ -2298,7 +2297,7 @@ fi
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox.mi4"
-    appextra="recorder:gui:radio"
+    appextra=""
     plugins="yes"
     boottool="$rootdir/tools/scramble -mi4v3 -model=e200 -type=RBBL"
     bootoutput="PP5022.mi4"
@@ -2325,7 +2324,7 @@ fi
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox.mi4"
-    appextra="recorder:gui:radio"
+    appextra=""
     plugins="yes"
     boottool="$rootdir/tools/scramble -mi4r -model=e20r -type=RBBL"
     bootoutput="pp5022.mi4"
@@ -2349,7 +2348,7 @@ fi
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox.mi4"
-    appextra="recorder:gui:radio"
+    appextra=""
     plugins="yes"
     boottool="$rootdir/tools/scramble -mi4v3 -model=c200 -type=RBBL"
     bootoutput="firmware.mi4"
@@ -2373,7 +2372,7 @@ fi
     tool="$rootdir/tools/scramble -add=clip"
     output="rockbox.sansa"
     bootoutput="bootloader-clip.sansa"
-    appextra="recorder:gui:radio"
+    appextra=""
     plugins="yes"
     toolset=$scramblebitmaptools
     t_cpu="arm"
@@ -2394,7 +2393,7 @@ fi
     tool="$rootdir/tools/scramble -add=e2v2"
     output="rockbox.sansa"
     bootoutput="bootloader-e200v2.sansa"
-    appextra="recorder:gui:radio"
+    appextra=""
     plugins="yes"
     toolset=$scramblebitmaptools
     arm_thumb_boot=1
@@ -2414,7 +2413,7 @@ fi
     tool="$rootdir/tools/scramble -add=m2v4"
     output="rockbox.sansa"
     bootoutput="bootloader-m200v4.sansa"
-    appextra="recorder:gui:radio"
+    appextra=""
     plugins="yes"
     toolset=$scramblebitmaptools
     t_cpu="arm"
@@ -2435,7 +2434,7 @@ fi
     tool="$rootdir/tools/scramble -add=fuze"
     output="rockbox.sansa"
     bootoutput="bootloader-fuze.sansa"
-    appextra="recorder:gui:radio"
+    appextra=""
     plugins="yes"
     toolset=$scramblebitmaptools
     t_cpu="arm"
@@ -2454,7 +2453,7 @@ fi
     tool="$rootdir/tools/scramble -add=c2v2"
     output="rockbox.sansa"
     bootoutput="bootloader-c200v2.sansa"
-    appextra="recorder:gui:radio"
+    appextra=""
     plugins="yes"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
@@ -2477,7 +2476,7 @@ fi
     tool="$rootdir/tools/scramble -add=clv2"
     output="rockbox.sansa"
     bootoutput="bootloader-clipv2.sansa"
-    appextra="recorder:gui:radio"
+    appextra=""
     plugins="yes"
     toolset=$scramblebitmaptools
     t_cpu="arm"
@@ -2497,7 +2496,7 @@ fi
     tool="$rootdir/tools/scramble -add=cli+"
     output="rockbox.sansa"
     bootoutput="bootloader-clipplus.sansa"
-    appextra="recorder:gui:radio"
+    appextra=""
     plugins="yes"
     toolset=$scramblebitmaptools
     t_cpu="arm"
@@ -2517,7 +2516,7 @@ fi
     tool="$rootdir/tools/scramble -add=fuz2"
     output="rockbox.sansa"
     bootoutput="bootloader-fuzev2.sansa"
-    appextra="recorder:gui:radio"
+    appextra=""
     plugins="yes"
     toolset=$scramblebitmaptools
     t_cpu="arm"
@@ -2536,7 +2535,7 @@ fi
     tool="$rootdir/tools/scramble -add=fuz+"
     output="rockbox.sansa"
     bootoutput="bootloader-fuzeplus.sansa"
-    appextra="gui:recorder:radio"
+    appextra=""
     plugins="yes"
     toolset=$scramblebitmaptools
     t_cpu="arm"
@@ -2555,7 +2554,7 @@ fi
     tool="$rootdir/tools/scramble -add=clzp"
     output="rockbox.sansa"
     bootoutput="bootloader-clipzip.sansa"
-    appextra="recorder:gui:radio"
+    appextra=""
     plugins="yes"
     toolset=$scramblebitmaptools
     t_cpu="arm"
@@ -2574,7 +2573,7 @@ fi
     tool="$rootdir/tools/scramble -add=conn"
     output="rockbox.sansa"
     bootoutput="bootloader-connect.sansa"
-    appextra="recorder:gui"
+    appextra=""
     plugins="yes"
     toolset=$scramblebitmaptools
     t_cpu="arm"
@@ -2595,7 +2594,7 @@ fi
     bmp2rb_remotemono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_remotenative="$rootdir/tools/bmp2rb -f 0"
     output="rockbox.mrobe500"
-    appextra="recorder:gui:radio"
+    appextra=""
     plugins="yes"
     toolset=$gigabeatbitmaptools
     boottool="cp "
@@ -2618,7 +2617,7 @@ fi
     bmp2rb_remotemono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_remotenative="$rootdir/tools/bmp2rb -f 0"
     output="rockbox.mi4"
-    appextra="recorder:gui:radio"
+    appextra=""
     plugins="yes"
     boottool="$rootdir/tools/scramble -mi4v2 -model=m100 -type=RBBL"
     bootoutput="pp5020.mi4"
@@ -2643,7 +2642,7 @@ fi
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox.ipod"
-    appextra="recorder:gui:radio"
+    appextra=""
     plugins="yes"
     bootoutput="bootloader-$modelname.ipod"
     # toolset is the tools within the tools directory that we build for
@@ -2666,7 +2665,7 @@ fi
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox.ipod"
-    appextra="recorder:gui:radio"
+    appextra=""
     plugins="yes"
     bootoutput="bootloader-$modelname.ipod"
     # toolset is the tools within the tools directory that we build for
@@ -2688,7 +2687,7 @@ fi
     tool="$rootdir/tools/scramble -add=zxfs"
     output="rockbox.creative"
     bootoutput="bootloader-zenxfistyle.creative"
-    appextra="gui:recorder:radio"
+    appextra=""
     plugins="yes"
     toolset=$scramblebitmaptools
     t_cpu="arm"
@@ -2707,7 +2706,7 @@ fi
     tool="$rootdir/tools/scramble -add=zxf2"
     output="rockbox.creative"
     bootoutput="bootloader-zenxfi2.creative"
-    appextra="gui:recorder:radio"
+    appextra=""
     plugins="yes"
     toolset=$scramblebitmaptools
     t_cpu="arm"
@@ -2726,7 +2725,7 @@ fi
     tool="$rootdir/tools/scramble -add=zxf3"
     output="rockbox.creative"
     bootoutput="bootloader-zenxfi3.creative"
-    appextra="gui:recorder:radio"
+    appextra=""
     plugins="yes"
     toolset=$scramblebitmaptools
     t_cpu="arm"
@@ -2745,7 +2744,7 @@ fi
     tool="$rootdir/tools/scramble -add=zenv"
     output="rockbox.creative"
     bootoutput="bootloader-zenv.creative"
-    appextra="radio:gui:recorder"
+    appextra=""
     plugins=""
     toolset=$scramblebitmaptools
     t_cpu="arm"
@@ -2764,7 +2763,7 @@ fi
     tool="$rootdir/tools/scramble -add=zxfi"
     output="rockbox.creative"
     bootoutput="bootloader-zenxfi.creative"
-    appextra="gui:recorder:radio"
+    appextra=""
     plugins="yes"
     toolset=$scramblebitmaptools
     t_cpu="arm"
@@ -2783,7 +2782,7 @@ fi
     tool="$rootdir/tools/scramble -add=zmoz"
     output="rockbox.creative"
     bootoutput="bootloader-zenmozaic.creative"
-    appextra="gui:recorder:radio"
+    appextra=""
     plugins="yes"
     toolset=$scramblebitmaptools
     t_cpu="arm"
@@ -2802,7 +2801,7 @@ fi
     tool="$rootdir/tools/scramble -add=zen"
     output="rockbox.creative"
     bootoutput="bootloader-zen.creative"
-    appextra="gui:recorder:radio"
+    appextra=""
     plugins="yes"
     toolset=$scramblebitmaptools
     t_cpu="arm"
@@ -2821,7 +2820,7 @@ fi
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox.mi4"
-    appextra="recorder:gui:radio"
+    appextra=""
     plugins="yes"
     boottool="$rootdir/tools/scramble -mi4v3 -model=9200 -type=RBBL"
     bootoutput="FWImage.ebn"
@@ -2845,7 +2844,7 @@ fi
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox.mi4"
-    appextra="recorder:gui:radio"
+    appextra=""
     plugins="yes"
     boottool="$rootdir/tools/scramble -mi4v3 -model=1630 -type=RBBL"
     bootoutput="FWImage.ebn"
@@ -2869,7 +2868,7 @@ fi
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 5"
     output="rockbox.mi4"
-    appextra="recorder:gui:radio"
+    appextra=""
     plugins="yes"
     boottool="$rootdir/tools/scramble -mi4v3 -model=6330 -type=RBBL"
     bootoutput="FWImage.ebn"
@@ -2893,7 +2892,7 @@ fi
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox.vx747"
-    appextra="recorder:gui:radio"
+    appextra=""
     plugins="yes"
     toolset=$genericbitmaptools
     boottool="$rootdir/tools/scramble -ccpmp"
@@ -2914,7 +2913,7 @@ fi
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox.vx767"
-    appextra="recorder:gui:radio"
+    appextra=""
     plugins="" #FIXME
     toolset=$genericbitmaptools
     boottool="$rootdir/tools/scramble -ccpmp"
@@ -2935,7 +2934,7 @@ fi
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox.vx747p"
-    appextra="recorder:gui:radio"
+    appextra=""
     plugins="yes"
     toolset=$genericbitmaptools
     boottool="$rootdir/tools/scramble -ccpmp"
@@ -2956,7 +2955,7 @@ fi
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox.vx777"
-    appextra="recorder:gui:radio"
+    appextra=""
     plugins="yes"
     toolset=$genericbitmaptools
     boottool="$rootdir/tools/scramble -ccpmp"
@@ -2977,7 +2976,7 @@ fi
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox.mi4"
-    appextra="recorder:gui:radio"
+    appextra=""
     plugins="yes"
     boottool="$rootdir/tools/scramble -mi4v2 -model=y820 -type=RBBL"
     bootoutput="FW_YH820.mi4"
@@ -3001,7 +3000,7 @@ fi
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 2"
     output="rockbox.mi4"
-    appextra="recorder:gui:radio"
+    appextra=""
     plugins="yes"
     boottool="$rootdir/tools/scramble -mi4v2 -model=y920 -type=RBBL"
     bootoutput="PP5020.mi4"
@@ -3025,7 +3024,7 @@ fi
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox.mi4"
-    appextra="recorder:gui:radio"
+    appextra=""
     plugins="yes"
     boottool="$rootdir/tools/scramble -mi4v2 -model=y925 -type=RBBL"
     bootoutput="FW_YH925.mi4"
@@ -3050,7 +3049,7 @@ fi
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox.rkw"
     bootoutput="bootloader.rkw"
-    appextra="recorder:gui:radio"
+    appextra=""
     plugins=""
     # toolset is the tools within the tools directory that we build for
     # this particular target.
@@ -3071,7 +3070,7 @@ fi
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 5"
     output="rockbox.mi4"
-    appextra="recorder:gui:radio"
+    appextra=""
     plugins="yes"
     boottool="$rootdir/tools/scramble -mi4v3 -model=v500 -type=RBBL"
     bootoutput="jukebox.mi4"
@@ -3096,7 +3095,7 @@ fi
     bmp2rb_native="$rootdir/tools/bmp2rb -f 7"
     output="rockbox.mpio"
     bootoutput="bootloader.mpio"
-    appextra="recorder:gui:radio"
+    appextra=""
     plugins="yes"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
@@ -3118,7 +3117,7 @@ fi
     bmp2rb_native="$rootdir/tools/bmp2rb -f 2"
     output="rockbox.mpio"
     bootoutput="bootloader.mpio"
-    appextra="recorder:gui:radio"
+    appextra=""
     plugins="yes"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
@@ -3140,7 +3139,7 @@ fi
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox.rkw"
     bootoutput="bootloader.rkw"
-    appextra="recorder:gui:radio"
+    appextra=""
     plugins=""
     # toolset is the tools within the tools directory that we build for
     # this particular target.
@@ -3162,7 +3161,7 @@ fi
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox.rkw"
     bootoutput="bootloader.rkw"
-    appextra="recorder:gui"
+    appextra=""
     plugins="yes"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
@@ -3184,7 +3183,7 @@ fi
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox.rkw"
     bootoutput="bootloader.rkw"
-    appextra="recorder:gui"
+    appextra=""
     plugins="yes"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
@@ -3211,7 +3210,7 @@ fi
     bmp2rb_native="$rootdir/tools/bmp2rb -f 9"
     output="rockbox"
     bootoutput="rockbox"
-    appextra="recorder:gui:radio"
+    appextra=""
     plugins="yes"
     # architecture, manufacturer and model for the target-tree build
     t_cpu="hosted"
@@ -3238,7 +3237,7 @@ fi
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="librockbox.so"
     bootoutput="librockbox.so"
-    appextra="recorder:gui:radio:hosted/android"
+    appextra="hosted/android"
     plugins="yes"
     # architecture, manufacturer and model for the target-tree build
     t_cpu="hosted"
@@ -3260,7 +3259,7 @@ fi
     bmp2rb_native="$rootdir/tools/bmp2rb -f 9"
     output="rockbox"
     bootoutput="rockbox"
-    appextra="recorder:gui:radio"
+    appextra=""
     plugins="yes"
     # architecture, manufacturer and model for the target-tree build
     t_cpu="hosted"
@@ -3287,7 +3286,7 @@ fi
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="librockbox.so"
     bootoutput="librockbox.so"
-    appextra="recorder:gui:radio:hosted/android"
+    appextra="radio:hosted/android"
     plugins="yes"
     # architecture, manufacturer and model for the target-tree build
     t_cpu="hosted"
@@ -3314,7 +3313,7 @@ fi
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="librockbox.so"
     bootoutput="librockbox.so"
-    appextra="recorder:gui:radio:hosted/android"
+    appextra="radio:hosted/android"
     plugins="yes"
     # architecture, manufacturer and model for the target-tree build
     t_cpu="hosted"
@@ -3337,7 +3336,7 @@ fi
     bmp2rb_native="$rootdir/tools/bmp2rb -f 9"
     output="rockbox"
     bootoutput="rockbox"
-    appextra="recorder:gui:radio"
+    appextra=""
     plugins="yes"
     # architecture, manufacturer and model for the target-tree build
     t_cpu="hosted"
@@ -3360,7 +3359,7 @@ fi
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox"
     bootoutput="rockbox"
-    appextra="recorder:gui"
+    appextra=""
     plugins="yes"
     t_cpu="hosted"
     t_manufacturer="anbernic"
@@ -3378,7 +3377,7 @@ fi
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox.rkw"
     bootoutput="bootloader.rkw"
-    appextra="recorder:gui"
+    appextra=""
     plugins="yes"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
@@ -3400,7 +3399,7 @@ fi
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox.rkw"
     bootoutput="bootloader.rkw"
-    appextra="recorder:gui"
+    appextra=""
     plugins="yes"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
@@ -3422,7 +3421,7 @@ fi
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox.rkw"
     bootoutput="bootloader.rkw"
-    appextra="recorder:gui"
+    appextra=""
     plugins="yes"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
@@ -3444,7 +3443,7 @@ fi
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox.rkw"
     bootoutput="bootloader.rkw"
-    appextra="recorder:gui"
+    appextra=""
     plugins="yes"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
@@ -3467,7 +3466,7 @@ fi
     output="rockbox.sony"
     boottool="$rootdir/tools/scramble -add=e350"
     bootoutput="bootloader-nwze350.sony"
-    appextra="gui:recorder:radio"
+    appextra=""
     plugins="yes"
     toolset=$genericbitmaptools
     t_cpu="hosted"
@@ -3487,7 +3486,7 @@ fi
     tool="$rootdir/tools/scramble -add=e370"
     output="rockbox.sony"
     bootoutput="bootloader-nwze370.sony"
-    appextra="gui:recorder:radio"
+    appextra=""
     plugins="yes"
     toolset=$scramblebitmaptools
     t_cpu="arm"
@@ -3506,7 +3505,7 @@ fi
     tool="$rootdir/tools/scramble -add=e360"
     output="rockbox.sony"
     bootoutput="bootloader-nwze360.sony"
-    appextra="gui:recorder:radio"
+    appextra=""
     plugins="yes"
     toolset=$scramblebitmaptools
     t_cpu="arm"
@@ -3527,7 +3526,7 @@ fi
     output="rockbox.sony"
     boottool="$rootdir/tools/scramble -add=e450"
     bootoutput="bootloader-nwze450.sony"
-    appextra="gui:recorder:radio"
+    appextra=""
     plugins="yes"
     toolset=$genericbitmaptools
     t_cpu="hosted"
@@ -3549,7 +3548,7 @@ fi
     output="rockbox.sony"
     boottool="$rootdir/tools/scramble -add=e460"
     bootoutput="bootloader-nwze460.sony"
-    appextra="gui:recorder:radio"
+    appextra=""
     plugins="yes"
     toolset=$genericbitmaptools
     t_cpu="hosted"
@@ -3571,7 +3570,7 @@ fi
     output="rockbox.sony"
     boottool="$rootdir/tools/scramble -add=e470"
     bootoutput="bootloader-nwze470.sony"
-    appextra="gui:recorder:radio"
+    appextra=""
     plugins="yes"
     toolset=$genericbitmaptools
     t_cpu="hosted"
@@ -3593,7 +3592,7 @@ fi
     output="rockbox.sony"
     boottool="$rootdir/tools/scramble -add=e580"
     bootoutput="bootloader-nwze580.sony"
-    appextra="gui:recorder:radio"
+    appextra=""
     plugins="yes"
     toolset=$genericbitmaptools
     t_cpu="hosted"
@@ -3615,7 +3614,7 @@ fi
     output="rockbox.sony"
     boottool="$rootdir/tools/scramble -add=a10"
     bootoutput="bootloader-nwza10.sony"
-    appextra="gui:recorder:radio"
+    appextra=""
     plugins="yes"
     toolset=$genericbitmaptools
     t_cpu="hosted"
@@ -3637,7 +3636,7 @@ fi
     output="rockbox.sony"
     boottool="$rootdir/tools/scramble -add=a20"
     bootoutput="bootloader-nwa20.sony"
-    appextra="gui:recorder:radio"
+    appextra=""
     plugins="yes"
     toolset=$genericbitmaptools
     t_cpu="hosted"
@@ -3659,7 +3658,7 @@ fi
     output="rockbox.sony"
     boottool="$rootdir/tools/scramble -add=a860"
     bootoutput="bootloader-nwza860.sony"
-    appextra="gui:recorder:radio"
+    appextra=""
     plugins=""
     toolset=$genericbitmaptools
     t_cpu="hosted"
@@ -3681,7 +3680,7 @@ fi
     output="rockbox.sony"
     boottool="$rootdir/tools/scramble -add=s750"
     bootoutput="bootloader-nwzs750.sony"
-    appextra="gui:recorder:radio"
+    appextra=""
     plugins="yes"
     toolset=$genericbitmaptools
     t_cpu="hosted"
@@ -3702,7 +3701,7 @@ fi
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox.rkw"
     bootoutput="bootloader.rkw"
-    appextra="recorder:gui"
+    appextra=""
     plugins=""
     # toolset is the tools within the tools directory that we build for
     # this particular target.
@@ -3724,7 +3723,7 @@ fi
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox.rkw"
     bootoutput="bootloader.rkw"
-    appextra="recorder:gui"
+    appextra=""
     plugins=""
     # toolset is the tools within the tools directory that we build for
     # this particular target.
@@ -3752,7 +3751,7 @@ fi
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox"
     bootoutput="rockbox"
-    appextra="recorder:gui:hosted"
+    appextra=""
     plugins="yes"
     tinyalsa="yes"
     # architecture, manufacturer and model for the target-tree build
@@ -3777,7 +3776,7 @@ fi
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox"
     bootoutput="rockbox"
-    appextra="recorder:gui:hosted"
+    appextra=""
     plugins="yes"
     tinyalsa="yes"
     # architecture, manufacturer and model for the target-tree build
@@ -3799,7 +3798,7 @@ fi
     bmp2rb_native="$rootdir/tools/bmp2rb -f 10"
     output="rockbox.rocker"
     bootoutput="bootloader.rocker"
-    appextra="recorder:gui:hosted"
+    appextra=""
     plugins="yes"
     # architecture, manufacturer and model for the target-tree build
     t_cpu="hosted"
@@ -3818,7 +3817,7 @@ fi
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$bmp2rb_mono"
     output="rockbox.x3"
-    appextra="recorder:gui"
+    appextra=""
     plugins="yes"
     toolset=$genericbitmaptools
     boottool="cp"
@@ -3844,7 +3843,7 @@ fi
     bmp2rb_native="$rootdir/tools/bmp2rb -f 10"
     output="rockbox.x3ii"
     bootoutput="bootloader.x3ii"
-    appextra="recorder:gui:hosted"
+    appextra=""
     plugins="yes"
     # architecture, manufacturer and model for the target-tree build
     t_cpu="hosted"
@@ -3867,7 +3866,7 @@ fi
     bmp2rb_native="$rootdir/tools/bmp2rb -f 10"
     output="rockbox.x20"
     bootoutput="bootloader.x20"
-    appextra="recorder:gui:hosted"
+    appextra=""
     plugins="yes"
     # architecture, manufacturer and model for the target-tree build
     t_cpu="hosted"
@@ -3889,7 +3888,7 @@ fi
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox.m3k"
     bootoutput="bootloader.m3k"
-    appextra="recorder:gui:hosted"
+    appextra=""
     plugins="yes"
     # architecture, manufacturer and model for the target-tree build
     t_cpu="hosted"
@@ -3913,7 +3912,7 @@ fi
     bmp2rb_native="$rootdir/tools/bmp2rb -f 10"
     output="rockbox.erosq"
     bootoutput="bootloader.erosq"
-    appextra="recorder:gui:hosted"
+    appextra=""
     plugins="yes"
     # architecture, manufacturer and model for the target-tree build
     t_cpu="hosted"
@@ -3928,7 +3927,7 @@ fi
     target="FIIO_M3K"
     memory=64
     mipsr2elcc
-    appextra="recorder:gui"
+    appextra=""
     plugins="yes"
     tool="$rootdir/tools/scramble -add=fiiom3k "
     boottool="$rootdir/tools/mkspl-x1000 -type=nand -ppb=2 -bpp=2 "
@@ -3953,7 +3952,7 @@ fi
     target="EROS_QN"
     memory=32
     mipsr2elcc
-    appextra="recorder:gui"
+    appextra=""
     plugins="yes"
     tool="$rootdir/tools/scramble -add=erosqnative "
     boottool="$rootdir/tools/mkspl-x1000 -type=nand -ppb=2 -bpp=2 "
@@ -3982,7 +3981,7 @@ fi
     target="EROS_QN"
     memory=32
     mipsr2elcc
-    appextra="recorder:gui"
+    appextra=""
     plugins="yes"
     tool="$rootdir/tools/scramble -add=erosqnative "
     boottool="$rootdir/tools/mkspl-x1000 -type=nand -ppb=2 -bpp=2 "
@@ -4012,7 +4011,7 @@ fi
     target="EROS_QN"
     memory=32
     mipsr2elcc
-    appextra="recorder:gui"
+    appextra=""
     plugins="yes"
     tool="$rootdir/tools/scramble -add=erosqnative "
     boottool="$rootdir/tools/mkspl-x1000 -type=nand -ppb=2 -bpp=2 "
@@ -4046,7 +4045,7 @@ fi
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox.rkw"
     bootoutput="bootloader.rkw"
-    appextra="recorder:gui"
+    appextra=""
     plugins="yes"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
@@ -4068,7 +4067,7 @@ fi
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox.rkw"
     bootoutput="bootloader.rkw"
-    appextra="recorder:gui"
+    appextra=""
     plugins="yes"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
@@ -4090,7 +4089,7 @@ fi
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox.rkw"
     bootoutput="bootloader.rkw"
-    appextra="recorder:gui"
+    appextra=""
     plugins="yes"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
@@ -4107,7 +4106,7 @@ fi
     target="SHANLING_Q1"
     memory=64
     mipsr2elcc
-    appextra="recorder:gui"
+    appextra=""
     plugins="yes"
     tool="$rootdir/tools/scramble -add=shq1 "
     boottool="$rootdir/tools/mkspl-x1000 -type=nand -ppb=2 -bpp=2 "
@@ -4132,7 +4131,7 @@ fi
     target="ECHO_R1"
     memory=32
     armcortexm7cc
-    appextra="recorder:gui"
+    appextra=""
     plugins="yes"
     tool="cp "
     boottool="cp "
@@ -4173,7 +4172,7 @@ fi
     bmp2rb_native="$rootdir/tools/bmp2rb -f 10"
     output="rockbox.f28"
     bootoutput="bootloader.f28"
-    appextra="recorder:gui:hosted"
+    appextra=""
     plugins="no"
     # architecture, manufacturer and model for the target-tree build
     t_cpu="hosted"
@@ -4197,7 +4196,7 @@ fi
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox.elf"
     bootoutput="rockbox"
-    appextra="recorder:gui"
+    appextra=""
     plugins="yes"
     t_cpu="hosted"
     t_manufacturer="game_console"
@@ -4218,7 +4217,7 @@ fi
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox.r3proii"
     bootoutput="bootloader.r3proii"
-    appextra="recorder:gui:hosted"
+    appextra=""
     plugins="yes"
     # architecture, manufacturer and model for the target-tree build
     # These align with
@@ -4243,7 +4242,7 @@ fi
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox.r1"
     bootoutput="bootloader.r1"
-    appextra="recorder:gui:hosted"
+    appextra=""
     plugins="yes"
     # architecture, manufacturer and model for the target-tree build
     # These align with
@@ -4268,7 +4267,7 @@ fi
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     output="rockbox.ap80max"
     bootoutput="bootloader.ap80max"
-    appextra="recorder:gui:hosted"
+    appextra=""
     plugins="yes"
     # architecture, manufacturer and model for the target-tree build
     # These align with
@@ -4983,7 +4982,7 @@ export BMP2RB_NATIVE=${bmp2rb_native}
 export BMP2RB_REMOTEMONO=${bmp2rb_remotemono}
 export BMP2RB_REMOTENATIVE=${bmp2rb_remotenative}
 export BINARY=${output}
-export APPEXTRA=${appextra}
+export APPEXTRA=gui:recorder:radio:${appextra}
 export ENABLEDPLUGINS=${plugins}
 export EXTRA_DEFINES=${extradefines}
 export HOSTCC=${HOSTCC}
