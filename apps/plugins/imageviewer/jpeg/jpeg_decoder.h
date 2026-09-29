@@ -49,7 +49,7 @@ struct jpeg
     struct derived_tbl ac_derived_tbls[2];
 
     struct frame_component frameheader[3]; /* Component descriptor */
-    struct scan_component scanheader[3]; /* currently not used */
+    struct scan_component scanheader[3]; /* Huffman tables per component */
 
     int mcu_membership[6]; /* info per block */
     int tab_membership[6];

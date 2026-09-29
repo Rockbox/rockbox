@@ -128,10 +128,9 @@ struct jpeg
     struct derived_tbl ac_derived_tbls[2];
 
     struct frame_component frameheader[3]; /* Component descriptor */
-    struct scan_component scanheader[3]; /* currently not used */
+    struct scan_component scanheader[3]; /* Huffman tables per component */
 
     int mcu_membership[6]; /* info per block */
-    int tab_membership[6];
     int subsample_x[3]; /* info per component */
     int subsample_y[3];
     bool resize;
@@ -1171,6 +1170,11 @@ static int process_markers(struct jpeg* p_jpeg)
                         >> 4;
                     p_jpeg->scanheader[i].AC_select = c & 0x0F;
                     marker_size -= 2;
+                    if (p_jpeg->scanheader[i].DC_select > 1
+                     || p_jpeg->scanheader[i].AC_select > 1)
+                    {
+                        return (-5); /* Huffman table index out of range */
+                    }
                 }
                 /* skip spectral information */
                 e_skip_bytes(p_jpeg, marker_size);
@@ -1472,10 +1476,6 @@ INLINE void fix_headers(struct jpeg* p_jpeg)
         p_jpeg->mcu_membership[1] = 0;
         p_jpeg->mcu_membership[2] = 1;
         p_jpeg->mcu_membership[3] = 2;
-        p_jpeg->tab_membership[0] = 0; /* DC, DC, AC, AC */
-        p_jpeg->tab_membership[1] = 0;
-        p_jpeg->tab_membership[2] = 1;
-        p_jpeg->tab_membership[3] = 1;
         p_jpeg->subsample_x[0] = 1;
         p_jpeg->subsample_x[1] = 2;
         p_jpeg->subsample_x[2] = 2;
@@ -1497,10 +1497,6 @@ INLINE void fix_headers(struct jpeg* p_jpeg)
         p_jpeg->mcu_membership[1] = 0;
         p_jpeg->mcu_membership[2] = 1;
         p_jpeg->mcu_membership[3] = 2;
-        p_jpeg->tab_membership[0] = 0; /* DC, DC, AC, AC */
-        p_jpeg->tab_membership[1] = 0;
-        p_jpeg->tab_membership[2] = 1;
-        p_jpeg->tab_membership[3] = 1;
         p_jpeg->subsample_x[0] = 1;
         p_jpeg->subsample_x[1] = 1;
         p_jpeg->subsample_x[2] = 1;
@@ -1522,12 +1518,6 @@ INLINE void fix_headers(struct jpeg* p_jpeg)
         p_jpeg->mcu_membership[3] = 0;
         p_jpeg->mcu_membership[4] = 1;
         p_jpeg->mcu_membership[5] = 2;
-        p_jpeg->tab_membership[0] = 0;
-        p_jpeg->tab_membership[1] = 0;
-        p_jpeg->tab_membership[2] = 0;
-        p_jpeg->tab_membership[3] = 0;
-        p_jpeg->tab_membership[4] = 1;
-        p_jpeg->tab_membership[5] = 1;
         p_jpeg->subsample_x[0] = 1;
         p_jpeg->subsample_x[1] = 2;
         p_jpeg->subsample_x[2] = 2;
@@ -1546,9 +1536,6 @@ INLINE void fix_headers(struct jpeg* p_jpeg)
         p_jpeg->mcu_membership[0] = 0;
         p_jpeg->mcu_membership[1] = 1;
         p_jpeg->mcu_membership[2] = 2;
-        p_jpeg->tab_membership[0] = 0;
-        p_jpeg->tab_membership[1] = 1;
-        p_jpeg->tab_membership[2] = 1;
         p_jpeg->subsample_x[0] = 1;
         p_jpeg->subsample_x[1] = 1;
         p_jpeg->subsample_x[2] = 1;
@@ -1845,14 +1832,15 @@ static struct img_part *store_row_jpeg(void *jpeg_args)
             for (blkn = 0; blkn < p_jpeg->blocks; blkn++)
             {
                 int ci = p_jpeg->mcu_membership[blkn]; /* component index */
-                int ti = p_jpeg->tab_membership[blkn]; /* table index */
 #ifdef JPEG_IDCT_TRANSPOSE
                 bool transpose = p_jpeg->v_scale[!!ci] > 2;
 #endif
                 int k = 1; /* coefficient index */
                 int s, r; /* huffman values */
-                struct derived_tbl* dctbl = &p_jpeg->dc_derived_tbls[ti];
-                struct derived_tbl* actbl = &p_jpeg->ac_derived_tbls[ti];
+                struct derived_tbl* dctbl =
+                    &p_jpeg->dc_derived_tbls[p_jpeg->scanheader[ci].DC_select];
+                struct derived_tbl* actbl =
+                    &p_jpeg->ac_derived_tbls[p_jpeg->scanheader[ci].AC_select];
 
                 /* Section F.2.2.1: decode the DC coefficient difference */
                 huff_decode_dc(p_jpeg, dctbl, s, r);

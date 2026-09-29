@@ -638,6 +638,11 @@ int process_markers(unsigned char* p_src, long size, struct jpeg* p_jpeg)
                     p_jpeg->scanheader[i].ID = *p_src++;
                     p_jpeg->scanheader[i].DC_select = *p_src >> 4;
                     p_jpeg->scanheader[i].AC_select = *p_src++ & 0x0F;
+                    if (p_jpeg->scanheader[i].DC_select > 1
+                     || p_jpeg->scanheader[i].AC_select > 1)
+                    {
+                        return (-5); /* Huffman table index out of range */
+                    }
                 }
                 p_src += 3; /* skip spectral information */
                 p_jpeg->p_entropy_data = p_src;
@@ -1282,8 +1287,10 @@ int jpeg_decode(struct jpeg* p_jpeg, unsigned char* p_pixel[3],
                 int s, r; /* huffman values */
                 int ci = p_jpeg->mcu_membership[blkn]; /* component index */
                 int ti = p_jpeg->tab_membership[blkn]; /* table index */
-                struct derived_tbl* dctbl = &p_jpeg->dc_derived_tbls[ti];
-                struct derived_tbl* actbl = &p_jpeg->ac_derived_tbls[ti];
+                struct derived_tbl* dctbl =
+                    &p_jpeg->dc_derived_tbls[p_jpeg->scanheader[ci].DC_select];
+                struct derived_tbl* actbl =
+                    &p_jpeg->ac_derived_tbls[p_jpeg->scanheader[ci].AC_select];
 
                 /* Section F.2.2.1: decode the DC coefficient difference */
                 s = huff_decode_dc(&bs, dctbl);
@@ -1453,8 +1460,10 @@ int jpeg_decode(struct jpeg* p_jpeg, unsigned char* p_pixel[1], int downscale,
                 int s, r; /* huffman values */
                 int ci = p_jpeg->mcu_membership[blkn]; /* component index */
                 int ti = p_jpeg->tab_membership[blkn]; /* table index */
-                struct derived_tbl* dctbl = &p_jpeg->dc_derived_tbls[ti];
-                struct derived_tbl* actbl = &p_jpeg->ac_derived_tbls[ti];
+                struct derived_tbl* dctbl =
+                    &p_jpeg->dc_derived_tbls[p_jpeg->scanheader[ci].DC_select];
+                struct derived_tbl* actbl =
+                    &p_jpeg->ac_derived_tbls[p_jpeg->scanheader[ci].AC_select];
 
                 /* Section F.2.2.1: decode the DC coefficient difference */
                 s = huff_decode_dc(&bs, dctbl);
