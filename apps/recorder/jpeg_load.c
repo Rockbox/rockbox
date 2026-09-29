@@ -1049,6 +1049,13 @@ static int process_markers(struct jpeg* p_jpeg)
                     return -3; /* Unsupported SOF0 subsampling */
                 }
                 p_jpeg->blocks = n;
+                /* A single-component scan is non-interleaved: the MCU is one
+                   8x8 block regardless of the sampling factors (T.81 A.2.2) */
+                if (n == 1)
+                {
+                    p_jpeg->frameheader[0].horizontal_sampling = 1;
+                    p_jpeg->frameheader[0].vertical_sampling = 1;
+                }
             }
             break;
 
@@ -1476,7 +1483,7 @@ INLINE void fix_headers(struct jpeg* p_jpeg)
         p_jpeg->subsample_y[1] = 1;
         p_jpeg->subsample_y[2] = 1;
     }
-    if (p_jpeg->frameheader[0].horizontal_sampling == 1
+    else if (p_jpeg->frameheader[0].horizontal_sampling == 1
         && p_jpeg->frameheader[0].vertical_sampling == 2)
     {   /* 4:2:2 vertically subsampled */
         p_jpeg->store_pos[1] = 2; /* block positions are mirrored */

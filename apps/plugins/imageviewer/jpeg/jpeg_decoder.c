@@ -538,6 +538,13 @@ int process_markers(unsigned char* p_src, long size, struct jpeg* p_jpeg)
                     return -3; /* Unsupported SOF0 subsampling */
                 }
                 p_jpeg->blocks = n;
+                /* A single-component scan is non-interleaved: the MCU is one
+                   8x8 block regardless of the sampling factors (T.81 A.2.2) */
+                if (n == 1)
+                {
+                    p_jpeg->frameheader[0].horizontal_sampling = 1;
+                    p_jpeg->frameheader[0].vertical_sampling = 1;
+                }
             }
             break;
 
