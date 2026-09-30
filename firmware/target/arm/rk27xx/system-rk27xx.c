@@ -208,10 +208,20 @@ static void cache_invalidate_way(int way)
 void commit_discard_idcache(void)
 {
     int old_irq = disable_irq_save();
+    unsigned long devid = DEVID;
+
+    /* Invalidate with the cache off, as crt0 does. This code runs from
+     * cached SDRAM: invalidating the ways while fetching through them fails
+     * when the poll loop starts on a cache line of its own, depending on
+     * where the linker happened to put it. The cache is write-through, so
+     * nothing is lost by turning it off. */
+    DEVID = devid & ~(1UL << 31);
 
     cache_invalidate_way(0);
 
     cache_invalidate_way(1);
+
+    DEVID = devid;
 
     restore_irq(old_irq);
 }
