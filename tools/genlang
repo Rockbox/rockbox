@@ -9,11 +9,14 @@
 # Copyright (C) 2006 - 2008 by Daniel Stenberg
 #
 
+use Digest::SHA1;
+
 # See apps/language.c (TODO: Use common include for both)
 # Cookie and binary version for the binary lang file
 my $LANGUAGE_COOKIE   = 0x1a;
+my $LANGUAGE_VERSION  = 0x07;
 my $VOICE_COOKIE      = 0x9a;
-my $LANGUAGE_VERSION  = 0x06;
+my $VOICE_VERSION     = 0x06;
 my $LANGUAGE_FLAG_RTL = 0x01;
 my $LANGUAGE_FLAG_UNITS_FIRST = 0x02;
 
@@ -69,6 +72,16 @@ my $english = $e;
 if (!$english) {
     print STDERR "Please specify the english lang source (with -e)!\n";
     exit;
+}
+my $english_crc;
+{
+    open my $fh, "<$english" or die $!;
+    binmode $fh;
+    my $sha = Digest::SHA1->new;
+    $sha->addfile($fh);
+    $english_crc = $sha->hexdigest;
+    $english_crc = substr($english_crc, 0, 2);
+    close $fh;
 }
 
 my $target_id = $i;
@@ -501,6 +514,9 @@ extern unsigned char *language_strings[];
 /* this contains the concatenation of all strings, separated by \\0 chars */
 extern const unsigned char core_language_builtin[];
 
+/* this is a checksum of the english language file */
+#define ENGLISH_LANG_CHECKSUM 0x$english_crc
+
 #include "${prefix}_enum.h"
 
 MOO
@@ -604,13 +620,13 @@ elsif($binary || $binvoice) {
     if($binary) {
         open(OUTF, ">$binary") or die "Error: Can't create $binary";
         binmode OUTF;
-        printf OUTF ("%c%c%c%c", $LANGUAGE_COOKIE, $LANGUAGE_VERSION, $target_id,
-            $langoptions); # magic lang file header
+        printf OUTF ("%c%c%c%c%c", $LANGUAGE_COOKIE, $LANGUAGE_VERSION, $target_id,
+		     $langoptions, hex($english_crc)); # magic lang file header
     }
     if($binvoice) {
         open(OUTV, ">$binvoice") or die "Error: Can't create $binary";
         binmode OUTV;
-        printf OUTV ("%c%c%c%c", $VOICE_COOKIE, $LANGUAGE_VERSION, $target_id,
+        printf OUTV ("%c%c%c%c", $VOICE_COOKIE, $VOICE_VERSION, $target_id,
             $langoptions); # magic lang file header
     }
 
