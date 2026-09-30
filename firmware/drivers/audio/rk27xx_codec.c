@@ -39,7 +39,27 @@ static int codec_read(uint8_t reg, uint8_t *val)
 }
 #endif
 
+/* The line input the FM tuner is wired to: RK27XX_CODEC_FM_LINE, 1 or 2,
+ * from the target config; both when the target does not say. Only the
+ * tuner's line is bypassed to the output mixer and powered, and only while
+ * it is being listened to. */
+#if defined(RK27XX_CODEC_FM_LINE) && RK27XX_CODEC_FM_LINE == 1
+#define FM_BYPASS   BYPASS1
+#define FM_IN_SB    SB_IN1
+#elif defined(RK27XX_CODEC_FM_LINE) && RK27XX_CODEC_FM_LINE == 2
+#define FM_BYPASS   BYPASS2
+#define FM_IN_SB    SB_IN2
+#else
+#define FM_BYPASS   (BYPASS1|BYPASS2)
+#define FM_IN_SB    (SB_IN1|SB_IN2)
+#endif
+
+/* what feeds the output mixer: the DAC, and the tuner's line while the
+ * radio plays - the DAC stays in the mix, for voice and beeps */
 static uint8_t cr1_sel = DACSEL;
+
+/* power: the line inputs in standby unless monitored */
+static uint8_t pmr1 = SB_ADC|SB_MIC|SB_IND|SB_IN1|SB_IN2;
 
 static void audiohw_mute(bool mute)
 {
@@ -95,7 +115,7 @@ void audiohw_postinit(void)
     udelay(1000);
 
     /* power up output stage */
-    codec_write(PMR1, SB_ADC|SB_MIC|SB_IND);
+    codec_write(PMR1, pmr1);
 
     sleep(HZ/10);
     GPIO_PDDR |= (1<<7); /* PD7 high */
@@ -152,6 +172,20 @@ void audiohw_set_volume(int vol_l, int vol_r)
 
 void audiohw_set_monitor(bool enable)
 {
-    cr1_sel = enable ? BYPASS1|BYPASS2 : DACSEL;
-    codec_write(CR1, cr1_sel|SB_MICBIAS);
+    if (enable)
+    {
+        /* input up before it is mixed in */
+        pmr1 &= ~FM_IN_SB;
+        codec_write(PMR1, pmr1);
+        cr1_sel = DACSEL|FM_BYPASS;
+        codec_write(CR1, cr1_sel|SB_MICBIAS);
+    }
+    else
+    {
+        /* out of the mix before the input goes down */
+        cr1_sel = DACSEL;
+        codec_write(CR1, cr1_sel|SB_MICBIAS);
+        pmr1 |= FM_IN_SB;
+        codec_write(PMR1, pmr1);
+    }
 }
