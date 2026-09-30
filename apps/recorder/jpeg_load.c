@@ -1019,6 +1019,7 @@ static int process_markers(struct jpeg* p_jpeg)
             break; /* discard */
 
         case 0xC0: /* SOF Huff  - Baseline DCT */
+        case 0xC1: /* SOF Huff  - Extended sequential DCT (8 bit samples) */
             {
                 JDEBUGF("SOF marker ");
                 ret |= SOF0;
@@ -1082,7 +1083,6 @@ static int process_markers(struct jpeg* p_jpeg)
             }
             break;
 
-        case 0xC1: /* SOF Huff  - Extended sequential DCT*/
         case 0xC2: /* SOF Huff  - Progressive DCT*/
         case 0xC3: /* SOF Huff  - Spatial (sequential) lossless*/
         case 0xC5: /* SOF Huff  - Differential sequential DCT*/
@@ -1231,20 +1231,25 @@ static int process_markers(struct jpeg* p_jpeg)
                 marker_size |= e_getc(p_jpeg, -1); /* Lowbyte */
                 marker_size -= 2;
 
-                n = (marker_size)/(QUANT_TABLE_LENGTH+1); /* # of tables */
-                for (i=0; i<n; i++)
+                while (marker_size > QUANT_TABLE_LENGTH) /* another table */
                 {
-                    int id = e_getc(p_jpeg, -1); /* ID */
-                    marker_size--;
-                    if (id >= 4)
+                    int id = e_getc(p_jpeg, -1); /* Pq: precision, Tq: ID */
+                    int pq = id >> 4;
+                    id &= 0x0F;
+                    marker_size -= 1 + QUANT_TABLE_LENGTH * (pq + 1);
+                    if (id >= 4 || pq > 1 || marker_size < 0)
                     {
                         return (-8); /* Unsupported quantization table */
                     }
                     /* Read Quantisation table: */
                     for (j=0; j<QUANT_TABLE_LENGTH; j++)
                     {
-                        p_jpeg->quanttable[id][j] = e_getc(p_jpeg, -1);
-                        marker_size--;
+                        int q = e_getc(p_jpeg, -1);
+                        if (pq) /* 16 bit entries (SOF1) */
+                            q = q << 8 | e_getc(p_jpeg, -1);
+                        if (q > 8191)
+                            return (-8); /* too big once scaled for the IDCT */
+                        p_jpeg->quanttable[id][j] = q;
                     }
                 }
                 e_skip_bytes(p_jpeg, marker_size);

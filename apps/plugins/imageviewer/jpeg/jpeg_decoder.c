@@ -519,6 +519,7 @@ int process_markers(unsigned char* p_src, long size, struct jpeg* p_jpeg)
             break;
 
         case 0xC0: /* SOF Huff  - Baseline DCT */
+        case 0xC1: /* SOF Huff  - Extended sequential DCT (8 bit samples) */
             {
                 ret |= SOF0;
                 marker_size = *p_src++ << 8; /* Highbyte */
@@ -569,7 +570,6 @@ int process_markers(unsigned char* p_src, long size, struct jpeg* p_jpeg)
             }
             break;
 
-        case 0xC1: /* SOF Huff  - Extended sequential DCT*/
         case 0xC2: /* SOF Huff  - Progressive DCT*/
         case 0xC3: /* SOF Huff  - Spatial (sequential) lossless*/
         case 0xC5: /* SOF Huff  - Differential sequential DCT*/
@@ -695,18 +695,27 @@ int process_markers(unsigned char* p_src, long size, struct jpeg* p_jpeg)
                 ret |= DQT;
                 marker_size = *p_src++ << 8; /* Highbyte */
                 marker_size |= *p_src++; /* Lowbyte */
-                n = (marker_size-2)/(QUANT_TABLE_LENGTH+1); /* # of tables */
-                for (i=0; i<n; i++)
+                unsigned char *p_seg_end = p_src + marker_size - 2;
+                while (p_seg_end - p_src > QUANT_TABLE_LENGTH) /* a table */
                 {
-                    int id = *p_src++; /* ID */
-                    if (id >= 4)
+                    int id = *p_src++; /* Pq: precision, Tq: ID */
+                    int pq = id >> 4;
+                    id &= 0x0F;
+                    if (id >= 4 || pq > 1
+                     || p_seg_end - p_src < QUANT_TABLE_LENGTH * (pq + 1))
                     {
                         return (-8); /* Unsupported quantization table */
                     }
                     /* Read Quantisation table: */
                     for (j=0; j<QUANT_TABLE_LENGTH; j++)
-                        p_jpeg->quanttable[id][j] = *p_src++;
+                    {
+                        int q = *p_src++;
+                        if (pq) /* 16 bit entries (SOF1) */
+                            q = q << 8 | *p_src++;
+                        p_jpeg->quanttable[id][j] = q;
+                    }
                 }
+                p_src = p_seg_end;
             }
             break;
 
