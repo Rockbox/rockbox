@@ -97,6 +97,12 @@
 #define FM_PLAY
 #define FM_MODE
 
+#elif (CONFIG_KEYPAD == RK27XX_GENERIC_PAD)
+#define FM_MENU
+#define FM_PLAY
+#define FM_STOP
+#define FM_EXIT
+
 #elif (CONFIG_KEYPAD == SAMSUNG_YPR0_PAD)
 #define FM_MENU
 #define FM_PRESET

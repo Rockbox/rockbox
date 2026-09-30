@@ -109,8 +109,12 @@
 /* Define the type of audio codec */
 #define HAVE_RK27XX_CODEC
 
+/* The tuner is an RDA5807P, driven in its TEA5767 compatible mode as the
+ * original firmware does - it has no RDS, and its own mode brings nothing */
 #define CONFIG_TUNER TEA5767
 #define CONFIG_TUNER_XTAL  32768
+/* its audio is on the codec's line input 1 */
+#define RK27XX_CODEC_FM_LINE 1
 
 /* #define HAVE_PCM_DMA_ADDRESS */
 
