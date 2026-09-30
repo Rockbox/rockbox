@@ -9,14 +9,25 @@ static unsigned char buff[256]; //TODO: Adjust it...
 static int length = 0;
 static int cur_buff_pos = 0;
 static int file_pos = 0;
+/* Past the end of the file. Overlays are loaded without clearing their
+   .bss, so these are set in OPEN() rather than relied on to start at 0. */
+static bool at_eof; /* read() found the end: don't call it again */
+static unsigned eof_bytes; /* bytes fed since: alternate FF, D9 */
 
 extern int GETC(void)
 {
     if (cur_buff_pos >= length)
     {
-        length = rb->read(fd, buff, sizeof(buff));
-        file_pos += length;
+        length = at_eof ? 0 : rb->read(fd, buff, sizeof(buff));
         cur_buff_pos = 0;
+        if (length <= 0)
+        {   /* past the end of a damaged file: feed EOI markers (FF D9)
+               so every loop in the decoder ends instead of spinning */
+            at_eof = true;
+            length = 0;
+            return (eof_bytes++ & 1) ? 0xD9 : 0xFF;
+        }
+        file_pos += length;
     }
 
     return buff[cur_buff_pos++];
@@ -56,11 +67,13 @@ extern void SEEK(int d)
     }
     file_pos = rb->lseek(fd, (cur_buff_pos - length) + d, SEEK_CUR);
     cur_buff_pos = length = 0;
+    at_eof = false;
 }
 
 extern void POS(int d)
 {
     cur_buff_pos = length = 0;
+    at_eof = false;
     file_pos = d;
     rb->lseek(fd, d, SEEK_SET);
 }
@@ -77,6 +90,8 @@ extern void *OPEN(char *f)
     memset(buff, 0, sizeof(buff));
     printf("Opening %s\n", f);
     cur_buff_pos = length = file_pos = 0;
+    at_eof = false;
+    eof_bytes = 0;
     fd = rb->open(f,O_RDONLY);
 
     if (  fd < 0 )

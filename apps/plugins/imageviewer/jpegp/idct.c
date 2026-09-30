@@ -129,6 +129,9 @@ extern void idct_sq(short *coef, int *sq)
 	for (i=0; i<8; i++) idct1(R+i*8, C+i);
 	for (i=0; i<8; i++) idct1(C+i*8, R+i);
 	
-	for (i=0; i<64; i++) coef[i] = CLIP[ R[i] >> 15 ];
+	for (i=0; i<64; i++) {	// clamp: corrupt data can exceed the CLIP table
+		int v= R[i] >> 15;
+		coef[i] = CLIP[ v < -256 ? -256 : v > 511 ? 511 : v ];
+	}
 }
 

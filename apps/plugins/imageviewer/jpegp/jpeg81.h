@@ -32,6 +32,7 @@ enum JPEGENUM {
 	JPEGENUMERR_MARKERDNL,			// DNL marker found (not supported)
 	JPEGENUMERR_ZEROY,				// Y in SOFn is zero (DNL?)
 	JPEGENUMERR_COMPNOTFOUND,		// Scan component selector (Csj) not found among Component identifiers (Ci)
+	JPEGENUMERR_CORRUPT,			// a header value out of range
 };
 
 #include <stdbool.h>
@@ -105,6 +106,7 @@ struct JPEGD {		// The JPEG DECODER OBJECT
 	void *jpeg_mem;				// <-- free me
 
 	int Hmax, Vmax;	// for conversion
+	int scans;		// scans decoded: none means no image data
 	bool jfif;				// saw a JFIF APP0 marker
 	unsigned char adobe;	// Adobe APP14 transform flag + 1, 0 if none
 	int mcu_width;
