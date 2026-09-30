@@ -43,6 +43,7 @@ jpeg81.c
 #include "GETC.h"
 #include "rb_glue.h"
 #include "jpeg81.h"
+#include "jpeg_common.h"
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
@@ -982,8 +983,15 @@ extern enum JPEGENUM JPEGDecode(struct JPEGD *j)
 		}
 		else if ( (marker & 0xf0) == 0xE0 ) // APPn E0..EF
 		{
-			int La= GETWbi();
-			SEEK(La-2);
+			int La= GETWbi()-2;
+			int n= 0;
+			if ( marker == 0xE0 || marker == 0xEE )	// JFIF, Adobe: colour space
+			{
+				unsigned char id[12];
+				for ( ; n < La && n < 12; n++ ) id[n]= GETC();
+				jpeg_app_colorspace(marker, id, n, &j->jfif, &j->adobe);
+			}
+			SEEK(La-n);
 			printf("APP%d\n", marker&15);
 		}
 		else if ( marker == 0xFE ) // COM

@@ -4,6 +4,7 @@
 #include "rb_glue.h"
 
 #include "../imageviewer.h"
+#include "jpeg_common.h"
 
 
 /**************** begin Application ********************/
@@ -217,6 +218,8 @@ static int get_image(struct image_info *info, int frame, int ds)
     int v1 = j->Vmax / j->Components[1].Vi;
     int h2 = j->Hmax / j->Components[2].Hi;
     int v2 = j->Vmax / j->Components[2].Vi;
+    bool rgb = jpeg_is_rgb(j->jfif, j->adobe, j->Components[0].Ci,
+                           j->Components[1].Ci, j->Components[2].Ci);
 
     int x, y;
     int max_y = info->height * ds;
@@ -264,6 +267,9 @@ static int get_image(struct image_info *info, int frame, int ds)
                 c2 = (sumV + area/2) / area;
             }
 
+            if (rgb)    // components are R, G, B: no conversion
+                *bmp++= FB_RGBPACK(c0, c1, c2);
+            else
             // ITU BT.601 full-range YUV-to-RGB integer approximation
             {
                 int y = (c0 << 5) + 16;
