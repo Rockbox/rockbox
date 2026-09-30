@@ -91,21 +91,22 @@ static void draw_image_rect(struct image_info *info,
 
 static int img_mem(int ds)
 {
-    int size;
+    /* in 64 bits: a huge image overflows an int and would seem to fit */
+    long long size;
     struct jpeg *p_jpg = &jpg;
 
-    size = (p_jpg->x_phys/ds/p_jpg->subsample_x[0])
+    size = (long long)(p_jpg->x_phys/ds/p_jpg->subsample_x[0])
          * (p_jpg->y_phys/ds/p_jpg->subsample_y[0]);
 #ifdef HAVE_LCD_COLOR
     if (p_jpg->blocks > 1) /* colour, add requirements for chroma */
     {
-        size += (p_jpg->x_phys/ds/p_jpg->subsample_x[1])
+        size += (long long)(p_jpg->x_phys/ds/p_jpg->subsample_x[1])
               * (p_jpg->y_phys/ds/p_jpg->subsample_y[1]);
-        size += (p_jpg->x_phys/ds/p_jpg->subsample_x[2])
+        size += (long long)(p_jpg->x_phys/ds/p_jpg->subsample_x[2])
               * (p_jpg->y_phys/ds/p_jpg->subsample_y[2]);
     }
 #endif
-    return size;
+    return size > INT_MAX ? INT_MAX : size;
 }
 
 static int load_image(char *filename, struct image_info *info,
@@ -177,7 +178,7 @@ static int load_image(char *filename, struct image_info *info,
     /* process markers, unstuffing */
     status = process_markers(buf_jpeg, filesize, p_jpg);
 
-    if (status < 0 || (status & (DQT | SOF0)) != (DQT | SOF0))
+    if (status < 0 || (status & (DQT | SOF0 | SOS)) != (DQT | SOF0 | SOS))
     {   /* bad format or minimum components not contained */
 #ifndef HAVE_LCD_COLOR
         rb->splashf(HZ, "unsupported %d", status);

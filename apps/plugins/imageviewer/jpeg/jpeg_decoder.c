@@ -494,12 +494,23 @@ int process_markers(unsigned char* p_src, long size, struct jpeg* p_jpeg)
 
     while (p_src < p_end)
     {
+        int marker;
         if (*p_src++ != 0xFF) /* no marker? */
         {
             continue; /* discard */
         }
+        if (p_src >= p_end)
+            break;
+        marker = *p_src++;
+        if (marker != 0xFF && marker != 0x00 && marker != 0x01
+         && (marker < 0xD0 || marker > 0xD9))
+        {   /* a marker segment: it must lie within the file */
+            if (p_end - p_src < 2 || (p_src[0] << 8 | p_src[1]) < 2
+             || (p_src[0] << 8 | p_src[1]) > p_end - p_src)
+                return -13; /* segment runs past the end of the file */
+        }
 
-        switch (*p_src++)
+        switch (marker)
         {
         case 0xFF: /* Previous FF was fill byte */
             p_src--; /* This FF could be start of a marker */
@@ -599,7 +610,8 @@ int process_markers(unsigned char* p_src, long size, struct jpeg* p_jpeg)
                             sum += *p_src;
                             p_jpeg->hufftable[i].huffmancodes_ac[j] = *p_src++;
                         }
-                        if(16 + sum > AC_LEN)
+                        if(16 + sum > AC_LEN
+                           || p_src + sum > p_temp + marker_size - 2)
                             return -10; /* longer than allowed */
 
                         for (; j < 16 + sum; j++)
@@ -612,7 +624,8 @@ int process_markers(unsigned char* p_src, long size, struct jpeg* p_jpeg)
                             sum += *p_src;
                             p_jpeg->hufftable[i].huffmancodes_dc[j] = *p_src++;
                         }
-                        if(16 + sum > DC_LEN)
+                        if(16 + sum > DC_LEN
+                           || p_src + sum > p_temp + marker_size - 2)
                             return -11; /* longer than allowed */
 
                         for (; j < 16 + sum; j++)
