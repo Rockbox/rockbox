@@ -345,5 +345,6 @@ uint32_t ftl_sync(void)
     {
         drive_sync();
     }
+    flash_sync();
     return 0;
 }

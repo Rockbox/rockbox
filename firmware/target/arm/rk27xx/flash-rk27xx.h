@@ -89,8 +89,13 @@ int flash_read(uint32_t sec, void *data, void *meta, unsigned n);
 
 /* Program n sectors from sec, which must be erased. data NULL programs
  * 0xff; meta NULL programs {0xff, 0x00, 0xff} - {0xff, 0xff, 0xff} with
- * passthrough on. Returns 0 or 1 on failure. */
+ * passthrough on. The last program is left running: its result arrives
+ * with the next flash call - a program returns 1 if the one before failed -
+ * or with flash_sync(). Returns 0 or 1 on failure. */
 int flash_program(uint32_t sec, const void *data, const void *meta, unsigned n);
+
+/* Wait for the program left running, if any. Returns 1 if it failed. */
+int flash_sync(void);
 
 /* Program the whole page (every plane) that contains sec. */
 int flash_program_page(uint32_t sec, const void *data, const void *meta);

@@ -87,6 +87,8 @@ static uint32_t ecc_mode;               /* BCHCTL mode bits: 0 or BCH_T14 */
 static uint32_t boot_area = UINT32_MAX;
 static struct flash_stats stats;
 
+static int prog_finish(void);
+
 int flash_layer_init(void)
 {
     const struct flashspec_t *f = &flash_spec[0];
@@ -136,6 +138,7 @@ const struct flash_geometry *flash_get_geometry(void)
 
 void flash_set_writable(bool on)
 {
+    prog_finish();
     writable = on;
 }
 
@@ -245,6 +248,7 @@ static void send_row(uint32_t row)
  * `mode` (BCHCTL mode bits). */
 static void latch_page(uint32_t row, uint32_t mode)
 {
+    prog_finish();
     flash_chip_select(0);
     wait_flash_ready();
 
@@ -496,51 +500,81 @@ static void load_run(uint8_t cmd, const struct prog_run *r)
     }
 }
 
-/* Program one raw page, or with `planes` 2 a page in each plane - r[0] in
- * the first, r[1] the same page of the second - with one two-plane program
- * as the OF's FlashProgEnhanced() does: 80h, the first page, 11h, tDBSY,
- * 81h, the second page, 10h. The planes then share one tPROG. */
+/* A program is left running when prog_raw() returns - WP# lifted - and
+ * finished by prog_finish() at the next chip access or at flash_sync(): its
+ * tPROG then overlaps whatever the caller does next, most of all the USB
+ * transfer that follows the last page of a write. */
+static bool prog_pending;
+static bool prog_failed;        /* a finished program failed: sticky */
+
+/* Wait for a pending program and check its status. Returns 1 if it
+ * failed. */
+static int prog_finish(void)
+{
+    int fail = 0;
+
+    if (prog_pending)
+    {
+        prog_pending = false;
+        flash_chip_select(0);
+        fail = wait_ready_us(PROG_TIMEOUT_US)
+               || (read_status() & NAND_STATUS_FAIL);
+        flash_chip_deselect();
+        FMCTL &= ~FM_PROTECT;
+
+        if (fail)
+        {
+            stats.prog_failures++;
+            prog_failed = true;
+        }
+    }
+    return fail;
+}
+
+int flash_sync(void)
+{
+    return prog_finish();
+}
+
+/* Start programming one raw page, or with `planes` 2 a page in each plane -
+ * r[0] in the first, r[1] the same page of the second - with one two-plane
+ * program as the OF's FlashProgEnhanced() does: 80h, the first page, 11h,
+ * tDBSY, 81h, the second page, 10h. The planes then share one tPROG.
+ * Returns 1 if the program before failed, or this one could not start. */
 static int prog_raw(const struct prog_run *r, unsigned planes)
 {
-    int fail;
+    int fail = prog_finish();
 
     flash_chip_select(0);
     FMCTL |= FM_PROTECT;                /* lift WP# for this operation */
     wait_flash_ready();
 
     load_run(CMD_PROG_1ST, &r[0]);
-    fail = 0;
     if (planes == 2)
     {
         FLASH_CMD(0) = CMD_PROG_PLANE;
-        fail = wait_ready_us(PLANE_TIMEOUT_US);
-        if (!fail)
+        if (wait_ready_us(PLANE_TIMEOUT_US))
         {
-            load_run(CMD_PROG_1ST_P1, &r[1]);
+            flash_chip_deselect();
+            FMCTL &= ~FM_PROTECT;
+            stats.prog_failures++;
+            prog_failed = true;
+            return 1;
         }
+        load_run(CMD_PROG_1ST_P1, &r[1]);
     }
 
-    if (!fail)
-    {
-        FLASH_CMD(0) = CMD_PROG_2ND;
-        fail = wait_ready_us(PROG_TIMEOUT_US)
-               || (read_status() & NAND_STATUS_FAIL);
-    }
-
+    FLASH_CMD(0) = CMD_PROG_2ND;
+    prog_pending = true;
     flash_chip_deselect();
-    FMCTL &= ~FM_PROTECT;
-
-    if (fail)
-    {
-        stats.prog_failures++;
-    }
-    return fail ? 1 : 0;
+    return fail;
 }
 
 static int erase_raw_block(uint32_t row)
 {
     int fail;
 
+    prog_finish();
     flash_chip_select(0);
     FMCTL |= FM_PROTECT;
     wait_flash_ready();
@@ -712,6 +746,11 @@ static int copy_sectors(uint32_t src, uint32_t dst, unsigned n,
     }
     else
     {
+        /* a copy reports its own programs' results, the last one included:
+         * the FTL moves the data elsewhere when one fails */
+        prog_finish();
+        prog_failed = false;
+
         while (k < n && ret == 0)
         {
             /* one destination page of every plane at a time, for
@@ -772,6 +811,12 @@ static int copy_sectors(uint32_t src, uint32_t dst, unsigned n,
                 ret = 1;
             }
             k += len;
+        }
+
+        prog_finish();
+        if (prog_failed)
+        {
+            ret = 1;
         }
     }
     return ret;
