@@ -170,6 +170,23 @@ enum {
 #define NEXT_BB_WIDTH   32
 #define NEXT_BB_Y       200
 
+/* 22x22 bubbles: the 320x240 layout, centred (Samsung YP-CP3) */
+#elif (LCD_HEIGHT == 240) && (LCD_WIDTH == 400)
+#define LAYOUT_X        ((LCD_WIDTH - 320) / 2)
+#define XOFS            (LAYOUT_X + 72)
+#define MAX_FPS         40
+
+/* the 320x240 text positions, which centre on its left panel */
+#define LEVEL_TXT_X     LAYOUT_X
+#define LEVEL_TXT_WIDTH 72
+#define LEVEL_TXT_Y     2
+#define SCORE_TXT_X     LAYOUT_X
+#define SCORE_TXT_WIDTH 72
+#define SCORE_TXT_Y     29
+#define NEXT_BB_X       (LAYOUT_X + 20)
+#define NEXT_BB_WIDTH   32
+#define NEXT_BB_Y       200
+
 /* 22x22 bubbles (Gigabeat, Onda VX747) */
 #elif ((LCD_HEIGHT == 320) || (LCD_HEIGHT == 400)) && (LCD_WIDTH == 240)
 #define XOFS          64
@@ -1524,7 +1541,9 @@ static void bubbles_drawboard(struct game_context* bb) {
 
     /* clear screen */
     rb->lcd_clear_display();
-#if ((LCD_HEIGHT >= 128) && (LCD_WIDTH <= 320)) || ((LCD_WIDTH == 132) && (LCD_HEIGHT == 80))
+#if ((LCD_HEIGHT >= 128) && (LCD_WIDTH <= 320)) || \
+    ((LCD_WIDTH == 132) && (LCD_HEIGHT == 80)) || \
+    ((LCD_WIDTH == 400) && (LCD_HEIGHT == 240))
     h = rb->font_get(FONT_SYSFIXED)->height + 1;
 #elif (LCD_WIDTH == 640) && (LCD_HEIGHT == 480)
     h = rb->font_get(FONT_SYSFIXED)->height + 6;
@@ -1534,7 +1553,13 @@ static void bubbles_drawboard(struct game_context* bb) {
 #endif
     /* draw background */
 #ifdef HAVE_LCD_COLOR
+#ifdef LAYOUT_X
+    /* the layout's background, centred */
+    rb->lcd_bitmap(bubbles_background, LAYOUT_X, 0,
+                   LCD_WIDTH - 2 * LAYOUT_X, LCD_HEIGHT);
+#else
     rb->lcd_bitmap(bubbles_background, 0, 0, LCD_WIDTH, LCD_HEIGHT);
+#endif
 #endif
 
     /* display play board */

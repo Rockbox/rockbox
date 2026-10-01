@@ -609,15 +609,17 @@
 #define PREVIEW_X 258
 #define PREVIEW_Y 300
 
-#elif (LCD_WIDTH == 320) && (LCD_HEIGHT == 240)
+#elif ((LCD_WIDTH == 320) || (LCD_WIDTH == 400)) && (LCD_HEIGHT == 240)
 
+/* 400x240: the 320x240 layout, centred */
+#define LAYOUT_X ((LCD_WIDTH - 320) / 2)
 #define BLOCK_WIDTH 12
 #define BLOCK_HEIGHT 12
-#define BOARD_X 86
+#define BOARD_X (LAYOUT_X + 86)
 #define BOARD_Y 0
-#define PREVIEW_X 12
+#define PREVIEW_X (LAYOUT_X + 12)
 #define PREVIEW_Y 11
-#define LABEL_X 242
+#define LABEL_X (LAYOUT_X + 242)
 #define SCORE_Y 25
 #define LEVEL_Y 70
 #define LINES_Y 105
@@ -834,6 +836,20 @@
 #endif
 
 extern const fb_data rockblox_background[];
+
+#ifndef LAYOUT_X
+#define LAYOUT_X 0
+#endif
+
+/* the background, which spans the layout - not the screen, when the
+ * layout is a smaller one centred */
+static void draw_background(void)
+{
+    if (LAYOUT_X > 0)
+        rb->lcd_clear_display();
+    rb->lcd_bitmap(rockblox_background, LAYOUT_X, 0,
+                   LCD_WIDTH - 2 * LAYOUT_X, LCD_HEIGHT);
+}
 
 #ifndef HIGHSCORE_SPACE
 #define HIGHSCORE_SPACE " "
@@ -1115,7 +1131,7 @@ static void init_rockblox (bool resume)
                  tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday,
                  tm->tm_hour, tm->tm_min, tm->tm_sec);
 
-    rb->lcd_bitmap (rockblox_background, 0, 0, LCD_WIDTH, LCD_HEIGHT);
+    draw_background();
     if (!resume)
     {
         rockblox_status.level = 1;
@@ -1583,7 +1599,7 @@ static int rockblox_loop (void)
             backlight_ignore_timeout();
 
             /* get rid of the splash text */
-            rb->lcd_bitmap (rockblox_background, 0, 0, LCD_WIDTH, LCD_HEIGHT);
+            draw_background();
             show_details ();
 #ifdef HIGH_SCORE_Y
             show_highscores ();

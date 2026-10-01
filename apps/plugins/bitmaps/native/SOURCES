@@ -440,7 +440,7 @@ invadrox_numbers.50x7x16.bmp
 invadrox_background.480x640x16.bmp
 #elif LCD_WIDTH == 360 && (LCD_HEIGHT == 400 || LCD_HEIGHT == 640)
 invadrox_background.360x400x16.bmp
-#elif LCD_WIDTH == 320
+#elif LCD_WIDTH == 320 || (LCD_WIDTH == 400 && LCD_HEIGHT == 240)
 invadrox_background.320x240x16.bmp
 #elif LCD_WIDTH == 240 && LCD_HEIGHT == 240
 invadrox_background.240x240x16.bmp
@@ -511,7 +511,7 @@ jewels.220x176x16.bmp
 jewels.240x240x16.bmp
 #elif (LCD_WIDTH == 240) && (LCD_HEIGHT >= 320)
 jewels.320x240x16.bmp
-#elif (LCD_WIDTH == 320) && (LCD_HEIGHT == 240)
+#elif ((LCD_WIDTH == 320) || (LCD_WIDTH == 400)) && (LCD_HEIGHT == 240)
 jewels.320x240x16.bmp
 #elif (LCD_WIDTH == 360) && ((LCD_HEIGHT == 400) || (LCD_HEIGHT == 640))
 jewels.360x400x16.bmp
@@ -909,7 +909,8 @@ sudoku_inverse.240x240x16.bmp
 sudoku_start.320x240x16.bmp
 sudoku_normal.320x240x16.bmp
 sudoku_inverse.320x240x16.bmp
-#elif (LCD_WIDTH == 320) && (LCD_HEIGHT == 240) && (LCD_DEPTH >= 16)
+#elif ((LCD_WIDTH == 320) || (LCD_WIDTH == 400)) && (LCD_HEIGHT == 240) \
+      && (LCD_DEPTH >= 16)
 sudoku_start.320x240x16.bmp
 sudoku_normal.320x240x16.bmp
 sudoku_inverse.320x240x16.bmp
@@ -943,7 +944,8 @@ superdom_boarditems.220x176x16.bmp
       ((LCD_WIDTH == 176) && (LCD_HEIGHT == 220))
 superdom_boarditems.176x132x16.bmp
 #elif ((LCD_WIDTH == 240) && (LCD_HEIGHT == 240)) || \
-      ((LCD_WIDTH == 320) && (LCD_HEIGHT == 240))
+      ((LCD_WIDTH == 320) && (LCD_HEIGHT == 240)) || \
+      ((LCD_WIDTH == 400) && (LCD_HEIGHT == 240))
 superdom_boarditems.320x240x16.bmp
 #elif ((LCD_WIDTH == 240) && (LCD_HEIGHT == 320)) || \
       ((LCD_WIDTH == 240) && (LCD_HEIGHT == 400)) || \

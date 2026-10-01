@@ -94,7 +94,13 @@ char buf[255];
 #define MY_BITMAP_PART   rb->lcd_mono_bitmap_part
 #endif
 
-#if LCD_WIDTH > LCD_HEIGHT
+#if (LCD_WIDTH == 400) && (LCD_HEIGHT == 240)
+/* boxes as wide as the screen allows make a board taller than it: take
+ * the 320x240 ones, which its board items are drawn for */
+#define BOX_WIDTH ((320-(MARGIN*2))/BOARD_SIZE)
+#define BOX_HEIGHT ((BOX_WIDTH*2)/3)
+
+#elif LCD_WIDTH > LCD_HEIGHT
 #define BOX_WIDTH ((LCD_WIDTH-(MARGIN*2))/BOARD_SIZE)
 #define BOX_HEIGHT ((BOX_WIDTH*2)/3)
 

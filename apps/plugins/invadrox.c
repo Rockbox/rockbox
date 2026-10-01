@@ -395,8 +395,8 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define LIVES_X 10
 #define MAX_Y 18
 
-/* iPod Video defines */
-#elif (LCD_WIDTH == 320) && (LCD_HEIGHT == 240)
+/* iPod Video defines - and Samsung YP-CP3, 400x240: the same, centred */
+#elif ((LCD_WIDTH == 320) || (LCD_WIDTH == 400)) && (LCD_HEIGHT == 240)
 
 /* Original arcade game size 224x240, 1bpp with
  * red overlay at top and green overlay at bottom.
@@ -427,7 +427,7 @@ CONFIG_KEYPAD == MROBE500_PAD
  */
 
 #define ARCADISH_GRAPHICS
-#define PLAYFIELD_X 48
+#define PLAYFIELD_X (48 + (LCD_WIDTH - 320) / 2)
 #define SHIP_Y (PLAYFIELD_Y - 3 * SHIP_HEIGHT)
 #define ALIEN_START_Y (UFO_Y + 3 * ALIEN_HEIGHT)
 #define SCORENUM_X (PLAYFIELD_X + NUMBERS_WIDTH)
@@ -1633,8 +1633,15 @@ static void move_ufo(void)
 
 static void draw_background(void)
 {
-
+#if BMPWIDTH_invadrox_background < LCD_WIDTH
+    /* a narrower background, centred like the playfield */
+    rb->lcd_clear_display();
+    rb->lcd_bitmap(invadrox_background,
+                   (LCD_WIDTH - BMPWIDTH_invadrox_background) / 2, 0,
+                   BMPWIDTH_invadrox_background, LCD_HEIGHT);
+#else
     rb->lcd_bitmap(invadrox_background, 0, 0, LCD_WIDTH, LCD_HEIGHT);
+#endif
     rb->lcd_update();
 }
 
