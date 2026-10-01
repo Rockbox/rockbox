@@ -26,6 +26,17 @@
 
 #define MAX_FLASH_NUM 4
 
+/* flashspec_t.vendor: the index of the maker ID in manufacture_id_tbl[] */
+enum vendor_t {
+    SAMSUNG,
+    TOSHIBA,
+    HYNIX,
+    INFINEON,
+    MICRON,
+    RENESAS,
+    ST
+};
+
 /* Per-chip geometry, as the OF derives it from the READ_ID response.
  *
  * The "_raw" fields describe one physical plane; the others are the
@@ -41,7 +52,7 @@ struct flashspec_t
     uint8_t  large;
     uint8_t  five;
     uint8_t  mlc;
-    uint8_t  vendor;
+    uint8_t  vendor;            /* enum vendor_t */
     uint8_t  access_time;
     uint8_t  sec_per_page;
     uint8_t  sec_per_page_raw;

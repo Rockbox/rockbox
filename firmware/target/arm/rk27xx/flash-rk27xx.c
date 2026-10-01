@@ -52,6 +52,9 @@
 #define CMD_READ_2ND     0x30
 #define CMD_PROG_1ST     0x80
 #define CMD_PROG_2ND     0x10
+#define CMD_PROG_PLANE   0x11           /* end of a two-plane program's first
+                                         * page */
+#define CMD_PROG_1ST_P1  0x81           /* start of its second page */
 #define CMD_ERASE_1ST    0x60
 #define CMD_ERASE_2ND    0xD0
 #define CMD_STATUS       0x70
@@ -72,11 +75,14 @@
 /* Busy limits: the datasheet maxima (tPROG 2.2 ms, tBERS 10 ms) with margin */
 #define PROG_TIMEOUT_US  5000
 #define ERASE_TIMEOUT_US 20000
+/* ...and tDBSY, the busy time after CMD_PROG_PLANE: 1 us at most */
+#define PLANE_TIMEOUT_US 10
 
 static struct flash_geometry geo;
 static bool ready;
 static bool writable;
 static bool meta_passthrough;
+static bool two_plane_prog;
 static uint32_t ecc_mode;               /* BCHCTL mode bits: 0 or BCH_T14 */
 static uint32_t boot_area = UINT32_MAX;
 static struct flash_stats stats;
@@ -111,6 +117,13 @@ int flash_layer_init(void)
         geo.sec_per_block     = f->sec_per_block;
         geo.total_blocks      = f->total_bloks;
         geo.total_sectors     = f->total_phy_sec;
+        /* The OF programs both planes' pages at once on every two-plane
+         * part, its second page with 0x81 - or 0x80 on Toshiba and Micron
+         * parts, whose plane addressing differs too. Only the 0x81 parts
+         * (a Samsung one tested) are done here; the others program a page
+         * at a time. */
+        two_plane_prog = f->mul_plane == 2 &&
+                         f->vendor != TOSHIBA && f->vendor != MICRON;
         ready = true;
     }
     return ret;
@@ -411,32 +424,37 @@ static void put_words(uintptr_t dst, const uint8_t *src, uint32_t len)
     }
 }
 
-/* Program `n` sectors of raw page `row`, from sector `first` in it. */
-static int prog_raw_run(uint32_t row, uint32_t first, uint32_t n,
-                        const uint8_t *data, const uint8_t *meta)
+/* `n` sectors of raw page `row`, from sector `first` in it */
+struct prog_run
 {
-    uint32_t col = first * SECTOR_STRIDE;
+    uint32_t row;
+    uint32_t first;
+    uint32_t n;
+    const uint8_t *data;
+    const uint8_t *meta;
+};
+
+/* Send `cmd` and the address of `r`, and load its sectors into the chip's
+ * page register. */
+static void load_run(uint8_t cmd, const struct prog_run *r)
+{
+    uint32_t col = r->first * SECTOR_STRIDE;
     uint32_t i;
-    int fail;
 
-    flash_chip_select(0);
-    FMCTL |= FM_PROTECT;                /* lift WP# for this operation */
-    wait_flash_ready();
-
-    FLASH_CMD(0)  = CMD_PROG_1ST;
+    FLASH_CMD(0)  = cmd;
     FLASH_ADDR(0) = col & 0xff;
     FLASH_ADDR(0) = (col >> 8) & 0xff;
-    send_row(row);
+    send_row(r->row);
 
-    for (i = 0; i < n; i++)
+    for (i = 0; i < r->n; i++)
     {
         uint32_t buf = i & 3;
         uint8_t spare[SPARE_SIZE];
 
         memset(spare, 0xff, sizeof(spare));
-        if (meta)
+        if (r->meta)
         {
-            memcpy(spare, meta + i * FLASH_META_SIZE, FLASH_META_SIZE);
+            memcpy(spare, r->meta + i * FLASH_META_SIZE, FLASH_META_SIZE);
         }
         if (!meta_passthrough)
         {
@@ -450,7 +468,7 @@ static int prog_raw_run(uint32_t row, uint32_t first, uint32_t n,
         }
 
         put_words((uintptr_t)&PAGE_BUF + (buf << 9),
-                  data ? data + (size_t)i * FLASH_SECTOR_SIZE : NULL,
+                  r->data ? r->data + (size_t)i * FLASH_SECTOR_SIZE : NULL,
                   FLASH_SECTOR_SIZE);
         put_words((uintptr_t)&SPARE_BUF + (buf << 4), spare, SPARE_SIZE);
 
@@ -461,9 +479,38 @@ static int prog_raw_run(uint32_t row, uint32_t first, uint32_t n,
     while (!(FLCTL & FL_RDY))
     {
     }
+}
 
-    FLASH_CMD(0) = CMD_PROG_2ND;
-    fail = wait_ready_us(PROG_TIMEOUT_US) || (read_status() & NAND_STATUS_FAIL);
+/* Program one raw page, or with `planes` 2 a page in each plane - r[0] in
+ * the first, r[1] the same page of the second - with one two-plane program
+ * as the OF's FlashProgEnhanced() does: 80h, the first page, 11h, tDBSY,
+ * 81h, the second page, 10h. The planes then share one tPROG. */
+static int prog_raw(const struct prog_run *r, unsigned planes)
+{
+    int fail;
+
+    flash_chip_select(0);
+    FMCTL |= FM_PROTECT;                /* lift WP# for this operation */
+    wait_flash_ready();
+
+    load_run(CMD_PROG_1ST, &r[0]);
+    fail = 0;
+    if (planes == 2)
+    {
+        FLASH_CMD(0) = CMD_PROG_PLANE;
+        fail = wait_ready_us(PLANE_TIMEOUT_US);
+        if (!fail)
+        {
+            load_run(CMD_PROG_1ST_P1, &r[1]);
+        }
+    }
+
+    if (!fail)
+    {
+        FLASH_CMD(0) = CMD_PROG_2ND;
+        fail = wait_ready_us(PROG_TIMEOUT_US)
+               || (read_status() & NAND_STATUS_FAIL);
+    }
 
     flash_chip_deselect();
     FMCTL &= ~FM_PROTECT;
@@ -500,12 +547,38 @@ static int erase_raw_block(uint32_t row)
     return fail ? 1 : 0;
 }
 
-/* Sectors of the FTL's view are split into one program per raw page - and
- * so per plane. */
+/* Fill `r` with the run of sectors from sec + i, up to sec + n, that lie
+ * consecutively in one raw page. Returns its length, or 0 past the chip. */
+static uint32_t get_run(uint32_t sec, uint32_t i, uint32_t n,
+                        const uint8_t *data, const uint8_t *meta,
+                        struct prog_run *r)
+{
+    uint32_t raw = sec_to_raw(sec + i);
+    uint32_t run = 1;
+
+    if (raw >= geo.total_sectors)
+    {
+        return 0;
+    }
+
+    r->row   = raw / geo.sec_per_page_raw;
+    r->first = raw % geo.sec_per_page_raw;
+    while (i + run < n && r->first + run < geo.sec_per_page_raw &&
+           sec_to_raw(sec + i + run) == raw + run)
+    {
+        run++;
+    }
+    r->n    = run;
+    r->data = data ? data + (size_t)i * FLASH_SECTOR_SIZE : NULL;
+    r->meta = meta ? meta + (size_t)i * FLASH_META_SIZE : NULL;
+    return run;
+}
+
+/* Sectors of the FTL's view are split into one program per raw page, or
+ * where they cover the same page of both planes, one per pair of pages. */
 int flash_program(uint32_t sec, const void *data, const void *meta, unsigned n)
 {
-    const uint8_t *d = data;
-    const uint8_t *m = meta;
+    uint32_t ppb_raw = geo.sec_per_block_raw / geo.sec_per_page_raw;
     uint32_t i = 0;
     int ret = 0;
 
@@ -525,32 +598,30 @@ int flash_program(uint32_t sec, const void *data, const void *meta, unsigned n)
     {
         while (i < n && ret == 0)
         {
-            uint32_t raw   = sec_to_raw(sec + i);
-            uint32_t row   = raw / geo.sec_per_page_raw;
-            uint32_t first = raw % geo.sec_per_page_raw;
-            uint32_t run   = 1;
+            struct prog_run r[2];
+            uint32_t len = get_run(sec, i, n, data, meta, &r[0]);
+            unsigned planes = 1;
 
-            if (raw >= geo.total_sectors)
+            if (len == 0)
             {
                 ret = 1;
                 break;
             }
 
-            /* extend the run while the next sector is the next slot of the
-             * same raw page */
-            while (i + run < n && first + run < geo.sec_per_page_raw &&
-                   sec_to_raw(sec + i + run) == raw + run)
+            /* sec_to_raw() puts a page's second plane in the next block */
+            if (two_plane_prog && i + len < n &&
+                get_run(sec, i + len, n, data, meta, &r[1]) != 0 &&
+                r[1].row == r[0].row + ppb_raw)
             {
-                run++;
+                len += r[1].n;
+                planes = 2;
             }
 
-            if (prog_raw_run(row, first, run,
-                             d ? d + (size_t)i * FLASH_SECTOR_SIZE : NULL,
-                             m ? m + (size_t)i * FLASH_META_SIZE : NULL))
+            if (prog_raw(r, planes))
             {
                 ret = 1;
             }
-            i += run;
+            i += len;
         }
     }
     return ret;

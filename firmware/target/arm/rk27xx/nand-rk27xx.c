@@ -48,16 +48,6 @@ struct flashspec_t flash_spec[MAX_FLASH_NUM];
 /* sum of all phy sectors in all chips */
 uint32_t  total_phy_sec;
 
-enum vendor_t {
-    SAMSUNG,
-    TOSHIBA,
-    HYNIX,
-    INFINEON,
-    MICRON,
-    RENESAS,
-    ST
-};
-
 /* taken from OF - one entry per device_info[] row. The OF's table is
  * 76 79 f1 da dc d3 d5 d7; 0xd5 was once missing here, which shifted every
  * later code onto the capacity one row up and sized a 4 GiB 0xd7 part as
