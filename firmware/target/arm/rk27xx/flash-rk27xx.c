@@ -331,11 +331,18 @@ int flash_read(uint32_t sec, void *data, void *meta, unsigned n)
     unsigned i;
     int ret = ready ? 0 : 1;
 
-    /* One page latch per sector. Reading whole runs in one pass is an
-     * obvious speed-up, left until the access pattern has been measured. */
-    for (i = 0; i < n && ready; i++)
+    unsigned run;
+
+    /* One page latch per run of sectors that lie consecutively in one raw
+     * page. Latching per sector instead cost an array load per sector and,
+     * the controller streaming a page from its first sector, a transfer of
+     * every sector before it: 8 loads and 36 transfers for an 8-sector page
+     * read sector by sector, against 1 and 8. On a two-plane part a run of
+     * FTL sectors stays in one page until it moves on to the other plane. */
+    for (i = 0; i < n && ready; i += run)
     {
         uint32_t raw = sec_to_raw(sec + i);
+        uint32_t slot = raw % geo.sec_per_page_raw;
 
         if (raw >= geo.total_sectors)
         {
@@ -343,8 +350,14 @@ int flash_read(uint32_t sec, void *data, void *meta, unsigned n)
             break;
         }
 
-        if (read_raw_run(raw / geo.sec_per_page_raw,
-                         raw % geo.sec_per_page_raw, 1,
+        run = 1;
+        while (i + run < n && slot + run < geo.sec_per_page_raw &&
+               sec_to_raw(sec + i + run) == raw + run)
+        {
+            run++;
+        }
+
+        if (read_raw_run(raw / geo.sec_per_page_raw, slot, run,
                          d ? d + (size_t)i * FLASH_SECTOR_SIZE : NULL,
                          m ? m + (size_t)i * FLASH_META_SIZE : NULL, ecc_mode))
         {
