@@ -259,19 +259,26 @@ static void latch_page(uint32_t row, uint32_t mode)
     BCHCTL = BCH_RST | mode;
 }
 
-/* Transfer the next sector of the latched page through slot `slot` & 3.
- * Returns the BCH status. */
-static uint32_t read_next_sector(uint32_t slot, uint8_t *data, uint8_t *meta)
+/* Start the transfer of the next sector of the latched page into slot
+ * `slot` & 3. */
+static void kick_read(uint32_t slot)
 {
-    uint32_t st;
-    uint32_t buf = slot & 3;
+    FLCTL = FL_KICK_READ | ((slot & 3) << 3);
+}
 
-    FLCTL = FL_KICK_READ | (buf << 3);
+/* Wait for the last kicked transfer. Returns its BCH status. */
+static uint32_t wait_read(void)
+{
     while (!(FLCTL & FL_RDY))
     {
     }
+    return BCHST;
+}
 
-    st = BCHST;
+/* Copy a transferred sector out of slot `slot` & 3. */
+static void copy_slot(uint32_t slot, uint8_t *data, uint8_t *meta)
+{
+    uint32_t buf = slot & 3;
 
     if (data)
     {
@@ -283,7 +290,6 @@ static uint32_t read_next_sector(uint32_t slot, uint8_t *data, uint8_t *meta)
         memcpy(meta, (const void *)((uintptr_t)&SPARE_BUF + (buf << 4)),
                FLASH_META_SIZE);
     }
-    return st;
 }
 
 /* Read sectors [first, first + n) of raw page `row`. Returns 1 if any was
@@ -295,6 +301,7 @@ static int read_raw_run(uint32_t row, uint32_t first, uint32_t n,
     int uncorrectable = 0;
 
     latch_page(row, mode);
+    kick_read(0);
 
     for (j = 0; j < first + n; j++)
     {
@@ -304,7 +311,15 @@ static int read_raw_run(uint32_t row, uint32_t first, uint32_t n,
                                       : NULL;
         uint8_t *m = (wanted && meta) ? meta + (size_t)k * FLASH_META_SIZE
                                       : NULL;
-        uint32_t st = read_next_sector(j, d, m);
+        uint32_t st = wait_read();
+
+        /* the next sector transfers, into the next slot, while this one is
+         * copied out */
+        if (j + 1 < first + n)
+        {
+            kick_read(j + 1);
+        }
+        copy_slot(j, d, m);
 
         if (wanted)
         {
