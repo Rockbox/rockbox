@@ -461,16 +461,16 @@ static void load_run(uint8_t cmd, const struct prog_run *r)
             spare[META_PROGRAMMED] = 0x00;
         }
 
-        /* a slot is reused every four sectors: its last transfer must be
-         * done */
-        while (!(FLCTL & FL_RDY))
-        {
-        }
-
+        /* stage this sector while the previous one, in another slot,
+         * transfers; the BCH engine restarts only once that is done */
         put_words((uintptr_t)&PAGE_BUF + (buf << 9),
                   r->data ? r->data + (size_t)i * FLASH_SECTOR_SIZE : NULL,
                   FLASH_SECTOR_SIZE);
         put_words((uintptr_t)&SPARE_BUF + (buf << 4), spare, SPARE_SIZE);
+
+        while (!(FLCTL & FL_RDY))
+        {
+        }
 
         BCHCTL = BCH_WR | BCH_RST;
         FLCTL  = FL_KICK_WRITE | (buf << 3);
