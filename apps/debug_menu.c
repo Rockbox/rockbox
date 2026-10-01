@@ -2857,7 +2857,8 @@ static bool view_ram_info(void)
 }
 #endif
 
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE) && (CONFIG_NAND == NAND_RK27XX) \
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE) && defined(CONFIG_NAND) \
+    && (CONFIG_NAND == NAND_RK27XX) \
     && !(CONFIG_STORAGE & STORAGE_NAND)
 #include "ftl-probe-rk27xx.h"
 
@@ -2961,7 +2962,8 @@ static const struct {
 #if ((CONFIG_PLATFORM & PLATFORM_NATIVE) || defined(SONY_NWZ_LINUX) || defined(HIBY_LINUX) || defined(FIIO_M3K_LINUX)) && !defined(SIMULATOR)
         { "View HW info", dbg_hw_info },
 #endif
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE) && (CONFIG_NAND == NAND_RK27XX) \
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE) && defined(CONFIG_NAND) \
+    && (CONFIG_NAND == NAND_RK27XX) \
     && !(CONFIG_STORAGE & STORAGE_NAND)
         { "View FTL scheme", dbg_ftl_scheme },
 #endif
