@@ -714,9 +714,9 @@ static int copy_sectors(uint32_t src, uint32_t dst, unsigned n,
     {
         while (k < n && ret == 0)
         {
-            /* one destination raw page at a time */
-            uint32_t len = geo.sec_per_page_raw
-                           - (dst + k) % geo.sec_per_page_raw;
+            /* one destination page of every plane at a time, for
+             * flash_program() to program the planes together */
+            uint32_t len = geo.sec_per_page - (dst + k) % geo.sec_per_page;
             uint32_t i = 0;
 
             if (len > n - k)
