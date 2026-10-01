@@ -902,7 +902,8 @@ Lyre prototype 1 */
  * pages in RAM (ftl-scheme-a.c) until a later write completes them;
  * storage_flush() commits them at shutdown, ROLO and wherever else it is
  * called. */
-#if (CONFIG_STORAGE & STORAGE_NAND) && (CONFIG_NAND == NAND_RK27XX) \
+#if (CONFIG_STORAGE & STORAGE_NAND) && defined(CONFIG_NAND) \
+    && (CONFIG_NAND == NAND_RK27XX) \
     && (CONFIG_RK27XX_FTL == RK27XX_FTL_SCHEME_A) \
     && !defined(HAVE_STORAGE_FLUSH)
 #define HAVE_STORAGE_FLUSH
