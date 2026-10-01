@@ -163,6 +163,43 @@ void flash_chip_select(uint8_t chip)
     FMCTL = tmp;
 }
 
+/* NAND bus timing for an AHB clock of `mhz`, from chip 0's access time, as
+ * the OF's FlashTimingCfg() computes it - the OF and the YP-CP3's NAND
+ * bootloader call it at every bus clock change. The value starts at 0x40,
+ * or 0x41 on Hynix and 0x60 on Toshiba and Micron parts, and grows by 0x20
+ * (by 1 from 0x100 on) for every bus cycle the access time needs beyond
+ * two. On the YP-CP3's Samsung part (25 ns) at 100 MHz that is 0x60, where
+ * flash_init()'s 0x1081 - what the OF's FlashInit() sets before - spends
+ * about twice as long on every byte. */
+static void flash_timing_cfg(uint32_t mhz)
+{
+    const struct flashspec_t *f = &flash_spec[0];
+    uint32_t wait, period, cycles;
+
+    if (mhz == 0 || mhz >= 200)
+        return;
+
+    if (f->vendor == MICRON || f->vendor == TOSHIBA)
+        wait = 0x60;
+    else if (f->vendor == HYNIX)
+        wait = 0x41;
+    else
+        wait = 0x40;
+
+    period = 1000 / mhz;
+    cycles = (f->access_time + period - 1) / period;
+
+    while (cycles-- > 2)
+    {
+        if (wait < 0x100)
+            wait += 0x20;
+        else
+            wait += 1;
+    }
+
+    FMWAIT = wait;
+}
+
 void flash_init(void)
 {
     uint8_t buff[5]; /* buff for CMD_READ_ID response */
@@ -310,6 +347,10 @@ void flash_init(void)
 
         total_phy_sec += flash_spec[i].total_phy_sec;
     }
+
+    /* for the fastest bus clock: AHB runs at CPUFREQ_MAX / 2 or slower */
+    if (total_phy_sec != 0)
+        flash_timing_cfg(CPUFREQ_MAX / 2 / 1000000);
 
     /* read ID block and propagate SysDiskCapacity and SysResBlocks */
 }
