@@ -76,6 +76,7 @@
 static struct flash_geometry geo;
 static bool ready;
 static bool writable;
+static bool meta_passthrough;
 static uint32_t boot_area = UINT32_MAX;
 static struct flash_stats stats;
 
@@ -127,6 +128,11 @@ void flash_set_writable(bool on)
 void flash_set_boot_area(uint32_t sectors)
 {
     boot_area = sectors;
+}
+
+void flash_set_meta_passthrough(bool on)
+{
+    meta_passthrough = on;
 }
 
 void flash_get_stats(struct flash_stats *out)
@@ -393,7 +399,10 @@ static int prog_raw_run(uint32_t row, uint32_t first, uint32_t n,
         {
             memcpy(spare, meta + i * FLASH_META_SIZE, FLASH_META_SIZE);
         }
-        spare[META_PROGRAMMED] = 0x00;
+        if (!meta_passthrough)
+        {
+            spare[META_PROGRAMMED] = 0x00;
+        }
 
         /* a slot is reused every four sectors: its last transfer must be
          * done */
@@ -547,14 +556,24 @@ int flash_erase(uint32_t sec)
     return ret;
 }
 
+/* What a copy programs as the destination's metadata */
+enum copy_meta
+{
+    COPY_META_FRESH,            /* as flash_program() with meta NULL */
+    COPY_META_KEEP,             /* each sector's own */
+    COPY_META_PAGE,             /* the caller's, by position in the page */
+};
+
 /* Copy through the ECC engine, never with the chip's internal data move: on
  * this MLC part moved pages accumulate bit errors, and the data area's
  * t=8 is already below the chip's 12-bit minimum. A source sector that
  * fails ECC is copied as read, and counted. */
-int flash_copy(uint32_t src, uint32_t dst, unsigned n)
+static int copy_sectors(uint32_t src, uint32_t dst, unsigned n,
+                        enum copy_meta how, const uint8_t *page_meta)
 {
     static uint8_t buf[FLASH_MAX_SEC_PER_PAGE * FLASH_SECTOR_SIZE]
         __attribute__((aligned(4)));
+    static uint8_t meta[FLASH_MAX_SEC_PER_PAGE * FLASH_META_SIZE];
     uint32_t k = 0;
     int ret = 0;
 
@@ -599,14 +618,30 @@ int flash_copy(uint32_t src, uint32_t dst, unsigned n)
                 }
 
                 if (read_raw_run(raw / geo.sec_per_page_raw, first, run,
-                                 buf + (size_t)i * FLASH_SECTOR_SIZE, NULL))
+                                 buf + (size_t)i * FLASH_SECTOR_SIZE,
+                                 how == COPY_META_KEEP ?
+                                     meta + (size_t)i * FLASH_META_SIZE : NULL))
                 {
                     stats.copy_uncorrectable++;
                 }
                 i += run;
             }
 
-            if (ret == 0 && flash_program(dst + k, buf, NULL, len))
+            if (how == COPY_META_PAGE)
+            {
+                for (i = 0; i < len; i++)
+                {
+                    uint32_t at = (dst + k + i) % geo.sec_per_page;
+
+                    memcpy(meta + i * FLASH_META_SIZE,
+                           page_meta + at * FLASH_META_SIZE,
+                           FLASH_META_SIZE);
+                }
+            }
+
+            if (ret == 0
+                && flash_program(dst + k, buf,
+                                 how == COPY_META_FRESH ? NULL : meta, len))
             {
                 ret = 1;
             }
@@ -614,4 +649,17 @@ int flash_copy(uint32_t src, uint32_t dst, unsigned n)
         }
     }
     return ret;
+}
+
+int flash_copy(uint32_t src, uint32_t dst, unsigned n)
+{
+    return copy_sectors(src, dst, n, COPY_META_FRESH, NULL);
+}
+
+int flash_copy_meta(uint32_t src, uint32_t dst, unsigned n,
+                    const void *page_meta)
+{
+    return copy_sectors(src, dst, n,
+                        page_meta ? COPY_META_PAGE : COPY_META_KEEP,
+                        page_meta);
 }

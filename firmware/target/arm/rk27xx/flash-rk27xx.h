@@ -33,8 +33,10 @@
  * METADATA: every sector carries 16 spare bytes. The last 13 are the BCH
  * code and belong to the hardware; the first three are the FTL's, and are
  * what the meta arguments below carry - FLASH_META_SIZE bytes per sector.
- * Byte 1 is special: this layer writes 0x00 there on every program, so that
- * the FTL can tell a programmed page from an erased one whatever it wrote.
+ * Byte 1 is special: by default this layer writes 0x00 there on every
+ * program, so that the FTL can tell a programmed page from an erased one
+ * whatever it wrote. An FTL that keeps its own data in byte 1 turns that off
+ * with flash_set_meta_passthrough().
  *
  * Only the first chip is supported; every device the FTL has been validated
  * on has one. */
@@ -86,7 +88,8 @@ const struct flash_geometry *flash_get_geometry(void);
 int flash_read(uint32_t sec, void *data, void *meta, unsigned n);
 
 /* Program n sectors from sec, which must be erased. data NULL programs
- * 0xff; meta NULL programs {0xff, 0x00, 0xff}. Returns 0 or 1 on failure. */
+ * 0xff; meta NULL programs {0xff, 0x00, 0xff} - {0xff, 0xff, 0xff} with
+ * passthrough on. Returns 0 or 1 on failure. */
 int flash_program(uint32_t sec, const void *data, const void *meta, unsigned n);
 
 /* Program the whole page (every plane) that contains sec. */
@@ -99,6 +102,15 @@ int flash_erase(uint32_t sec);
  * engine, so that correctable errors are not propagated. The destination
  * gets fresh metadata {0xff, 0x00, 0xff}. */
 int flash_copy(uint32_t src, uint32_t dst, unsigned n);
+
+/* As flash_copy(), but with chosen metadata: page_meta NULL keeps each
+ * sector's own; otherwise sector k of every destination page is programmed
+ * with page_meta[k] (sec_per_page * FLASH_META_SIZE bytes). */
+int flash_copy_meta(uint32_t src, uint32_t dst, unsigned n,
+                    const void *page_meta);
+
+/* Program metadata byte 1 as given rather than 0x00. */
+void flash_set_meta_passthrough(bool on);
 
 /* Read one PHYSICAL sector, bypassing the super-block view: for the boot
  * area, which the boot ROM addresses physically. */
