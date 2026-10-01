@@ -1710,14 +1710,22 @@ target/arm/rk27xx/system-rk27xx.c
 target/arm/rk27xx/backlight-rk27xx.c
 target/arm/rk27xx/adc-rk27xx.c
 target/arm/rk27xx/sd-rk27xx.c
-target/arm/rk27xx/ftl-rk27xx.c
-target/arm/rk27xx/ftl-scheme-a.c
+#if CONFIG_NAND == NAND_RK27XX
+#if (CONFIG_STORAGE & STORAGE_NAND)
 target/arm/rk27xx/flash-rk27xx.c
 target/arm/rk27xx/nand-rk27xx.c
-#if (CONFIG_NAND == NAND_RK27XX) && !(CONFIG_STORAGE & STORAGE_NAND) \
-    && !defined(BOOTLOADER)
-/* no FTL scheme configured: the finder (debug menu) */
+target/arm/rk27xx/ftl-rk27xx.c
+#if CONFIG_RK27XX_FTL == RK27XX_FTL_SCHEME_A
+target/arm/rk27xx/ftl-scheme-a.c
+#elif CONFIG_RK27XX_FTL == RK27XX_FTL_SCHEME_B
+target/arm/rk27xx/ftl-scheme-b.c
+#endif
+#elif !defined(BOOTLOADER)
+/* no FTL scheme configured: only the finder (debug menu) */
+target/arm/rk27xx/flash-rk27xx.c
+target/arm/rk27xx/nand-rk27xx.c
 target/arm/rk27xx/ftl-probe-rk27xx.c
+#endif
 #endif
 target/arm/rk27xx/usb-rk27xx.c
 target/arm/rk27xx/lcdif-rk27xx.c

@@ -44,6 +44,7 @@
 #define CONFIG_STORAGE (STORAGE_SD | STORAGE_NAND)
 
 #define CONFIG_NAND NAND_RK27XX
+#define CONFIG_RK27XX_FTL RK27XX_FTL_SCHEME_A
 
 /* commented for now */
 /* #define HAVE_HOTSWAP */
