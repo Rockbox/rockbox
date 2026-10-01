@@ -39,6 +39,8 @@ extern "C" {
 
 #define IM3_IDENT       "8702"
 #define IM3_VERSION     "1.0"
+#define IMG1_IDENT      "8720"
+#define IMG1_VERSION    "2.0"
 #define IM3HDR_SZ       0x800
 #define IM3INFO_SZ      (sizeof(struct Im3Info))
 #define IM3INFOSIGN_SZ  (offsetof(struct Im3Info, info_sign))
@@ -109,13 +111,18 @@ enum {
     DFU_INST,           /* RB installer */
     DFU_INST_SINGLE,    /* RB installer (single) */
     DFU_UNINST,         /* RB uninstaller */
-    DFU_RAW             /* raw binary */
+    DFU_RAW,            /* raw binary */
+    DFU_N4G             /* Nano 4G IMG1 */
 };
 
 unsigned char *mkdfu(int dfu_type, char *dfu_arg, int* dfu_size,
                                 char* errstr, int errstrsize);
+unsigned char *mkdfu_n4g(char *filename, int *dfu_size,
+                                char* errstr, int errstrsize);
 
 int ipoddfu_send(int pid, unsigned char *buf, int size,
+                                char* errstr, int errstrsize);
+int ipoddfu_send_n4g(int pid, unsigned char *buf, int size,
                                 char* errstr, int errstrsize);
 int ipoddfu_scan(int pid, int *state, int reset,
                                 char* errstr, int errstrsize);

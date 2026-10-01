@@ -159,6 +159,7 @@ struct usbStatusData {
  * DFU API
  */
 #define DFU_PKT_SZ  2048    /* must be pow2 <= wTransferSize (2048) */
+#define DFU_PKT_SZ_V2 1024   /* S5L8720 DFU protocol */
 
 /* DFU 1.1 specs */
 typedef enum {
@@ -900,7 +901,8 @@ static struct dfuDev *dfuapi_create(void)
  * app level functions
  */
 static int ipoddfu_download_file(struct dfuDev* dfuh,
-                            unsigned char *data, unsigned long size)
+                            unsigned char *data, unsigned long size,
+                            unsigned int packet_size)
 {
     unsigned int blknum, len, remaining;
     int poll_tmo;
@@ -919,9 +921,9 @@ static int ipoddfu_download_file(struct dfuDev* dfuh,
     remaining = size;
     while (remaining)
     {
-        len = (remaining < DFU_PKT_SZ) ? remaining : DFU_PKT_SZ;
+        len = (remaining < packet_size) ? remaining : packet_size;
 
-        if (dfuapi_send_packet(dfuh, blknum, len, data + blknum*DFU_PKT_SZ,
+        if (dfuapi_send_packet(dfuh, blknum, len, data + blknum*packet_size,
                     &status, &poll_tmo, &state, NULL) != DFUAPISuccess)
             goto error;
 
@@ -977,41 +979,85 @@ error:
     return 0;
 }
 
+#define N4G_DFU_PID             0x1225
+
 /* exported functions */
 int ipoddfu_send(int pid, unsigned char *data, int size,
                             char* errstr, int errstrsize)
 {
     struct dfuDev *dfuh;
-    unsigned char *buf;
+    unsigned char *buf = NULL;
     uint32_t checksum;
     int ret = 1; /* ok */
 
     dfuh = dfuapi_create();
 
-    buf = malloc(size+4);
-    if (!buf) {
-        dfuapi_set_err(dfuh, "Could not allocate memory for DFU buffer");
+    if (size < 4 || memcmp(data, IM3_IDENT, 4)) {
+        dfuapi_set_err(dfuh, "Bad DFU image data");
         goto error;
     }
 
-    if (memcmp(data, IM3_IDENT, 4)) {
-        dfuapi_set_err(dfuh, "Bad DFU image data");
+    buf = malloc(size + 4);
+    if (!buf) {
+        dfuapi_set_err(dfuh, "Could not allocate memory for DFU buffer");
         goto error;
     }
 
     crc32_init();
     checksum = crc32(data, size, 0);
     memcpy(buf, data, size);
-    put_uint32le(buf+size, ~checksum);
+    put_uint32le(buf + size, ~checksum);
 
     if (dfuapi_open(dfuh, pid) != DFUAPISuccess)
         goto error;
 
-    if (!ipoddfu_download_file(dfuh, buf, size+4))
+    if (!ipoddfu_download_file(dfuh, buf, size + 4, DFU_PKT_SZ))
         goto error;
 
 bye:
     if (buf) free(buf);
+    dfuapi_destroy(dfuh);
+    return ret;
+
+error:
+    ret = 0;
+    if (errstr)
+        snprintf(errstr, errstrsize, "[ERR] %s", dfuh->err);
+    goto bye;
+}
+
+/*
+ * Nano 4G DFU is protocol version 2: no CRC trailer, 1024-byte packets.
+ * The certificate inside the image is what the BootROM executes, so the
+ * transfer is a normal download on every host.
+ */
+int ipoddfu_send_n4g(int pid, unsigned char *data, int size,
+                            char* errstr, int errstrsize)
+{
+    struct dfuDev *dfuh;
+    int ret = 1; /* ok */
+
+    dfuh = dfuapi_create();
+
+    if (size < 4 || memcmp(data, IMG1_IDENT, 4)) {
+        dfuapi_set_err(dfuh, "Bad Nano 4G IMG1 data");
+        goto error;
+    }
+
+    if (!pid)
+        pid = N4G_DFU_PID;
+    if (dfuapi_open(dfuh, pid) != DFUAPISuccess)
+        goto error;
+
+    if (dfuh->found_pid != N4G_DFU_PID) {
+        dfuapi_set_err(dfuh, "Nano 4G image requires USB PID 1225");
+        goto error;
+    }
+
+    if (!ipoddfu_download_file(dfuh, data, size, DFU_PKT_SZ_V2))
+        goto error;
+
+bye:
     dfuapi_destroy(dfuh);
     return ret;
 

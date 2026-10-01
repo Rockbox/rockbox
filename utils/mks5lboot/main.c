@@ -112,6 +112,7 @@ static void usage(void)
     "            --mkdfu-inst <bootloader.ipod> <outfile.dfu> [--single]\n"
     "            --mkdfu-uninst <platform> <outfile.dfu>\n"
     "            --mkdfu-raw <filename.bin> <outfile.dfu>\n"
+    "            --mkdfu-n4g <bootloader.bin> <outfile.img1>\n"
     "\n"
     "Commands:\n"
     "  --bl-inst    Install file <bootloader.ipod> into an iPod device\n"
@@ -131,6 +132,9 @@ static void usage(void)
     "                  code, save it ass <outfile.dfu>. <infile.bin>\n"
     "                  is the code you want to run, it is loaded at\n"
     "                  address 0x%08x and executed.\n"
+    "  --mkdfu-n4g     Build a Nano 4G IMG1 from <bootloader.bin>. The\n"
+    "                  certificate is the S5L8720 Pwnage chain and the\n"
+    "                  entry PC is 0x22000000. Save it as <outfile.img1>.\n"
     "\n"
     "  <bootloader.ipod> is the rockbox bootloader that you want to\n"
     "  install (previously scrambled with tools/scramble utility).\n"
@@ -172,6 +176,7 @@ int main(int argc, char* argv[])
     char errstr[200];
     unsigned char *dfubuf;
     int dfusize;
+    int sent;
 
     fprintf(stderr,
 #if defined(WIN32) && defined(USE_LIBUSBAPI)
@@ -199,6 +204,7 @@ int main(int argc, char* argv[])
             if      (!strcmp(*argv+7, "-inst"))   dfu_type = DFU_INST;
             else if (!strcmp(*argv+7, "-uninst")) dfu_type = DFU_UNINST;
             else if (!strcmp(*argv+7, "-raw"))    dfu_type = DFU_RAW;
+            else if (!strcmp(*argv+7, "-n4g"))    dfu_type = DFU_N4G;
             else usage();
             if (!--argc) usage();
             dfu_arg = *++argv;
@@ -271,6 +277,8 @@ int main(int argc, char* argv[])
 
     if (dfuinfile)
         dfubuf = read_file(dfuinfile, &dfusize, errstr, sizeof(errstr));
+    else if (dfu_type == DFU_N4G)
+        dfubuf = mkdfu_n4g(dfu_arg, &dfusize, errstr, sizeof(errstr));
     else
         dfubuf = mkdfu(dfu_type, dfu_arg, &dfusize, errstr, sizeof(errstr));
 
@@ -284,7 +292,14 @@ int main(int argc, char* argv[])
         }
     }
     else {
-        if (ipoddfu_send(pid, dfubuf, dfusize, errstr, sizeof(errstr))) {
+        if (dfusize >= 4 && !memcmp(dfubuf, IMG1_IDENT, 4))
+            sent = ipoddfu_send_n4g(pid, dfubuf, dfusize,
+                                    errstr, sizeof(errstr));
+        else
+            sent = ipoddfu_send(pid, dfubuf, dfusize,
+                                errstr, sizeof(errstr));
+
+        if (sent) {
             printf("[INFO] DFU image sent successfully (%d bytes)\n", dfusize);
             exit(0);
         }
