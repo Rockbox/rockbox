@@ -3050,7 +3050,7 @@ fi
     output="rockbox.rkw"
     bootoutput="bootloader.rkw"
     appextra=""
-    plugins=""
+    plugins="yes"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset="$genericbitmaptools"
