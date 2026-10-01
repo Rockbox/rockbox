@@ -112,6 +112,14 @@ int flash_copy_meta(uint32_t src, uint32_t dst, unsigned n,
 /* Program metadata byte 1 as given rather than 0x00. */
 void flash_set_meta_passthrough(bool on);
 
+/* The BCH strength of the FTL's area: t = 8 (the default) or 14, the
+ * controller's BCH_T14 mode. flash_read_raw() always reads t=8, as the
+ * boot area is on every device seen. Writing is refused in t=14 mode: its
+ * sectors are 538-byte records on the media (3 + 23 spare bytes), and
+ * programming them has not been tried.
+ * Returns 0, or 1 for an unsupported t. */
+int flash_set_ecc(unsigned t);
+
 /* Read one PHYSICAL sector, bypassing the super-block view: for the boot
  * area, which the boot ROM addresses physically. */
 int flash_read_raw(uint32_t raw_sec, void *data, void *meta);

@@ -77,6 +77,7 @@ static struct flash_geometry geo;
 static bool ready;
 static bool writable;
 static bool meta_passthrough;
+static uint32_t ecc_mode;               /* BCHCTL mode bits: 0 or BCH_T14 */
 static uint32_t boot_area = UINT32_MAX;
 static struct flash_stats stats;
 
@@ -133,6 +134,25 @@ void flash_set_boot_area(uint32_t sectors)
 void flash_set_meta_passthrough(bool on)
 {
     meta_passthrough = on;
+}
+
+int flash_set_ecc(unsigned t)
+{
+    int ret = 0;
+
+    if (t == 8)
+    {
+        ecc_mode = 0;
+    }
+    else if (t == 14)
+    {
+        ecc_mode = BCH_T14;
+    }
+    else
+    {
+        ret = 1;
+    }
+    return ret;
 }
 
 void flash_get_stats(struct flash_stats *out)
@@ -208,8 +228,9 @@ static void send_row(uint32_t row)
     FLASH_ADDR(0) = (row >> 16) & 0xff;
 }
 
-/* Latch raw page `row` in the chip and prepare the ECC engine to decode. */
-static void latch_page(uint32_t row)
+/* Latch raw page `row` in the chip and prepare the ECC engine to decode in
+ * `mode` (BCHCTL mode bits). */
+static void latch_page(uint32_t row, uint32_t mode)
 {
     flash_chip_select(0);
     wait_flash_ready();
@@ -222,8 +243,7 @@ static void latch_page(uint32_t row)
 
     wait_flash_ready();
 
-    /* ECC on, t=8 - right for the whole chip on the devices seen */
-    BCHCTL = BCH_RST;
+    BCHCTL = BCH_RST | mode;
 }
 
 /* Transfer the next sector of the latched page through slot `slot` & 3.
@@ -256,12 +276,12 @@ static uint32_t read_next_sector(uint32_t slot, uint8_t *data, uint8_t *meta)
 /* Read sectors [first, first + n) of raw page `row`. Returns 1 if any was
  * uncorrectable. */
 static int read_raw_run(uint32_t row, uint32_t first, uint32_t n,
-                        uint8_t *data, uint8_t *meta)
+                        uint8_t *data, uint8_t *meta, uint32_t mode)
 {
     uint32_t j;
     int uncorrectable = 0;
 
-    latch_page(row);
+    latch_page(row, mode);
 
     for (j = 0; j < first + n; j++)
     {
@@ -296,8 +316,10 @@ int flash_read_raw(uint32_t raw_sec, void *data, void *meta)
 
     if (ready && raw_sec < geo.total_sectors)
     {
+        /* the boot area is t=8 on every device seen, whatever the FTL
+         * area uses */
         ret = read_raw_run(raw_sec / geo.sec_per_page_raw,
-                           raw_sec % geo.sec_per_page_raw, 1, data, meta);
+                           raw_sec % geo.sec_per_page_raw, 1, data, meta, 0);
     }
     return ret;
 }
@@ -324,7 +346,7 @@ int flash_read(uint32_t sec, void *data, void *meta, unsigned n)
         if (read_raw_run(raw / geo.sec_per_page_raw,
                          raw % geo.sec_per_page_raw, 1,
                          d ? d + (size_t)i * FLASH_SECTOR_SIZE : NULL,
-                         m ? m + (size_t)i * FLASH_META_SIZE : NULL))
+                         m ? m + (size_t)i * FLASH_META_SIZE : NULL, ecc_mode))
         {
             ret = 1;
         }
@@ -334,9 +356,13 @@ int flash_read(uint32_t sec, void *data, void *meta, unsigned n)
 
 /* ---- writing ---- */
 
+/* A write is refused in t=14 mode too: a t=14 sector is a 538-byte record
+ * on the media - 512 data, 3 metadata, 23 parity - where the program path
+ * below addresses 528-byte records, and programming in that mode has not
+ * been tried. */
 static bool write_refused(void)
 {
-    bool refused = !ready || !writable;
+    bool refused = !ready || !writable || ecc_mode != 0;
 
     if (refused)
     {
@@ -620,7 +646,8 @@ static int copy_sectors(uint32_t src, uint32_t dst, unsigned n,
                 if (read_raw_run(raw / geo.sec_per_page_raw, first, run,
                                  buf + (size_t)i * FLASH_SECTOR_SIZE,
                                  how == COPY_META_KEEP ?
-                                     meta + (size_t)i * FLASH_META_SIZE : NULL))
+                                     meta + (size_t)i * FLASH_META_SIZE : NULL,
+                                 ecc_mode))
                 {
                     stats.copy_uncorrectable++;
                 }
