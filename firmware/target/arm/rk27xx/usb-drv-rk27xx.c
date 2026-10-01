@@ -687,6 +687,11 @@ void usb_drv_init(void)
 {
     udc_reset_semaphores();
     tick_add_task(udc_tick);
+
+    /* enable USB interrupts in interrupt controller - here, as
+     * usb_drv_exit() disables them at every disconnect */
+    INTC_IMR |= IRQ_ARM_UDC;
+    INTC_IECR |= IRQ_ARM_UDC;
 }
 
 /* Present ourselves to the host. Called by usb_enable() once usb_core_init()
