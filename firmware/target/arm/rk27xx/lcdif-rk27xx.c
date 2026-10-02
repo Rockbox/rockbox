@@ -95,6 +95,19 @@ static void lcdctrl_buff_setup(int width, int height)
     LINE3_UVADDR = LINE3_YADDR + 1;
 }
 
+/* CSn/WEn/RDn timings in MCU mode, in AHB clocks: csrw (bits 9-7), rwpw
+ * (6-3), rwcs (2-0). csrw 1, rwpw 4, rwcs 1 makes a 120 ns write cycle at
+ * the 50 MHz bus clock, but 60 ns at the boosted 100 MHz - too fast for
+ * the panel: stray pixels, and partial updates landing in the wrong place.
+ * Twice the clocks keep it 120 ns there. */
+#define LCD_TIMING_50MHZ    ((1<<7) | (4<<3) | 1)
+#define LCD_TIMING_100MHZ   ((2<<7) | (8<<3) | 2)
+
+void lcdif_set_bus_timing(bool boosted)
+{
+    VERT_PERIOD = boosted ? LCD_TIMING_100MHZ : LCD_TIMING_50MHZ;
+}
+
 static void lcdctrl_init(void)
 {
     int i;
@@ -107,7 +120,9 @@ static void lcdctrl_init(void)
     LCDC_CTRL = ALPHA(7) | LCDC_STOP | LCDC_MCU | RGB24B;
     MCU_CTRL = ALPHA_BASE(0x3f) | MCU_CTRL_BYPASS;
 
-    VERT_PERIOD = (1<<7)|(1<<5)|1;  /* CSn/WEn/RDn signal timings */
+    /* for the clock running now: the firmware boosts before lcd_init(),
+     * and the bootloader runs at crt0's, which is CPUFREQ_MAX */
+    lcdif_set_bus_timing(cpu_frequency == CPUFREQ_MAX);
 
     lcd_display_init();
     lcdctrl_bypass(0);

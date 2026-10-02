@@ -23,6 +23,7 @@
 #include "panic.h"
 #include "button.h"
 #include "system-target.h"
+#include "lcdif-rk27xx.h"
 
 #define default_interrupt(name) \
   extern __attribute__((weak,alias("UIRQ"))) void name (void)
@@ -249,6 +250,9 @@ void set_cpu_frequency(long frequency)
 
     if (frequency == CPUFREQ_MAX)
     {
+        /* the LCD strobes take twice the clocks at twice the clock */
+        lcdif_set_bus_timing(true);
+
         /* PLL set to 200 Mhz
          * PLL:ARM = 1:1
          * ARM:AHB = 2:1
@@ -282,6 +286,8 @@ void set_cpu_frequency(long frequency)
         SCU_DIVCON1 &= ~1;
 
         set_sdram_timing(CPUFREQ_NORMAL);
+
+        lcdif_set_bus_timing(false);
     }
 
     cpu_frequency = frequency;
