@@ -340,7 +340,9 @@ static int decode_subframe_lpc(FLACContext *s, int32_t* decoded, int pred_order,
     if (decode_residuals(s, decoded, pred_order) < 0)
         return -8;
 
-    if ((s->bps + coeff_prec + av_log2(pred_order)) <= 32) {
+    /* bps is this subframe's width, one more than the stream's on a side
+       channel, and it is what decides whether the sum fits in 32 bits. */
+    if ((bps + coeff_prec + av_log2(pred_order)) <= 32) {
         #if defined(CPU_COLDFIRE)
         (void)sum;
         lpc_decode_emac(s->blocksize - pred_order, qlevel, pred_order,
@@ -378,7 +380,7 @@ static int decode_subframe_lpc(FLACContext *s, int32_t* decoded, int pred_order,
         flac_lpc_32_c(decoded, coeffs, pred_order, qlevel, s->blocksize);
         #endif
 
-        if (bps <= 16)
+        if (s->bps <= 16)
             lpc_analyze_remodulate(decoded, coeffs, pred_order, qlevel, s->blocksize, bps);
         #endif
     }
