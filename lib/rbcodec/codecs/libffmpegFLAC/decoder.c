@@ -181,7 +181,7 @@ static int decode_residuals(FLACContext *s, int32_t *decoded, int pred_order)
                 /* The assembly decodes the common case and falls through
                    anything it does not handle. Every unusual code still goes
                    through the C reader, and k <= 17 keeps a code inside the
-                   25 bits one refill guarantees. */
+                   window the assembly reads. */
                 if (tmp <= 17) {
                     int got = flac_rice_decode_arm(decoded, samples - i, tmp,
                                                    &gb);

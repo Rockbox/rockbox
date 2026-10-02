@@ -839,62 +839,66 @@ flac_lpc_32_arm_narrow:
        99.91% to 99.97% of residuals qualify; the distribution is 43% zero,
        74% one or fewer, 96% three or fewer.
      - k must be 17 or less, which the caller checks once per partition.  With
-       both, a code is at most 25 bits, so one refill to 25 bits serves any
-       single residual.
+       both, a code is at most 25 bits, and the window always holds more.
      - it stops rather than read past buffer_end.
+
+   The cache is two whole words of the stream and a bit position in the
+   first.  Each residual reads a 32-bit window at that position and adds the
+   code's length to it; nothing is shifted along.  Once the position passes
+   32 the second word becomes the first and the next word is loaded, so the
+   position is 0-31 at every decode and the window has more than 32 bits.
 
    Registers through the loop:
 
      r0 out      r1 residuals left   r2 k          r3 scratch
-     r4 cache high   r5 cache low    r6 valid bits (0..64)
-     r7 word pointer, aligned        r8 leading-zero table
+     r4 first word   r5 second word  r6 bit position in r4
+     r7 next word to load, aligned   r8 leading-zero table
      r9 31-k     r10 k+1             r11 buffer_end-4    ip, lr scratch
  */
 
-/* One residual: the unary run, the k bits after it, the sign folded back
-   out, and the cache advanced past the code.  Bails to \bail if the run is
-   longer than 7, leaving the code for C. */
+/* One residual: the 32-bit window at the bit position, its unary run, the
+   k bits after it, the sign folded back out, and the position moved past the
+   code.  Bails to \bail if the run is longer than 7, leaving it for C. */
 .macro RICE_DECODE bail
+    rsb     r3, r6, #32
+    mov     ip, r4, lsl r6
+    orr     ip, ip, r5, lsr r3        @ a shift by 32 gives 0, so r6 = 0 works
 #if ARM_ARCH >= 5
-    clz     lr, r4                    @ leading zeros, the unary run
+    clz     lr, ip                    @ leading zeros, the unary run
 #else
-    mov     ip, r4, lsr #24
-    ldrb    lr, [r8, ip]              @ 8 means "8 or more": bail
+    mov     lr, ip, lsr #24
+    ldrb    lr, [r8, lr]              @ 8 means "8 or more": bail
 #endif
     cmp     lr, #7
     bhi     \bail
-    rsb     ip, lr, r9                @ 31 - k - z
-    mov     ip, r4, lsr ip            @ the 1 bit, then the k low bits
-    sub     r3, lr, #1
-    add     ip, ip, r3, lsl r2        @ + (z-1) << k  == quotient<<k | rest
-    movs    ip, ip, lsr #1            @ fold the sign back out: halve, and
-    mvncs   ip, ip                    @ complement if the low bit was set
-    str     ip, [r0], #4              @ z<=7 and k<=17 bound the code at 2^20,
+    rsb     r3, lr, r9                @ 31 - k - z
+    mov     r3, ip, lsr r3            @ the 1 bit, then the k low bits
+    sub     ip, lr, #1
+    add     r3, r3, ip, lsl r2        @ + (z-1) << k  == quotient<<k | rest
+    movs    r3, r3, lsr #1            @ fold the sign back out: halve, and
+    mvncs   r3, r3                    @ complement if the low bit was set
+    str     r3, [r0], #4              @ z<=7 and k<=17 bound the code at 2^20,
                                       @ so the 0x80000000 the caller rejects
                                       @ cannot arise here
     add     lr, lr, r10               @ bits this code used: z + 1 + k
-    rsb     ip, lr, #32
-    mov     r4, r4, lsl lr
-    orr     r4, r4, r5, lsr ip
-    mov     r5, r5, lsl lr
-    sub     r6, r6, lr
+    add     r6, r6, lr
 .endm
 
-/* One aligned word into the back of the cache, big-endian.  r6 <= 32 on
-   entry, so the word splits between the two halves; a register shift by 32
-   yields zero on ARM, which covers both ends of that range. */
+/* A word as loaded, little-endian, into stream order. */
+.macro RICE_BSWAP reg, tmp
+    eor     \tmp, \reg, \reg, ror #16
+    bic     \tmp, \tmp, #0xff0000
+    mov     \reg, \reg, ror #8
+    eor     \reg, \reg, \tmp, lsr #8
+.endm
+
+/* The position has passed 32: the second word becomes the first, and the
+   next word is loaded behind it. */
 .macro RICE_FILL
-    ldr     ip, [r7], #4
-    eor     r3, ip, ip, ror #16
-    bic     r3, r3, #0xff0000
-    mov     ip, ip, ror #8
-    eor     ip, ip, r3, lsr #8
-    mov     r3, ip, lsr r6
-    orr     r4, r4, r3
-    rsb     r3, r6, #32
-    mov     r3, ip, lsl r3
-    orr     r5, r5, r3
-    add     r6, r6, #32
+    mov     r4, r5
+    ldr     r5, [r7], #4
+    sub     r6, r6, #32
+    RICE_BSWAP r5, r3
 .endm
 
 /* This lives in DRAM by default: the PP502x codec IRAM window has no room
@@ -911,9 +915,8 @@ flac_rice_decode_arm:
     stmfd   sp!, { r4-r11, lr }
     subs    r1, r1, #0
     ble     .Lr_none
-    cmp     r2, #17                   @ above this a code can exceed the 25
-    bhi     .Lr_none                  @ bits one refill guarantees; the caller
-                                      @ checks too, but do not depend on it
+    cmp     r2, #17                   @ above this, leave it to C; the caller
+    bhi     .Lr_none                  @ checks too, but do not depend on it
     ldr     r12, [r3, #8]             @ gb->index, in bits
     ldr     lr, [r3]                  @ gb->buffer
     stmfd   sp!, { r1, r3, lr }       @ n, gb, buffer
@@ -923,46 +926,36 @@ flac_rice_decode_arm:
     add     r7, lr, r12, lsr #3       @ byte holding the next bit
     and     r3, r7, #3                @ ... and how far into its word it is
     bic     r7, r7, #3
-    and     r9, r12, #7               @ (r9, not ip: the refill uses ip)
-    add     r9, r9, r3, lsl #3        @ bit offset within that word
-    add     r3, r7, #4                @ both of the fills below must fit
-    cmp     r3, r11                   @ inside the buffer, and until the
-    bhi     .Lr_abort                 @ discard below they leave gb->index
-                                      @ inconsistent, so leave it untouched
-    mov     r4, #0                    @ cache empty; the two refills fill it
-    mov     r5, #0                    @ and the shift then drops the bits
-    mov     r6, #0                    @ that precede the starting position
-    bl      .Lr_fill
-    bl      .Lr_fill
-    rsb     r3, r9, #32               @ drop r9 bits from the front
-    mov     r4, r4, lsl r9
-    orr     r4, r4, r5, lsr r3
-    mov     r5, r5, lsl r9
-    sub     r6, r6, r9
+    and     r6, r12, #7
+    add     r6, r6, r3, lsl #3        @ bit position within that word
+    add     r3, r7, #4                @ both words must lie inside the buffer
+    cmp     r3, r11
+    bhi     .Lr_abort
+    ldr     r4, [r7], #4
+    ldr     r5, [r7], #4
+    RICE_BSWAP r4, r3
+    RICE_BSWAP r5, r3
 
     rsb     r9, r2, #31               @ 31-k
     add     r10, r2, #1               @ k+1
 #if ARM_ARCH < 5
     adr     r8, .Lr_lztab
 #endif
-    cmp     r6, #25
-    blt     .Lr_done                  @ not enough data to start
 
 .Lr_pair:
     /* Two residuals per pass, so the count and the loop branch are paid once
-       per pair.  r1 counts what is left after the pair in hand.  A pass
-       starts with at least 25 valid bits, enough for any one code, and the
-       bit level is checked again between the two, since a cache refilled a
-       word at a time only ever guarantees 33. */
+       per pair.  r1 counts what is left after the pair in hand.  The position
+       is checked between the two as well as after them: one code can carry
+       it past 32, and the window is only good below that. */
     subs    r1, r1, #2
     blt     .Lr_last                  @ one or none left
     RICE_DECODE .Lr_bail2
-    cmp     r6, #25
-    blt     .Lr_fill1                 @ the less common case, out of line
+    cmp     r6, #32
+    bhs     .Lr_fill1                 @ the less common case, out of line
 .Lr_second:
     RICE_DECODE .Lr_bail1
-    cmp     r6, #25
-    bge     .Lr_pair
+    cmp     r6, #32
+    blo     .Lr_pair
     cmp     r7, r11                   @ refill, if there is a word to read
     bhi     .Lr_done
     RICE_FILL
@@ -987,9 +980,10 @@ flac_rice_decode_arm:
 
 .Lr_done:
     ldmfd   sp!, { r2, r3, lr }       @ n, gb, buffer
-    sub     r0, r7, lr                @ bits consumed = 8*(wp-buffer) - valid
-    mov     r0, r0, lsl #3
-    sub     r0, r0, r6
+    sub     r0, r7, lr                @ r4 was loaded from r7 - 8, so the
+    mov     r0, r0, lsl #3            @ index is 8*(r7-buffer) - 64 + r6
+    sub     r0, r0, #64
+    add     r0, r0, r6
     str     r0, [r3, #8]              @ gb->index
     sub     r0, r2, r1                @ residuals decoded
     ldmpc   regs=r4-r11
@@ -998,11 +992,6 @@ flac_rice_decode_arm:
 .Lr_none:
     mov     r0, #0
     ldmpc   regs=r4-r11
-
-    /* RICE_FILL as a subroutine, for the two fills at entry. */
-.Lr_fill:
-    RICE_FILL
-    bx      lr
 
 #if ARM_ARCH < 5
 .Lr_lztab:
