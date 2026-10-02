@@ -305,8 +305,11 @@ void lcd_update_rect(int x, int y, int width, int height)
     /* Setup buffered writes to lcd controler */
     MCU_CTRL = MCU_CTRL_RS_HIGH|MCU_CTRL_BUFF_WRITE|MCU_CTRL_BUFF_START;
 
-    /* Wait for DMA transfer to finish */
-    while (DWDMA_CTL_L(0) & (1<<27));
+    /* Wait for the DMA transfer to finish: the channel disables itself
+     * after its last block. CTL_L's LLP_DST_EN (bit 27) is no measure -
+     * it clears as soon as the last block is loaded, while that block
+     * still runs. */
+    while (DWDMA_DMA_CHEN & (1<<0));
 }
 
 void lcd_update()
