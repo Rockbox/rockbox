@@ -318,8 +318,9 @@ bool settings_load_config(const char* file, bool apply)
             if (checkwps_loader(value + 1, 2))
                 return false;
         }
+        else
 #endif
-        else if (!strcmp(name, "wps"))
+        if (!strcmp(name, "wps"))
         {
             if (value[0] != '-')
                 if (checkwps_loader(value + 1, 2))
