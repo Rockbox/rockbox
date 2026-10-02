@@ -134,6 +134,17 @@ static int get_crc8(const uint8_t *buf, int count)
     return crc;
 }
 
+/* Escaped partitions are rare, so their reader stays out of IRAM. A width of
+   0 means all residuals are zero, and a width can reach 31, beyond the 25
+   bits get_sbits() can read. */
+static NO_INLINE int32_t *decode_escaped(GetBitContext *gb, int32_t *decoded,
+                                         int count, int width)
+{
+    while (count--)
+        *decoded++ = width ? get_sbits_long(gb, width) : 0;
+    return decoded;
+}
+
 static int decode_residuals(FLACContext *s, int32_t* decoded, int pred_order) ICODE_ATTR_FLAC;
 static int decode_residuals(FLACContext *s, int32_t *decoded, int pred_order)
 {
@@ -161,9 +172,7 @@ static int decode_residuals(FLACContext *s, int32_t *decoded, int pred_order)
         tmp = get_bits(&gb, rice_bits);
         if (tmp == rice_esc) {
             tmp = get_bits(&gb, 5);
-            /* An escape width of 0 means all residuals are zero. */
-            for (; i < samples; i++)
-                *decoded++ = tmp ? get_sbits(&gb, tmp) : 0;
+            decoded = decode_escaped(&gb, decoded, samples - i, tmp);
         } else {
             unsigned lim = tmp ? (UINT_MAX >> tmp) + 2 : INT_MAX;
             int real_limit = lim > INT_MAX ? INT_MAX : lim;
