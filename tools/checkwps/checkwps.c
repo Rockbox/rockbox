@@ -230,58 +230,97 @@ bool radio_hardware_present(void)
 
 static int loaded_fonts = 0;
 static struct font _font;
-int checkwps_loader(const char *path, int mode)
+
+/* mode 0 is for fonts in the WPS
+   mode 1 is for fonts in the cfg file
+   mode 2 is everything else in the cfg file
+
+   search is an optional location to search for relative paths
+*/
+static int checkwps_loader(const char *path, const char *search, int mode)
 {
+    if (!path)
+        return -1;
+    if (!path[0])
+        return mode? 0 : -2;  /* Empty is ok for non-WPS */
+    if (path[0] == '-' && !path[1])
+        return mode? 0 : -3;  /* Also ok for non-WPS */
+    if (path[0] == '/')
+        path++;  /* Absolute path, skip leading / */
+
     /* First see if it exists in the theme */
     int fd = open(path, O_RDONLY);
+    if (fd >= 0)
+        goto done;
 
-    if (fd < 0) {
+    {
         char buf[1024];
-        if (mode)
-            sprintf(buf, "%s", path);
-        else
+        if (!mode) {
             sprintf(buf, ".rockbox/%s", path);
-        fd = open(buf, O_RDONLY);
-        if (fd < 0) {
+            fd = open(buf, O_RDONLY);
+            if (fd >= 0)
+                goto done;
+        }
+
+        if (search)
+        {
+            sprintf(buf, ".rockbox/%s/%s", search, path);
+            fd = open(buf, O_RDONLY);
+            if (fd >= 0)
+                goto done;
+        }
+
+        if (mode == 0 || mode == 1) /* not found and it's a font */
+        {
             char *first = strrchr(buf, '/');
             char *final = strrchr(buf, '.');
-            if (final) *final = 0;
             int missing = 1;
+            if (final) *final = 0;
 
             /* Check if font is included in the bundle */
-            for (int i = 0 ; bundledfonts[i] != NULL ; i++) {
-                if (first && !strcmp(first+1, bundledfonts[i])) {
+            for (int i = 0 ; bundledfonts[i] != NULL ; i++)
+            {
+                if (first && !strcmp(first+1, bundledfonts[i]))
+                {
                     missing = 0;
                     break;
                 }
             }
-            if (missing) {
-                if (mode == 2) {
-                    printf("ERROR: File missing: %s\n", path);
-                    return -2;
-                } else {
-                    printf("Font missing >%s<\n", first+1);
-                    return -1;
-                }
+
+            if (missing)
+            {
+                printf("Font missing >%s<\n", first+1);
+                return -4;
             } else {
                 printf("INFO: Theme requires rockbox font bundle\n");
             }
         }
+
+        if (mode == 2)
+        {
+            printf("ERROR: File missing: %s\n", path);
+            return -5;
+        }
     }
+
+done:
     if (fd >= 0)
         close(fd);
 
-    if (mode)
-        return 0;
-
-    int id = 2 + loaded_fonts;
-    loaded_fonts++;
-    return id;
+    return 0;
 }
+
 int font_load(const char *path)
 {
-    return checkwps_loader(path, 0);
+    int rval = checkwps_loader(path, FONT_DIR, 0);
+    if (rval)
+        return rval;
+
+    rval = 2 + loaded_fonts;
+    loaded_fonts++;
+    return rval;
 }
+
 void font_unload(int font_id)
 {
     (void)font_id;
@@ -306,57 +345,75 @@ bool settings_load_config(const char* file, bool apply)
         char *name, *value;
         if (!settings_parseline(line, &name, &value))
             continue;
-
-        if (!strcmp(name, "font")) {
-            if (checkwps_loader(value + 1, 1))
+        if (!strcmp(name, "font"))
+        {
+            if (checkwps_loader(value, FONT_DIR, 1))
+                return false;
+        }
+#ifdef HAVE_REMOTE_LCD
+        if (!strcmp(name, "remote font"))
+        {
+            if (checkwps_loader(value, FONT_DIR, 1))
                 return false;
         }
         else
-#if LCD_DEPTH > 1 || LCD_REMOTE_DEPTH > 1
+#endif
+#if LCD_DEPTH > 1
         if (!strcmp(name, "backdrop"))
         {
-            if (value[0] != '-')
-                if (checkwps_loader(value + 1, 2))
-                    return false;
+            if (checkwps_loader(value, NULL, 2)) /* No default path */
+                return false;
         }
         else
 #endif
         if (!strcmp(name, "wps"))
         {
-            if (value[0] != '-')
-                if (checkwps_loader(value + 1, 2))
-                    return false;
+            if (checkwps_loader(value, WPS_DIR, 2))
+                return false;
         }
         else if (!strcmp(name, "sbs"))
         {
-            if (value[0] != '-')
-                if (checkwps_loader(value + 1, 2))
-                    return false;
+            if (checkwps_loader(value, SBS_DIR, 2))
+                return false;
         }
         else if (!strcmp(name, "fms"))
         {
-            if (value[0] != '-')
-                if (checkwps_loader(value + 1, 2))
-                    return false;
+            if (checkwps_loader(value, SBS_DIR, 2))
+                return false;
         }
         else if (!strcmp(name, "rwps"))
         {
-            if (value[0] != '-')
-                if (checkwps_loader(value + 1, 2))
-                    return false;
+            if (checkwps_loader(value, WPS_DIR, 2))
+                return false;
         }
         else if (!strcmp(name, "rsbs"))
         {
-            if (value[0] != '-')
-                if (checkwps_loader(value + 1, 2))
-                    return false;
+            if (checkwps_loader(value, SBS_DIR, 2))
+                return false;
         }
         else if (!strcmp(name, "rfms"))
         {
-            if (value[0] != '-')
-                if (checkwps_loader(value + 1, 2))
-                    return false;
+            if (checkwps_loader(value, SBS_DIR, 2))
+                return false;
         }
+        else if (!strcmp(name, "iconset"))
+        {
+            if (checkwps_loader(value, ICON_DIR, 2))
+                return false;
+        }
+        else if (!strcmp(name, "viewers iconset"))
+        {
+            if (checkwps_loader(value, ICON_DIR, 2))
+                return false;
+        }
+#ifdef HAVE_REMOTE_LCD
+        else if (!strcmp(name, "remote iconset"))
+        {
+            if (checkwps_loader(value, ICON_DIR, 2))
+                return false;
+        }
+#endif
+
         if (!string_to_cfg(name, value, &theme_changed))
         {
             if (strcmp(name, "fms") && strcmp(name, "rfms")) {
