@@ -297,6 +297,8 @@ int fast_readline(int fd, char *buf, int buf_size, void *parameters,
     return 0;
 }
 
+#endif /* !defined(__PCTOOL__) */
+
 /* parse a line from a configuration file. the line format is:
 
    name: value
@@ -337,6 +339,8 @@ bool settings_parseline(char* line, char** name, char** value)
 
     return true;
 }
+
+#ifndef __PCTOOL__
 
 static void system_flush(void)
 {

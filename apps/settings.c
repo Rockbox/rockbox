@@ -148,6 +148,8 @@ static void rename_temp_file(const char *tempfile,
 }
 #endif /* ndef ROCKBOX_NO_TEMP_SETTINGS_FILE */
 
+#endif // !__PCTOOL__
+
 const char* setting_get_cfgvals(const struct settings_list *setting)
 {
     if ((setting->flags & F_TABLE_SETTING) == F_TABLE_SETTING)
@@ -163,6 +165,8 @@ const char* setting_get_cfgvals(const struct settings_list *setting)
         return setting->cfg_vals;
     return NULL;
 }
+
+#ifndef __PCTOOL__
 
 /* calculates and stores crc of settings, returns true if settings have changed */
 static bool settings_crc_changed(void)
@@ -210,6 +214,8 @@ void settings_load(void)
     /* set initial CRC value - settings_save checks, if changed writes to disk */
     settings_crc_changed();
 }
+
+#endif // !__PCTOOL__
 
 bool cfg_string_to_int(const struct settings_list *setting, int* out, const char* str)
 {
@@ -396,6 +402,7 @@ bool string_to_cfg(const char *name, char* value, bool *theme_changed)
     return true;
 }
 
+#ifndef __PCTOOL__
 bool settings_load_config(const char* file, bool apply)
 {
     logf("%s()\r\n", __func__);
