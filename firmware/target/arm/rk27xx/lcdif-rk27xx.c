@@ -258,6 +258,27 @@ void lcd_update_rect(int x, int y, int width, int height)
 {
     int x_end, y_end, x_align, y_align;
 
+    /* Clip to the screen, as other targets do. A rect reaching past it
+     * set a GRAM window off the panel - nothing showed - and built more
+     * DMA descriptors than scr_llp[] holds, overwriting what follows it
+     * in memory: the kernel's queue list among it. */
+    if (x < 0)
+    {
+        width += x;
+        x = 0;
+    }
+    if (y < 0)
+    {
+        height += y;
+        y = 0;
+    }
+    if (width > LCD_WIDTH - x)
+        width = LCD_WIDTH - x;
+    if (height > LCD_HEIGHT - y)
+        height = LCD_HEIGHT - y;
+    if (width <= 0 || height <= 0)
+        return;
+
     /* min alowed transfer seems to be 4x4 pixels */
     x_align = x & 3;
     y_align = y & 3;
