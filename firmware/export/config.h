@@ -329,6 +329,7 @@ Lyre prototype 1 */
 #define NAND_CC      4 /* ChinaChip */
 #define NAND_RK27XX  5
 #define NAND_IMX233  6
+#define NAND_S5L8720 7 /* Apple S5L8720 FMI controller (iPod nano 4G) */
 
 /* CONFIG_RK27XX_FTL: the on-flash format of an rk27xx target's NAND. A
  * target that does not define it builds only the FTL scheme finder. */

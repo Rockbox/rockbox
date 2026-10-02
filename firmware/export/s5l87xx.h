@@ -887,8 +887,9 @@
 #define FMC_BASE 0x3C200000
 #elif CONFIG_CPU==S5L8701
 #define FMC_BASE 0x39400000
-#elif CONFIG_CPU==S5L8702
-/* The first of two controllers; the BootROM addresses the second at +0x400 */
+#elif CONFIG_CPU==S5L8702 || CONFIG_CPU==S5L8720
+/* The first of two controllers; the BootROM addresses the second at +0x400.
+ * S5L8720 uses the same FMI aperture. */
 #define FMC_BASE 0x38a00000
 #endif
 

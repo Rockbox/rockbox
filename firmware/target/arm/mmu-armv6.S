@@ -189,11 +189,9 @@ enable_mmu:
 .endm
 #endif /* CONFIG_CPU == IMX31L */
 
-#if 0 /* unused */
-
 /*
  * Write DCache back to RAM for the given range and remove cache lines
- * from DCache afterwards
+ * from DCache afterwards. NAND DMA on the Nano 4G uses this.
  * void commit_discard_dcache_range(const void *base, unsigned int size);
  */
     .section   .text.commit_discard_dcache_range, "ax", %progbits
@@ -211,8 +209,6 @@ commit_discard_dcache_range:
     mcrhi   p15, 0, r2, c7, c10, 4  @ Data synchronization barrier
     bx      lr                      @
     .size   commit_discard_dcache_range, .-commit_discard_dcache_range
-
-#endif /* unused function */
 
 /*
  * Write DCache back to RAM for the given range
