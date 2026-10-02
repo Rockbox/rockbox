@@ -413,6 +413,13 @@ bool settings_load_config(const char* file, bool apply)
                 return false;
         }
 #endif
+#ifdef HAVE_LCD_COLOR
+        else if (!strcmp(name, "filetype colours"))
+        {
+            if (checkwps_loader(value, THEME_DIR, 2))
+                return false;
+        }
+#endif
 
         if (!string_to_cfg(name, value, &theme_changed))
         {
