@@ -851,9 +851,55 @@ flac_lpc_32_arm_narrow:
      r9 31-k     r10 k+1             r11 buffer_end-4    ip, lr scratch
  */
 
-/* PP502x has 96 bytes of codec IRAM spare, so this lives in DRAM by default;
-   a dense loop like this one is cache-resident in any case (§8).  Define
-   FLAC_RICE_IRAM to move it, once there is room. */
+/* One residual: the unary run, the k bits after it, the sign folded back
+   out, and the cache advanced past the code.  Bails to \bail if the run is
+   longer than 7, leaving the code for C. */
+.macro RICE_DECODE bail
+#if ARM_ARCH >= 5
+    clz     lr, r4                    @ leading zeros, the unary run
+#else
+    mov     ip, r4, lsr #24
+    ldrb    lr, [r8, ip]              @ 8 means "8 or more": bail
+#endif
+    cmp     lr, #7
+    bhi     \bail
+    rsb     ip, lr, r9                @ 31 - k - z
+    mov     ip, r4, lsr ip            @ the 1 bit, then the k low bits
+    sub     r3, lr, #1
+    add     ip, ip, r3, lsl r2        @ + (z-1) << k  == quotient<<k | rest
+    movs    ip, ip, lsr #1            @ fold the sign back out: halve, and
+    mvncs   ip, ip                    @ complement if the low bit was set
+    str     ip, [r0], #4              @ z<=7 and k<=17 bound the code at 2^20,
+                                      @ so the 0x80000000 the caller rejects
+                                      @ cannot arise here
+    add     lr, lr, r10               @ bits this code used: z + 1 + k
+    rsb     ip, lr, #32
+    mov     r4, r4, lsl lr
+    orr     r4, r4, r5, lsr ip
+    mov     r5, r5, lsl lr
+    sub     r6, r6, lr
+.endm
+
+/* One aligned word into the back of the cache, big-endian.  r6 <= 32 on
+   entry, so the word splits between the two halves; a register shift by 32
+   yields zero on ARM, which covers both ends of that range. */
+.macro RICE_FILL
+    ldr     ip, [r7], #4
+    eor     r3, ip, ip, ror #16
+    bic     r3, r3, #0xff0000
+    mov     ip, ip, ror #8
+    eor     ip, ip, r3, lsr #8
+    mov     r3, ip, lsr r6
+    orr     r4, r4, r3
+    rsb     r3, r6, #32
+    mov     r3, ip, lsl r3
+    orr     r5, r5, r3
+    add     r6, r6, #32
+.endm
+
+/* This lives in DRAM by default: the PP502x codec IRAM window has no room
+   for it, and a dense loop like this one is cache-resident in any case (§8).
+   Define FLAC_RICE_IRAM to move it, once there is room. */
 #if defined(USE_IRAM) && defined(FLAC_RICE_IRAM)
     .section .icode,"ax",%progbits
 #else
@@ -902,41 +948,42 @@ flac_rice_decode_arm:
     cmp     r6, #25
     blt     .Lr_done                  @ not enough data to start
 
-.Lr_loop:
-#if ARM_ARCH >= 5
-    clz     lr, r4                    @ leading zeros, the unary run
-#else
-    mov     ip, r4, lsr #24
-    ldrb    lr, [r8, ip]              @ 8 means "8 or more": bail
-#endif
-    cmp     lr, #7
-    bhi     .Lr_done
-    rsb     ip, lr, r9                @ 31 - k - z
-    mov     ip, r4, lsr ip            @ the 1 bit, then the k low bits
-    sub     r3, lr, #1
-    add     ip, ip, r3, lsl r2        @ + (z-1) << k  == quotient<<k | rest
-    and     r3, ip, #1                @ fold the sign back out
-    rsb     r3, r3, #0
-    eor     ip, r3, ip, lsr #1
-    str     ip, [r0], #4              @ z<=7 and k<=17 bound the code at 2^20,
-                                      @ so the 0x80000000 the caller rejects
-                                      @ cannot arise here
-
-    add     lr, lr, r10               @ bits this code used: z + 1 + k
-    rsb     ip, lr, #32
-    mov     r4, r4, lsl lr
-    orr     r4, r4, r5, lsr ip
-    mov     r5, r5, lsl lr
-    subs    r6, r6, lr
-    subs    r1, r1, #1
-    beq     .Lr_done
+.Lr_pair:
+    /* Two residuals per pass, so the count and the loop branch are paid once
+       per pair.  r1 counts what is left after the pair in hand.  A pass
+       starts with at least 25 valid bits, enough for any one code, and the
+       bit level is checked again between the two, since a cache refilled a
+       word at a time only ever guarantees 33. */
+    subs    r1, r1, #2
+    blt     .Lr_last                  @ one or none left
+    RICE_DECODE .Lr_bail2
     cmp     r6, #25
-    bge     .Lr_loop
+    blt     .Lr_fill1                 @ the less common case, out of line
+.Lr_second:
+    RICE_DECODE .Lr_bail1
+    cmp     r6, #25
+    bge     .Lr_pair
     cmp     r7, r11                   @ refill, if there is a word to read
     bhi     .Lr_done
-    bl      .Lr_fill
-    cmp     r6, #25
-    bge     .Lr_loop
+    RICE_FILL
+    b       .Lr_pair
+
+.Lr_fill1:
+    cmp     r7, r11
+    addhi   r1, r1, #1                @ the second of the pair is not done
+    bhi     .Lr_done
+    RICE_FILL
+    b       .Lr_second
+
+.Lr_last:                             @ r1 is -1 with one left, -2 with none
+    adds    r1, r1, #1
+    beq     .Lr_second                @ one: decode it with r1 = 0 after
+    mov     r1, #0
+    b       .Lr_done
+.Lr_bail2:                            @ a run too long for the assembly:
+    add     r1, r1, #1                @ give back the residuals not decoded,
+.Lr_bail1:                            @ both of the pair, or just the second
+    add     r1, r1, #1
 
 .Lr_done:
     ldmfd   sp!, { r2, r3, lr }       @ n, gb, buffer
@@ -952,21 +999,9 @@ flac_rice_decode_arm:
     mov     r0, #0
     ldmpc   regs=r4-r11
 
-    /* One aligned word into the back of the cache, big-endian.  r6 <= 32 on
-       entry, so the word splits between the two halves; a register shift by
-       32 yields zero on ARM, which covers both ends of that range. */
+    /* RICE_FILL as a subroutine, for the two fills at entry. */
 .Lr_fill:
-    ldr     ip, [r7], #4
-    eor     r3, ip, ip, ror #16
-    bic     r3, r3, #0xff0000
-    mov     ip, ip, ror #8
-    eor     ip, ip, r3, lsr #8
-    mov     r3, ip, lsr r6
-    orr     r4, r4, r3
-    rsb     r3, r6, #32
-    mov     r3, ip, lsl r3
-    orr     r5, r5, r3
-    add     r6, r6, #32
+    RICE_FILL
     bx      lr
 
 #if ARM_ARCH < 5
