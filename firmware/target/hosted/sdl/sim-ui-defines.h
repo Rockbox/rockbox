@@ -390,6 +390,13 @@
 #define UI_WIDTH                    LCD_WIDTH
 #define UI_HEIGHT                   LCD_HEIGHT
 
+#elif defined(SAMSUNG_YPCP3)
+#define UI_TITLE                    "Samsung YP-CP3"
+#define UI_WIDTH                    614 /* width of GUI window */
+#define UI_HEIGHT                   324 /* height of GUI window */
+#define UI_LCD_POSX                 40
+#define UI_LCD_POSY                 37
+
 #elif defined(SAMSUNG_YPR0)
 #define UI_TITLE                    "Samsung YP-R0"
 #define UI_WIDTH                    313 /* width of GUI window */

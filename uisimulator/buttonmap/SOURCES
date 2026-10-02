@@ -62,7 +62,11 @@ sansa-connect.c
 #elif CONFIG_KEYPAD == SONY_NWZ_PAD
 sony-nwz.c
 #elif CONFIG_KEYPAD == SAMSUNG_YPR0_PAD
+#ifdef SAMSUNG_YPCP3
+samsung-ypcp3.c
+#else
 samsung-ypr0.c
+#endif
 #elif CONFIG_KEYPAD == CREATIVE_ZEN_PAD
 creative-zen.c
 #elif CONFIG_KEYPAD == SONY_NWZA860_PAD
