@@ -20,18 +20,18 @@ CLEANOBJS += $(BUILDDIR)/lang/max_language_size.h $(BUILDDIR)/lang/lang*
 #DUMMY := $(shell mkdir -p $(BUILDDIR)/apps/lang)
 
 # Calculate the maximum language size. Currently based on the file size
-# of the largest lng file. Subtract 11 due to HEADER_SIZE and
+# of the largest lng file. Subtract 10 due to HEADER_SIZE and
 # SUBHEADER_SIZE.
 # TODO: In the future generate this file within genlang or another script
 # in order to only calculate the maximum size based on the core strings.
 $(BUILDDIR)/lang/max_language_size.h: $(LANGOBJ) $(BUILDDIR)/apps/lang/voicestrings.zip
 	$(call PRINTS,GEN $(subst $(BUILDDIR)/,,$@))
-	$(SILENT)echo "#define MAX_LANGUAGE_SIZE `ls -ln $(BUILDDIR)/apps/lang/*.lng | awk '{print $$5-11}' | sort -n | tail -1`" > $@
+	$(SILENT)echo "#define MAX_LANGUAGE_SIZE `ls -ln $(BUILDDIR)/apps/lang/*.lng | awk '{print $$5-10}' | sort -n | tail -1`" > $@
 
 $(BUILDDIR)/lang/lang_core.o: $(BUILDDIR)/lang/lang.h $(BUILDDIR)/lang/lang_core.c
 	$(call PRINTS,CC lang_core.c)$(CC) $(CFLAGS) -c $(BUILDDIR)/lang/lang_core.c -o $@
 
-# genlang creates *both* lang.c and lang.h but in Make there is no way to express this rule
+# genlang creates *both* lang.c and lang.h but in Make there is no wat to express this rule
 # (multiple target rules DO NOT express that, they are a simple shortcut for multiple rules)
 # instead we pretend that genlang create lang_core.c and that lang.c depends from lang.h
 # it will work fine as long as one never manually removes lang.c and not lang.h, and it will avoid

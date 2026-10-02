@@ -35,12 +35,12 @@
 /* These defines must match the initial bytes in the binary lang file */
 /* See tools/genlang (TODO: Use common include for both) */
 #define LANGUAGE_COOKIE   0x1a
-#define LANGUAGE_VERSION  0x07
+#define LANGUAGE_VERSION  0x06
 
 #define LANGUAGE_FLAG_RTL         0x01
 #define LANGUAGE_FLAG_UNITS_FIRST 0x02
 
-#define HEADER_SIZE 5
+#define HEADER_SIZE 4
 #define SUBHEADER_SIZE 6
 
 static unsigned char language_buffer[MAX_LANGUAGE_SIZE];
@@ -72,9 +72,8 @@ int lang_load(const char *filename, const unsigned char *builtin,
 
     if(read(fd, lang_header, HEADER_SIZE) == HEADER_SIZE &&
        ((lang_header[0] == LANGUAGE_COOKIE) &&
-        (lang_header[1] == LANGUAGE_VERSION) &&
-        (lang_header[2] == TARGET_ID) &&
-        (lang_header[4] == ENGLISH_LANG_CHECKSUM)) ) {
+       (lang_header[1] == LANGUAGE_VERSION) &&
+       (lang_header[2] == TARGET_ID))) {
         /* jump to the proper entry in the table of subheaders */
         lseek(fd, user_num * SUBHEADER_SIZE, SEEK_CUR);
         if (read(fd, sub_header, SUBHEADER_SIZE) != SUBHEADER_SIZE)
