@@ -64,6 +64,9 @@ void usb_remove_int(void);
 
 #ifdef BOOTLOADER
 void system_preinit(void);
+#if CONFIG_CPU == S5L8720
+int system_sdram_ok(void);
+#endif
 #endif
 
 #endif /* SYSTEM_TARGET_H */

@@ -21,6 +21,18 @@
 #include "config.h"
 #include "cpu.h"
 
+/* Copy interrupt vectors to iram */
+.macro copy_vectors
+    ldr     r2, =_intvectstart
+    ldr     r3, =_intvectend
+    ldr     r4, =_intvectcopy
+97:
+    cmp     r3, r2
+    ldrhi   r1, [r4], #4
+    strhi   r1, [r2], #4
+    bhi     97b
+.endm
+
     .section .intvect,"ax",%progbits
     .global    start
     .global    _newstart
@@ -99,10 +111,35 @@ start_loc:
     mcr     p15, 0, r0, c7, c5, 0   /* invalidate icache */
 
 #elif defined(IPOD_NANO4G)
+    /* 0x100000 in WDTCON is a SoC reset. 0 stops the bootrom watchdog
+     * so a later hang does not fall through into the NAND OS. */
+    mov     r0, #0
+    ldr     r1, =0x3c800000
+    str     r0, [r1]
+
     mrc     p15, 0, r0, c1, c0, 0
+#ifdef BOOTLOADER
     bic     r0, r0, #0x1000
     bic     r0, r0, #0x5
-    mcr     p15, 0, r0, c1, c0, 0   /* disable caches and protection unit */
+#else
+    /* The bootloader's MMU stays on: its page tables are the ones
+     * memory_init() builds, and with the MMU off address 0 is the bootrom,
+     * which boots the NAND OS on any exception. Until the real vectors
+     * are copied, faults go to n4g_early_vectors in IRAM0 instead. */
+    ldr     r1, =n4g_early_vectors
+    mov     r2, #0
+    ldmia   r1!, {r3-r10}
+    stmia   r2!, {r3-r10}
+    /* With the security extensions, exceptions use VBAR, not address 0 */
+    mrc     p15, 0, r2, c0, c1, 1   /* ID_PFR1 */
+    tst     r2, #0xf0
+    movne   r2, #0
+    mcrne   p15, 0, r2, c12, c0, 0  /* VBAR */
+    /* caches and high vectors off */
+    bic     r0, r0, #0x3000
+    bic     r0, r0, #0x4
+#endif
+    mcr     p15, 0, r0, c1, c0, 0
 
     mov     r0, #0
     mcr     p15, 0, r0, c7, c14, 0  /* clean & invalidate dcache */
@@ -140,17 +177,15 @@ start_loc:
     orr     r0, r0, #1<<12           /* enable icache */
     mcr     p15, 0, r0, c1, c0, 0
 #else
+#ifdef IPOD_NANO4G
+    /* The IRAM stacks are only set up below, so memory_init gets a
+     * temporary stack in DRAM just below the page tables. */
+    ldr     sp, =TTB_BASE_ADDR
+#endif
     bl      memory_init
-
-    /* Copy interrupt vectors to iram */
-    ldr     r2, =_intvectstart
-    ldr     r3, =_intvectend
-    ldr     r4, =_intvectcopy
-1:
-    cmp     r3, r2
-    ldrhi   r1, [r4], #4
-    strhi   r1, [r2], #4
-    bhi     1b
+#ifndef IPOD_NANO4G
+    copy_vectors
+#endif
 
     /* Initialise bss section to zero */
     ldr     r2, =_edata
@@ -179,6 +214,17 @@ start_loc:
     cmp     r3, r2
     strhi   r4, [r2], #4
     bhi     1b
+
+#ifdef IPOD_NANO4G
+    /* The caches are on here, so the vectors and icode copied above may
+     * still be dirty in the dcache while instruction fetches read RAM. */
+    mov     r0, #0
+    mcr     p15, 0, r0, c7, c10, 0  /* clean dcache */
+    mcr     p15, 0, r0, c7, c10, 4  /* drain write buffer */
+    mcr     p15, 0, r0, c7, c5, 0   /* invalidate icache */
+    mcr     p15, 0, r0, c7, c5, 6   /* flush branch target cache */
+    mcr     p15, 0, r0, c7, c5, 4   /* flush prefetch buffer */
+#endif
 #endif
 
     /* Set up stack for IRQ mode */
@@ -209,7 +255,32 @@ start_loc:
     strhi   r3, [r2], #4
     bhi     1b
 
+#if defined(IPOD_NANO4G) && !defined(BOOTLOADER)
+    copy_vectors
+    mov     r0, #0
+    mcr     p15, 0, r0, c7, c10, 0  /* clean dcache */
+    mcr     p15, 0, r0, c7, c10, 4  /* drain write buffer */
+    /* four times: ARM1176 erratum 411920, see commit_discard_idcache */
+    mcr     p15, 0, r0, c7, c5, 0   /* invalidate icache */
+    mcr     p15, 0, r0, c7, c5, 0
+    mcr     p15, 0, r0, c7, c5, 0
+    mcr     p15, 0, r0, c7, c5, 0
+    .rept   11
+    nop
+    .endr
+    mcr     p15, 0, r0, c7, c5, 4   /* flush prefetch buffer */
+#endif
     b       main
+
+#if defined(IPOD_NANO4G) && !defined(BOOTLOADER)
+    /* Keep faults away from the BootROM vectors until the real vectors and
+     * their handlers have been copied into IRAM. */
+n4g_early_vectors:
+    .rept   8
+    .word   0xeafffffe              /* b . */
+    .endr
+    .ltorg
+#endif
 
 #ifdef BOOTLOADER
     /* Initialise bss section to zero */

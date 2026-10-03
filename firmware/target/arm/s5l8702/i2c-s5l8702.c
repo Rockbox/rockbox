@@ -45,9 +45,11 @@ void i2c_init()
     mutex_init(&i2c_mtx[1]);
 }
 
-static void wait_rdy(int bus)
+static bool wait_rdy(int bus)
 {
-    while (IICUNK10(bus));
+    for (int i = 0; i < 100000 && IICUNK10(bus); i++)
+        ;
+    return IICUNK10(bus) == 0;
 }
 
 static void i2c_on(int bus)
@@ -61,34 +63,43 @@ static void i2c_on(int bus)
 #endif
 }
 
-static void i2c_off(int bus)
+static bool i2c_off(int bus)
 {
     /* serial output off */
-    wait_rdy(bus);
+    if (!wait_rdy(bus))
+        return false;
     IICSTAT(bus) = 0;
     /* disable I2C clock */
-    wait_rdy(bus);
+    if (!wait_rdy(bus))
+        return false;
     clockgate_enable(I2CCLKGATE(bus), false);
 #if CONFIG_CPU == S5L8720
     clockgate_enable(I2CCLKGATE_2(bus), false);
 #endif
+    return true;
 }
 
 /* wait for bus not busy, or tx/rx byte (should return once
    8 data + 1 ack clocks are generated), or STOP. */
-static void i2c_wait_io(int bus)
+static bool i2c_wait_io(int bus)
 {
-    while (((IICSTAT(bus) & (1 << 5)) != 0) &&
-            ((IICSTA2(bus) & ((1 << 8)|(1 << 13))) == 0)) {
-        wait_rdy(bus);
+    for (int i = 0; i < 100000; i++) {
+        if ((IICSTAT(bus) & (1 << 5)) == 0 ||
+            (IICSTA2(bus) & ((1 << 8)|(1 << 13))) != 0) {
+            IICSTA2(bus) |= (1 << 8)|(1 << 13);
+            return true;
+        }
+        if (!wait_rdy(bus))
+            return false;
     }
-    IICSTA2(bus) |= (1 << 8)|(1 << 13);
+    return false;
 }
 
 static int i2c_start(int bus, unsigned char slave, bool rd)
 {
     /* configure port */
-    wait_rdy(bus);
+    if (!wait_rdy(bus))
+        return 2;
     IICCON(bus) = (0 << 8) | /* INT_EN = disabled */
                   (1 << 7) | /* ACK_GEN */
                   (0 << 6) | /* CLKSEL = SRCCLK/32 (TBC) */
@@ -100,21 +111,23 @@ static int i2c_start(int bus, unsigned char slave, bool rd)
 
     /* START */
     int mode = rd ? 0x80 : 0xC0;
-    wait_rdy(bus);
+    if (!wait_rdy(bus))
+        return 2;
     IICSTAT(bus) = mode;
-    wait_rdy(bus);
+    if (!wait_rdy(bus))
+        return 2;
     IICDS(bus) = slave | rd;
-    wait_rdy(bus);
+    if (!wait_rdy(bus))
+        return 2;
     IICSTAT(bus) = mode | 0x30;
 
 #if CONFIG_CPU == S5L8702
-    // XXX this seems needed when ECLK is used
-    wait_rdy(bus);      // XXX: To solve the nano3g problem with ECLK,
-                        // or you can put it in either of the two i2c_wait_io(),
-                        // both work if you put this
-                        // TODO: Try on classic, maybe it's not necessary
+    /* Nano 3G needs this synchronization when ECLK is used. */
+    if (!wait_rdy(bus))
+        return 2;
 #endif
-    i2c_wait_io(bus);
+    if (!i2c_wait_io(bus))
+        return 2;
 
     /* check ACK */
     if (IICSTAT(bus) & 1)
@@ -123,14 +136,16 @@ static int i2c_start(int bus, unsigned char slave, bool rd)
     return 0;
 }
 
-static void i2c_stop(int bus)
+static bool i2c_stop(int bus)
 {
     /* STOP */
-    wait_rdy(bus);
+    if (!wait_rdy(bus))
+        return false;
     IICSTAT(bus) &= ~0x20;
-    wait_rdy(bus);
+    if (!wait_rdy(bus))
+        return false;
     IICCON(bus) = 0x10;
-    i2c_wait_io(bus);
+    return i2c_wait_io(bus);
 }
 
 static int i2c_wr_internal(int bus, unsigned char slave,
@@ -148,12 +163,21 @@ static int i2c_wr_internal(int bus, unsigned char slave,
             len++;
         }
         while (len--) {
-            wait_rdy(bus);
+            if (!wait_rdy(bus)) {
+                rc = 3;
+                break;
+            }
             IICDS(bus) = *ptr;
             udelay(5);
-            wait_rdy(bus);
+            if (!wait_rdy(bus)) {
+                rc = 3;
+                break;
+            }
             IICCON(bus) = IICCON(bus);
-            i2c_wait_io(bus);
+            if (!i2c_wait_io(bus)) {
+                rc = 3;
+                break;
+            }
             /* check ACK */
             if (IICSTAT(bus) & 1) {
                 rc = 2;
@@ -166,7 +190,8 @@ static int i2c_wr_internal(int bus, unsigned char slave,
     else
         rc = 1;
 
-    i2c_stop(bus);
+    if (!i2c_stop(bus) && rc == 0)
+        rc = 3;
     return rc;
 }
 
@@ -177,16 +202,23 @@ static int i2c_rd_internal(int bus, unsigned char slave, int len, unsigned char 
     if (i2c_start(bus, slave, true) == 0)
     {
         while (len--) {
-            wait_rdy(bus);
+            if (!wait_rdy(bus)) {
+                rc = 4;
+                break;
+            }
             IICCON(bus) &= ~(len ? 0 : 0x80); /* ACK or NAK */
-            i2c_wait_io(bus);
+            if (!i2c_wait_io(bus)) {
+                rc = 4;
+                break;
+            }
             *data++ = IICDS(bus);
         }
     }
     else
         rc = 3;
 
-    i2c_stop(bus);
+    if (!i2c_stop(bus) && rc == 0)
+        rc = 4;
     return rc;
 }
 
@@ -194,7 +226,8 @@ int i2c_wr(int bus, unsigned char slave, int address, int len, const unsigned ch
 {
     i2c_on(bus);
     int rc = i2c_wr_internal(bus, slave, address, len, data);
-    i2c_off(bus);
+    if (!i2c_off(bus) && rc == 0)
+        rc = 5;
     return rc;
 }
 
@@ -204,7 +237,8 @@ int i2c_rd(int bus, unsigned char slave, int address, int len, unsigned char *da
     int rc = i2c_wr_internal(bus, slave, address, 0, NULL);
     if (rc == 0)
         rc = i2c_rd_internal(bus, slave, len, data);
-    i2c_off(bus);
+    if (!i2c_off(bus) && rc == 0)
+        rc = 5;
     return rc;
 }
 
@@ -226,7 +260,7 @@ int i2c_read(int bus, unsigned char slave, int address, int len, unsigned char *
     return ret;
 }
 
-void i2c_preinit(int bus)
+int i2c_preinit(int bus)
 {
 #if CONFIG_CPU == S5L8702
     if (bus == 0)
@@ -242,17 +276,32 @@ void i2c_preinit(int bus)
     }
 #endif
     i2c_on(bus);
-    wait_rdy(bus);
+    if (!wait_rdy(bus))
+        goto fail;
     IICADD(bus) = 0x40;   /* own slave address */
-    wait_rdy(bus);
+    if (!wait_rdy(bus))
+        goto fail;
     IICUNK14(bus) = 1;    /* SRCCLK = ECLK */
-    wait_rdy(bus);
+    if (!wait_rdy(bus))
+        goto fail;
     IICUNK18(bus) = 0;
-    wait_rdy(bus);
+    if (!wait_rdy(bus))
+        goto fail;
     IICSTAT(bus) = 0x80;  /* master Rx mode, serial output off */
-    wait_rdy(bus);
+    if (!wait_rdy(bus))
+        goto fail;
     IICCON(bus) = 0;
-    wait_rdy(bus);
+    if (!wait_rdy(bus))
+        goto fail;
     IICSTA2(bus) = 0x3f00;
-    i2c_off(bus);
+    if (!i2c_off(bus))
+        goto fail;
+    return 0;
+
+fail:
+    clockgate_enable(I2CCLKGATE(bus), false);
+#if CONFIG_CPU == S5L8720
+    clockgate_enable(I2CCLKGATE_2(bus), false);
+#endif
+    return -1;
 }

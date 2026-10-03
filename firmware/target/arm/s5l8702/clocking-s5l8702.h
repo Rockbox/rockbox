@@ -273,11 +273,11 @@ void soc_set_hsdiv(int hsdiv);
 void usec_timer_init(void);
 
 #if CONFIG_CPU == S5L8702
-void cg16_config(volatile uint16_t* cg16,
-                    bool onoff, int clksel, int div1, int div2);
+int cg16_config(volatile uint16_t* cg16,
+                   bool onoff, int clksel, int div1, int div2);
 #elif CONFIG_CPU == S5L8720
-void cg16_config(volatile uint16_t* cg16,
-                    bool onoff, int clksel, int div1, int div2, int flags);
+int cg16_config(volatile uint16_t* cg16,
+                   bool onoff, int clksel, int div1, int div2, int flags);
 #endif
 
 int pll_config(int pll, int op_mode, int p, int m, int s, int lock_time);

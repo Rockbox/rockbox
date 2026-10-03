@@ -38,6 +38,11 @@
     .type       ttb_init, %function
 ttb_init:
     ldr     r0, =TTB_BASE_ADDR      @
+#if (CONFIG_CPU == S5L8720) && !defined(BOOTLOADER)
+    @ TTBCR N=0: TTB0 translates every address, TTB1 is not used
+    mov     r1, #0                  @
+    mcr     p15, 0, r1, c2, c0, 2   @
+#endif
     mvn     r1, #0                  @
     // TODO: only set the first 3 bits to 0
     // mcr     p15, 0, r1, c2, c0, 2   @ Set TTB backwards compatiblity

@@ -382,7 +382,16 @@ int pll_onoff(int pll, bool onoff)
     if (onoff)
     {
         PLLMODE |= PLLMODE_EN_BIT(pll); /* start PLL */
-        while (!(PLLLOCK & PLLLOCK_LCK_BIT(pll))); /* locking... */
+        /* Same bound on every CPU. The lock bit is the configured
+         * lock time expiring, not proof that the PLL locked. */
+        for (int i = 0; i < 1000000 &&
+                        !(PLLLOCK & PLLLOCK_LCK_BIT(pll)); i++)
+            ;
+        if (!(PLLLOCK & PLLLOCK_LCK_BIT(pll)))
+        {
+            PLLMODE &= ~PLLMODE_EN_BIT(pll);
+            return -1;
+        }
         PLLMODE |= PLLMODE_PLLOUT_BIT(pll); /* slow mode OFF */
 
         /* returns DMLCK status, only meaningful for Divisor Mode (DM) */
@@ -400,11 +409,11 @@ int pll_onoff(int pll, bool onoff)
 
 /* configure and enable/disable 16-bit clockgate */
 #if (CONFIG_CPU == S5L8702)
-void cg16_config(volatile uint16_t* cg16,
-                    bool onoff, int clksel, int div1, int div2)
+int cg16_config(volatile uint16_t* cg16,
+                   bool onoff, int clksel, int div1, int div2)
 #elif (CONFIG_CPU == S5L8720)
-void cg16_config(volatile uint16_t* cg16,
-                    bool onoff, int clksel, int div1, int div2, int flags)
+int cg16_config(volatile uint16_t* cg16,
+                   bool onoff, int clksel, int div1, int div2, int flags)
 #endif
 {
     uint16_t val16 = ((clksel & CG16_SEL_MSK) << CG16_SEL_POS)
@@ -422,7 +431,14 @@ void cg16_config(volatile uint16_t* cg16,
 
     /*udelay(100);*/  /* probably not needed */
 
+#if CONFIG_CPU == S5L8720
+    for (int i = 0; i < 100000 && *cg16 != val16; i++)
+        ;
+    return *cg16 == val16 ? 0 : -1;
+#else
     while (*cg16 != val16);
+    return 0;
+#endif
 }
 
 /* Configures EClk for USEC_TIMER. DRAM refresh also depends on EClk,
@@ -442,11 +458,15 @@ void usec_timer_init(void)
     /* unmask timer controller clock gate */
     clockgate_enable(CLOCKGATE_TIMER, true);
 #elif CONFIG_CPU == S5L8720
-    cg16_config(&CG16_RTIME, true, CG16_SEL_OSC, 1, 1, 0x0);
-
-    /* unmask timer controller clock gates */
+    /* The BootROM leaves Timer E counting at 1 MHz. system_preinit()
+     * updates its prescaler after changing CG16_RTIME. */
     clockgate_enable(CLOCKGATE_TIMERE, true);
     clockgate_enable(CLOCKGATE_TIMERE_2, true);
+    TECON = 0x40;
+    TEPRE = 0xb;
+    TEDATA0 = ~0;
+    TECMD = 0x3;
+    return;
 #endif
 
     /* configure and start timer E */

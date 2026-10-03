@@ -981,7 +981,8 @@ void main(void)
 #endif
 
     /* Configure I2C0 */
-    i2c_preinit(0);
+    if (i2c_preinit(0))
+        while (1);
 
     if (pmu_is_hibernated()) {
         rc = launch_onb(1); /* 27/2 = 13.5 MHz. */
