@@ -61,7 +61,9 @@ static const int blocksize_table[] ICONST_ATTR = {
 256<<0, 256<<1, 256<<2, 256<<3, 256<<4, 256<<5, 256<<6, 256<<7 
 };
 
-static const uint8_t table_crc8[256] ICONST_ATTR = {
+/* Only the frame header is checked against it, a few bytes a frame, so it
+   is not worth the IRAM. */
+static const uint8_t table_crc8[256] = {
     0x00, 0x07, 0x0e, 0x09, 0x1c, 0x1b, 0x12, 0x15,
     0x38, 0x3f, 0x36, 0x31, 0x24, 0x23, 0x2a, 0x2d,
     0x70, 0x77, 0x7e, 0x79, 0x6c, 0x6b, 0x62, 0x65,

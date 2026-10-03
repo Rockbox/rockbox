@@ -395,8 +395,9 @@ lpc_decode_arm:
    Orders 1..8 get their own loop with every coefficient held in a register:
    the C loop reloads all of them for every output sample although they are
    invariant for the whole call, and spills the loop bound to the stack on top
-   of that.  Orders above 8 go through a chunked loop; the reference encoder's
-   default maximum order is 8 and no test stream here exceeds it.
+   of that.  Orders 9..12, which -8 uses, cannot hold theirs, so they compute
+   two outputs per pass instead and every coefficient and sample loaded serves
+   two multiplies.  Orders above 12 go through a generic loop.
 
    Registers, all orders:
 
@@ -456,37 +457,89 @@ lpc_decode_arm:
     subs    r12, r12, #32             @ one output done; the borrow out of the
     .endm                             @ count field is the loop's exit test
 
-    /* The high-order tail.  Orders above 8 cannot hold their coefficients, so
-       those loops keep the accumulator in r10:r11 and have r2 free for a
-       fourth history sample -- the order is a constant there, so nothing
-       needs to remember it. */
-    .macro  HTAIL order
-    ldr     r2, [r0]                  @ residual
-    and     lr, r12, #31              @ qlevel
-    mov     r10, r10, lsr lr
-    rsb     lr, lr, #32
-    orr     r10, r10, r11, lsl lr
-    add     r10, r2, r10
-    str     r10, [r0], #-(4 * \order - 4)
-    subs    r12, r12, #32
+    /* Orders 9..12: two outputs per pass, y0 at p[order] and y1 after it.
+       History ascends from p[0], coefficients descend from coeffs[order-1],
+       so h[k] meets c(k) = coeffs[order-1-k] in y0 and c(k-1) in y1.  y1's
+       last term is coeffs[0] times y0 itself, added once y0 is known, so
+       coeffs[0] is kept in r2.  Sums in r4:r5 (y0) and r6:r7 (y1), history
+       in r8 and r9, coefficients in r10, r11 and lr.
+
+       One step: two taps of each sum.  The coefficient that carries over to
+       the next step alternates between r10 and r11, so the pair loaded here
+       never lands in a register the next instruction reads. */
+    .macro  PAIR64_STEP cur, nxt
+    smlal   r4, r5, r9, \cur          @ y0 += h[k] * c(k)
+    ldmia   r0!, { r8, r9 }           @ h[k+1], h[k+2]
+    ldmdb   r3!, { \nxt, lr }         @ c(k+2), c(k+1)
+    smlal   r6, r7, r8, \cur          @ y1 += h[k+1] * c(k)
+    smlal   r4, r5, r8, lr            @ y0 += h[k+1] * c(k+1)
+    smlal   r6, r7, r9, lr            @ y1 += h[k+2] * c(k+1)
     .endm
 
-    /* One pass of four taps, for the orders that cannot keep their
-       coefficients in registers.  Both operand streams burst: coefficients
-       descend from the top, history ascends.  r2 is the fourth sample
-       register, which is what lets the samples come in one ldm of four
-       rather than three plus a single load. */
-    .macro  HCHUNK first
-    ldmdb   r3!, { r4-r7 }
-    ldmia   r0!, { r2, r8, r9, lr }
-    .ifnb \first
-    smull   r10, r11, r2, r7          @ opens the accumulator, so it never
-    .else                             @ has to be zeroed
-    smlal   r10, r11, r2, r7
+    /* A whole order.  r12 counts outputs as everywhere else; an odd one left
+       over goes to the generic loop, in DRAM, which \far says how to reach. */
+    .macro  PAIR64 order, far
+    ldr     r2, [r1]                  @ coeffs[0]
+    subs    r12, r12, #32             @ count field: outputs left - 2
+    bmi     2f
+1:
+    add     r3, r1, #4 * \order
+    ldr     r9, [r0], #4              @ h[0]
+    ldr     r10, [r3, #-4]!           @ c(0) = coeffs[order-1]
+    smull   r4, r5, r9, r10           @ the first step opens both sums
+    ldmia   r0!, { r8, r9 }
+    ldmdb   r3!, { r11, lr }
+    smull   r6, r7, r8, r10
+    smlal   r4, r5, r8, lr
+    smlal   r6, r7, r9, lr
+    PAIR64_STEP r11, r10
+    PAIR64_STEP r10, r11
+    PAIR64_STEP r11, r10
+  .if (\order - 1) / 2 == 5
+    PAIR64_STEP r10, r11
+  .endif
+  .if \order & 1                      @ odd: y0's last tap
+    .if (\order - 1) / 2 == 5
+    smlal   r4, r5, r9, r11
+    .else
+    smlal   r4, r5, r9, r10
     .endif
-    smlal   r10, r11, r8, r6
-    smlal   r10, r11, r9, r5
-    smlal   r10, r11, lr, r4
+  .else                               @ even: two taps of y0, one of y1 left
+    ldr     r8, [r0], #4              @ h[order-1]
+    .if (\order - 1) / 2 == 5
+    smlal   r4, r5, r9, r11
+    smlal   r6, r7, r8, r11
+    .else
+    smlal   r4, r5, r9, r10
+    smlal   r6, r7, r8, r10
+    .endif
+    smlal   r4, r5, r8, r2            @ ... c(order-1) is coeffs[0]
+  .endif
+    and     lr, r12, #31              @ qlevel
+    rsb     r3, lr, #32               @ a shift by 32 gives 0, as qlevel 0
+    ldmia   r0, { r10, r11 }          @ the two residuals, at p[order]
+    mov     r4, r4, lsr lr
+    orr     r4, r4, r5, lsl r3
+    add     r10, r10, r4              @ y0
+    smlal   r6, r7, r10, r2           @ y1's last term needs y0
+    mov     r6, r6, lsr lr
+    orr     r6, r6, r7, lsl r3
+    add     r11, r11, r6              @ y1
+    stmia   r0, { r10, r11 }
+    sub     r0, r0, #4 * \order - 8   @ the window moves on two samples
+    subs    r12, r12, #64
+    bpl     1b
+2:
+    adds    r12, r12, #32             @ count field back to outputs left - 1
+    bmi     3f
+    mov     r2, #\order               @ one left: the generic loop takes it
+  .ifb \far
+    ldr     pc, .Lx_pgen
+  .else
+    b       .Lx_highgen
+  .endif
+3:
+    ldmpc   regs=r4-r11
     .endm
 
     LPC32_HOT
@@ -513,34 +566,15 @@ flac_lpc_32_arm:
     b       .Lx_order6
     b       .Lx_order7
     b       .Lx_order8
-    ldr     pc, .Lx_pgen              @ 9  -- generic loop
+    ldr     pc, .Lx_p9                @ 9 and 11 are rarer, so in DRAM
     b       .Lx_order10
-    ldr     pc, .Lx_pgen              @ 11 -- generic loop
-@ order 12 is the last table slot, so it falls through.  10 and 12 get their
-@ own loops because they are what the reference encoder's -8 actually emits;
-@ 9 and 11 would too if there were IRAM to put them in.
+    ldr     pc, .Lx_p11
+@ order 12 is the last table slot, so it falls through.  10 and 12 are what
+@ the reference encoder's -8 mostly emits, so they get the IRAM.
 .Lx_order12:
-    add     r3, r1, #48               @ coefficient pointer, descending
-.Lx_loop12:
-    HCHUNK  first
-    HCHUNK
-    HCHUNK
-    HTAIL   12
-    bpl     .Lx_order12
-    ldmpc   regs=r4-r11
-
+    PAIR64  12
 .Lx_order10:
-    add     r3, r1, #40
-.Lx_loop10:
-    ldmdb   r3!, { r4, r5 }           @ coeffs[8..9], the two odd taps
-    ldmia   r0!, { r2, r8 }           @ p[0..1]
-    smull   r10, r11, r2, r5
-    smlal   r10, r11, r8, r4
-    HCHUNK
-    HCHUNK
-    HTAIL   10
-    bpl     .Lx_order10
-    ldmpc   regs=r4-r11
+    PAIR64  10
 @ order 8 is reached from the table above
 .Lx_order8:
     ldmia   r1, { r4-r11 }            @ coeffs[0..7], resident for the call
@@ -660,11 +694,17 @@ flac_lpc_32_arm:
     bpl     .Lx_loop1
     ldmpc   regs=r4-r11
 
-    /* Orders 9..32.  Four taps a pass, both operand streams bursted: the
-       coefficients descend from coeffs + order and the history ascends, so the
-       inner loop ends when the coefficient pointer reaches coeffs and needs no
-       counter of its own.  order & 3 leftover taps go first, one at a time. */
-.Lx_highgen:                          @ orders 9, 11 and 13..32
+.Lx_order9:
+    PAIR64  9, far
+.Lx_order11:
+    PAIR64  11, far
+
+    /* Orders 13..32, and the odd last output of 9..12.  Four taps a pass,
+       both operand streams bursted: the coefficients descend from coeffs +
+       order and the history ascends, so the inner loop ends when the
+       coefficient pointer reaches coeffs and needs no counter of its own.
+       order & 3 leftover taps go first, one at a time. */
+.Lx_highgen:                          @ orders 13..32, and one odd output
 .Lx_dnext:
     add     r3, r1, r2, lsl #2        @ coefficient pointer, descending
     mov     r10, #0                   @ 64-bit accumulator (r10 low)
@@ -707,6 +747,8 @@ flac_lpc_32_arm:
 .Lx_p2:   .word .Lx_order2
 .Lx_p3:   .word .Lx_order3
 .Lx_pgen: .word .Lx_highgen
+.Lx_p9:   .word .Lx_order9
+.Lx_p11:  .word .Lx_order11
 
 #if ARM_ARCH >= 5
 /* ---------------------------------------------------------------------------
