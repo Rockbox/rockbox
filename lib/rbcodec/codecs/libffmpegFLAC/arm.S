@@ -25,8 +25,11 @@
 /* The following is an assembler optimised version of the LPC filtering
    routines needed for FLAC decoding. It is optimised for use with ARM 
    processors.
-   All LPC filtering up to order 9 is done in specially optimised unrolled
-   loops, while every order above this is handled by a slower default routine.
+   Orders up to 8 are done in unrolled loops with every coefficient held in a
+   register.  Above that there are too few registers to hold them, so orders 9
+   and up compute two outputs per pass instead, which lets each coefficient
+   and each history sample loaded serve two multiplies.  The generic routine
+   only takes a final odd sample.
  */
 #ifdef USE_IRAM
     .section .icode,"ax",%progbits
@@ -51,7 +54,7 @@ lpc_decode_arm:
     cmp r2, #9                @ check if order is too high for unrolled loops
     addls pc, pc, r2, lsl #2  @ jump to our unrolled decode loop if it exists
 @ jumptable:
-    b .default                @ order too high, go to default routine
+    b .pair                   @ order too high, go to the two-output loop
     b .exit                   @ zero order filter isn't possible, exit function
     b .order1
     b .order2
@@ -64,33 +67,64 @@ lpc_decode_arm:
 
 @ last jump table entry coincides with target, so leave it out
 .order9:
-    ldmia r4, { r5-r12, r14 } @ fetch coefs
-.loop9:
-    ldr r4, [r3], #4          @ load first history sample
-    mul r2, r4, r14           @ multiply with last coef
-    ldr r4, [r3], #4          @ rinse and repeat while accumulating sum in r2
-    mla r2, r4, r12, r2
-    ldr r4, [r3], #4
-    mla r2, r4, r11, r2
-    ldr r4, [r3], #4
-    mla r2, r4, r10, r2
-    ldr r4, [r3], #4
-    mla r2, r4, r9, r2
-    ldr r4, [r3], #4
-    mla r2, r4, r8, r2
-    ldr r4, [r3], #4
-    mla r2, r4, r7, r2
-    ldr r4, [r3], #4
-    mla r2, r4, r6, r2
-    ldr r4, [r3], #4
-    mla r2, r4, r5, r2
-    ldr r4, [r3]              @ r4 = residual
-    add r2, r4, r2, asr r1    @ shift sum by qlevel bits and add residual 
-    str r2, [r3], #-8*4       @ save result and wrap history pointer back
-    subs r0, r0, #1           @ check if we're done
-    bne .loop9                @ nope, jump back
-    b .exit
-    
+.pair:
+    /* Two outputs per pass, y0 at r14 and y1 after it.  y0 sums c[m] times
+       the sample m+1 back from it; y1 sums c[m] times the sample m back from
+       y0, so walking m upwards one history sample serves y0 with c[m] and y1
+       with c[m+1].  y1's last term is c[0] times y0 itself, added once y0 is
+       known.  Coefficients go up through r5, samples down through r3.
+         r0 outputs left   r1 qlevel        r2 end of the coefficient walk
+         r4 coeffs         r10, r11 sums    r12 order    r14 y0 */
+    mov r12, r2
+    sub r2, r12, #1
+    mov r2, r2, lsr #1        @ (order-1)/2 passes of two taps
+    add r2, r4, r2, lsl #3
+    add r2, r2, #4            @ where r5 stands when they are done
+    add r14, r3, r12, lsl #2  @ first output, holding its residual
+    subs r0, r0, #2
+    blt .pairlast
+.pairloop:
+    mov r3, r14
+    mov r5, r4
+    ldr r6, [r3, #-4]!        @ newest history sample
+    ldr r9, [r5], #4          @ c[0]
+    mov r10, #0
+    mov r11, #0
+.pairtaps:
+    mla r10, r6, r9, r10      @ y0 += c[m] * s[m]
+    ldmia r5!, { r8, r9 }     @ c[m+1], c[m+2]
+    mla r11, r6, r8, r11      @ y1 += c[m+1] * s[m]
+    ldmdb r3!, { r6, r7 }     @ s[m+2], s[m+1]
+    mla r10, r7, r8, r10      @ y0 += c[m+1] * s[m+1]
+    cmp r5, r2
+    mla r11, r7, r9, r11      @ y1 += c[m+2] * s[m+1]
+    bne .pairtaps
+    tst r12, #1
+    mlane r10, r6, r9, r10    @ odd order: y0's last tap, and done
+    beq .paireven
+.pairout:
+    ldr r8, [r4]              @ c[0]
+    ldmia r14, { r6, r7 }     @ the two residuals
+    add r6, r6, r10, asr r1   @ y0
+    mla r11, r6, r8, r11      @ y1's last term needs y0
+    add r7, r7, r11, asr r1   @ y1
+    stmia r14!, { r6, r7 }
+    subs r0, r0, #2
+    bge .pairloop
+.pairlast:
+    adds r0, r0, #2           @ 0 or 1 left
+    beq .exit
+    mov r2, r12               @ the generic routine takes the last one
+    sub r3, r14, r12, lsl #2
+    b .default
+.paireven:                    @ even order: two taps of y0 and one of y1 left
+    mla r10, r6, r9, r10
+    ldr r8, [r5]              @ c[order-1]
+    mla r11, r6, r8, r11
+    ldr r7, [r3, #-4]         @ the oldest sample
+    mla r10, r7, r8, r10
+    b .pairout
+
 .order8:
     ldmia r4, { r5-r12 }
 .loop8:
