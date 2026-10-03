@@ -28,9 +28,60 @@
    Orders up to 8 are done in unrolled loops with every coefficient held in a
    register.  Above that there are too few registers to hold them, so orders 9
    and up compute two outputs per pass instead, which lets each coefficient
-   and each history sample loaded serve two multiplies.  The generic routine
-   only takes a final odd sample.
+   and each history sample loaded serve two multiplies: unrolled for orders 9
+   to 12, which -8 uses, and a loop for the rest.  The generic routine only
+   takes a final odd sample.
  */
+/* Two LPC outputs per pass for a fixed order, unrolled: the .pair loop
+   below with the order known, so no tap loop and no parity test, and c[0]
+   kept in r12 for the last term of y1.  On entry r2 is the order, r3 the
+   history and r4 the coefficients. */
+.macro PAIR_STEP                      @ two taps of y0 and two of y1
+    mla r10, r6, r9, r10              @ y0 += c[m] * s[m]
+    ldmia r5!, { r8, r9 }             @ c[m+1], c[m+2]
+    mla r11, r6, r8, r11              @ y1 += c[m+1] * s[m]
+    ldmdb r3!, { r6, r7 }             @ s[m+2], s[m+1]
+    mla r10, r7, r8, r10              @ y0 += c[m+1] * s[m+1]
+    mla r11, r7, r9, r11              @ y1 += c[m+2] * s[m+1]
+.endm
+
+.macro PAIR_ORDER order
+    add r14, r3, #\order * 4          @ first output, holding its residual
+    ldr r12, [r4]                     @ c[0]
+    subs r0, r0, #2
+    blt .pairunrolledlast
+1:
+    mov r3, r14
+    add r5, r4, #4
+    ldr r6, [r3, #-4]!                @ newest history sample
+    mul r10, r6, r12                  @ the first step, with c[0] from r12
+    ldmia r5!, { r8, r9 }
+    mul r11, r6, r8
+    ldmdb r3!, { r6, r7 }
+    mla r10, r7, r8, r10
+    mla r11, r7, r9, r11
+    .rept (\order - 1) / 2 - 1
+    PAIR_STEP
+    .endr
+.if \order & 1
+    mla r10, r6, r9, r10              @ odd: y0's last tap
+.else
+    mla r10, r6, r9, r10              @ even: two taps of y0, one of y1 left
+    ldr r8, [r5]                      @ c[order-1]
+    mla r11, r6, r8, r11
+    ldr r7, [r3, #-4]                 @ the oldest sample
+    mla r10, r7, r8, r10
+.endif
+    ldmia r14, { r6, r7 }             @ the two residuals
+    add r6, r6, r10, asr r1           @ y0
+    mla r11, r6, r12, r11             @ y1's last term needs y0
+    add r7, r7, r11, asr r1           @ y1
+    stmia r14!, { r6, r7 }
+    subs r0, r0, #2
+    bge 1b
+    b .pairunrolledlast
+.endm
+
 #ifdef USE_IRAM
     .section .icode,"ax",%progbits
 #else
@@ -51,7 +102,7 @@ lpc_decode_arm:
     sub r3, r3, r2, lsl #2    @ r3 = history
     cmp r0, #0                @ no samples to process
     beq .exit
-    cmp r2, #9                @ check if order is too high for unrolled loops
+    cmp r2, #12               @ check if order is too high for unrolled loops
     addls pc, pc, r2, lsl #2  @ jump to our unrolled decode loop if it exists
 @ jumptable:
     b .pair                   @ order too high, go to the two-output loop
@@ -64,9 +115,25 @@ lpc_decode_arm:
     b .order6
     b .order7
     b .order8
+    b .order9
+    b .order10
+    b .order11
 
 @ last jump table entry coincides with target, so leave it out
+.order12:
+    PAIR_ORDER 12
+.order11:
+    PAIR_ORDER 11
+.order10:
+    PAIR_ORDER 10
 .order9:
+    PAIR_ORDER 9
+.pairunrolledlast:                @ r2 is still the order here
+    adds r0, r0, #2               @ 0 or 1 left
+    beq .exit
+    sub r3, r14, r2, lsl #2       @ the generic routine takes the last one
+    b .default
+
 .pair:
     /* Two outputs per pass, y0 at r14 and y1 after it.  y0 sums c[m] times
        the sample m+1 back from it; y1 sums c[m] times the sample m back from

@@ -577,7 +577,9 @@ static int decode_frame(FLACContext *s,
     return 0;
 }
 
-static int flac_downmix(FLACContext *s) ICODE_ATTR_FLAC;
+/* Only streams of three channels or more run this, so it stays out of line
+   and out of IRAM, which the stereo paths need more. */
+static NO_INLINE int flac_downmix(FLACContext *s);
 static int flac_downmix(FLACContext *s)
 {
     int32_t *FL, *FR, *FC, *SB, *RL, *RR, *RC;
