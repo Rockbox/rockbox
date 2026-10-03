@@ -128,10 +128,8 @@
 /* Define this if you do software codec */
 #define CONFIG_CODEC SWCODEC
 
-// TODO
-/* define this if you have a real-time clock */
-//#define CONFIG_RTC RTC_NANO3G
-#define CONFIG_RTC  0
+/* Dialog D1759 RTC, BCD, same field order as the Nano 3G reader */
+#define CONFIG_RTC RTC_NANO4G
 
 /* Define if the device can wake from an RTC alarm */
 //#define HAVE_RTC_ALARM

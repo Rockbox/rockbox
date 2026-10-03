@@ -25,15 +25,27 @@
 #include "panic.h"
 #include "pmu-target.h"
 #include "usb_core.h"   /* for usb_charging_maxcurrent_change */
+#include "powermgmt.h"
+#ifndef BOOTLOADER
+#include "lcd.h"
+#endif
 
 void power_init(void)
 {
     pmu_init();
-    pmu_set_usblimit(false);  /* limit to 100mA */
+    /* The USB input limit stays as the bootloader set it (500 mA with the
+     * host configured): on a dead battery, 100 mA browns the SoC out */
 }
 
 void power_off(void)
 {
+#ifndef BOOTLOADER
+    /* Standby may wake straight into the Apple OS, so show it first */
+    lcd_putsf(0, LCD_HEIGHT / 8 - 3, "power_off from %08lx",
+              (unsigned long)__builtin_return_address(0));
+    lcd_update();
+    udelay(5000000);
+#endif
 //     /* USB inserted or EXTON1 */
 //     pmu_set_wake_condition(/*TODO*/);
     pmu_enter_standby();
@@ -43,10 +55,19 @@ void power_off(void)
 #if CONFIG_CHARGING
 
 #ifdef HAVE_USB_CHARGING_ENABLE
+/* Below this the battery cannot carry the SoC (Apple's BatteryTrap holds
+ * the OS at the logo until it is reached) */
+#define USB_LIMIT_LOW_BATTERY_MV    3450
+
 void usb_charging_maxcurrent_change(int maxcurrent)
 {
 //     bool suspend_charging = (maxcurrent < 100);
     bool fast_charging = (maxcurrent >= 500);
+
+    /* The USB stack asks for 100 mA until the host configures it, which
+     * resets a Nano 4G running on USB power alone */
+    if (!fast_charging && _battery_voltage() < USB_LIMIT_LOW_BATTERY_MV)
+        fast_charging = true;
     pmu_set_usblimit(fast_charging);
 }
 #endif
@@ -63,7 +84,9 @@ unsigned int power_input_status(void)
 
 bool charging_state(void)
 {
-    // TODO
-    return false;
+    /* Bit 7 is the flag preinit preserves. No input means not charging. */
+    if (power_input_status() == POWER_INPUT_NONE)
+        return false;
+    return (pmu_read(D1759_REG_CHCTL) & D1759_CHCTL_ACTIVE) != 0;
 }
 #endif /* CONFIG_CHARGING */

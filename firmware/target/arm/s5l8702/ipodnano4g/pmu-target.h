@@ -37,10 +37,16 @@ enum d1759_regs {
     D1759_REG_IRQMASKA      = 0x07,
     D1759_REG_IRQMASKB      = 0x08,
     D1759_REG_IRQMASKC      = 0x09,
-//     D1759_REG_SYSCTRLA      = 0x0a,
-//     D1759_REG_SYSCTRLB      = 0x0b,
+    D1759_REG_SYSCTRL       = 0x0a, /* preinit writes 0x70 */
+    D1759_REG_WAKE          = 0x0d, /* preinit gates bit 5 from PMU 0x7f */
     D1759_REG_LEDOUT        = 0x30,
     D1759_REG_LEDCTL        = 0x31,
+    D1759_REG_ILIM          = 0x33, /* preinit keeps bits 0..1, sets 0x50 */
+    D1759_REG_CHCTL         = 0x34, /* OF keeps bit 7 and writes 0x54 */
+    D1759_REG_ADCCTL        = 0x40,
+    D1759_REG_ADCLO         = 0x41, /* result bits 0..1 */
+    D1759_REG_ADCHI         = 0x42, /* result bits 2..9 */
+    D1759_REG_RTCSEC        = 0x50, /* 7-byte BCD, same order as Nano 3G */
 };
 
 #if 1
@@ -96,6 +102,29 @@ enum d1759_reg_ledctl {
     D1759_LEDCTL_ENABLE     = 0x01,
 };
 
+enum d1759_reg_sysctrl {
+    D1759_SYSCTRL_STBY      = 0x01, /* OR into 0x0a; do not replace 0x70 */
+};
+
+enum d1759_reg_chctl {
+    D1759_CHCTL_ACTIVE      = 0x80, /* bit OF preserves */
+
+    /* USB input current in D1759_REG_ILIM bits 0..1, as Apple's DxeD1759
+     * picks it: 100 mA while USB is not configured, 500 mA once it is,
+     * 3 for an Apple charger. (Bit 0 of CHCTL resets the SoC.) */
+    D1759_ILIM_MASK         = 0x03,
+    D1759_ILIM_100MA        = 0x00,
+    D1759_ILIM_500MA        = 0x02,
+};
+
+/* From the OF ADC routine: ADCCTL = EN | START | mux, poll START, then read
+ * the 10-bit result; mV = 2500 + raw * 2000 / 1023, as on the D1671. */
+enum d1759_reg_adcctl {
+    D1759_ADCCTL_MUX_VBAT   = 0x04,
+    D1759_ADCCTL_START      = 0x10, /* cleared when the conversion is done */
+    D1759_ADCCTL_EN         = 0x40, /* also the register's value at rest */
+};
+
 
 /* GPIO for external PMU interrupt */
 // #define GPIO_EINT_PMU   0x7b                // TODO: I think it is not this one, or it does not work well, also this GPIO does not exist in s5l8720
@@ -122,11 +151,14 @@ int pmu_write(int address, unsigned char val);
 int pmu_read_multiple(int address, int count, unsigned char* buffer);
 int pmu_write_multiple(int address, int count, unsigned char* buffer);
 #ifdef BOOTLOADER
+void nano4g_backlight_now(void);
 unsigned char pmu_rd(int address);
 int pmu_wr(int address, unsigned char val);
 int pmu_rd_multiple(int address, int count, unsigned char* buffer);
 int pmu_wr_multiple(int address, int count, unsigned char* buffer);
 bool pmu_is_hibernated(void);
+/* D1759_REG_CHCTL as the BootROM left it, before pmu_preinit() */
+extern unsigned char pmu_chctl_boot;
 #endif
 
 // void pmu_ldo_on_in_standby(unsigned int ldo, int onoff);
@@ -139,7 +171,7 @@ void pmu_enter_standby(void);
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
 void pmu_set_cpu_voltage(unsigned mv);
 #endif
-#if (CONFIG_RTC == RTC_NANO3G)
+#if (CONFIG_RTC == RTC_NANO4G)
 void pmu_read_rtc(unsigned char* buffer);
 void pmu_write_rtc(unsigned char* buffer);
 #endif

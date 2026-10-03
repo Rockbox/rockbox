@@ -27,16 +27,18 @@
 #include "pmu-target.h"
 #include "kernel.h"
 
-/* Returns battery voltage [millivolts] */
 unsigned int adc_read_battery_voltage(void)
 {
-    return 0;
+    unsigned short raw = pmu_read_adc(NULL);
+
+    return pmu_adc_raw2mv(NULL, raw);
 }
 
 /* API functions */
 unsigned short adc_read(int channel)
 {
-    (void) channel;
+    if (channel == ADC_BATTERY)
+        return adc_read_battery_voltage();
     return 0;
 }
 

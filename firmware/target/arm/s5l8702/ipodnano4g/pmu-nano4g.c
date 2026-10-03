@@ -26,6 +26,8 @@
 #include "adc-target.h"
 #include "i2c-s5l8702.h"
 #include "gpio-s5l8702.h"
+#include "clocking-s5l8702.h"
+#include "s5l87xx.h"
 
 
 int pmu_read_multiple(int address, int count, unsigned char* buffer)
@@ -40,7 +42,7 @@ int pmu_write_multiple(int address, int count, unsigned char* buffer)
 
 unsigned char pmu_read(int address)
 {
-    unsigned char tmp;
+    unsigned char tmp = 0;
     pmu_read_multiple(address, 1, &tmp);
     return tmp;
 }
@@ -93,13 +95,15 @@ void pmu_ldo_power_off(unsigned int ldo)
 
 void pmu_set_wake_condition(unsigned char condition)
 {
-    // TODO
-    (void) condition;
+    /* 0x0d also holds the boot-config bit preinit may have cleared. */
+    pmu_write(D1759_REG_WAKE, pmu_read(D1759_REG_WAKE) | condition);
 }
 
 void pmu_enter_standby(void)
 {
-    // TODO
+    /* Keep the 0x70 preinit wrote. Bit 0 is the standby request. */
+    pmu_write(D1759_REG_SYSCTRL,
+              pmu_read(D1759_REG_SYSCTRL) | D1759_SYSCTRL_STBY);
 }
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
@@ -116,21 +120,21 @@ void pmu_set_cpu_voltage(unsigned mv)
 #if (CONFIG_RTC == RTC_NANO4G)
 void pmu_read_rtc(unsigned char* buffer)
 {
-    // TODO
-    (void) buffer;
+    pmu_read_multiple(D1759_REG_RTCSEC, 7, buffer);
 }
 
 void pmu_write_rtc(unsigned char* buffer)
 {
-    // TODO
-    (void) buffer;
+    pmu_write_multiple(D1759_REG_RTCSEC, 7, buffer);
 }
 #endif
 
 void pmu_set_usblimit(bool fast_charge)
 {
-    // TODO
-    (void) fast_charge;
+    unsigned char val = pmu_read(D1759_REG_ILIM) & ~D1759_ILIM_MASK;
+
+    val |= fast_charge ? D1759_ILIM_500MA : D1759_ILIM_100MA;
+    pmu_write(D1759_REG_ILIM, val);
 }
 
 /*
@@ -142,19 +146,28 @@ static struct mutex pmu_adc_mutex;
 unsigned short pmu_adc_raw2mv(
         const struct pmu_adc_channel *ch, unsigned short raw)
 {
-    // TODO
     (void) ch;
-    (void) raw;
-    return 0;
+    return 2500 + (raw * 2000) / 1023;
 }
 
-/* returns raw value */
+/* returns raw value of the battery channel */
 unsigned short pmu_read_adc(const struct pmu_adc_channel *ch)
 {
-    // TODO
-    int raw = 0;
-    mutex_lock(&pmu_adc_mutex);
+    int raw, tries;
+
     (void) ch;
+    mutex_lock(&pmu_adc_mutex);
+    pmu_write(D1759_REG_ADCCTL, D1759_ADCCTL_EN | D1759_ADCCTL_START
+                              | D1759_ADCCTL_MUX_VBAT);
+    for (tries = 0; tries < 20; tries++)
+    {
+        udelay(50);
+        if (!(pmu_read(D1759_REG_ADCCTL) & D1759_ADCCTL_START))
+            break;
+    }
+    raw = (pmu_read(D1759_REG_ADCHI) << 2)
+        | (pmu_read(D1759_REG_ADCLO) & 3);
+    pmu_write(D1759_REG_ADCCTL, D1759_ADCCTL_EN);
     mutex_unlock(&pmu_adc_mutex);
     return raw;
 }
@@ -203,8 +216,9 @@ int pmu_firewire_present(void)
 }
 #endif
 
-#if defined(BOOTLOADER)   // XXX: from usb-s5l8702.c
 #include "usb.h"
+
+#if defined(BOOTLOADER) && !defined(HAVE_BOOTLOADER_USB_MODE)   // XXX: from usb-s5l8702.c
 static int usb_status = USB_EXTRACTED;
 
 int usb_detect(void)
@@ -226,16 +240,23 @@ void usb_remove_int(void)
 static void pmu_read_inputs(void)
 {
 #if CONFIG_CHARGING
-    unsigned char status[3];
+    unsigned char status[3] = { 0 };
 #else
-    unsigned char status[2];
+    unsigned char status[2] = { 0 };
 #endif
 
-    pmu_read_multiple(D1759_REG_STATUSA, sizeof(status), status);
+    /* A failed read keeps the last state rather than reporting an unplug */
+    if (pmu_read_multiple(D1759_REG_STATUSA, sizeof(status), status))
+        return;
 
+    /* Report only changes: every USB event restarts the idle poweroff
+     * timer, and the inputs are polled. */
     if (status[0] & D1759_STATUSA_VBUS)
-        usb_insert_int();
-    else
+    {
+        if (usb_detect() != USB_INSERTED)
+            usb_insert_int();
+    }
+    else if (usb_detect() != USB_EXTRACTED)
         usb_remove_int();
 
 #ifdef IPOD_ACCESSORY_PROTOCOL
@@ -259,7 +280,11 @@ static void NORETURN_ATTR pmu_thread(void)
 
     while (true)
     {
-        queue_wait_w_tmo(&pmu_queue, &ev, TIMEOUT_BLOCK);
+        /* GPIO_EINT_PMU never fires on a 16 GB Nano 4G: unplugging USB and
+         * moving the hold switch latch D1759 events, and none of the
+         * candidate pins changes level. USB removal also latches only
+         * EVENTC 0x14, which is masked. Poll the inputs instead. */
+        queue_wait_w_tmo(&pmu_queue, &ev, HZ/5);
         switch (ev.id)
         {
             case Q_EINT:
@@ -278,6 +303,7 @@ static void NORETURN_ATTR pmu_thread(void)
                 break;
 
             case SYS_TIMEOUT:
+                pmu_read_inputs();
                 break;
         }
     }
@@ -334,7 +360,7 @@ int pmu_wr_multiple(int address, int count, unsigned char* buffer)
 
 unsigned char pmu_rd(int address)
 {
-    unsigned char val;
+    unsigned char val = 0;
     pmu_rd_multiple(address, 1, &val);
     return val;
 }
@@ -344,8 +370,82 @@ int pmu_wr(int address, unsigned char val)
     return pmu_wr_multiple(address, 1, &val);
 }
 
+#ifdef BOOTLOADER
+/* emcore bootstub pmuwrite, with a spin limit. The Rockbox I2C driver
+ * calls udelay(), and the usec timer is not running yet. */
+static int i2c_spin(volatile uint32_t *reg, uint32_t mask, bool set)
+{
+    for (int i = 0; i < 100000; i++) {
+        uint32_t v = *reg;
+        if (set) {
+            if (v & mask)
+                return 0;
+        } else if ((v & mask) == 0) {
+            return 0;
+        }
+    }
+    return -1;
+}
+
+static int pmu_wr_bounded(unsigned char addr, unsigned char data)
+{
+    if (i2c_spin(&IICUNK10(0), 0xffffffff, false))
+        return -1;
+
+    IICDS(0) = 0xe6;
+    IICSTAT(0) = 0xf0;
+    IICCON(0) = 0xb7;
+    if (i2c_spin(&IICCON(0), 0x10, true))
+        return -1;
+
+    IICDS(0) = addr;
+    IICCON(0) = 0xb7;
+    if (i2c_spin(&IICCON(0), 0x10, true))
+        return -1;
+
+    IICDS(0) = data;
+    IICCON(0) = 0xb7;
+    if (i2c_spin(&IICCON(0), 0x10, true))
+        return -1;
+
+    IICSTAT(0) = 0xd0;
+    IICCON(0) = 0xb7;
+    return i2c_spin(&IICSTAT(0), 0x20, false);
+}
+
+void nano4g_backlight_now(void)
+{
+    clockgate_enable(CLOCKGATE_I2C0, true);
+    clockgate_enable(CLOCKGATE_I2C0_2, true);
+
+    /* I2C0 pins and controller setup, as in the emcore bootstub */
+    PCON2 = (PCON2 & ~0xf0000000) | 0x20000000;
+    PCON3 = (PCON3 & ~0x0000000f) | 0x00000002;
+    if (i2c_spin(&IICUNK10(0), 0xffffffff, false))
+        return;
+    IICADD(0) = 0x40;
+    IICUNK14(0) = 1;
+    IICUNK18(0) = 0;
+    IICSTAT(0) = 0x80;
+    IICCON(0) = 0;
+    IICSTAT(0) = 0;
+    IICDS(0) = 0x40;
+    IICCON(0) = 0x181;
+    IICSTAT(0) = 0x10;
+
+    /* bootstub final values: brightness 250, LEDCTL = 3 (on, no fade) */
+    if (pmu_wr_bounded(D1759_REG_LEDOUT, 250))
+        return;
+    pmu_wr_bounded(D1759_REG_LEDCTL, 3);
+}
+#endif
+
+/* Non-zero so it stays in .data: pmu_preinit() runs before SDRAM is up */
+unsigned char pmu_chctl_boot = 0xff;
+
 void pmu_preinit(void)
 {
+    pmu_chctl_boot = pmu_rd(D1759_REG_CHCTL);
     pmu_wr(0x14, 0x13);
     pmu_wr(0x15, 0x0d);
     pmu_wr(0xb, 0x22);
