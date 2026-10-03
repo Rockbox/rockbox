@@ -30,10 +30,25 @@
 #include "lcd-s5l8702.h"
 #endif
 
+static unsigned char led_out = DEFAULT_BRIGHTNESS_SETTING << 2;
+static bool led_on;
+
+/* As Apple's DxeD1759 does it: SYSCTRL bits 4..6 (pmu_preinit sets them)
+ * are cleared while LEDOUT and LEDCTL are written, then restored. */
+static void led_update(void)
+{
+    unsigned char sysctrl = pmu_read(D1759_REG_SYSCTRL);
+
+    pmu_write(D1759_REG_SYSCTRL, sysctrl & 0x8f);
+    pmu_write(D1759_REG_LEDOUT, led_out);
+    pmu_write(D1759_REG_LEDCTL, led_on ? D1759_LEDCTL_ENABLE : 0);
+    pmu_write(D1759_REG_SYSCTRL, sysctrl);
+}
 
 void backlight_hw_brightness(int brightness)
 {
-    pmu_write(D1759_REG_LEDOUT, brightness << 2);
+    led_out = brightness << 2;
+    led_update();
 }
 
 void backlight_hw_on(void)
@@ -42,19 +57,19 @@ void backlight_hw_on(void)
     if (!lcd_active())
         lcd_awake();
 #endif
-    pmu_write(D1759_REG_LEDCTL,
-            (pmu_read(D1759_REG_LEDCTL) | D1759_LEDCTL_ENABLE));
+    led_on = true;
+    led_update();
 }
 
 void backlight_hw_off(void)
 {
-    pmu_write(D1759_REG_LEDCTL,
-            (pmu_read(D1759_REG_LEDCTL) & ~D1759_LEDCTL_ENABLE));
+    led_on = false;
+    led_update();
 }
 
 bool backlight_hw_init(void)
 {
-    backlight_hw_brightness(DEFAULT_BRIGHTNESS_SETTING);
+    led_out = DEFAULT_BRIGHTNESS_SETTING << 2;
     backlight_hw_on();
     return true;
 }
