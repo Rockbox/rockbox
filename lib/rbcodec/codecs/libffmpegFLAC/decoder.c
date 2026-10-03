@@ -679,7 +679,6 @@ int flac_decode_frame(FLACContext *s,
                       void (*yield)(void))
 {
     int tmp;
-    int i;
     int framesize;
     int scale;
 
@@ -705,33 +704,40 @@ int flac_decode_frame(FLACContext *s,
 
     yield();
     
-#define DECORRELATE(left, right)\
-             for (i = 0; i < s->blocksize; i++) {\
+#if defined(CPU_ARM_CLASSIC) && !defined(FLAC_NO_DECORRELATE_ASM)
+/* arm.S does the same, four pairs at a time. */
+#define DECORRELATE(arm, left, right)\
+             arm(s->decoded[0], s->decoded[1], s->blocksize, scale);
+#else
+#define DECORRELATE(arm, left, right)\
+             for (int i = 0; i < s->blocksize; i++) {\
                 int32_t a = s->decoded[0][i];\
                 int32_t b = s->decoded[1][i];\
                 s->decoded[0][i] = (left)  << scale;\
                 s->decoded[1][i] = (right) << scale;\
-             }\
+             }
+#endif
 
     scale=FLAC_OUTPUT_DEPTH-s->bps;
     switch(s->ch_mode)
     {
         case INDEPENDENT:
             if (s->channels <= 2) {
-                DECORRELATE(a, b) /* Always decorrelate exactly the two supported channels. */
+                /* Always decorrelate exactly the two supported channels. */
+                DECORRELATE(flac_decorrelate_indep_arm, a, b)
             } else {
                 if ((tmp=flac_downmix(s)) != 0)
                     return tmp;
             }
             break;
         case LEFT_SIDE:
-            DECORRELATE(a, a-b)
+            DECORRELATE(flac_decorrelate_ls_arm, a, a-b)
             break;
         case RIGHT_SIDE:
-            DECORRELATE(a+b, b)
+            DECORRELATE(flac_decorrelate_rs_arm, a+b, b)
             break;
         case MID_SIDE:
-            DECORRELATE( (a-=b>>1) + b, a)
+            DECORRELATE(flac_decorrelate_ms_arm, (a-=b>>1) + b, a)
             break;
     }
 

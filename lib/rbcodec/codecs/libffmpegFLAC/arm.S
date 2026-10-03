@@ -1012,3 +1012,88 @@ flac_rice_decode_arm:
     .byte  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     .byte  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 #endif
+
+/* Channel decorrelation and the shift to FLAC_OUTPUT_DEPTH, the loop at the
+   end of flac_decode_frame():
+
+   void flac_decorrelate_<mode>_arm(int32_t *ch0, int32_t *ch1, int n,
+                                    int scale);
+
+   Both channels are rewritten in place, as left and right, each shifted up
+   by scale.  The shift is folded into the arithmetic, (a<<s) + (b<<s) for
+   (a+b)<<s and so on, which is the same modulo 2^32 and saves an
+   instruction per pair.  Four pairs go per pass, through ldm and stm, and a
+   scalar loop takes the rest of a block that is not a multiple of four.
+
+   Dense enough to stay cache-resident, so it lives in DRAM (§8). */
+
+/* One pair, in place: \a is channel 0 and \b channel 1 on entry.  Mid/side
+   leaves left in \b and right in \a; every other mode leaves left in \a. */
+.macro DECORR_PAIR mode, a, b
+.ifc \mode,indep
+    mov     \a, \a, lsl r3
+    mov     \b, \b, lsl r3
+.endif
+.ifc \mode,ls                         @ left, side
+    mov     \a, \a, lsl r3            @ left
+    sub     \b, \a, \b, lsl r3        @ right = left - side
+.endif
+.ifc \mode,rs                         @ side, right
+    mov     \b, \b, lsl r3            @ right
+    add     \a, \b, \a, lsl r3        @ left = side + right
+.endif
+.ifc \mode,ms                         @ mid, side
+    sub     \a, \a, \b, asr #1        @ mid - side/2
+    mov     \a, \a, lsl r3            @ right
+    add     \b, \a, \b, lsl r3        @ left = right + side
+.endif
+.endm
+
+.macro DECORR_FN name, mode
+    .align  2
+    .global \name
+\name:
+    stmfd   sp!, { r4-r11, lr }
+    subs    r2, r2, #4
+    blt     2f
+1:
+    ldmia   r0, { r4-r7 }
+    ldmia   r1, { r8-r11 }
+    DECORR_PAIR \mode, r4, r8
+    DECORR_PAIR \mode, r5, r9
+    DECORR_PAIR \mode, r6, r10
+    DECORR_PAIR \mode, r7, r11
+.ifc \mode,ms
+    stmia   r0!, { r8-r11 }
+    stmia   r1!, { r4-r7 }
+.else
+    stmia   r0!, { r4-r7 }
+    stmia   r1!, { r8-r11 }
+.endif
+    subs    r2, r2, #4
+    bge     1b
+2:
+    adds    r2, r2, #4
+    beq     4f
+3:
+    ldr     r4, [r0]
+    ldr     r8, [r1]
+    DECORR_PAIR \mode, r4, r8
+.ifc \mode,ms
+    str     r8, [r0], #4
+    str     r4, [r1], #4
+.else
+    str     r4, [r0], #4
+    str     r8, [r1], #4
+.endif
+    subs    r2, r2, #1
+    bne     3b
+4:
+    ldmpc   regs=r4-r11
+.endm
+
+    .section .text.flac_decorrelate,"ax",%progbits
+    DECORR_FN flac_decorrelate_indep_arm, indep
+    DECORR_FN flac_decorrelate_ls_arm, ls
+    DECORR_FN flac_decorrelate_rs_arm, rs
+    DECORR_FN flac_decorrelate_ms_arm, ms
