@@ -25,12 +25,18 @@ MEMORY
 
     /* IRAM region where loaded IM3 body will be moved and executed,
        preserving the loaded IM3 header (0x600 or 0x800 bytes) at IRAM1_ORIG */
-    MOVE_AREA : ORIGIN = IRAM1_ORIG + IM3HDR_SZ,
-                LENGTH = IRAM1_SIZE - IM3HDR_SZ
-
-    /* DRAM region for BSS */
+#ifdef IPOD_NANO4G
+    /* The BootROM puts the NAND image's body at 0x22000000 and enters it
+     * there */
+    MOVE_AREA : ORIGIN = IRAM0_ORIG, LENGTH = IRAM0_SIZE
     BSS_AREA  : ORIGIN = DRAM_ORIG + MAX_LOADSIZE,
                 LENGTH = DRAM_SIZE - MAX_LOADSIZE - TTB_SIZE
+#else
+    MOVE_AREA : ORIGIN = IRAM1_ORIG + IM3HDR_SZ,
+                LENGTH = IRAM1_SIZE - IM3HDR_SZ
+    BSS_AREA  : ORIGIN = DRAM_ORIG + MAX_LOADSIZE,
+                LENGTH = DRAM_SIZE - MAX_LOADSIZE - TTB_SIZE
+#endif
 }
 #define LOAD_AREA   MOVE_AREA
 #else
@@ -82,7 +88,11 @@ SECTIONS
      *(.stack)
      _stackbegin = .;
      stackbegin = .;
+#ifdef IPOD_NANO4G
+     . += 0x1400;
+#else
      . += 0x2000;
+#endif
      _stackend = .;
      stackend = .;
      _irqstackbegin = .;

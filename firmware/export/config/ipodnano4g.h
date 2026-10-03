@@ -83,6 +83,14 @@
 
 #define CONFIG_NAND NAND_S5L8720
 
+/* Write to Apple's FTL. A failed block is not remapped yet: the disk
+ * becomes read-only until reboot. The bootloader arms its own writes
+ * only after PLAY is held. */
+#define N4G_FTL_WRITE
+#ifdef BOOTLOADER
+#define N4G_BL_FTL_WRITE
+#endif
+
 /* define this if at least one storage driver
    needs to do cleanup on shutdown */
 #define HAVE_STORAGE_FLUSH

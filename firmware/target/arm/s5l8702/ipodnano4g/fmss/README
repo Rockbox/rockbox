@@ -1,0 +1,39 @@
+iPod Nano 4G flash sequencer (FMSS) programs
+============================================
+
+The .s files here are the programs the NAND driver (../nand-nano4g.c) runs
+on the S5L8720 flash sequencer. They are assembled during the build by the
+host tool tools/fmssasm (firmware.make includes fmss.make when the target's
+toolset lists fmssasm) into $(BUILDDIR)/fmss-nano4g.h, which defines one
+static, 32-byte aligned array fmss_prog_<name> per file. Edit the sources.
+
+  erase.s     erase one block
+  program.s   program one 4 KiB page (eight BCH codewords + metadata)
+  read.s      read 4 KiB pages with ECC, metadata and per-chunk status
+  boot_read.s     read one BootROM boot page (0x600 bytes, three BCH16
+                  chunks, no metadata)
+  boot_program.s  program one BootROM boot page (bootloader only)
+
+Each instruction is two words: word0 = arg | reg << 16 | opcode << 24,
+word1 = immediate. The sequencer fetches the program from memory by bus
+address, so the arrays must be cleaned from the D-cache before a run.
+
+Instruction set. Registers r0..r7; r6 is visible to the CPU at FMC +0xc30
+when the program ends. [REG] = MMIO register 0x38a00000 + arg; mem32[rX] =
+system memory.
+  op 00 END   stop, raise interrupt bit 0 (done)
+  op 01 WR    [arg] = imm          op 02 ST    [arg] = rR
+  op 03 LDI   rR = mem32[r(arg)]   op 04 LD    rR = [arg] & imm
+  op 05 MOVI  rR = imm             op 06 MOV   rR = r(arg)
+  op 07 WAIT  wait for event R: 0 command sent, 1 address sent, 2 DMA done,
+              3 data transferred, 4 ECC done, 12 NAND status match
+              (arg = value, mask); a timeout jumps to the fault vector
+              (+0xc4c)
+  op 0a/0b/0c/0d AND/OR/ADD/SUB, op 13/14 SHL/SHR: imm != 0: rR = r(arg)
+              op imm; imm == 0: rR = rR op r(arg)
+  op 0e BNZ / op 17 BZ   branch to byte offset imm if rR != 0 / == 0
+  op 11 STI   mem32[r(arg)] = rR
+
+Parameters are words at FMC +0xd08.. written by the CPU before a run (see
+the head of each program). The erase and program results are r6 = 0 on
+success, bit 0 if the chip reported FAIL, bit 27 on a sequencer fault.

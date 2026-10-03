@@ -1661,6 +1661,7 @@ target/arm/s5l8702/ipodnano4g/adc-nano4g.c
 target/arm/s5l8702/ipodnano4g/powermgmt-nano4g.c
 target/arm/s5l8702/ipodnano4g/power-nano4g.c
 target/arm/s5l8702/ipodnano4g/nand-nano4g.c
+target/arm/s5l8702/ipodnano4g/ftl-nano4g.c
 #if (CONFIG_RTC == RTC_NANO4G)
 target/arm/s5l8702/ipodnano4g/rtc-nano4g.c
 #endif
