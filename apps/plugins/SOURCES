@@ -218,7 +218,8 @@ test_codec.c
 test_core_jpeg.c
 #endif
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE) && defined(CPU_ARM) \
-    && !defined(CPU_ARM_MICRO)
+    && !defined(CPU_ARM_MICRO) \
+    && PLUGIN_BUFFER_SIZE > 0x20000 /* about 140 KB on ARMv5 */
 test_cyc.c
 #endif
 test_disk.c
