@@ -1,12 +1,18 @@
 # Cabbie v2.0
-# (C) 2007-2012 The Authors (see /rockbox/wps/AUTHORS)
+# (C) 2007-2026 The Authors (see /rockbox/wps/AUTHORS)
 # Derived from "cabbie" (C) Yohann Misquitta
+#
+# One backdrop for the WPS and the FM screen: the header label is drawn,
+# rather than painted into it.
 #
 # Disable Status Bar
 %wd
 #
 # Load Backdrop
-%X(wpsbackdrop-400x240x16.bmp)
+%X(backdrop-400x240x16.bmp)
+#
+# Header font
+%Fl(2,12-Adobe-Helvetica-Bold.fnt)
 #
 # Preload Images
 %xl(A,lock-320x240x16.bmp,0,0,2)
@@ -15,9 +21,15 @@
 %xl(D,shuffle-320x240x16.bmp,0,0)
 %xl(E,repeat-320x240x16.bmp,0,0,4)
 %xl(F,playmode-320x240x16.bmp,0,0,5)
+%xl(G,shuffleoff-400x240x16.bmp,0,0)
+%xl(H,repeatoff-400x240x16.bmp,0,0)
 #
 # Album Art/Info Viewport Conditional
 %?C<%Vd(a)|%Vd(b)>
+#
+# Header
+%V(10,11,380,12,2)%Vf(0F0B00)
+%acNOW PLAYING
 #
 # Progress Bar
 %V(10,162,380,15,-)
@@ -37,11 +49,11 @@
 #
 # Shuffle
 %V(277,211,37,16,-)
-%?ps<%xd(D)>
+%?ps<%xd(D)|%xd(G)>
 #
 # Repeat
 %V(320,207,18,23,-)
-%?mm<|%xd(Ea)|%xd(Eb)|%xd(Ec)|%xd(Ed)>
+%?mm<%xd(H)|%xd(Ea)|%xd(Eb)|%xd(Ec)|%xd(Ed)>
 #
 # Playmode
 %V(346,207,24,23,-)

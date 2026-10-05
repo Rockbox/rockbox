@@ -110,6 +110,7 @@ wps.112x64x1:         cabbiev2.112x64x1.wps
 wps.96x96x(16|24|32):    cabbiev2.96x96x16.wps
 
 # override implicit .fms filename
+fms.400x240x(16|24|32):  cabbiev2-400x240x16.fms
 fms.160x128x2:   cabbiev2-160x128x2.fms
 fms.128x128x2:   cabbiev2-128x128x2.fms
 

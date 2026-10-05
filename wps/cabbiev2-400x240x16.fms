@@ -1,0 +1,94 @@
+# Cabbie v2.0
+# (C) 2010-2026 The Authors (see /rockbox/wps/AUTHORS)
+# Derived from "Cabbie v2.0" (C) 2010-2012 The Authors
+#
+# One backdrop for the WPS and the FM screen: the header label is drawn,
+# rather than painted into it.
+#
+# Disable Status Bar
+%wd
+#
+# Load Backdrop
+%X(backdrop-400x240x16.bmp)
+#
+# Header font
+%Fl(2,12-Adobe-Helvetica-Bold.fnt)
+#
+# Preload Images
+%xl(lock,lock-320x240x16.bmp,0,0,2)
+%xl(battery,battery-320x240x16.bmp,0,0,10)
+%xl(volume,volume-320x240x16.bmp,0,0,10)
+#
+# Station Art/Info Viewport Conditional
+# Preset present conditional
+# RDS present conditional
+%?C<%Vd(art)>
+%?Ti<%?C<%Vd(art_preset)|%Vd(noart_preset)>>
+%?tx<%?Ti<%?C<%Vd(art_preset_rds)|%Vd(noart_preset_rds)>|%?C<%Vd(art_nopreset_rds)|%Vd(noart_nopreset_rds)>>|>
+#
+# Header
+%V(10,11,380,12,2)%Vf(0F0B00)
+%acFM RADIO
+#
+# Frequency Bar
+%V(10,162,380,15,-)
+%pb(0,0,380,15,pb-400x240x16.bmp)
+#
+# Hold
+%V(144,207,30,23,-)
+%xd(lock,%mh)
+#
+# Battery
+%V(182,207,44,23,-)
+%?bp<%?bc<%xd(battery,1)|%xd(battery,2)>|%xd(battery,%bl,2)>
+#
+# Volume
+%V(233,207,34,23,-)
+%xd(volume,%pv)
+#
+# Signal strength
+%V(277,207,113,23,1)
+%ar%tr dBuV
+#
+# Below frequency bar Scan/Preset frequency MHz Force Mono/Mono/Stereo
+%V(32,180,336,20,1)
+%al%?tm<%Sx(Scan)|%Sx(Preset)> %ac%tf MHz %ar%?St(force fm mono)<%Sx(Force Mono)|%?ts<%Sx(Stereo)|%Sx(Mono)>>
+#
+# Station Art
+%ax%Vl(art,16,32,120,120,-)
+%Cl(0,0,120,120,c,c)
+%Cd
+#
+# Station Art
+# Preset present
+%ax%Vl(art_preset,153,40,-,20,1)
+%Vp(0,%s%al%?Ti<Station: |>%?Tn<%Tn|%Tf>)
+%ax%Vl(art_preset,153,62,-,20,1)
+%Vp(1,%s%al%?Ti<Next station: |>%?Tn<%Tn|%Tf>)
+#
+%ax%Vl(art_preset_rds,153,94,-,40,1)
+%s%al%ty
+%s%al%tz
+#
+# Station Art
+# Preset absent
+%ax%Vl(art_nopreset_rds,153,62,-,40,1)
+%s%al%ty
+%s%al%tz
+#
+# No station art
+# Preset present
+%Vl(noart_preset,10,40,380,20,1)
+%Vp(0,%s%ac%?Ti<Station: |>%?Tn<%Tn|%Tf>)
+%Vl(noart_preset,10,62,380,20,1)
+%Vp(1,%s%ac%?Ti<Next station: |>%?Tn<%Tn|%Tf>)
+#
+%Vl(noart_preset_rds,10,94,380,40,1)
+%s%ac%ty
+%s%ac%tz
+#
+# No station art
+# Preset absent
+%Vl(noart_nopreset_rds,10,62,380,40,1)
+%s%ac%ty
+%s%ac%tz
