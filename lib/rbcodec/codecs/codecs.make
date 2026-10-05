@@ -17,8 +17,9 @@ CODECS := $(subst $(RBCODECLIB_DIR),$(RBCODEC_BLD),$(CODECS))
 include $(RBCODECLIB_DIR)/codecs/lib/libcodec.make
 OTHER_INC += -I$(RBCODECLIB_DIR)/codecs/lib
 
-# extra libraries
-CODEC_LIBS := $(CODECLIB) $(FIXEDPOINTLIB)
+# extra libraries.  libarm_support has the division routines, which are much
+# faster than what libgcc may supply; it is empty when not building for ARM.
+CODEC_LIBS := $(CODECLIB) $(FIXEDPOINTLIB) $(ARMSUPPORTLIB)
 
 # compile flags for codecs
 CODECFLAGS := $(CFLAGS) $(RBCODEC_CFLAGS) -fstrict-aliasing \
