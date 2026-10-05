@@ -121,21 +121,37 @@ each function (and the RNGC macro)).
    for aligned reads.
 */
 
-static unsigned char* bytebuffer IBSS_ATTR_DEMAC;
-static int bytebufferoffset IBSS_ATTR_DEMAC;
-
-static inline void skip_byte(void)
+/* The decoder's state.  It lives in statics between calls, but while a
+   block is decoded it is copied to locals, so that the compiler can keep
+   it in registers: with every field in memory, loads and stores were about
+   half of the decode time on ARM7TDMI.  That only works if everything
+   that takes a pointer to it is inlined, which the compiler does not
+   always choose to do by itself. */
+#define DEMAC_INLINE static inline __attribute__((always_inline))
+struct rangecoder_t
 {
-    bytebufferoffset--;
-    bytebuffer += bytebufferoffset & 4;
-    bytebufferoffset &= 3;
+    uint32_t low;        /* low end of interval */
+    uint32_t range;      /* length of interval */
+    uint32_t help;       /* bytes_to_follow resp. intermediate value */
+    unsigned int buffer; /* buffer for input/output */
+    unsigned char* bytebuffer;
+    int bytebufferoffset;
+};
+
+static struct rangecoder_t rc IBSS_ATTR_DEMAC;
+
+DEMAC_INLINE void skip_byte(struct rangecoder_t* rc)
+{
+    rc->bytebufferoffset--;
+    rc->bytebuffer += rc->bytebufferoffset & 4;
+    rc->bytebufferoffset &= 3;
 }
 
-static inline int read_byte(void)
+DEMAC_INLINE int read_byte(struct rangecoder_t* rc)
 {
-    int ch = bytebuffer[bytebufferoffset];
+    int ch = rc->bytebuffer[rc->bytebufferoffset];
 
-    skip_byte();
+    skip_byte(rc);
 
     return ch;
 }
@@ -150,31 +166,21 @@ static inline int read_byte(void)
 #define EXTRA_BITS ((CODE_BITS-2) % 8 + 1)
 #define BOTTOM_VALUE (TOP_VALUE >> 8)
 
-struct rangecoder_t
-{
-    uint32_t low;        /* low end of interval */
-    uint32_t range;      /* length of interval */
-    uint32_t help;       /* bytes_to_follow resp. intermediate value */
-    unsigned int buffer; /* buffer for input/output */
-};
-
-static struct rangecoder_t rc IBSS_ATTR_DEMAC;
-
 /* Start the decoder */
-static inline void range_start_decoding(void)
+DEMAC_INLINE void range_start_decoding(struct rangecoder_t* rc)
 {
-    rc.buffer = read_byte();
-    rc.low = rc.buffer >> (8 - EXTRA_BITS);
-    rc.range = (uint32_t) 1 << EXTRA_BITS;
+    rc->buffer = read_byte(rc);
+    rc->low = rc->buffer >> (8 - EXTRA_BITS);
+    rc->range = (uint32_t) 1 << EXTRA_BITS;
 }
 
-static inline void range_dec_normalize(void)
+DEMAC_INLINE void range_dec_normalize(struct rangecoder_t* rc)
 {
-    while (rc.range <= BOTTOM_VALUE)
-    {   
-        rc.buffer = (rc.buffer << 8) | read_byte();
-        rc.low = (rc.low << 8) | ((rc.buffer >> 1) & 0xff);
-        rc.range <<= 8;
+    while (rc->range <= BOTTOM_VALUE)
+    {
+        rc->buffer = (rc->buffer << 8) | read_byte(rc);
+        rc->low = (rc->low << 8) | ((rc->buffer >> 1) & 0xff);
+        rc->range <<= 8;
     }
 }
 
@@ -182,87 +188,76 @@ static inline void range_dec_normalize(void)
 /* tot_f is the total frequency                              */
 /* or: totf is (code_value)1<<shift                                      */
 /* returns the culmulative frequency                         */
-static inline int range_decode_culfreq(int tot_f)
+DEMAC_INLINE int range_decode_culfreq(struct rangecoder_t* rc, int tot_f)
 {
-    range_dec_normalize();
-    rc.help = UDIV32(rc.range, tot_f);
-    return UDIV32(rc.low, rc.help);
+    range_dec_normalize(rc);
+    rc->help = UDIV32(rc->range, tot_f);
+    return UDIV32(rc->low, rc->help);
 }
 
-static inline int range_decode_culshift(int shift)
+DEMAC_INLINE int range_decode_culshift(struct rangecoder_t* rc, int shift)
 {
-    range_dec_normalize();
-    rc.help = rc.range >> shift;
-    return UDIV32(rc.low, rc.help);
+    range_dec_normalize(rc);
+    rc->help = rc->range >> shift;
+    return UDIV32(rc->low, rc->help);
 }
 
 
 /* Update decoding state                                     */
 /* sy_f is the interval length (frequency of the symbol)     */
 /* lt_f is the lower end (frequency sum of < symbols)        */
-static inline void range_decode_update(int sy_f, int lt_f)
+DEMAC_INLINE void range_decode_update(struct rangecoder_t* rc,
+                                       int sy_f, int lt_f)
 {
-    rc.low -= rc.help * lt_f;
-    rc.range = rc.help * sy_f;
+    rc->low -= rc->help * lt_f;
+    rc->range = rc->help * sy_f;
 }
 
 
 /* Decode a byte/short without modelling                     */
-static inline unsigned char decode_byte(void)
-{   int tmp = range_decode_culshift(8);
-    range_decode_update( 1,tmp);
-    return tmp;
-}
-
-static inline unsigned short range_decode_short(void)
-{   int tmp = range_decode_culshift(16);
-    range_decode_update( 1,tmp);
+DEMAC_INLINE unsigned short range_decode_short(struct rangecoder_t* rc)
+{   int tmp = range_decode_culshift(rc, 16);
+    range_decode_update(rc, 1, tmp);
     return tmp;
 }
 
 /* Decode n bits (n <= 16) without modelling - based on range_decode_short */
-static inline int range_decode_bits(int n)
-{   int tmp = range_decode_culshift(n);
-    range_decode_update( 1,tmp);
+DEMAC_INLINE int range_decode_bits(struct rangecoder_t* rc, int n)
+{   int tmp = range_decode_culshift(rc, n);
+    range_decode_update(rc, 1, tmp);
     return tmp;
 }
 
 
 /* Finish decoding                                           */
-static inline void range_done_decoding(void)
-{   range_dec_normalize();      /* normalize to use up all bytes */
+DEMAC_INLINE void range_done_decoding(struct rangecoder_t* rc)
+{   range_dec_normalize(rc);    /* normalize to use up all bytes */
 }
 
 /*
-  range_get_symbol_* functions based on main decoding loop in simple_d.c from
+  range_get_symbol() is based on the main decoding loop in simple_d.c from
   http://www.compressconsult.com/rangecoder/rngcod13.zip
   (c) Michael Schindler
+
+  That divides low by help for the cumulative frequency cf and then looks
+  for the last symbol whose count is not above it.  counts[n] <= cf is the
+  same as counts[n] * help <= low, so the division is not needed: the search
+  multiplies instead.  The first few symbols are by far the likeliest, so
+  it is short.  No count is above 65536 and help is below it here, so the
+  product cannot overflow.
 */
-
-static inline int range_get_symbol_3980(void)
+DEMAC_INLINE int range_get_symbol(struct rangecoder_t* rc,
+                                   const int* counts, const int* counts_diff)
 {
-    int symbol, cf;
+    int symbol;
 
-    cf = range_decode_culshift(16);
+    range_dec_normalize(rc);
+    rc->help = rc->range >> 16;
 
-    /* figure out the symbol inefficiently; a binary search would be much better */
-    for (symbol = 0; counts_3980[symbol+1] <= cf; symbol++);
+    for (symbol = 0; (uint32_t)counts[symbol+1] * rc->help <= rc->low;
+         symbol++);
 
-    range_decode_update(counts_diff_3980[symbol],counts_3980[symbol]);
-
-    return symbol;
-}
-
-static inline int range_get_symbol_3970(void)
-{
-    int symbol, cf;
-
-    cf = range_decode_culshift(16);
-
-    /* figure out the symbol inefficiently; a binary search would be much better */
-    for (symbol = 0; counts_3970[symbol+1] <= cf; symbol++);
-
-    range_decode_update(counts_diff_3970[symbol],counts_3970[symbol]);
+    range_decode_update(rc, counts_diff[symbol], counts[symbol]);
 
     return symbol;
 }
@@ -278,7 +273,7 @@ struct rice_t
 static struct rice_t riceX IBSS_ATTR_DEMAC;
 static struct rice_t riceY IBSS_ATTR_DEMAC;
 
-static inline void update_rice(struct rice_t* rice, int x)
+DEMAC_INLINE void update_rice(struct rice_t* rice, int x)
 {
     rice->ksum += ((x + 1) / 2) - ((rice->ksum + 16) >> 5);
 
@@ -294,7 +289,8 @@ static inline void update_rice(struct rice_t* rice, int x)
     }
 }
 
-static inline int entropy_decode3980(struct rice_t* rice)
+DEMAC_INLINE int entropy_decode3980(struct rangecoder_t* rc,
+                                     struct rice_t* rice)
 {
     int base, x, pivot, overflow;
 
@@ -302,11 +298,11 @@ static inline int entropy_decode3980(struct rice_t* rice)
     if (UNLIKELY(pivot == 0))
         pivot=1;
 
-    overflow = range_get_symbol_3980();
+    overflow = range_get_symbol(rc, counts_3980, counts_diff_3980);
 
     if (UNLIKELY(overflow == (MODEL_ELEMENTS-1))) {
-        overflow = range_decode_short() << 16;
-        overflow |= range_decode_short();
+        overflow = range_decode_short(rc) << 16;
+        overflow |= range_decode_short(rc);
     }
 
     if (pivot >= 0x10000) {
@@ -322,17 +318,17 @@ static inline int entropy_decode3980(struct rice_t* rice)
         */
         lo_bits = (nbits - 16);
 
-        base_hi = range_decode_culfreq((pivot >> lo_bits) + 1);
-        range_decode_update(1, base_hi);
+        base_hi = range_decode_culfreq(rc, (pivot >> lo_bits) + 1);
+        range_decode_update(rc, 1, base_hi);
 
-        base_lo = range_decode_culshift(lo_bits);
-        range_decode_update(1, base_lo);
+        base_lo = range_decode_culshift(rc, lo_bits);
+        range_decode_update(rc, 1, base_lo);
 
         base = (base_hi << lo_bits) + base_lo;
     } else {
         /* Codepath for 16-bit streams */
-        base = range_decode_culfreq(pivot);
-        range_decode_update(1, base);
+        base = range_decode_culfreq(rc, pivot);
+        range_decode_update(rc, 1, base);
     }
 
     x = base + (overflow * pivot);
@@ -346,24 +342,25 @@ static inline int entropy_decode3980(struct rice_t* rice)
 }
 
 
-static inline int entropy_decode3970(struct rice_t* rice)
+DEMAC_INLINE int entropy_decode3970(struct rangecoder_t* rc,
+                                     struct rice_t* rice)
 {
     int x, tmpk;
 
-    int overflow = range_get_symbol_3970();
+    int overflow = range_get_symbol(rc, counts_3970, counts_diff_3970);
 
     if (UNLIKELY(overflow == (MODEL_ELEMENTS - 1))) {
-        tmpk = range_decode_bits(5);
+        tmpk = range_decode_bits(rc, 5);
         overflow = 0;
     } else {
         tmpk = (rice->k < 1) ? 0 : rice->k - 1;
     }
 
     if (tmpk <= 16) {
-        x = range_decode_bits(tmpk);
+        x = range_decode_bits(rc, tmpk);
     } else {
-        x = range_decode_short();
-        x |= (range_decode_bits(tmpk - 16) << 16);
+        x = range_decode_short(rc);
+        x |= (range_decode_bits(rc, tmpk - 16) << 16);
     }
     x += (overflow << tmpk);
 
@@ -380,24 +377,24 @@ void init_entropy_decoder(struct ape_ctx_t* ape_ctx,
                           unsigned char* inbuffer, int* firstbyte,
                           int* bytesconsumed)
 {
-    bytebuffer = inbuffer;
-    bytebufferoffset = *firstbyte;
+    rc.bytebuffer = inbuffer;
+    rc.bytebufferoffset = *firstbyte;
 
     /* Read the CRC */
-    ape_ctx->CRC = read_byte();
-    ape_ctx->CRC = (ape_ctx->CRC << 8) | read_byte();
-    ape_ctx->CRC = (ape_ctx->CRC << 8) | read_byte();
-    ape_ctx->CRC = (ape_ctx->CRC << 8) | read_byte();
+    ape_ctx->CRC = read_byte(&rc);
+    ape_ctx->CRC = (ape_ctx->CRC << 8) | read_byte(&rc);
+    ape_ctx->CRC = (ape_ctx->CRC << 8) | read_byte(&rc);
+    ape_ctx->CRC = (ape_ctx->CRC << 8) | read_byte(&rc);
 
     /* Read the frame flags if they exist */
     ape_ctx->frameflags = 0;
     if ((ape_ctx->fileversion > 3820) && (ape_ctx->CRC & 0x80000000)) {
         ape_ctx->CRC &= ~0x80000000;
 
-        ape_ctx->frameflags = read_byte();
-        ape_ctx->frameflags = (ape_ctx->frameflags << 8) | read_byte();
-        ape_ctx->frameflags = (ape_ctx->frameflags << 8) | read_byte();
-        ape_ctx->frameflags = (ape_ctx->frameflags << 8) | read_byte();
+        ape_ctx->frameflags = read_byte(&rc);
+        ape_ctx->frameflags = (ape_ctx->frameflags << 8) | read_byte(&rc);
+        ape_ctx->frameflags = (ape_ctx->frameflags << 8) | read_byte(&rc);
+        ape_ctx->frameflags = (ape_ctx->frameflags << 8) | read_byte(&rc);
     }
     /* Keep a count of the blocks decoded in this frame */
     ape_ctx->blocksdecoded = 0;
@@ -409,13 +406,13 @@ void init_entropy_decoder(struct ape_ctx_t* ape_ctx,
     riceY.ksum = (1 << riceY.k) * 16;
 
     /* The first 8 bits of input are ignored. */
-    skip_byte();
+    skip_byte(&rc);
 
-    range_start_decoding();
+    range_start_decoding(&rc);
 
     /* Return the new state of the buffer */
-    *bytesconsumed = (intptr_t)bytebuffer - (intptr_t)inbuffer;
-    *firstbyte = bytebufferoffset;
+    *bytesconsumed = (intptr_t)rc.bytebuffer - (intptr_t)inbuffer;
+    *firstbyte = rc.bytebufferoffset;
 }
 
 void ICODE_ATTR_DEMAC entropy_decode(struct ape_ctx_t* ape_ctx,
@@ -424,8 +421,12 @@ void ICODE_ATTR_DEMAC entropy_decode(struct ape_ctx_t* ape_ctx,
                                      int32_t* decoded0, int32_t* decoded1,
                                      int blockstodecode)
 {
-    bytebuffer = inbuffer;
-    bytebufferoffset = *firstbyte;
+    /* local copies, for the compiler to keep in registers */
+    struct rangecoder_t r = rc;
+    struct rice_t rx = riceX, ry = riceY;
+
+    r.bytebuffer = inbuffer;
+    r.bytebufferoffset = *firstbyte;
 
     ape_ctx->blocksdecoded += blockstodecode;
 
@@ -439,25 +440,29 @@ void ICODE_ATTR_DEMAC entropy_decode(struct ape_ctx_t* ape_ctx,
     } else {
         if (ape_ctx->fileversion > 3970) {
             while (LIKELY(blockstodecode--)) {
-                *(decoded0++) = entropy_decode3980(&riceY);
+                *(decoded0++) = entropy_decode3980(&r, &ry);
                 if (decoded1 != NULL)
-                    *(decoded1++) = entropy_decode3980(&riceX);
+                    *(decoded1++) = entropy_decode3980(&r, &rx);
             }
         } else {
             while (LIKELY(blockstodecode--)) {
-                *(decoded0++) = entropy_decode3970(&riceY);
+                *(decoded0++) = entropy_decode3970(&r, &ry);
                 if (decoded1 != NULL)
-                    *(decoded1++) = entropy_decode3970(&riceX);
+                    *(decoded1++) = entropy_decode3970(&r, &rx);
             }
         }
     }
 
     if (ape_ctx->blocksdecoded == ape_ctx->currentframeblocks)
     {
-        range_done_decoding();
+        range_done_decoding(&r);
     }
 
+    rc = r;
+    riceX = rx;
+    riceY = ry;
+
     /* Return the new state of the buffer */
-    *bytesconsumed = bytebuffer - inbuffer;
-    *firstbyte = bytebufferoffset;
+    *bytesconsumed = r.bytebuffer - inbuffer;
+    *firstbyte = r.bytebufferoffset;
 }
