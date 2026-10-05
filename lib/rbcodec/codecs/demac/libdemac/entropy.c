@@ -184,6 +184,37 @@ DEMAC_INLINE void range_dec_normalize(struct rangecoder_t* rc)
     }
 }
 
+/* range / tot_f.  tot_f is the Rice pivot, which is small (below 1024
+   for nearly every sample of ordinary 16-bit audio), so where a 32x32->64
+   multiply is cheap its reciprocal comes from a table that is filled in as
+   divisors turn up, and the division is a multiply and a correction.  The
+   other division, by help, has no such pattern. */
+#if defined(CPU_ARM) && ARM_ARCH >= 5 && !defined(ARM_HAVE_HW_DIV)
+#define RECIP_ENTRIES 4096
+/* recip[n] is (2^32 - 1) / n, which is never 0: 0 is "not worked out" */
+static uint32_t recip[RECIP_ENTRIES];
+
+DEMAC_INLINE uint32_t range_div(uint32_t range, uint32_t tot_f)
+{
+    uint32_t r, q;
+
+    if (UNLIKELY(tot_f >= RECIP_ENTRIES))
+        return UDIV32(range, tot_f);
+
+    r = recip[tot_f];
+    if (UNLIKELY(r == 0))
+        r = recip[tot_f] = UDIV32(0xffffffff, tot_f);
+
+    /* this is the quotient or one less */
+    q = ((uint64_t)range * r) >> 32;
+    if (range - q * tot_f >= tot_f)
+        q++;
+    return q;
+}
+#else
+#define range_div(range, tot_f) UDIV32(range, tot_f)
+#endif
+
 /* Calculate culmulative frequency for next symbol. Does NO update!*/
 /* tot_f is the total frequency                              */
 /* or: totf is (code_value)1<<shift                                      */
@@ -191,7 +222,7 @@ DEMAC_INLINE void range_dec_normalize(struct rangecoder_t* rc)
 DEMAC_INLINE int range_decode_culfreq(struct rangecoder_t* rc, int tot_f)
 {
     range_dec_normalize(rc);
-    rc->help = UDIV32(rc->range, tot_f);
+    rc->help = range_div(rc->range, tot_f);
     return UDIV32(rc->low, rc->help);
 }
 
