@@ -44,16 +44,31 @@ static int line = 0;
 static int max_line = 0;
 static int line_height = 0;
 static int log_fd = -1;
+static char logfilename[MAX_PATH];
 
 static void log_close(void)
 {
     if (log_fd >= 0)
         rb->close(log_fd);
+    log_fd = -1;
+}
+
+/* The file's length only reaches the disk when it is closed.  So that what
+   has been logged survives the player being switched off, or its battery
+   running out, before the plugin is left: close the log and open it again
+   to carry on. */
+static void log_commit(void)
+{
+    if (log_fd >= 0)
+    {
+        rb->close(log_fd);
+        log_fd = rb->open(logfilename, O_WRONLY|O_APPEND);
+    }
 }
 
 static bool log_init(bool use_logfile)
 {
-    char logfilename[MAX_PATH];
+    static bool close_at_exit = false;
 
     rb->lcd_getstringsize("A", NULL, &line_height);
     max_line = LCD_HEIGHT / line_height;
@@ -61,8 +76,16 @@ static bool log_init(bool use_logfile)
     rb->lcd_clear_display();
     rb->lcd_update();
 
+    log_close();
+
     if (use_logfile) {
-        log_close();
+        /* Leaving on USB or power off goes through exit(), not the end of
+           plugin_start(). */
+        if (!close_at_exit)
+        {
+            atexit(log_close);
+            close_at_exit = true;
+        }
         rb->create_numbered_filename(logfilename, HOME_DIR, "test_codec_log_", ".txt",
                                      2 IF_CNFN_NUM_(, NULL));
         log_fd = rb->open(logfilename, O_RDWR|O_CREAT|O_TRUNC, 0666);
@@ -1014,6 +1037,7 @@ menu:
                         break;
 
                     log_text("", true);
+                    log_commit();
                 }
 
                 /* Read next entry */
@@ -1022,6 +1046,9 @@ menu:
             
             rb->closedir(dir);
         }
+
+        /* The run is over: nothing more goes in the log. */
+        log_close();
     } else {
         /* Just test the file */
         res = test_track(parameter);
