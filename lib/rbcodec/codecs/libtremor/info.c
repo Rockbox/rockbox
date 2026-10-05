@@ -131,6 +131,11 @@ static int _vorbis_unpack_info(vorbis_info *vi,oggpack_buffer *opb){
   
   if(vi->rate<1)goto err_out;
   if(vi->channels<1)goto err_out;
+  /* This build decodes at most CHANNELS channels (synthesis.c produces no
+     PCM for more, and several arrays are sized by it). Refuse the stream
+     here, before its setup is unpacked: a 5.1 stream's codebooks alone
+     can take several hundred KB of the codec heap for no output. */
+  if(vi->channels>CHANNELS)goto err_out;
   if(ci->blocksizes[0]<64)goto err_out; 
   if(ci->blocksizes[1]<ci->blocksizes[0])goto err_out;
   if(ci->blocksizes[1]>8192)goto err_out;
