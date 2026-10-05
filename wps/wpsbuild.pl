@@ -231,6 +231,13 @@ sub copywps
             open(SKIN, "$dir/$file");
             while (<SKIN>) {
                 $filelist[$#filelist + 1] = $1 if (/[\(,]([^,]*?.bmp)[\),]/);
+                # fonts the skin loads itself ship with it, as the theme
+                # font does: a default theme must not need the font pack.
+                # A copy of $1: copythemefont()'s own matching resets it.
+                if (/%Fl\(\d+,([^,\)]+\.fnt)[,\)]/) {
+                    my $skinfont = $1;
+                    copythemefont($skinfont);
+                }
             }
             close(SKIN);
         }
