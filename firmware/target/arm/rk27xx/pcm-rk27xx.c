@@ -196,8 +196,9 @@ static void i2s_init(void)
 #endif
 }
 
-#ifdef CODEC_SLAVE
-/* When codec is slave we need to setup i2s MCLK clock using codec pll.
+#if defined(CODEC_SLAVE) || defined(RK27XX_I2S_MCLK)
+/* When codec is slave, or master off our MCLK (RK27XX_I2S_MCLK), we need
+ * to setup i2s MCLK clock using codec pll.
  * The MCLK frequency is 256*codec frequency as i2s setup is:
  * LRCK/SCLK = 64 and MCLK/SCLK = 4 (see i2s_init() for reference)
  *
@@ -278,7 +279,7 @@ static void sink_dma_init(void)
 
 static void sink_set_freq(uint16_t freq)
 {
-#ifdef CODEC_SLAVE
+#if defined(CODEC_SLAVE) || defined(RK27XX_I2S_MCLK)
     set_codec_freq(freq);
 #endif
 
