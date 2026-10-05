@@ -1031,6 +1031,38 @@ static int decode_scale_factors(WMAProDecodeCtx* s)
 }
 
 /**
+ *@brief Apply a 2x2 decorrelation matrix to one band of two channels.
+ *       Two channels are by far the common case; the results are the
+ *       same as the general loop's in inverse_channel_transform().
+ *@param ch0 first channel's coefficients
+ *@param ch1 second channel's coefficients
+ *@param mat the matrix, as 16.16 fixed point
+ *@param len number of coefficients
+ */
+static inline void decorrelate_stereo(int32_t *ch0, int32_t *ch1,
+                                      const int32_t *mat, int len)
+{
+    const int32_t m0 = mat[0], m1 = mat[1], m2 = mat[2], m3 = mat[3];
+
+    if (m0 == ONE_FRACT16 && m1 == -ONE_FRACT16 &&
+        m2 == ONE_FRACT16 && m3 ==  ONE_FRACT16) {
+        /* The matrix of a stereo stream. Multiplying by +-1.0 is exact,
+         * so add and subtract; unsigned, as the multiply's result wraps. */
+        for (; len > 0; len--) {
+            uint32_t a = *ch0, b = *ch1;
+            *ch0++ = a - b;
+            *ch1++ = a + b;
+        }
+    } else {
+        for (; len > 0; len--) {
+            int32_t a = *ch0, b = *ch1;
+            *ch0++ = fixmul16(m0, a) + fixmul16(m1, b);
+            *ch1++ = fixmul16(m2, a) + fixmul16(m3, b);
+        }
+    }
+}
+
+/**
  *@brief Reconstruct the individual channel data.
  *@param s codec context
  */
@@ -1052,24 +1084,33 @@ static void inverse_channel_transform(WMAProDecodeCtx *s)
                  sfb < s->cur_sfb_offsets + s->num_bands; sfb++) {
                 int y;
                 if (*tb++ == 1) {
-                    /** multiply values with the decorrelation_matrix */
-                    for (y = sfb[0]; y < FFMIN(sfb[1], s->subframe_len); y++) {
-                        const int32_t* mat = s->chgroup[i].fixdecorrelation_matrix;
-                        const int32_t* data_end = data + num_channels;
-                        int32_t* data_ptr = data;
-                        int32_t** ch;
+                    if (num_channels == 2) {
+                        decorrelate_stereo(ch_data[0] + sfb[0],
+                                ch_data[1] + sfb[0],
+                                s->chgroup[i].fixdecorrelation_matrix,
+                                FFMIN(sfb[1], s->subframe_len) - sfb[0]);
+                    } else {
+                        /** multiply values with the decorrelation_matrix */
+                        for (y = sfb[0];
+                             y < FFMIN(sfb[1], s->subframe_len); y++) {
+                            const int32_t* mat =
+                                s->chgroup[i].fixdecorrelation_matrix;
+                            const int32_t* data_end = data + num_channels;
+                            int32_t* data_ptr = data;
+                            int32_t** ch;
 
-                        for (ch = ch_data; ch < ch_end; ch++)
-                            *data_ptr++ = (*ch)[y];
+                            for (ch = ch_data; ch < ch_end; ch++)
+                                *data_ptr++ = (*ch)[y];
 
-                        for (ch = ch_data; ch < ch_end; ch++) {
-                            int32_t sum = 0;
-                            data_ptr = data;
+                            for (ch = ch_data; ch < ch_end; ch++) {
+                                int32_t sum = 0;
+                                data_ptr = data;
 
-                            while (data_ptr < data_end)
-                                sum += fixmul16(*mat++, *data_ptr++);
+                                while (data_ptr < data_end)
+                                    sum += fixmul16(*mat++, *data_ptr++);
 
-                            (*ch)[y] = sum;
+                                (*ch)[y] = sum;
+                            }
                         }
                     }
                 } else if (s->num_channels == 2) {
