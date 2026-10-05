@@ -222,7 +222,7 @@ sub make_install {
 
     foreach my $_dir (@files) {
         my $dir = "wps/" . $_dir;
-        if ( -d "$src/$dir" && $_dir !~ /\.\.?/) {
+        if ( -d "$src/$dir" && $_dir !~ /^\.\.?$/) {
             unless (glob_mkdir("$userdir/$dir")) {
                 return 0;
             }
