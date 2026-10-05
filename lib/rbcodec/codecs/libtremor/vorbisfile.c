@@ -130,25 +130,45 @@ static ogg_int64_t _get_next_page(OggVorbis_File *vf,ogg_page *og,
   }
 }
 
-/* This is a nasty hack to work around the huge allocations we get from
-   huge comment packets, usually due to embedded album art */
+/* Skip the comment packet without storing it. It can be huge, usually due
+   to embedded album art, and none of it is used here.
+
+   If only the start of the packet is buffered, that start is forgotten.
+   ogg_stream_pagein() then drops the rest of the packet by itself, as it
+   does for any packet whose beginning was lost, so the stream's body and
+   lacing buffers never grow with the size of the comment. */
 static int ogg_stream_discard_packet(OggVorbis_File *vf,ogg_page *og,
                                      ogg_int64_t boundary){
-  int ret;
-  while((ret = ogg_stream_packetout(&vf->os, NULL)) == 0) {
-    if(_get_next_page(vf, og, boundary)<0)
-      break;
-    ogg_stream_pagein(&vf->os,og,false);
+  ogg_stream_state *os=&vf->os;
+  int ret=ogg_stream_packetout(os,NULL);
+  int i;
+
+  if(ret<0)return -1;
+  if(ret>0)return 1; /* the whole packet was buffered, and is now skipped */
+
+  /* forget the partial packet, as ogg_stream_pagein() does for a page
+     that is out of sequence */
+  for(i=os->lacing_packet;i<os->lacing_fill;i++)
+    os->body_fill-=os->lacing_vals[i]&0xff;
+  os->lacing_fill=os->lacing_packet;
+
+  /* read pages until one holds the end of the packet: every lacing value
+     of a page that only continues it is 255 */
+  for(;;){
+    int segments;
+
+    if(_get_next_page(vf,og,boundary)<0)return -1;
+    if(ogg_page_serialno(og)!=os->serialno)continue;
+
+    ogg_stream_pagein(os,og,true);
+
+    segments=og->header[26];
+    for(i=0;i<segments;i++)
+      if(og->header[27+i]<255)break;
+    if(i<segments || !ogg_page_continued(og))break;
   }
-  if (ret < 0)
-    return -1;
-  /* We might be pretending to have filled in more of the buffer than there is
-     actual space, in this case the body storage must be expanded before we
-     start writing to it */
-  if (vf->os.body_fill < og->body_len || vf->os.body_storage < vf->os.body_fill)
-    if(_os_body_expand(&vf->os, vf->os.body_fill - vf->os.body_storage + og->body_len))
-      return -1;
-  memcpy(vf->os.body_data+vf->os.body_fill-og->body_len, og->body, og->body_len);
+
+  os->packetno++; /* count the packet that was skipped */
   return 1;
 }
 
@@ -1287,11 +1307,16 @@ int ov_pcm_seek_page(OggVorbis_File *vf,ogg_int64_t pos){
   /* new search algorithm by HB (Nicholas Vinen) */
   {
     ogg_int64_t end=vf->offsets[link+1];
-    ogg_int64_t begin=vf->offsets[link];
+    /* Search from the first audio page, not from the start of the link
+       (as libvorbis does): a seek to the beginning must not run the
+       headers through the stream again, as that buffers the whole
+       comment packet, album art included. */
+    ogg_int64_t begin=vf->dataoffsets[link];
     ogg_int64_t begintime = vf->pcmlengths[link*2];
     ogg_int64_t endtime = vf->pcmlengths[link*2+1]+begintime;
     ogg_int64_t target=pos-total+begintime;
     ogg_int64_t best=begin;
+    int found=0; /* a page that ends before the target */
 
     ogg_page og;
     while(begin<end){
@@ -1337,6 +1362,7 @@ int ov_pcm_seek_page(OggVorbis_File *vf,ogg_int64_t pos){
 
           if(granulepos<target){
             best=result;  /* raw offset of packet with granulepos */
+            found=1;
             begin=vf->offset; /* raw offset of next page */
             begintime=granulepos;
 
@@ -1391,8 +1417,14 @@ int ov_pcm_seek_page(OggVorbis_File *vf,ogg_int64_t pos){
       ogg_stream_reset_serialno(&vf->os,vf->current_serialno);
       ogg_stream_pagein(&vf->os,&og,true);
 
+      /* The target is in the first audio page, which is where we are
+         now: decoding starts with its first packet, at the beginning of
+         the link. */
+      if(!found)
+        vf->pcm_offset=total;
+
       /* pull out all but last packet; the one with granulepos */
-      while(1){
+      while(found){
         result=ogg_stream_packetpeek(&vf->os,&op);
         if(result==0){
           /* !!! the packet finishing this page originated on a
