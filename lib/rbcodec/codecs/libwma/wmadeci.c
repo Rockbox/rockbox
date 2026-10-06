@@ -587,7 +587,8 @@ int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
    interpolation to reduce the mantissa table size at a small speed
    expense (linear interpolation approximately doubles the number of
    bits of precision). */
-static inline fixed32 pow_m1_4(WMADecodeContext *s, fixed64 x)
+/* x^(-1/4) in 16.16, for x given with frac_bits fractional bits */
+static inline fixed32 pow_m1_4(WMADecodeContext *s, fixed64 x, int frac_bits)
 {
     union {
         float f;
@@ -597,16 +598,16 @@ static inline fixed32 pow_m1_4(WMADecodeContext *s, fixed64 x)
     fixed32 a, b;
     int shift = 0;
 
-    /* x can be above what 16.16 holds; bring it into 32 bits to convert
-       it and put the shift back into the float's exponent */
+    /* bring x into 32 bits to convert it, and put that shift and the
+       fractional bits into the float's exponent */
     while (x >> 31)
     {
         x >>= 1;
         shift++;
     }
-    u.f = fixtof64((fixed32)x);
+    u.f = (float)(fixed32)x;
     if (x != 0)
-        u.v += shift << 23;
+        u.v += (shift - frac_bits) << 23;
     e = u.v >> 23;
     m = (u.v >> (23 - LSP_POW_BITS)) & ((1 << LSP_POW_BITS) - 1);
     /* build interpolation scale: 1 <= t < 2. */
@@ -689,10 +690,11 @@ static void wma_lsp_to_curve(WMADecodeContext *s,
 
         /* 2 in 5.27 format is 0x10000000.
          * These squares are far above what 16.16 holds where the curve
-         * is low, so the sum is taken in 64 bits. It is in 16.16. */
-        v64 = ((fixed64)p * fixmul32b(p, (0x10000000 - w)) +
-               (fixed64)q * fixmul32b(q, (0x10000000 + w))) >> 22;
-        v = pow_m1_4(s, v64);
+         * is low, and far below one of its steps where the curve peaks,
+         * so the sum is taken in 64 bits, with 38 fractional bits. */
+        v64 = (fixed64)p * fixmul32b(p, (0x10000000 - w)) +
+              (fixed64)q * fixmul32b(q, (0x10000000 + w));
+        v = pow_m1_4(s, v64, 38);
         if (v > val_max)
             val_max = v;
         out[i] = v;
