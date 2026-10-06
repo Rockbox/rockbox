@@ -587,7 +587,7 @@ int wma_decode_init(WMADecodeContext* s, asf_waveformatex_t *wfx)
    interpolation to reduce the mantissa table size at a small speed
    expense (linear interpolation approximately doubles the number of
    bits of precision). */
-static inline fixed32 pow_m1_4(WMADecodeContext *s, fixed32 x)
+static inline fixed32 pow_m1_4(WMADecodeContext *s, fixed64 x)
 {
     union {
         float f;
@@ -595,8 +595,18 @@ static inline fixed32 pow_m1_4(WMADecodeContext *s, fixed32 x)
     } u, t;
     unsigned int e, m;
     fixed32 a, b;
+    int shift = 0;
 
-    u.f = fixtof64(x);
+    /* x can be above what 16.16 holds; bring it into 32 bits to convert
+       it and put the shift back into the float's exponent */
+    while (x >> 31)
+    {
+        x >>= 1;
+        shift++;
+    }
+    u.f = fixtof64((fixed32)x);
+    if (x != 0)
+        u.v += shift << 23;
     e = u.v >> 23;
     m = (u.v >> (23 - LSP_POW_BITS)) & ((1 << LSP_POW_BITS) - 1);
     /* build interpolation scale: 1 <= t < 2. */
@@ -654,6 +664,7 @@ static void wma_lsp_to_curve(WMADecodeContext *s,
 {
     int i, j;
     fixed32 p, q, w, v, val_max, temp2;
+    fixed64 v64;
 
     val_max = 0;
     for(i=0;i<n;++i)
@@ -676,12 +687,12 @@ static void wma_lsp_to_curve(WMADecodeContext *s,
             p = fixmul32b(p, (w - (lsp[j]<<11)))<<4;
         }
 
-        /* 2 in 5.27 format is 0x10000000 */
-        p = fixmul32(p, fixmul32b(p, (0x10000000 - w)))<<3;
-        q = fixmul32(q, fixmul32b(q, (0x10000000 + w)))<<3;
-
-        v = (p + q) >>9;  /* p/q end up as 16.16 */
-        v = pow_m1_4(s, v);
+        /* 2 in 5.27 format is 0x10000000.
+         * These squares are far above what 16.16 holds where the curve
+         * is low, so the sum is taken in 64 bits. It is in 16.16. */
+        v64 = ((fixed64)p * fixmul32b(p, (0x10000000 - w)) +
+               (fixed64)q * fixmul32b(q, (0x10000000 + w))) >> 22;
+        v = pow_m1_4(s, v64);
         if (v > val_max)
             val_max = v;
         out[i] = v;
