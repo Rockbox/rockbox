@@ -224,6 +224,8 @@ typedef struct WMAProDecodeCtx {
     uint8_t          len_prefix;                    ///< frame is prefixed with its length
     uint8_t          dynamic_range_compression;     ///< frame contains DRC data
     uint8_t          bits_per_sample;               ///< integer audio sample size for the unscaled IMDCT output (used to scale to [-1.0, 1.0])
+    uint8_t          quant_step_bias;               ///< added to the quantization step of a stream of less than 24 bits
+    int32_t          quant_scale;                   ///< s1.30 factor for its quantization factors, 0 if none
     uint16_t         samples_per_frame;             ///< number of samples to output
     uint16_t         log2_frame_size;
     int8_t           num_channels;                  ///< number of channels in the stream (same as AVCodecContext.num_channels)
@@ -332,6 +334,18 @@ int decode_init(asf_waveformatex_t *wfx)
         s->decode_flags    = AV_RL16(edata_ptr+14);
         channel_mask       = AV_RL32(edata_ptr+2);
         s->bits_per_sample = AV_RL16(edata_ptr);
+
+        /* A stream of fewer bits has a lower quantization step. Decode it at
+         * the level of a 24 bit stream instead: use that stream's quantization
+         * step, and scale the factors by what is left,
+         * 2^(24-bits) / 10^(bias/20). */
+        if (s->bits_per_sample == 16) {
+            s->quant_step_bias = (90 * 24 >> 4) - (90 * 16 >> 4);
+            s->quant_scale     = 1545752065; /* 256 / 10^(45/20) */
+        } else if (s->bits_per_sample == 20) {
+            s->quant_step_bias = (90 * 24 >> 4) - (90 * 20 >> 4);
+            s->quant_scale     = 1216241597; /* 16 / 10^(23/20) */
+        }
         /** dump the extradata */
         for (i = 0; i < wfx->datalen; i++)
             DEBUGF("[%x] ", wfx->data[i]);
@@ -1270,7 +1284,7 @@ static int decode_subframe(WMAProDecodeCtx *s)
 
     if (transmit_coeffs) {
         int step;
-        int quant_step = 90 * s->bits_per_sample >> 4;
+        int quant_step = (90 * s->bits_per_sample >> 4) + s->quant_step_bias;
 
         /** decode number of vector coded coefficients */
         if ((s->transmit_num_vec_coeffs = get_bits1(&s->gb))) {
@@ -1371,8 +1385,11 @@ static int decode_subframe(WMAProDecodeCtx *s)
                     DEBUGF("in wmaprodec.c : unhandled value for exp (%d), please report sample.\n", exp);
                     return -1;
                 }
-                const int32_t quant = QUANT(exp);
+                int32_t quant = QUANT(exp);
                 int start = s->cur_sfb_offsets[b];
+
+                if (s->quant_scale)
+                    quant = (int64_t)quant * s->quant_scale >> 30;
 
                 vector_fixmul_scalar(s->tmp+start,
                                      s->channel[c].coeffs + start,
