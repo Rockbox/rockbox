@@ -107,6 +107,10 @@ enum codec_status codec_run(void)
     scrambling_unit_size = h * (fs + packet_header_size);
     spn = h * fs / sps;
 
+    /* The decoder takes its frame size from the id3, which the RM
+     * metadata parser does not fill in. */
+    ci->id3->bytesperframe = sps;
+
     res = atrac3_decode_init(&q, ci->id3, rmctx.nb_channels, rmctx.extradata_size);
     if(res < 0) {
         DEBUGF("failed to initialize RM atrac decoder\n");
