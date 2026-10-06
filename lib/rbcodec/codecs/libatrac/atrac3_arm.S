@@ -161,7 +161,7 @@ atrac3_iqmf_dewindowing:
     orr   r8, r12, r8, lsl #1       /* s2 = low>>31 || hi<<1 */
 
     stmia r0!, {r8, r9}             /* store result out[0]=s2, out[1]=s1 */
-    sub   r1, r1, #184              /* roll back 64 entries = 184 bytes */
+    sub   r1, r1, #184              /* roll back 46 entries = 184 bytes */
     sub   r2, r2, #192              /* roll back 48 entries = 192 bytes = win[0] */
 
     subs r3, r3, #1                 /* outer loop -= 1 */
