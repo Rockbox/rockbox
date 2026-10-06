@@ -178,29 +178,42 @@ new_packet:
                 goto new_packet;
             }
         } else if (res > 0) {
-            wma_decode_superframe_init(&wmadec, audiobuf, audiobufsize);
+            /* A payload usually holds one codec packet (a superframe) of
+             * blockalign bytes, but it can hold several. */
+            int packetsize = audiobufsize;
+            int offset;
 
-            for (i=0; i < wmadec.nb_frames; i++)
+            if (wfx.blockalign > 0 && audiobufsize % wfx.blockalign == 0)
+                packetsize = wfx.blockalign;
+
+            for (offset = 0; offset < audiobufsize; offset += packetsize)
             {
-                wmares = wma_decode_superframe_frame(&wmadec,
-                                                     audiobuf, audiobufsize);
+                const uint8_t *packet = audiobuf + offset;
 
-                ci->yield ();
+                wma_decode_superframe_init(&wmadec, packet, packetsize);
 
-                if (wmares < 0) {
-                    /* Do the above, but for errors in decode. */
-                    errcount++;
-                    DEBUGF("WMA decode error %d, errcount %d\n",wmares, errcount);
-                    if (errcount > 5) {
-                        return CODEC_ERROR;
-                    } else {
-                        ci->advance_buffer(packetlength);
-                        goto new_packet;
+                for (i=0; i < wmadec.nb_frames; i++)
+                {
+                    wmares = wma_decode_superframe_frame(&wmadec,
+                                                         packet, packetsize);
+
+                    ci->yield ();
+
+                    if (wmares < 0) {
+                        /* Do the above, but for errors in decode. */
+                        errcount++;
+                        DEBUGF("WMA decode error %d, errcount %d\n",wmares, errcount);
+                        if (errcount > 5) {
+                            return CODEC_ERROR;
+                        } else {
+                            ci->advance_buffer(packetlength);
+                            goto new_packet;
+                        }
+                    } else if (wmares > 0) {
+                        ci->pcmbuf_insert((*wmadec.frame_out)[0], (*wmadec.frame_out)[1], wmares);
+                        elapsedtime += (wmares*10)/(wfx.rate/100);
+                        ci->set_elapsed(elapsedtime);
                     }
-                } else if (wmares > 0) {
-                    ci->pcmbuf_insert((*wmadec.frame_out)[0], (*wmadec.frame_out)[1], wmares);
-                    elapsedtime += (wmares*10)/(wfx.rate/100);
-                    ci->set_elapsed(elapsedtime);
                 }
             }
         }
