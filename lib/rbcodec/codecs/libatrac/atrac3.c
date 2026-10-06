@@ -252,10 +252,15 @@ atrac3_imdct_windowing(int32_t *buffer,
                        const int32_t *win)
 {
     int32_t i;
-    /* win[0..127] = win[511..384], win[128..383] = 1 */
+    /* win[0..127] = win[511..384] */
     for(i = 0; i<128; i++) {
         buffer[    i] = fixmul31(win[i], buffer[    i]);
         buffer[511-i] = fixmul31(win[i], buffer[511-i]);
+    }
+    /* win[128..255] = win[383..256] = 1 + window_lookup_mid[] */
+    for(i = 0; i<128; i++) {
+        buffer[128+i] += fixmul31(window_lookup_mid[i], buffer[128+i]);
+        buffer[383-i] += fixmul31(window_lookup_mid[i], buffer[383-i]);
     }
 }
 
