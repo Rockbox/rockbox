@@ -777,6 +777,69 @@ static int decode_exp_vlc(WMADecodeContext *s, int ch)
     return 0;
 }
 
+/* The gain of a noise coded band, as ffmpeg computes it in floating point:
+ *
+ *   mdct_norm * sqrt(power / last_power) * 10^(value/20)
+ *                                        / (max_exponent * noise_mult)
+ *
+ * returned as the 16.16 factor wma_decode_block() applies to the band.
+ * 1/noise_mult is 50 or 25. The terms differ too much in size for 32 bits,
+ * and this runs once a band, so it is all done in 64 bits. */
+static fixed32 noise_band_gain(uint64_t power, uint64_t last_power, int value,
+                               fixed32 max_exponent, fixed32 mdct_norm,
+                               int inv_noise_mult)
+{
+    uint64_t ratio, root, bit, a, b;
+    int shift = 16 + 20;
+
+    if (power == 0 || max_exponent <= 0)
+        return 0;
+
+    /* the power ratio in 16.16, kept small enough to take its root */
+    ratio = last_power ? (power << 16) / last_power : (uint64_t)1 << 46;
+    if (ratio > (uint64_t)1 << 46)
+        ratio = (uint64_t)1 << 46;
+
+    /* its root in 16.16 */
+    ratio <<= 16;
+    root = 0;
+    for (bit = (uint64_t)1 << 62; bit != 0; bit >>= 2) {
+        if (ratio >= root + bit) {
+            ratio -= root + bit;
+            root = (root >> 1) + bit;
+        } else {
+            root >>= 1;
+        }
+    }
+
+    a = root * mdct_norm * inv_noise_mult;
+    b = pow_table[value + 20];
+    while (b >> 43) {       /* keep the shift below in 64 bits */
+        b >>= 1;
+        shift--;
+    }
+    b = (b << 20) / max_exponent;
+
+    /* a * b >> shift, with both brought down to 31 bits first */
+    while (a >> 31) {
+        a >>= 1;
+        shift--;
+    }
+    while (b >> 31) {
+        b >>= 1;
+        shift--;
+    }
+    a *= b;
+    if (shift > 0)
+        a >>= shift;
+    else if (a >> (31 + shift))
+        return 0x7fffffff;
+    else
+        a <<= -shift;
+
+    return a > 0x7fffffff ? 0x7fffffff : (fixed32)a;
+}
+
 /* return 0 if OK. return 1 if last block of frame. return -1 if
    unrecorrable error. */
 static int wma_decode_block(WMADecodeContext *s)
@@ -1064,7 +1127,7 @@ static int wma_decode_block(WMADecodeContext *s)
             fixed64 mult1;
             fixed32 noise, temp1, temp2, mult2;
             int i, j, n, n1, last_high_band, esize;
-            fixed32 exp_power[HIGH_BAND_MAX_SIZE];
+            uint64_t exp_power[HIGH_BAND_MAX_SIZE];
 
             //total_gain, coefs1, mdctnorm are lossless
 
@@ -1098,14 +1161,15 @@ static int wma_decode_block(WMADecodeContext *s)
                 for(i = 0;i < s->coefs_start; ++i)
                 {
                     *coefs++ = fixmul32( (fixmul32(s->noise_table[s->noise_index],
-                            exponents[i<<bsize>>esize])>>4),Fixed32From64(mult1)) >>2;
+                            exponents[i<<bsize>>esize])>>4),(fixed32)(mult1>>16)) >>2;
                     s->noise_index = (s->noise_index + 1) & (NOISE_TAB_SIZE - 1);
                 }
 
                 n1 = s->exponent_high_sizes[bsize];
 
                 /* compute power of high bands */
-                exponents = s->exponents[ch] +(s->high_band_start[bsize]<<bsize);
+                exponents = s->exponents[ch] +
+                            (s->high_band_start[bsize]<<bsize>>esize);
                 last_high_band = 0; /* avoid warning */
                 for (j=0;j<n1;++j)
                 {
@@ -1113,22 +1177,23 @@ static int wma_decode_block(WMADecodeContext *s)
                                                s->block_len_bits][j];
                     if (s->high_band_coded[ch][j])
                     {
-                        fixed32 e2, v;
-                        e2 = 0;
+                        uint64_t e2 = 0;
                         for(i = 0;i < n; ++i)
                         {
-                            /*v is normalized later on so its fixed format is irrelevant*/
-                            v = exponents[i<<bsize>>esize]>>4;
-                            e2 += fixmul32(v, v)>>3;
+                            /* Only ratios of the powers are used, so their
+                               format does not matter; this one cannot
+                               overflow. */
+                            uint32_t v = exponents[i<<bsize>>esize]>>6;
+                            e2 += (uint64_t)v * v;
                         }
-                         exp_power[j] = e2/n; /*n is an int...*/
+                        exp_power[j] = e2/n;
                         last_high_band = j;
                     }
-                    exponents += n<<bsize;
+                    exponents += n<<bsize>>esize;
                 }
 
                 /* main freqs and high freqs */
-                exponents = s->exponents[ch] + (s->coefs_start<<bsize);
+                exponents = s->exponents[ch] + (s->coefs_start<<bsize>>esize);
                 for(j=-1;j<n1;++j)
                 {
                     if (j < 0)
@@ -1144,24 +1209,21 @@ static int wma_decode_block(WMADecodeContext *s)
                     if (j >= 0 && s->high_band_coded[ch][j])
                     {
                         /* use noise with specified power */
-                        fixed32 tmp = fixdiv32(exp_power[j],exp_power[last_high_band]);
+                        fixed32 gain = noise_band_gain(exp_power[j],
+                                exp_power[last_high_band],
+                                s->high_band_values[ch][j],
+                                s->max_exponent[ch], mdct_norm,
+                                s->use_exp_vlc ? 50 : 25);
 
-                        /*mult1 is 48.16, pow_table is 48.16*/
-                        mult1 = fixmul32(fixsqrt32(tmp),
-                                pow_table[s->high_band_values[ch][j]+20]) >> 16;
-
-                        /*this step has a fairly high degree of error for some reason*/
-                        mult1 = fixdiv64(mult1,fixmul32(s->max_exponent[ch],s->noise_mult));
-                        mult1 = mult1*mdct_norm>>PRECISION;
                         for(i = 0;i < n; ++i)
                         {
                             noise = s->noise_table[s->noise_index];
                             s->noise_index = (s->noise_index + 1) & (NOISE_TAB_SIZE - 1);
                             *coefs++ = fixmul32((fixmul32(exponents[i<<bsize>>esize],noise)>>4),
-                                    Fixed32From64(mult1)) >>2;
+                                    gain) >>2;
 
                         }
-                        exponents += n<<bsize;
+                        exponents += n<<bsize>>esize;
                     }
                     else
                     {
@@ -1176,7 +1238,7 @@ static int wma_decode_block(WMADecodeContext *s)
                            temp2 = fixmul32(exponents[i<<bsize>>esize], mult>>18);
                            *coefs++ = fixmul32(temp1, temp2);
                         }
-                        exponents += n<<bsize;
+                        exponents += n<<bsize>>esize;
                     }
                 }
 
