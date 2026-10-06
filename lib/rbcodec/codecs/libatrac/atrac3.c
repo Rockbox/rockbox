@@ -297,8 +297,17 @@ static void iqmf (int32_t *inlo, int32_t *inhi, unsigned int nIn, int32_t *pOut,
  * @param odd_band  1 if the band is an odd band
  */
 
-static void IMLT(int32_t *pInput, int32_t *pOutput)
+static void IMLT(int32_t *pInput, int32_t *pOutput, int odd_band)
 {
+    if (odd_band) {
+        /* Reverse the odd bands before the IMDCT; this is an effect of the
+         * QMF transform. The whole band is reversed, tonal components
+         * included, so it cannot be done as the coefficients are decoded. */
+        int i;
+        for (i = 0; i < 128; i++)
+            FFSWAP(int32_t, pInput[i], pInput[255-i]);
+    }
+
     /* Apply the imdct. */
     ff_imdct_calc(9, pOutput, pInput);
 
@@ -438,31 +447,16 @@ static void inverseQuantizeSpectrum(int *mantissas, int32_t *pOut,
     int *pIn = mantissas;
     
     /* Inverse quantize the coefficients. */
-    if((first/256) &1) {
-        /* Odd band - Reverse coefficients */
-        do {
-            pOut[last--] = fixmul16(*pIn++, SF);
-            pOut[last--] = fixmul16(*pIn++, SF);
-            pOut[last--] = fixmul16(*pIn++, SF);
-            pOut[last--] = fixmul16(*pIn++, SF);
-            pOut[last--] = fixmul16(*pIn++, SF);
-            pOut[last--] = fixmul16(*pIn++, SF);
-            pOut[last--] = fixmul16(*pIn++, SF);
-            pOut[last--] = fixmul16(*pIn++, SF);
-        } while (last>first);
-    } else {
-         /* Even band - Do not reverse coefficients */
-         do {
-            pOut[first++] = fixmul16(*pIn++, SF);
-            pOut[first++] = fixmul16(*pIn++, SF);
-            pOut[first++] = fixmul16(*pIn++, SF);
-            pOut[first++] = fixmul16(*pIn++, SF);
-            pOut[first++] = fixmul16(*pIn++, SF);
-            pOut[first++] = fixmul16(*pIn++, SF);
-            pOut[first++] = fixmul16(*pIn++, SF);
-            pOut[first++] = fixmul16(*pIn++, SF);
-        } while (first<last);
-    }
+    do {
+        pOut[first++] = fixmul16(*pIn++, SF);
+        pOut[first++] = fixmul16(*pIn++, SF);
+        pOut[first++] = fixmul16(*pIn++, SF);
+        pOut[first++] = fixmul16(*pIn++, SF);
+        pOut[first++] = fixmul16(*pIn++, SF);
+        pOut[first++] = fixmul16(*pIn++, SF);
+        pOut[first++] = fixmul16(*pIn++, SF);
+        pOut[first++] = fixmul16(*pIn++, SF);
+    } while (first<last);
 }
 
 
@@ -998,7 +992,7 @@ static int decodeChannelSoundUnit (GetBitContext *gb, channel_unit *pSnd, int32_
     for (band=0; band<4; band++) {
         /* Perform the IMDCT step without overlapping. */
         if (band <= numBands) {
-            IMLT(&(pSnd->spectrum[band*256]), pSnd->IMDCT_buf);
+            IMLT(&(pSnd->spectrum[band*256]), pSnd->IMDCT_buf, band & 1);
         } else {
             memset(pSnd->IMDCT_buf, 0, 512 * sizeof(int32_t));
         }
