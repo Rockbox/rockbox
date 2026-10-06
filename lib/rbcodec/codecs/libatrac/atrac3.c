@@ -717,8 +717,10 @@ static int applyVariableGain (int32_t *pIn, int32_t *pPrev, int32_t *pOut,
 {
     int32_t i = start;
     
-    /* Apply fix gains until end index is reached */
-    do {
+    /* Apply fix gains until end index is reached. There is nothing to do
+     * here when the gain point is where the previous one ended, or at the
+     * start of the block. */
+    while (i < end) {
         pOut[i] = fixmul16((fixmul16(pIn[i], gain1) + pPrev[i]), gain2); i++;
         pOut[i] = fixmul16((fixmul16(pIn[i], gain1) + pPrev[i]), gain2); i++;
         pOut[i] = fixmul16((fixmul16(pIn[i], gain1) + pPrev[i]), gain2); i++;
@@ -727,7 +729,7 @@ static int applyVariableGain (int32_t *pIn, int32_t *pPrev, int32_t *pOut,
         pOut[i] = fixmul16((fixmul16(pIn[i], gain1) + pPrev[i]), gain2); i++;
         pOut[i] = fixmul16((fixmul16(pIn[i], gain1) + pPrev[i]), gain2); i++;
         pOut[i] = fixmul16((fixmul16(pIn[i], gain1) + pPrev[i]), gain2); i++;
-    } while (i < end);
+    }
 
     /* Interpolation is done over next eight samples */
     pOut[i] = fixmul16((fixmul16(pIn[i], gain1) + pPrev[i]), gain2); i++;
