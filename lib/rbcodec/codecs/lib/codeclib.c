@@ -72,6 +72,14 @@ void* codec_malloc(size_t size)
     return(x);
 }
 
+/* What codec_malloc() has left to give, and where it is.  It can be used
+   as scratch memory until the next codec_malloc(). */
+void *codec_malloc_spare(size_t *size)
+{
+    *size = bufsize - mem_ptr;
+    return &mallocbuf[mem_ptr];
+}
+
 void* codec_calloc(size_t nmemb, size_t size)
 {
     void* x;

@@ -42,6 +42,7 @@ extern struct codec_api *ci;
 #define strlen(s) codec_strlen(s)
 
 void* codec_malloc(size_t size);
+void *codec_malloc_spare(size_t *size);
 void* codec_calloc(size_t nmemb, size_t size);
 void* codec_realloc(void* ptr, size_t size);
 void codec_free(void* ptr);

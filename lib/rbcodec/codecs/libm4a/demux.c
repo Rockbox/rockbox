@@ -46,10 +46,20 @@
 #define DEBUGF(...)
 #endif
 
+/* The most tracks other than the one played whose place in the file is
+ * kept, to see whether their data is among its chunks. */
+#define OTHER_TRACKS_MAX 8
+
 typedef struct
 {
     stream_t *stream;
     demux_res_t *res;
+    /* the first and last chunk offsets of the track played */
+    uint32_t audio_first, audio_last;
+    bool have_audio;
+    /* and of the others, as many as there is room for */
+    uint32_t other_first[OTHER_TRACKS_MAX], other_last[OTHER_TRACKS_MAX];
+    int num_other;
 } qtmovie_t;
 
 
@@ -359,7 +369,7 @@ static bool read_chunk_stts(qtmovie_t *qtmovie, size_t chunk_len)
 static bool read_chunk_stsz(qtmovie_t *qtmovie, size_t chunk_len)
 {
     size_t size_remaining = chunk_len - 8;
-    uint32_t numsizes, i;
+    uint32_t numsizes;
 
     /* version */
     stream_read_uint8(qtmovie->stream);
@@ -383,34 +393,9 @@ static bool read_chunk_stsz(qtmovie_t *qtmovie, size_t chunk_len)
     numsizes = stream_read_uint32(qtmovie->stream);
     size_remaining -= 4;
 
-    /* Because this table can be really large and is only used to improve seek
-     * accuracy, it's optional. In that case the seek code will fall back to a
-     * less accurate seek method. */
+    /* The sizes are not kept: build_seek_index() reads them from here. */
     qtmovie->res->num_sample_byte_sizes = numsizes;
-    if (numsizes * sizeof(uint32_t) < CODEC_SIZE * 1 / 2)
-        qtmovie->res->sample_byte_sizes = malloc(numsizes * sizeof(uint32_t));
-    else
-        qtmovie->res->sample_byte_sizes = NULL;
-
-    if (qtmovie->res->sample_byte_sizes)
-    {
-        for (i = 0; i < numsizes; ++i)
-        {
-            qtmovie->res->sample_byte_sizes[i] =
-                stream_read_uint32(qtmovie->stream);
-            size_remaining -= 4;
-        }
-
-        if (size_remaining)
-        {
-            DEBUGF("extra bytes after stsz\n");
-        }
-    }
-    else
-    {
-        qtmovie->res->sample_byte_sizes_offset = stream_tell(qtmovie->stream);
-        DEBUGF("stsz too large: %u, save sample_byte_sizes_offset\n", numsizes);
-    }
+    qtmovie->res->sample_byte_sizes_offset = stream_tell(qtmovie->stream);
 
     if (size_remaining)
     {
@@ -442,138 +427,775 @@ static bool read_chunk_stsc(qtmovie_t *qtmovie, size_t chunk_len)
     return true;
 }
 
-static void stream_read_sample_to_chunk(stream_t *stream, uint32_t *first_chunk, uint32_t *num_samples)
+static void add_other_track(qtmovie_t *qtmovie, uint32_t first,
+                            uint32_t last)
 {
-    (*first_chunk) = stream_read_uint32(stream);
-    (*num_samples) = stream_read_uint32(stream);
-    stream_skip(stream, 4);
+    if (qtmovie->num_other < OTHER_TRACKS_MAX)
+    {
+        qtmovie->other_first[qtmovie->num_other] = first;
+        qtmovie->other_last[qtmovie->num_other] = last;
+    }
+    qtmovie->num_other++;
+}
+
+/* The first and last offset in an stco, or a co64 if wide, whose count
+ * has been read.  An offset past 4 GB is past any the audio can have.
+ * Leaves the stream after the chunk.  Returns false if it has none. */
+static bool read_chunk_range(qtmovie_t *qtmovie, size_t size_remaining,
+                             uint32_t count, bool wide,
+                             uint32_t *first, uint32_t *last)
+{
+    const size_t entry = wide ? 8 : 4;
+    uint32_t hi = 0;
+
+    if (count == 0 || count > size_remaining / entry)
+    {
+        stream_skip(qtmovie->stream, size_remaining);
+        return false;
+    }
+
+    if (wide)
+        hi = stream_read_uint32(qtmovie->stream);
+    *first = stream_read_uint32(qtmovie->stream);
+    if (hi)
+        *first = 0xffffffff;
+    *last = *first;
+    if (count > 1)
+    {
+        stream_skip(qtmovie->stream, (count - 2) * entry);
+        if (wide)
+            hi = stream_read_uint32(qtmovie->stream);
+        *last = stream_read_uint32(qtmovie->stream);
+        if (hi)
+            *last = 0xffffffff;
+    }
+    stream_skip(qtmovie->stream, size_remaining - count * entry);
+    return true;
 }
 
 static bool read_chunk_stco(qtmovie_t *qtmovie, size_t chunk_len)
 {
-    uint32_t i, k, old_i;
-    uint32_t numentries;
-    uint32_t frame;
-    uint32_t old_first = 0, new_first;
-    uint32_t old_frame = 0, new_frame;
     size_t size_remaining = chunk_len - 8;
+    uint32_t first = 0, last = 0;
 
     /* version + flags */
     stream_read_uint32(qtmovie->stream);
     size_remaining -= 4;
 
-    numentries = stream_read_uint32(qtmovie->stream);
+    qtmovie->res->num_chunks = stream_read_uint32(qtmovie->stream);
     size_remaining -= 4;
 
-    uint8_t accuracy_divider = 1;
-    uint32_t fit_numentries = numentries;
-    while (true)
-    {
-        qtmovie->res->lookup_table = malloc(fit_numentries * sizeof(*qtmovie->res->lookup_table));
+    /* The offsets are not kept either: see build_seek_index(). */
+    qtmovie->res->chunk_offset_offset = stream_tell(qtmovie->stream);
 
-        if (qtmovie->res->lookup_table || (++accuracy_divider == 0))
-        {
+    /* The last audio track is the one played: an earlier one is now one
+     * of the others. */
+    if (qtmovie->have_audio)
+        add_other_track(qtmovie, qtmovie->audio_first, qtmovie->audio_last);
+    qtmovie->have_audio = read_chunk_range(qtmovie, size_remaining,
+                                           qtmovie->res->num_chunks, false,
+                                           &first, &last);
+    qtmovie->audio_first = first;
+    qtmovie->audio_last = last;
+
+    return true;
+}
+
+/* Whether the data of another track is among the audio's chunks, which
+ * playback has to step over. */
+static bool other_tracks_interleaved(const qtmovie_t *qtmovie)
+{
+    int i;
+
+    if (qtmovie->num_other > OTHER_TRACKS_MAX)
+        return true;                    /* not all known: suppose so */
+    for (i = 0; i < qtmovie->num_other; i++)
+    {
+        if (qtmovie->other_first[i] <= qtmovie->audio_last &&
+            qtmovie->other_last[i] >= qtmovie->audio_first)
+            return true;
+    }
+    return false;
+}
+
+/* The seek index.
+ *
+ * The file says where each chunk starts (stco), how many frames each chunk
+ * has (stsc) and how long each frame is (stsz).  Seeking to a frame needs
+ * its offset, which is its chunk's plus the sizes of the frames before it
+ * in the chunk.  Keeping the sizes takes four bytes a frame, and what the
+ * chunk table is worth depends on who wrote the file: chunks are a third of
+ * a second in some files and minutes in others.
+ *
+ * So neither is kept.  They are read through once when the file is opened,
+ * to make two things:
+ *  - lookup_table[], the first frame of each chunk that does not start
+ *    where the chunk before it ended, which playback needs to step over
+ *    the gap (see m4a_check_sample_offset()).  Usually that is the first
+ *    chunk alone, but a file with another track among the audio has one
+ *    for nearly every chunk.
+ *  - seek_offsets[], the file offset of every seek_step'th frame.  The step
+ *    is the smallest that the memory there is allows: one, so that a seek
+ *    is exact, for a file short enough, and more for a longer one.  With
+ *    48 KB to spare that is every frame up to 4 1/2 minutes of AAC, a third
+ *    of a second for an hour and a second for 3 1/3 hours.
+ *
+ * Both are in one piece of memory, the offsets from its start and the gaps
+ * from its end, since how many gaps there are is not known until the end.
+ * Playback cannot do without the gaps, so when the two meet it is the
+ * offsets that give way: every other one is dropped and the step doubles.
+ * That stops when the gaps have three quarters of the memory.  A file with
+ * more than that, which is one with another track between the audio chunks
+ * and too long for the heap, has only its first ones to begin with.  When
+ * playback gets past them, or a seek does, the chunk tables are read again
+ * for the chunks from there on (m4a_lookup_refill()): one more visit to the
+ * tables for each stretch of the file that the memory covers.
+ *
+ * The three tables can be megabytes apart, and going from one to another
+ * can cost a refill of the playback buffer.  So the two that have an entry
+ * a chunk are read many entries at a time, into heap that is not yet in
+ * use, and the sizes are read straight through between those.
+ *
+ * Reading every size takes too long for a very long file on a player that
+ * reads slowly: 40 hours of AAC has 13 MB of them.  Past SEEK_SIZES_MAX the
+ * sizes are left alone and the index is of chunks instead: lookup_table[]
+ * gets the first frame and the offset of every lookup_step'th chunk, as
+ * many as there is memory for, and there are no seek_offsets[].  A seek
+ * then goes to a chunk and, if every chunk is there, reads the sizes of the
+ * frames before the one it wants (see m4a_seek()).  A file whose chunks are
+ * too long for that to be quick gets the index of frames all the same.  So
+ * does one whose chunks do not all fit, if another track has data among
+ * them (other_tracks_interleaved()): playback needs every gap to step over
+ * that data. */
+
+/* What to leave of the codec's heap for the decoder. */
+#define SEEK_INDEX_RESERVE 8192
+/* The first step is chosen to leave room for this many gaps. */
+#define SEEK_GAPS_FIRST 64
+/* The gaps can have all but one part in this many of the index's memory. */
+#define SEEK_GAPS_SHARE 4
+/* The most bytes of frame sizes to read when the file is opened. */
+#ifndef SEEK_SIZES_MAX
+#define SEEK_SIZES_MAX (1024 * 1024)
+#endif
+/* The most frames a chunk to have, on average, for an index of chunks. */
+#define SEEK_CHUNK_FRAMES_MAX 16384
+
+#define BE32(p) (((uint32_t)(p)[0] << 24) | ((uint32_t)(p)[1] << 16) | \
+                 ((uint32_t)(p)[2] << 8) | (uint32_t)(p)[3])
+
+/* Up to want bytes of the file at pos, where they lie in the buffer.  They
+ * are only good until the next call. */
+static const unsigned char *index_peek(stream_t *stream, uint32_t pos,
+                                       size_t want, size_t *got)
+{
+    if (!stream->ci->seek_buffer(pos))
+    {
+        *got = 0;
+        return NULL;
+    }
+    return stream->ci->request_buffer(got, want);
+}
+
+/* Copy bytes of the file at pos to dst.  Returns how many there were. */
+static size_t index_load(stream_t *stream, uint32_t pos, unsigned char *dst,
+                         size_t bytes)
+{
+    size_t done = 0;
+
+    while (done < bytes)
+    {
+        size_t got;
+        size_t want = bytes - done > 16384 ? 16384 : bytes - done;
+        const unsigned char *p = index_peek(stream, pos + done, want, &got);
+        if (!p || !got)
             break;
-        }
-        else
+        if (got > want)
+            got = want;
+        memcpy(dst + done, p, got);
+        done += got;
+    }
+    return done;
+}
+
+/* Go through the sizes of n frames, big-endian at w: add them to *offset
+ * and put the offset of every step'th frame in seek[], the next of them
+ * being *to_next frames on.  The caller has seen that there is room.
+ * Returns how many offsets that was.  This is where the time goes for a
+ * long file, so it is kept small. */
+static inline uint32_t index_run(const uint32_t *w, uint32_t n,
+                                 uint32_t *offset, uint32_t *seek,
+                                 uint32_t *to_next, uint32_t step)
+{
+    uint32_t *s = seek;
+    uint32_t off = *offset;
+    uint32_t t = *to_next;
+
+    if (step == 1 && t == 0)
+    {
+        for (; n; n--)
         {
-            // we failed to alloc memory for lookup table, so reduce seek accuracy and try again
-            /* Entries 0, divider, 2*divider, ... require a ceiling divide.
-             * The old floor allocation overran by one entry whenever the
-             * chunk count was not evenly divisible. */
-            fit_numentries =
-                (numentries + accuracy_divider - 1) / accuracy_divider;
+            *s++ = off;
+            off += betoh32(*w++);
         }
     }
-    DEBUGF("lookup_table numentries %d, fit_numentries %ld\n", numentries, fit_numentries);
-    qtmovie->res->num_lookup_table = fit_numentries;
-
-    if (!qtmovie->res->lookup_table)
+    else
     {
-        DEBUGF("stco too large to allocate lookup_table[]\n");
+        while (n)
+        {
+            uint32_t m;
+            if (t == 0)
+            {
+                *s++ = off;
+                t = step;
+            }
+            m = t < n ? t : n;
+            n -= m;
+            t -= m;
+            do
+                off += betoh32(*w++);
+            while (--m);
+        }
+    }
+    *offset = off;
+    *to_next = t;
+    return s - seek;
+}
+
+/* How many stsc entries, of 12 bytes, to keep in scratch memory that also
+ * has to hold stco entries, of 4. */
+static uint32_t index_share(size_t scratch_size, uint32_t nstsc,
+                            uint32_t nchunks)
+{
+    uint64_t sc_bytes = 12 * (uint64_t)nstsc;
+    uint32_t n = scratch_size * sc_bytes / (sc_bytes + 4 * (uint64_t)nchunks)
+                 / 12;
+    if (n < 2)
+        n = 2;                      /* an entry and the one after it */
+    if (n > (scratch_size - 16) / 12)
+        n = (scratch_size - 16) / 12;
+    return n;
+}
+
+/* The two tables that have an entry a chunk, as much of each as is in the
+ * scratch memory. */
+struct chunk_tables
+{
+    stream_t *stream;
+    demux_res_t *res;
+    unsigned char *sc, *co;         /* the stsc and stco entries held */
+    uint32_t sc_room, co_room;      /* how many there is room for */
+    uint32_t sc_first, sc_n;
+    uint32_t co_n, co_i;
+    uint32_t stsc_i, next_first;
+    uint32_t per_chunk;             /* frames in the chunk last asked for */
+    bool loaded;                    /* the last call read from the file */
+    bool counts_only;               /* leave the offsets alone */
+};
+
+/* The start of the tables. */
+static const chunk_place_t first_chunk = { 1, 0, 0, 1, 0 };
+
+/* place is where to go on from: first_chunk, or what chunk_tables_place()
+ * gave.  With its chunk made 0, only the frame counts are read, and
+ * chunk_tables_next() gives no offset. */
+static void chunk_tables_init(struct chunk_tables *t, qtmovie_t *qtmovie,
+                              unsigned char *scratch, size_t scratch_size,
+                              const chunk_place_t *place)
+{
+    demux_res_t *res = qtmovie->res;
+
+    memset(t, 0, sizeof(*t));
+    t->stream = qtmovie->stream;
+    t->res = res;
+    /* the scratch is shared out by how big the two tables are */
+    t->sc = scratch;
+    t->sc_room = index_share(scratch_size, res->num_sample_to_chunks,
+                             res->num_chunks);
+    t->co = scratch + t->sc_room * 12;
+    t->co_room = (scratch_size - t->sc_room * 12) / 4;
+    if (place->chunk == 0)
+    {
+        /* all of the scratch for the frame counts */
+        t->counts_only = true;
+        t->sc_room = scratch_size / 12;
+    }
+    t->stsc_i = place->stsc_i;
+    t->next_first = place->next_first;
+    t->per_chunk = place->per_chunk;
+}
+
+/* Where to go on from to have chunk, the last one asked for, again: its
+ * first frame is frame. */
+static void chunk_tables_place(const struct chunk_tables *t, uint32_t chunk,
+                               uint32_t frame, chunk_place_t *place)
+{
+    place->chunk = chunk;
+    place->frame = frame;
+    place->stsc_i = t->stsc_i;
+    place->next_first = t->next_first;
+    place->per_chunk = t->per_chunk;
+}
+
+/* Where chunk starts, in *offset, and how many frames it has, in
+ * t->per_chunk.  Chunks are numbered from 1 and have to be asked for in
+ * turn.  Returns false if the file could not be read. */
+static inline bool chunk_tables_next(struct chunk_tables *t, uint32_t chunk,
+                                     uint32_t *offset)
+{
+    demux_res_t *res = t->res;
+    const uint32_t nstsc = res->num_sample_to_chunks;
+    const unsigned char *p;
+
+    t->loaded = false;
+
+    /* how many frames this chunk has */
+    while (chunk >= t->next_first && t->stsc_i < nstsc)
+    {
+        /* this entry and, for where it ends, the one after it */
+        uint32_t last = t->stsc_i + 1 < nstsc ? t->stsc_i + 1 : t->stsc_i;
+        if (t->stsc_i < t->sc_first || last >= t->sc_first + t->sc_n)
+        {
+            uint32_t n = nstsc - t->stsc_i;
+            if (n > t->sc_room)
+                n = t->sc_room;
+            t->sc_n = index_load(t->stream,
+                                 res->sample_to_chunk_offset + 12 * t->stsc_i,
+                                 t->sc, 12 * n) / 12;
+            t->sc_first = t->stsc_i;
+            if (last >= t->sc_first + t->sc_n)
+                return false;
+            t->loaded = true;
+        }
+        p = t->sc + 12 * (t->stsc_i - t->sc_first);
+        t->per_chunk = BE32(p + 4);
+        t->next_first = ++t->stsc_i < nstsc ? BE32(p + 12) : 0xffffffff;
+    }
+
+    if (t->counts_only)
+    {
+        *offset = 0;
+        return true;
+    }
+
+    /* where it starts */
+    if (t->co_i == t->co_n)
+    {
+        uint32_t n = res->num_chunks - (chunk - 1);
+        if (n > t->co_room)
+            n = t->co_room;
+        t->co_n = index_load(t->stream,
+                             res->chunk_offset_offset + 4 * (chunk - 1),
+                             t->co, 4 * n) / 4;
+        if (!t->co_n)
+            return false;
+        t->co_i = 0;
+        t->loaded = true;
+    }
+    *offset = BE32(t->co + 4 * t->co_i);
+    t->co_i++;
+    return true;
+}
+
+/* Go through the tables once, filling size bytes at block with
+ * seek_offsets[] from the start and lookup_table[] from the end.  scratch
+ * is for parts of the chunk tables.  Returns false if the file could not
+ * be read. */
+static bool seek_index_pass(qtmovie_t *qtmovie, void *block, size_t size,
+                            unsigned char *scratch, size_t scratch_size)
+{
+    demux_res_t *res = qtmovie->res;
+    stream_t *stream = qtmovie->stream;
+    const uint32_t nframes = res->num_sample_byte_sizes;
+    const uint32_t nchunks = res->num_chunks;
+    struct chunk_tables tables;
+    const unsigned char *sizes = NULL;
+    size_t sizes_left = 0;
+    uint32_t chunk, frame = 0, to_next = 0, index = 0;
+    uint32_t step = res->seek_step;
+    uint32_t prev_end = 0xffffffff;
+    uint32_t *seek = block;
+    sample_offset_t *gaps_end = (sample_offset_t *)((char *)block + size);
+    sample_offset_t *gap = gaps_end, *g;
+
+    chunk_tables_init(&tables, qtmovie, scratch, scratch_size,
+                      &first_chunk);
+    for (chunk = 1; chunk <= nchunks && frame < nframes; chunk++)
+    {
+        uint32_t offset, k;
+        uint32_t per_chunk;
+
+        if (!chunk_tables_next(&tables, chunk, &offset))
+            return false;
+        if (tables.loaded)
+            sizes_left = 0;
+        per_chunk = tables.per_chunk;
+
+        if (offset != prev_end && res->lookup_end == 0xffffffff)
+        {
+            /* a gap: make room for it if there is none, until the gaps
+             * have their share of the memory */
+            const size_t most = size / SEEK_GAPS_SHARE * (SEEK_GAPS_SHARE - 1);
+            const size_t have = (char *)gaps_end - (char *)gap;
+
+            while ((char *)(gap - 1) < (char *)&seek[index] && index > 1 &&
+                   have < most)
+            {
+                for (k = 0; 2 * k < index; k++)
+                    seek[k] = seek[2 * k];
+                index = k;
+                step *= 2;
+                to_next = (step - frame % step) % step;
+            }
+            if ((char *)(gap - 1) >= (char *)&seek[index] && have < most)
+            {
+                gap--;
+                gap->sample = frame;
+                gap->offset = offset;
+            }
+            else
+            {
+                /* no room: the gaps from here on are read when playback
+                 * gets to them */
+                DEBUGF("no memory for the gap at frame %lu\n",
+                       (unsigned long)frame);
+                res->lookup_end = frame;
+                chunk_tables_place(&tables, chunk, frame, &res->lookup_next);
+            }
+        }
+
+        for (k = 0; k < per_chunk && frame < nframes; )
+        {
+            uint32_t aligned[64];
+            const uint32_t *w;
+            uint32_t n, room, wrote;
+
+            room = ((char *)gap - (char *)&seek[index]) / sizeof(*seek);
+            if (to_next == 0 && room == 0)
+            {
+                /* an offset is due and there is nowhere to put it: make
+                 * the index half as fine, or go without */
+                if (index > 1)
+                {
+                    uint32_t j;
+                    for (j = 0; 2 * j < index; j++)
+                        seek[j] = seek[2 * j];
+                    index = j;
+                    step *= 2;
+                    to_next = (step - frame % step) % step;
+                }
+                else
+                {
+                    to_next = step;
+                }
+                continue;
+            }
+
+            if (sizes_left < 4)
+            {
+                n = nframes - frame;
+                if (n > 1024)
+                    n = 1024;
+                sizes = index_peek(stream,
+                                   res->sample_byte_sizes_offset + 4 * frame,
+                                   4 * n, &sizes_left);
+                if (!sizes || sizes_left < 4)
+                    return false;
+            }
+
+            /* as many frames as are here and have room for their offsets */
+            n = per_chunk - k;
+            if (n > nframes - frame)
+                n = nframes - frame;
+            if (n > sizes_left / 4)
+                n = sizes_left / 4;
+            if (room == 0)
+            {
+                if (n > to_next)
+                    n = to_next;
+            }
+            else if (n / step >= room)
+            {
+                n = room * step;
+            }
+            if ((uintptr_t)sizes & 3)
+            {
+                if (n > sizeof(aligned) / sizeof(aligned[0]))
+                    n = sizeof(aligned) / sizeof(aligned[0]);
+                memcpy(aligned, sizes, 4 * n);
+                w = aligned;
+            }
+            else
+            {
+                w = (const uint32_t *)sizes;
+            }
+            wrote = index_run(w, n, &offset, &seek[index], &to_next, step);
+            index += wrote;
+            sizes += 4 * n;
+            sizes_left -= 4 * n;
+            frame += n;
+            k += n;
+        }
+        prev_end = offset;
+    }
+
+    /* the gaps were put in last to first */
+    res->num_lookup_table = gaps_end - gap;
+    res->lookup_room = res->num_lookup_table;
+    res->lookup_table = gap;
+    for (g = gaps_end - 1; gap < g; gap++, g--)
+    {
+        sample_offset_t t = *gap;
+        *gap = *g;
+        *g = t;
+    }
+    res->seek_offsets = seek;
+    res->num_seek_offsets = index;
+    res->seek_step = step;
+    return true;
+}
+
+/* Put the first frame and the offset of every step'th chunk in table[].
+ * Returns how many that was, or 0 if the file could not be read. */
+static uint32_t chunk_index_pass(qtmovie_t *qtmovie, sample_offset_t *table,
+                                 uint32_t step, unsigned char *scratch,
+                                 size_t scratch_size)
+{
+    demux_res_t *res = qtmovie->res;
+    const uint32_t nframes = res->num_sample_byte_sizes;
+    const uint32_t nchunks = res->num_chunks;
+    struct chunk_tables tables;
+    uint32_t chunk, offset, frame = 0, to_next = 0, n = 0;
+
+    chunk_tables_init(&tables, qtmovie, scratch, scratch_size,
+                      &first_chunk);
+    for (chunk = 1; chunk <= nchunks && frame < nframes; chunk++)
+    {
+        if (!chunk_tables_next(&tables, chunk, &offset))
+            return 0;
+        if (!tables.per_chunk)
+            continue;                   /* nothing to play in it */
+        if (to_next == 0)
+        {
+            table[n].sample = frame;
+            table[n].offset = offset;
+            n++;
+            to_next = step;
+        }
+        to_next--;
+        frame += tables.per_chunk < nframes - frame ? tables.per_chunk
+                                                    : nframes - frame;
+    }
+    return n;
+}
+
+static bool build_seek_index(qtmovie_t *qtmovie)
+{
+    demux_res_t *res = qtmovie->res;
+    int32_t resume_at = stream_tell(qtmovie->stream);
+    const uint32_t nframes = res->num_sample_byte_sizes;
+    const uint32_t nchunks = res->num_chunks;
+    uint32_t entries, gaps;
+    size_t size, scratch_size, tables;
+    unsigned char *scratch;
+    void *block;
+
+    res->seek_offsets = NULL;
+    res->num_seek_offsets = 0;
+    res->seek_step = 1;
+    res->lookup_table = NULL;
+    res->num_lookup_table = 0;
+    res->lookup_step = 0;
+    res->lookup_first = 0;
+    res->lookup_end = 0xffffffff;
+    res->lookup_room = 0;
+
+    if (!nframes || !nchunks || !res->num_sample_to_chunks)
+        return true;                    /* nothing to seek in */
+
+    /* What there is, or what every frame and every chunk would take. */
+    codec_malloc_spare(&size);
+    size = size > SEEK_INDEX_RESERVE + 1024 ? size - SEEK_INDEX_RESERVE
+                                            : 1024;
+    /* Chunk tables too big for what is left over as scratch memory get up
+     * to an eighth of the index's, to be read in fewer pieces. */
+    tables = nchunks < size / 4 && res->num_sample_to_chunks < size / 12
+             ? 4 * nchunks + 12 * res->num_sample_to_chunks : size;
+    if (tables > SEEK_INDEX_RESERVE)
+    {
+        tables -= SEEK_INDEX_RESERVE;
+        size -= tables < size / 8 ? tables : size / 8;
+    }
+
+    if (nframes > SEEK_SIZES_MAX / 4 &&
+        nframes / nchunks <= SEEK_CHUNK_FRAMES_MAX &&
+        (!other_tracks_interleaved(qtmovie) ||
+         nchunks <= size / sizeof(sample_offset_t)))
+    {
+        /* too long to read every size: an index of chunks */
+        uint32_t step = 1;
+
+        entries = size / sizeof(sample_offset_t);
+        if (nchunks > entries)
+            step = (nchunks + entries - 1) / entries;
+        entries = (nchunks + step - 1) / step;
+        block = malloc(entries * sizeof(sample_offset_t));
+        scratch = codec_malloc_spare(&scratch_size);
+        if (!block || scratch_size < 256)
+        {
+            DEBUGF("no memory for the seek index\n");
+            return false;
+        }
+        res->num_lookup_table = chunk_index_pass(qtmovie, block, step,
+                                                 scratch, scratch_size);
+        if (!res->num_lookup_table)
+        {
+            DEBUGF("cannot read the tables for the seek index\n");
+            return false;
+        }
+        res->lookup_table = block;
+        res->lookup_step = step;
+        DEBUGF("seek index: %lu chunks, one in %lu\n",
+               (unsigned long)res->num_lookup_table, (unsigned long)step);
+
+        stream_seek(qtmovie->stream, resume_at);
+        return true;
+    }
+
+    if (nframes < size / sizeof(uint32_t) &&
+        nchunks < size / sizeof(sample_offset_t) &&
+        nframes * sizeof(uint32_t) + nchunks * sizeof(sample_offset_t) < size)
+    {
+        size = nframes * sizeof(uint32_t) + nchunks * sizeof(sample_offset_t);
+    }
+    size &= ~(sizeof(sample_offset_t) - 1);
+    block = malloc(size);
+    scratch = codec_malloc_spare(&scratch_size);
+    if (!block || scratch_size < 256)
+    {
+        DEBUGF("no memory for the seek index\n");
         return false;
     }
 
-    // Reading sample_byte_sizes data on seek can lead to additional re-buffering.
-    // So skip it if we have good enough seek accuracy via lookup_table (3000 ms)
-    if (qtmovie->res->sample_byte_sizes_offset && ci->id3->length / fit_numentries <= 3000)
+    /* The smallest step whose offsets fit beside a few gaps. */
+    gaps = nchunks < SEEK_GAPS_FIRST ? nchunks : SEEK_GAPS_FIRST;
+    entries = (size - gaps * sizeof(sample_offset_t)) / sizeof(uint32_t);
+    res->seek_step = (nframes + entries - 1) / entries;
+
+    if (!seek_index_pass(qtmovie, block, size, scratch, scratch_size) ||
+        !res->num_lookup_table ||
+        !res->num_seek_offsets)
     {
-        qtmovie->res->sample_byte_sizes_offset = 0;
-        DEBUGF("lookup_table seek accuracy %ld ms, ignoring sample_byte_sizes_offset \n", ci->id3->length / fit_numentries);
+        DEBUGF("cannot read the tables for the seek index\n");
+        return false;
     }
+    DEBUGF("seek index: %lu offsets, a frame in %lu, and %lu gaps\n",
+           (unsigned long)res->num_seek_offsets,
+           (unsigned long)res->seek_step,
+           (unsigned long)res->num_lookup_table);
 
-    /* Build up lookup table. The lookup table contains the sample index and
-     * byte position in the file for each chunk. This table is used to seek
-     * and resume (see m4a_seek() and m4a_seek_raw() in libm4a/m4a.c) and
-     * to skip empty chunks (see m4a_check_sample_offset() in codecs/aac.c and
-     * libm4a/m4a.c).
-     * The seek/resume precision is lower than using sample_byte_size[] and
-     * depends on numentries. Typically the resolution is ~1/10 of all frames
-     * which equals about 1/4-1/2 seconds. The loss of seek precision is
-     * accepted to be able to avoid allocation of the large sample_byte_size[]
-     * table. This reduces the memory consumption by a factor of 2 or even
-     * more. */
-    uint32_t idx = 0;
-    for (i = 0; i < numentries; ++i)
-    {
-        if (i % accuracy_divider == 0)
-        {
-            qtmovie->res->lookup_table[idx++].offset = stream_read_uint32(qtmovie->stream);
-        }
-        else
-        {
-            stream_skip(qtmovie->stream, 4);
-        }
-        size_remaining -= 4;
-    }
-
-    idx = 0;
-    i = 1;
-    old_i = 0;
-    frame = 0;
-
-    int32_t current_offset = stream_tell(qtmovie->stream);
-    stream_seek(qtmovie->stream, qtmovie->res->sample_to_chunk_offset);
-    stream_read_sample_to_chunk(qtmovie->stream, &new_first, &new_frame);
-    for (k = 1; k <= numentries; ++k)
-    {
-        for (; i <= qtmovie->res->num_sample_to_chunks; ++i)
-        {
-            if (i > old_i)
-            {
-                /* Only access sample_to_chunk[] if new data is required. */
-                old_first = new_first;
-                old_frame = new_frame;
-                if (i < qtmovie->res->num_sample_to_chunks)
-                    stream_read_sample_to_chunk(qtmovie->stream, &new_first, &new_frame);
-                old_i = i;
-            }
-
-            if (new_first > k)
-                break;
-
-            frame += (new_first - old_first) * old_frame;
-        }
-
-        if ((k-1) % accuracy_divider == 0)
-        {
-            qtmovie->res->lookup_table[idx++].sample = frame + (k - old_first) * old_frame;
-        }
-    }
-    /* zero-terminate sample if it wasn't calculated */
-    if (idx < fit_numentries)
-    {
-        qtmovie->res->lookup_table[idx].sample = 0;
-    }
-
-    stream_seek(qtmovie->stream, current_offset);
-    if (size_remaining)
-    {
-        DEBUGF("ehm, size remianing?\n");
-        stream_skip(qtmovie->stream, size_remaining);
-    }
-
+    stream_seek(qtmovie->stream, resume_at);
     return true;
+}
+
+/* Fill lookup_table[] again, with every chunk from the one that frame is in
+ * for as many as there is room for, whether it follows on from the chunk
+ * before it or not.  The stream is left where it was.
+ *
+ * This is during playback, with no heap to spare, and going from one table
+ * to the other can cost a refill of the playback buffer each time.  So each
+ * is read once: the frame counts up to the chunk wanted, then the offsets
+ * of the chunks from there, into the far half of lookup_table[] itself,
+ * then the frame counts again, to put each offset with its first frame.
+ * An entry is twice the size of an offset, so the entries do not catch up
+ * with the offsets that are still to be used. */
+void m4a_lookup_refill(demux_res_t *res, stream_t *stream, uint32_t frame)
+{
+    unsigned char scratch[1020];
+    qtmovie_t qtmovie = { .stream = stream, .res = res };
+    const uint32_t nframes = res->num_sample_byte_sizes;
+    const uint32_t nchunks = res->num_chunks;
+    const uint32_t resume_at = stream->ci->curpos;
+    sample_offset_t *table = res->lookup_table;
+    struct chunk_tables tables;
+    chunk_place_t place = res->lookup_next;
+    unsigned char *raw;
+    uint32_t chunk, first, offset, at, per_chunk, n = 0, count, i;
+
+    /* all of the file from here, unless there is more than fits */
+    res->lookup_first = frame;
+    res->lookup_end = 0xffffffff;
+    res->num_lookup_table = 0;
+    if (!res->lookup_room)
+        return;
+
+    /* The chunk the frame is in: on from where the last ones stopped, if
+     * that is not past it. */
+    if (place.chunk == 0 || place.frame > frame)
+        place = first_chunk;
+    first = place.chunk;
+    at = place.frame;
+    place.chunk = 0;                    /* the frame counts alone */
+    chunk_tables_init(&tables, &qtmovie, scratch, sizeof(scratch), &place);
+    for (;; first++)
+    {
+        if (first > nchunks || at >= nframes ||
+            !chunk_tables_next(&tables, first, &offset))
+        {
+            stream->ci->seek_buffer(resume_at);
+            return;                     /* past the end: nothing to skip */
+        }
+        per_chunk = tables.per_chunk < nframes - at ? tables.per_chunk
+                                                    : nframes - at;
+        if (at + per_chunk > frame && per_chunk)
+            break;
+        at += per_chunk;
+    }
+    chunk_tables_place(&tables, 0, at, &place);
+
+    /* the offsets of the chunks from there */
+    count = nchunks - first + 1;
+    if (count > res->lookup_room)
+        count = res->lookup_room;
+    raw = (unsigned char *)table + 4 * count;
+    count = index_load(stream, res->chunk_offset_offset + 4 * (first - 1),
+                       raw, 4 * count) / 4;
+    if (!count)
+    {
+        stream->ci->seek_buffer(resume_at);
+        return;                         /* cannot be read: go without */
+    }
+
+    /* and the first frame of each */
+    chunk_tables_init(&tables, &qtmovie, scratch, sizeof(scratch), &place);
+    for (i = 0, chunk = first; i < count && at < nframes; i++, chunk++)
+    {
+        if (!chunk_tables_next(&tables, chunk, &offset))
+            break;                      /* go without the rest */
+        offset = BE32(raw + 4 * i);
+        per_chunk = tables.per_chunk < nframes - at ? tables.per_chunk
+                                                    : nframes - at;
+        if (!per_chunk)
+            continue;                   /* nothing to play in it */
+        table[n].sample = at;
+        table[n].offset = offset;
+        n++;
+        at += per_chunk;
+    }
+    if (i == count && chunk <= nchunks && at < nframes)
+    {
+        /* there are more: these end here */
+        res->lookup_end = at;
+        chunk_tables_place(&tables, chunk, at, &res->lookup_next);
+    }
+    res->num_lookup_table = n;
+    if (n)
+        res->lookup_first = table[0].sample;
+    DEBUGF("gaps for frames %lu to %lu: %lu chunks\n",
+           (unsigned long)res->lookup_first, (unsigned long)res->lookup_end,
+           (unsigned long)n);
+
+    stream->ci->seek_buffer(resume_at);
 }
 
 static bool read_chunk_stbl(qtmovie_t *qtmovie, size_t chunk_len)
@@ -634,13 +1256,63 @@ static bool read_chunk_stbl(qtmovie_t *qtmovie, size_t chunk_len)
 
         size_remaining -= sub_chunk_len;
     }
+
     return true;
+}
+
+/* The rest of a minf, or of its stbl, that is not the audio: note where the
+ * track's chunks lie, from its stco or co64.  Leaves the stream after it. */
+static void read_other_minf(qtmovie_t *qtmovie, size_t size_remaining)
+{
+    while (size_remaining >= 8)
+    {
+        uint32_t sub_chunk_len = stream_read_uint32(qtmovie->stream);
+        fourcc_t sub_chunk_id = stream_read_uint32(qtmovie->stream);
+        uint32_t first, last, count;
+
+        if (sub_chunk_len < 8 || sub_chunk_len > size_remaining)
+        {
+            /* cannot tell where it is: suppose it among the audio */
+            add_other_track(qtmovie, 0, 0xffffffff);
+            stream_skip(qtmovie->stream, size_remaining - 8);
+            return;
+        }
+
+        switch (sub_chunk_id)
+        {
+        case MAKEFOURCC('s','t','b','l'):
+            read_other_minf(qtmovie, sub_chunk_len - 8);
+            break;
+        case MAKEFOURCC('s','t','c','o'):
+        case MAKEFOURCC('c','o','6','4'):
+            if (sub_chunk_len < 16)
+            {
+                stream_skip(qtmovie->stream, sub_chunk_len - 8);
+                break;
+            }
+            stream_read_uint32(qtmovie->stream);    /* version + flags */
+            count = stream_read_uint32(qtmovie->stream);
+            if (read_chunk_range(qtmovie, sub_chunk_len - 16, count,
+                                 sub_chunk_id == MAKEFOURCC('c','o','6','4'),
+                                 &first, &last))
+                add_other_track(qtmovie, first, last);
+            break;
+        default:
+            stream_skip(qtmovie->stream, sub_chunk_len - 8);
+            break;
+        }
+
+        size_remaining -= sub_chunk_len;
+    }
+    if (size_remaining)
+        stream_skip(qtmovie->stream, size_remaining);
 }
 
 static bool read_chunk_minf(qtmovie_t *qtmovie, size_t chunk_len)
 {
     size_t size_remaining = chunk_len - 8;
     uint32_t i;
+    fourcc_t header;
 
     /* Check for smhd, the only kind of minf we care about. MP4 video files
      * normally put a video trak before the AAC trak. Older Rockbox code
@@ -654,9 +1326,11 @@ static bool read_chunk_minf(qtmovie_t *qtmovie, size_t chunk_len)
         return false;
     }
 
-    if (stream_read_uint32(qtmovie->stream) != MAKEFOURCC('s','m','h','d'))
+    header = stream_read_uint32(qtmovie->stream);
+    if (header != MAKEFOURCC('s','m','h','d'))
     {
-        stream_skip(qtmovie->stream, size_remaining - 8);
+        stream_skip(qtmovie->stream, i - 8);
+        read_other_minf(qtmovie, size_remaining - i);
         return true;
     }
     if (i != 16)
@@ -817,7 +1491,9 @@ static bool read_chunk_moov(qtmovie_t *qtmovie, size_t chunk_len)
 
         size_remaining -= sub_chunk_len;
     }
-    return true;
+
+    /* now that it is known what other tracks there are */
+    return build_seek_index(qtmovie);
 }
 
 static void read_chunk_mdat(qtmovie_t *qtmovie, size_t chunk_len)
@@ -832,8 +1508,11 @@ int qtmovie_read(stream_t *file, demux_res_t *demux_res)
     qtmovie_t qtmovie;
 
     /* construct the stream */
+    memset(&qtmovie, 0, sizeof(qtmovie));
     qtmovie.stream = file;
     qtmovie.res = demux_res;
+    demux_res->stream = file;
+    demux_res->lookup_end = 0xffffffff;
 
     /* read the chunks */
     while (1)

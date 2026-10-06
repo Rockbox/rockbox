@@ -62,6 +62,14 @@ typedef struct
     uint32_t offset;
 } sample_offset_t;
 
+/* A place in the chunk tables to go on reading them from. */
+typedef struct
+{
+    uint32_t chunk;                 /* the next chunk, numbered from 1 */
+    uint32_t frame;                 /* and its first frame */
+    uint32_t stsc_i, next_first, per_chunk;
+} chunk_place_t;
+
 typedef struct
 {
     uint16_t num_channels;
@@ -73,16 +81,40 @@ typedef struct
     int32_t sample_to_chunk_offset;
     uint32_t num_sample_to_chunks;
 
+    /* The seek index: seek_offsets[i] is the file offset of frame
+     * i * seek_step.  See demux.c. */
+    uint32_t *seek_offsets;
+    uint32_t num_seek_offsets;
+    uint32_t seek_step;
+
+    /* The first frame, and its file offset, of each chunk that does not
+     * follow straight on from the chunk before it, the first chunk
+     * included.  For a file too long to have seek_offsets[] it is every
+     * lookup_step'th chunk instead, and is what there is to seek with. */
     sample_offset_t *lookup_table;
     uint32_t num_lookup_table;
+    uint32_t lookup_step;
+
+    /* If there was not room for all of them, lookup_table[] has those for
+     * frames lookup_first up to lookup_end, with room for lookup_room, and
+     * is filled again from the file when playback leaves them: see
+     * m4a_lookup_refill().  lookup_next is where they stopped. */
+    uint32_t lookup_first;
+    uint32_t lookup_end;
+    uint32_t lookup_room;
+    chunk_place_t lookup_next;
+    stream_t *stream;
 
     time_to_sample_t *time_to_sample;
     uint32_t num_time_to_samples;
     uint32_t time_to_sample_offset;
 
-    uint32_t *sample_byte_sizes;
+    /* The frame sizes and chunk offsets stay in the file; they are read
+     * once, to make the seek index. */
     uint32_t num_sample_byte_sizes;
     int32_t sample_byte_sizes_offset;
+    uint32_t num_chunks;
+    int32_t chunk_offset_offset;
 
     uint32_t codecdata_len;
     uint8_t codecdata[MAX_CODECDATA_SIZE];
@@ -136,5 +168,7 @@ unsigned int m4a_seek (demux_res_t* demux_res, stream_t* stream,
 unsigned int m4a_seek_raw (demux_res_t* demux_res, stream_t* stream,
     uint32_t file_loc, uint64_t* sound_samples_done, uint32_t* current_sample, uint32_t* lookup_table_idx);
 int m4a_check_sample_offset(demux_res_t *demux_res, uint32_t frame, uint32_t *start);
+void m4a_lookup_refill(demux_res_t *demux_res, stream_t *stream,
+                       uint32_t frame);
 
 #endif /* STREAM_H */
