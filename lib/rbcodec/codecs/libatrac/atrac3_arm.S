@@ -92,48 +92,35 @@ atrac3_iqmf_matrixing:
  *          in += 2;
  *          out += 2;
  *      }
+ *
+ * The window is symmetric, win[i] = win[47-i], so only its first half is
+ * read: win[2k] and win[2k+1] serve in[2k] and in[2k+1] from the front of
+ * the 48 inputs and, swapped, in[46-2k] and in[47-2k] from the back. That
+ * is 24 coefficient loads for an output pair where there were 48, and
+ * they can be loaded four at a time. The sums are kept in 64 bits, so the
+ * order of the additions does not change the result.
+ *
  * Note: r12 is a scratch register and can be used without restorage.
  ****************************************************************************/
 
-/* To be called as first block to call smull for initial filling of the result
- * registers lr/r9 and r12/r8. */
-#define DEWIN_8_SAMPLES_MUL_ASM \
-    ldmia r2!, {r4, r5};            /* load win[0..1] */ \
-    ldmia r1!, {r6, r7};            /* load in [0..1] */ \
-    smull lr , r9, r4, r6;          /* s1 = win[0] * in[0] */ \
-    smull r12, r8, r5, r7;          /* s2 = win[1] * in[1] */ \
-    ldmia r2!, {r4, r5};            /* load win[i..i+1] */ \
-    ldmia r1!, {r6, r7};            /* load in [i..i+1] */ \
-    smlal lr , r9, r4, r6;          /* s1 = win[i  ] * in[i  ] */ \
-    smlal r12, r8, r5, r7;          /* s2 = win[i+1] * in[i+1] */ \
-    ldmia r2!, {r4, r5};            /* load win[i..i+1] */ \
-    ldmia r1!, {r6, r7};            /* load in [i..i+1] */ \
-    smlal lr , r9, r4, r6;          /* s1 = win[i  ] * in[i  ] */ \
-    smlal r12, r8, r5, r7;          /* s2 = win[i+1] * in[i+1] */ \
-    ldmia r2!, {r4, r5};            /* load win[i..i+1] */ \
-    ldmia r1!, {r6, r7};            /* load in [i..i+1] */ \
-    smlal lr , r9, r4, r6;          /* s1 = win[i  ] * in[i  ] */ \
-    smlal r12, r8, r5, r7;          /* s2 = win[i+1] * in[i+1] */
-
-/* Called after first block. Will always multiply-add to the result registers 
- * lr/r9 and r12/r8. */
-#define DEWIN_8_SAMPLES_MLA_ASM \
-    ldmia r2!, {r4, r5};            /* load win[i..i+1] */ \
-    ldmia r1!, {r6, r7};            /* load in [i..i+1] */ \
-    smlal lr , r9, r4, r6;          /* s1 = win[i  ] * in[i  ] */ \
-    smlal r12, r8, r5, r7;          /* s2 = win[i+1] * in[i+1] */ \
-    ldmia r2!, {r4, r5};            /* load win[i..i+1] */ \
-    ldmia r1!, {r6, r7};            /* load in [i..i+1] */ \
-    smlal lr , r9, r4, r6;          /* s1 = win[i  ] * in[i  ] */ \
-    smlal r12, r8, r5, r7;          /* s2 = win[i+1] * in[i+1] */ \
-    ldmia r2!, {r4, r5};            /* load win[i..i+1] */ \
-    ldmia r1!, {r6, r7};            /* load in [i..i+1] */ \
-    smlal lr , r9, r4, r6;          /* s1 = win[i  ] * in[i  ] */ \
-    smlal r12, r8, r5, r7;          /* s2 = win[i+1] * in[i+1] */ \
-    ldmia r2!, {r4, r5};            /* load win[i..i+1] */ \
-    ldmia r1!, {r6, r7};            /* load in [i..i+1] */ \
-    smlal lr , r9, r4, r6;          /* s1 = win[i  ] * in[i  ] */ \
-    smlal r12, r8, r5, r7;          /* s2 = win[i+1] * in[i+1] */
+/* Eight taps: coefficients win[2k..2k+3], two input pairs from the front
+ * (r1) and two from the back (r3). s1 is lr/r9 and s2 is r12/r8. The
+ * samples are the last operand of the multiplies, as they are the smaller
+ * one and that is what the multiplier's early termination goes by. */
+#define DEWIN_8_SAMPLES_ASM(first1, first2) \
+    ldmia r2!, {r4-r7};             /* load win[2k..2k+3] */ \
+    ldmia r1!, {r10, r11};          /* load in[2k], in[2k+1] */ \
+    first1 lr , r9, r4, r10;        /* s1 += win[2k  ] * in[2k  ] */ \
+    first2 r12, r8, r5, r11;        /* s2 += win[2k+1] * in[2k+1] */ \
+    ldmdb r3!, {r10, r11};          /* load in[46-2k], in[47-2k] */ \
+    smlal lr , r9, r5, r10;         /* s1 += win[2k+1] * in[46-2k] */ \
+    smlal r12, r8, r4, r11;         /* s2 += win[2k  ] * in[47-2k] */ \
+    ldmia r1!, {r10, r11};          /* load in[2k+2], in[2k+3] */ \
+    smlal lr , r9, r6, r10;         /* s1 += win[2k+2] * in[2k+2] */ \
+    smlal r12, r8, r7, r11;         /* s2 += win[2k+3] * in[2k+3] */ \
+    ldmdb r3!, {r10, r11};          /* load in[44-2k], in[45-2k] */ \
+    smlal lr , r9, r7, r10;         /* s1 += win[2k+3] * in[44-2k] */ \
+    smlal r12, r8, r6, r11;         /* s2 += win[2k+2] * in[45-2k] */
 
     .align  2
     .global atrac3_iqmf_dewindowing
@@ -144,16 +131,19 @@ atrac3_iqmf_dewindowing:
     /* r1 = input samples */
     /* r2 = window coefficients */
     /* r3 = counter */
-    stmfd   sp!, {r4-r9, lr}        /* save non-scratch registers */
+    stmfd   sp!, {r4-r11, lr}       /* save non-scratch registers */
+    add     r3, r0, r3, lsl #3      /* end of dest: two words a count */
+    stmfd   sp!, {r3}
+    add     r3, r1, #192            /* r3 = end of the 48 inputs */
     
 .iqmf_dewindow_outer_loop:          /* outer loop 0...counter-1 */
     
-    DEWIN_8_SAMPLES_MUL_ASM         /*  0.. 7, use "MUL" macro here! */
-    DEWIN_8_SAMPLES_MLA_ASM         /*  8..15 */
-    DEWIN_8_SAMPLES_MLA_ASM         /* 16..23 */
-    DEWIN_8_SAMPLES_MLA_ASM         /* 24..31 */
-    DEWIN_8_SAMPLES_MLA_ASM         /* 32..39 */
-    DEWIN_8_SAMPLES_MLA_ASM         /* 40..47 */
+    DEWIN_8_SAMPLES_ASM(smull, smull)   /* in[ 0.. 3], in[44..47] */
+    DEWIN_8_SAMPLES_ASM(smlal, smlal)   /* in[ 4.. 7], in[40..43] */
+    DEWIN_8_SAMPLES_ASM(smlal, smlal)   /* in[ 8..11], in[36..39] */
+    DEWIN_8_SAMPLES_ASM(smlal, smlal)   /* in[12..15], in[32..35] */
+    DEWIN_8_SAMPLES_ASM(smlal, smlal)   /* in[16..19], in[28..31] */
+    DEWIN_8_SAMPLES_ASM(smlal, smlal)   /* in[20..23], in[24..27] */
 
     mov   lr , lr , lsr #31
     orr   r9, lr , r9, lsl #1       /* s1 = low>>31 || hi<<1 */
@@ -161,13 +151,16 @@ atrac3_iqmf_dewindowing:
     orr   r8, r12, r8, lsl #1       /* s2 = low>>31 || hi<<1 */
 
     stmia r0!, {r8, r9}             /* store result out[0]=s2, out[1]=s1 */
-    sub   r1, r1, #184              /* roll back 46 entries = 184 bytes */
-    sub   r2, r2, #192              /* roll back 48 entries = 192 bytes = win[0] */
+    ldr   r4, [sp]                  /* end of dest */
+    sub   r1, r1, #88               /* back 24 entries, on 2: in += 2 */
+    add   r3, r3, #104              /* on 24 entries, and 2 more */
+    sub   r2, r2, #96               /* roll back 24 entries = win[0] */
 
-    subs r3, r3, #1                 /* outer loop -= 1 */
-    bgt .iqmf_dewindow_outer_loop
+    cmp   r0, r4
+    bne .iqmf_dewindow_outer_loop
     
-    ldmpc   regs=r4-r9              /* restore registers */
+    add     sp, sp, #4
+    ldmpc   regs=r4-r11             /* restore registers */
     
 .atrac3_iqmf_dewindowing_end:
     .size   atrac3_iqmf_dewindowing,.atrac3_iqmf_dewindowing_end-atrac3_iqmf_dewindowing
