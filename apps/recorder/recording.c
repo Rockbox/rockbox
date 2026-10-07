@@ -1540,6 +1540,9 @@ bool recording_screen(bool no_source)
                 {
                     FOR_NB_SCREENS(i)
                         screens[i].set_viewport(NULL);
+                    /* not monitoring the input in USB mode: this screen
+                     * only switches back to playback when it ends */
+                    rec_set_source(AUDIO_SRC_PLAYBACK, SRCF_PLAYBACK);
                     default_event_handler(SYS_USB_CONNECTED);
                     done = true;
                     rec_status |= RCSTAT_BEEN_IN_USB_MODE;
