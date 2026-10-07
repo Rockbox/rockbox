@@ -71,6 +71,9 @@
 # include "radio.h"
 #endif
 #include "viewport.h"
+#include "skin_engine/skin_engine.h"
+#include "skin_engine/wps_internals.h"
+#include "statusbar-skinned.h"
 #include "list.h"
 #include "general.h"
 #include "appevents.h"
@@ -152,8 +155,15 @@ static int screen_update = NB_SCREENS;
 static bool remote_display_on = true;
 #endif
 
-/* as we have the ability to disable the remote, we need an alternative loop */
-#define FOR_NB_ACTIVE_SCREENS(i) for(int i = 0; i < screen_update; i++)
+/* With a theme's recording screen skin (.wrs, .rwrs for the remote), the
+ * skin draws the screen and the settings list goes where it says,
+ * %Vi(-,...); a screen without one is drawn as it always was. As we have the
+ * ability to disable the remote, the screens drawn here are counted by
+ * screen_update. */
+static bool rec_skinned[NB_SCREENS];
+static bool rec_any_skinned;
+#define FOR_NB_UNSKINNED_SCREENS(i) \
+    for(int i = 0; i < screen_update; i++) if (!rec_skinned[i])
 
 static bool update_list = false;   /* (GIU) list needs updating */
 
@@ -918,6 +928,102 @@ static void recording_step_levels(int setting_id, int steps)
 
 bool recording_start_automatic = false;
 
+/* Use the theme's recording screen skin if it has one with a place for the
+ * list - without one, the screen draws itself as it always has */
+static bool rec_skin_usable(enum screen_type screen)
+{
+    skin_get_gwps(RECORDING_SCREEN, screen);
+    return skin_has_file(RECORDING_SCREEN, screen) &&
+           skin_get_info_vp(RECORDING_SCREEN, screen) != NULL;
+}
+
+#ifdef HAVE_BACKDROP_IMAGE
+/* skin_backdrop_show() takes none (-1) to be the main screen's */
+static void rec_backdrop_show(enum screen_type screen, int backdrop_id)
+{
+    if (backdrop_id < 0 && screen != SCREEN_MAIN)
+        screens[screen].backdrop_show(NULL);
+    else
+        skin_backdrop_show(backdrop_id);
+}
+#endif
+
+/* Set a skinned screen up for the skin, or back for the rest of the UI */
+static void rec_skin_display(enum screen_type screen, bool enter)
+{
+    static bool shown[NB_SCREENS];
+    struct gui_wps *gwps;
+
+    if (!rec_skinned[screen] || enter == shown[screen] ||
+        (enter && screen >= screen_update)) /* remote LCD off */
+        return;
+    shown[screen] = enter;
+    gwps = skin_get_gwps(RECORDING_SCREEN, screen);
+
+    if (enter)
+    {
+        viewportmanager_theme_enable(screen, skin_has_sbs(gwps), NULL);
+#ifdef HAVE_BACKDROP_IMAGE
+        rec_backdrop_show(screen, gwps->data->backdrop_id);
+#endif
+        screens[screen].clear_display();
+        send_event(GUI_EVENT_ACTIONUPDATE, (void*)1);
+        skin_request_full_update(RECORDING_SCREEN);
+    }
+    else
+    {
+        screens[screen].scroll_stop();
+#ifdef HAVE_BACKDROP_IMAGE
+        rec_backdrop_show(screen, sb_get_backdrop(screen));
+#endif
+        viewportmanager_theme_undo(screen, skin_has_sbs(gwps));
+    }
+}
+
+static void rec_skin_display_all(bool enter)
+{
+    FOR_NB_SCREENS(i)
+        rec_skin_display(i, enter);
+}
+
+/* Wait a while (HZ/10) for a button, refreshing the skins' peak meters and
+ * drawing the meter on the other screens as without a skin */
+static int rec_skin_get_btn(int x[], int y[], int height[],
+                            struct viewport vps[])
+{
+    long next_refresh = current_tick;
+    long timeout = current_tick + HZ / 10;
+
+    while (TIME_BEFORE(current_tick, timeout))
+    {
+        int button = get_action(CONTEXT_RECSCREEN, TIMEOUT_NOBLOCK);
+
+        if (button != BUTTON_NONE)
+            return button;
+
+        peak_meter_peek();
+        sleep(0);
+        if (TIME_BEFORE(current_tick, next_refresh))
+            continue;
+
+        for (int i = 0; i < screen_update; i++)
+        {
+            if (rec_skinned[i])
+            {
+                skin_update(RECORDING_SCREEN, i, SKIN_REFRESH_PEAK_METER);
+                continue;
+            }
+            screens[i].set_viewport(&vps[i]);
+            peak_meter_screen(&screens[i], x[i], y[i], height[i]);
+            screens[i].update_viewport_rect(x[i], y[i],
+                                            screens[i].getwidth() - x[i],
+                                            height[i]);
+        }
+        next_refresh += HZ / PEAK_METER_FPS;
+    }
+    return BUTTON_NONE;
+}
+
 bool recording_screen(bool no_source)
 {
     int button;
@@ -993,12 +1099,23 @@ bool recording_screen(bool no_source)
 
     /* recording_menu gets messed up: so prevent manus talking */
     talk_disable(true);
-    /* audio_init_recording stops anything playing when it takes the audio
-       buffer */
 
 #ifdef HAVE_AGC
     peak_meter_get_peakhold(&peak_l, &peak_r);
 #endif
+
+    /* audio_init_recording stops anything playing when it takes the audio
+       buffer - stop it now, or loading the skins makes it stutter */
+    if (audio_status() & AUDIO_STATUS_PLAY)
+        audio_stop();
+
+    /* the skins' memory comes from where the recording buffer is taken */
+    rec_any_skinned = false;
+    FOR_NB_SCREENS(i)
+    {
+        rec_skinned[i] = rec_skin_usable(i);
+        rec_any_skinned |= rec_skinned[i];
+    }
 
     pm_reset_clipcount();
     pm_activate_clipcount(false);
@@ -1083,6 +1200,12 @@ bool recording_screen(bool no_source)
                 trig_ypos[i] = font_get(vp_top[i].font)->height * 3;
                 if(compact_view[i])
                     trig_ypos[i] -= (font_get(vp_top[i].font)->height)/2;
+            }
+
+            FOR_NB_SCREENS(i)
+            {
+                if (rec_skinned[i])
+                    vp_list[i] = *skin_get_info_vp(RECORDING_SCREEN, i);
             }
 
             /* init the bottom list */
@@ -1185,6 +1308,7 @@ bool recording_screen(bool no_source)
                 gui_synclist_set_nb_items(&lists, listi);   /* stereo */
             }
 
+            rec_skin_display_all(true);
             gui_synclist_draw(&lists);
         } /* if(done < 0) */
 
@@ -1238,9 +1362,12 @@ bool recording_screen(bool no_source)
 #endif /* CONFIG_LED */
 
         /* Wait for a button a while (HZ/10) drawing the peak meter */
-        button = peak_meter_draw_get_btn(CONTEXT_RECSCREEN,
-                                         pm_x, pm_y, pm_h,
-                                         screen_update, vp_top);
+        if (rec_any_skinned)
+            button = rec_skin_get_btn(pm_x, pm_y, pm_h, vp_top);
+        else
+            button = peak_meter_draw_get_btn(CONTEXT_RECSCREEN,
+                                             pm_x, pm_y, pm_h,
+                                             screen_update, vp_top);
         if (last_audio_stat != audio_stat)
         {
             if (audio_stat & AUDIO_STATUS_RECORD)
@@ -1433,6 +1560,13 @@ bool recording_screen(bool no_source)
                 {
                     /* switch to single screen, leave message on remote */
                     screen_update = 1;
+                    if (rec_skinned[SCREEN_REMOTE])
+                    {
+                        rec_skin_display(SCREEN_REMOTE, false);
+                        screens[1].set_viewport(NULL);
+                        screens[1].clear_display();
+                        screens[1].set_viewport(&vp_top[1]);
+                    }
                     screens[1].clear_viewport();
                     screens[1].puts(0, 0, str(LANG_REMOTE_LCD_OFF));
                     screens[1].puts(0, 1, str(LANG_REMOTE_LCD_ON));
@@ -1443,6 +1577,7 @@ bool recording_screen(bool no_source)
                     /* remote switched on again */
                     update_list = true;
                     screen_update = NB_SCREENS;
+                    rec_skin_display(SCREEN_REMOTE, true);
                 }
                 remote_display_on = !remote_display_on; /* toggle */
                 update_countdown = 0; /* Update immediately */
@@ -1512,6 +1647,7 @@ bool recording_screen(bool no_source)
                     /* led is restored at begin of loop / end of function */
                     led(false);
 #endif
+                    rec_skin_display_all(false);
                     if (recording_menu(no_source))
                     {
                         done = 1;
@@ -1538,6 +1674,7 @@ bool recording_screen(bool no_source)
                 /* Only accept USB connection when not recording */
                 if(!(audio_stat & AUDIO_STATUS_RECORD))
                 {
+                    rec_skin_display_all(false);
                     FOR_NB_SCREENS(i)
                         screens[i].set_viewport(NULL);
                     /* not monitoring the input in USB mode: this screen
@@ -1575,6 +1712,8 @@ bool recording_screen(bool no_source)
 
             FOR_NB_SCREENS(i)
             {
+                if (rec_skinned[i])
+                    continue;
                 screens[i].set_viewport(&vp_top[i]);
                 screens[i].clear_viewport();
             }
@@ -1613,7 +1752,7 @@ bool recording_screen(bool no_source)
                              hours, minutes, seconds%60);
             }
 
-            FOR_NB_ACTIVE_SCREENS(i)
+            FOR_NB_UNSKINNED_SCREENS(i)
                 screens[i].puts(0, 0, buf);
 
             if(audio_stat & AUDIO_STATUS_PRERECORD)
@@ -1649,7 +1788,7 @@ bool recording_screen(bool no_source)
                 }
             }
 
-            FOR_NB_ACTIVE_SCREENS(i)
+            FOR_NB_UNSKINNED_SCREENS(i)
                 screens[i].puts(0, 1, buf);
 
             /* We will do file splitting regardless, either at the end of
@@ -1684,7 +1823,7 @@ bool recording_screen(bool no_source)
             if(global_settings.peak_meter_clipcounter)
             {
                 int clipcount = pm_get_clipcount();
-                FOR_NB_ACTIVE_SCREENS(i)
+                FOR_NB_UNSKINNED_SCREENS(i)
                 {
                     if(!compact_view[i])
                     {
@@ -1697,7 +1836,8 @@ bool recording_screen(bool no_source)
             }
 
 #ifdef HAVE_HISTOGRAM
-            if(global_settings.histogram_interval)
+            /* on the main screen only */
+            if(global_settings.histogram_interval && !rec_skinned[SCREEN_MAIN])
             {
                 histogram_draw(0,
                                screens[0].getwidth()/2,
@@ -1711,12 +1851,14 @@ bool recording_screen(bool no_source)
 #ifdef HAVE_AGC
             hist_time++;
 #endif
-            /* draw the trigger status */
-            if (peak_meter_trigger_status() != TRIG_OFF)
+            /* draw the trigger status - drawn from the main screen on, so not
+             * on a skinned one, which can show it with %Rt */
+            if (!rec_skinned[SCREEN_MAIN] &&
+                peak_meter_trigger_status() != TRIG_OFF)
             {
                 peak_meter_draw_trig(pm_x, trig_ypos, trig_width,
-                                    screen_update);
-                FOR_NB_ACTIVE_SCREENS(i)
+                                     rec_any_skinned ? 1 : screen_update);
+                FOR_NB_UNSKINNED_SCREENS(i)
                     screens[i].update_viewport_rect(pm_x[i], trig_ypos[i],
                                                 trig_width[i] + 2, TRIG_HEIGHT);
             }
@@ -1756,11 +1898,16 @@ bool recording_screen(bool no_source)
             }
 
             /* draw peakmeter again (check if this can be removed) */
-            FOR_NB_ACTIVE_SCREENS(i)
+            FOR_NB_UNSKINNED_SCREENS(i)
             {
                 screens[i].set_viewport(&vp_top[i]);
                 peak_meter_screen(&screens[i], pm_x[i], pm_y[i], pm_h[i]);
                 screens[i].update();
+            }
+            for (int i = 0; i < screen_update; i++)
+            {
+                if (rec_skinned[i])
+                    skin_update(RECORDING_SCREEN, i, SKIN_REFRESH_NON_STATIC);
             }
         } /* display update every second */
 
@@ -1825,6 +1972,10 @@ rec_abort:
     rec_status &= ~RCSTAT_IN_RECSCREEN;
     sound_settings_apply();
 
+    rec_skin_display_all(false);
+    FOR_NB_SCREENS(i)
+        rec_skinned[i] = false;
+    rec_any_skinned = false;
     FOR_NB_SCREENS(i) {
         screens[i].set_viewport(NULL);
         screens[i].setfont(FONT_UI);

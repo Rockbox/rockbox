@@ -235,6 +235,12 @@ static struct browse_folder_info sbs   = {SBS_DIR, SHOW_SBS};
 #if CONFIG_TUNER
 static struct browse_folder_info fms   = {WPS_DIR, SHOW_FMS};
 #endif
+#ifdef HAVE_RECORDING
+static struct browse_folder_info wrs   = {WPS_DIR, SHOW_WRS};
+#ifdef HAVE_REMOTE_LCD
+static struct browse_folder_info rwrs  = {WPS_DIR, SHOW_RWRS};
+#endif
+#endif
 static struct browse_folder_info wps = {WPS_DIR, SHOW_WPS};
 #ifdef HAVE_REMOTE_LCD
 static struct browse_folder_info rwps = {WPS_DIR, SHOW_RWPS};
@@ -297,6 +303,20 @@ int browse_folder(void *param)
             lang_id = LANG_RADIOSCREEN;
             break;
 #endif /* CONFIG_TUNER */
+#ifdef HAVE_RECORDING
+        case SHOW_WRS:
+            ext = "wrs";
+            setting = global_settings.wrs_file;
+            lang_id = LANG_RECORDING_SCREEN;
+            break;
+#ifdef HAVE_REMOTE_LCD
+        case SHOW_RWRS:
+            ext = "rwrs";
+            setting = global_settings.rwrs_file;
+            lang_id = LANG_REMOTE_RECORDING_SCREEN;
+            break;
+#endif
+#endif
 #ifdef HAVE_REMOTE_LCD
         case SHOW_RWPS:
             ext = "rwps";
@@ -343,6 +363,14 @@ MENUITEM_FUNCTION_W_PARAM(browse_sbs, 0, ID2P(LANG_BASE_SKIN),
 #if CONFIG_TUNER
 MENUITEM_FUNCTION_W_PARAM(browse_fms, 0, ID2P(LANG_RADIOSCREEN),
                           browse_folder, (void*)&fms, NULL, Icon_Wps);
+#endif
+#ifdef HAVE_RECORDING
+MENUITEM_FUNCTION_W_PARAM(browse_wrs, 0, ID2P(LANG_RECORDING_SCREEN),
+                          browse_folder, (void*)&wrs, NULL, Icon_Wps);
+#ifdef HAVE_REMOTE_LCD
+MENUITEM_FUNCTION_W_PARAM(browse_rwrs, 0, ID2P(LANG_REMOTE_RECORDING_SCREEN),
+                          browse_folder, (void*)&rwrs, NULL, Icon_Wps);
+#endif
 #endif
 MENUITEM_FUNCTION_W_PARAM(browse_wps, 0, ID2P(LANG_WHILE_PLAYING),
                           browse_folder, (void*)&wps, NULL, Icon_Wps);
@@ -397,6 +425,12 @@ MAKE_MENU(theme_menu, ID2P(LANG_THEME_MENU),
             &browse_fms,
 #ifdef HAVE_REMOTE_LCD
             &browse_rfms,
+#endif
+#endif
+#ifdef HAVE_RECORDING
+            &browse_wrs,
+#ifdef HAVE_REMOTE_LCD
+            &browse_rwrs,
 #endif
 #endif
             &browse_sbs,

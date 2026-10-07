@@ -46,7 +46,9 @@ RWPS: yes
 SBS: yes
 RSBS: yes
 FMS: yes
+WRS: yes
 RFMS: yes
+RWRS: yes
 
 <main>
 backdrop: -

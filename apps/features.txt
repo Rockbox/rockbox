@@ -121,6 +121,9 @@ recording_linein
 #if defined(HAVE_MIC_IN)
 recording_mic
 #endif
+#ifdef HAVE_REMOTE_LCD
+recording_remote
+#endif
 #endif
 
 #if defined(HAVE_HISTOGRAM)

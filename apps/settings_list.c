@@ -336,6 +336,7 @@ static const char graphic_numeric[] = "graphic,numeric";
 #define DEFAULT_WPSNAME  "cabbiev2"
 #define DEFAULT_SBSNAME  "-"
 #define DEFAULT_FMS_NAME "cabbiev2"
+#define DEFAULT_WRS_NAME "cabbiev2"
 
 #if LCD_HEIGHT <= 64
   #define DEFAULT_FONT_HEIGHT 8
@@ -2226,6 +2227,14 @@ const struct settings_list settings[] = {
                      DEFAULT_FMS_NAME, SBS_DIR "/", ".rfms"),
 #endif
 #endif /* CONFIG_TUNER */
+#ifdef HAVE_RECORDING
+    TEXT_SETTING(F_THEMESETTING|F_NEEDAPPLY, wrs_file, "wrs",
+                     DEFAULT_WRS_NAME, WPS_DIR "/", ".wrs"),
+#ifdef HAVE_REMOTE_LCD
+    TEXT_SETTING(F_THEMESETTING|F_NEEDAPPLY, rwrs_file, "rwrs",
+                     DEFAULT_WRS_NAME, WPS_DIR "/", ".rwrs"),
+#endif
+#endif
     TEXT_SETTING(F_THEMESETTING|F_NEEDAPPLY, font_file, "font",
                      DEFAULT_FONTNAME, FONT_DIR "/", ".fnt"),
     INT_SETTING(0, glyphs_to_cache, LANG_GLYPHS, DEFAULT_GLYPHS,

@@ -48,6 +48,8 @@
 #define FILE_ATTR_RFMS  0x1300 /* FM screen skin file */
 #define FILE_ATTR_OPX   0x1400 /* open plugins shortcut */
 #define FILE_ATTR_LOG   0x1500 /* log file */
+#define FILE_ATTR_WRS   0x1600 /* recording screen skin file */
+#define FILE_ATTR_RWRS  0x1700 /* remote recording screen skin file */
 #define FILE_ATTR_MASK  0xFF00 /* which bits tree.c uses for file types */
 
 long tree_get_filetype_voiceclip(int attr);

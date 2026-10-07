@@ -380,6 +380,12 @@ int ft_load(struct tree_context* c, const char* tempdir)
             CHK_FT(SHOW_FMS, FILE_ATTR_FMS) ||
             CHK_FT(SHOW_FMR, FILE_ATTR_FMR) ||
 #endif
+#ifdef HAVE_RECORDING
+            CHK_FT(SHOW_WRS, FILE_ATTR_WRS) ||
+#ifdef HAVE_REMOTE_LCD
+            CHK_FT(SHOW_RWRS, FILE_ATTR_RWRS) ||
+#endif
+#endif
 #ifdef HAVE_REMOTE_LCD
             CHK_FT(SHOW_RWPS, FILE_ATTR_RWPS) ||
             CHK_FT(SHOW_RSBS, FILE_ATTR_RSBS) ||
@@ -660,6 +666,16 @@ int ft_enter(struct tree_context* c)
             case FILE_ATTR_SBS:
                 ft_apply_skin_file(buf, global_settings.sbs_file);
                 break;
+#ifdef HAVE_RECORDING
+            case FILE_ATTR_WRS:
+                ft_apply_skin_file(buf, global_settings.wrs_file);
+                break;
+#ifdef HAVE_REMOTE_LCD
+            case FILE_ATTR_RWRS:
+                ft_apply_skin_file(buf, global_settings.rwrs_file);
+                break;
+#endif
+#endif
 #ifdef HAVE_REMOTE_LCD
             case FILE_ATTR_RSBS:
                 ft_apply_skin_file(buf, global_settings.rsbs_file);

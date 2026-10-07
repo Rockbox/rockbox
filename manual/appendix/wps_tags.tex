@@ -517,7 +517,8 @@ For general information where to put album art see \reference{ref:album_art}.
 
 \opt{recording}{
 \section{Recording}
-These tags show the state of recording, in any skin.
+These tags are meant for the recording screen (\fname{.wrs}, and
+\fname{.rwrs} for the remote), but work in any skin.
   \begin{tagmap}
     \config{\%Rp} & Can this \dap{} record?\\
     \config{\%Rr} & Is a recording in progress?\\
@@ -546,6 +547,13 @@ These tags show the state of recording, in any skin.
     \config{\%Rw} & Recording warnings, as a hexadecimal number; empty while
       there are none.\\
   \end{tagmap}
+
+The peak meters (\config{\%pL}, \config{\%pR}) show the recording input
+while recording or on the recording screen; with the \config{hold} bar
+option they behave like the recording screen's built-in peak meter. The list
+of recording settings is drawn in the UI viewport (\config{\%Vi}). Without a
+skin file for a display, or with one that has no UI viewport, that display
+shows the built-in recording screen.
 }
 
 \opt{radio}{

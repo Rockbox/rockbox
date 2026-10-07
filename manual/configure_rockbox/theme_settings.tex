@@ -58,6 +58,14 @@ customize the visual appearance of Rockbox.
   about the WPS see \reference{ref:WPS}. For information about editing
   a .wps file see \reference{ref:ConfiguringtheWPS}.
 
+\opt{recording}{
+  \item[Recording Screen.]
+    Opens the \setting{File Browser} in the \fname{/.rockbox/wps} directory and
+    displays all \fname{.wrs} files. Selecting one will activate it,
+    \ActionStdCancel{} will exit back to the menu. A theme without a
+    \fname{.wrs} file keeps the built-in recording screen.
+}
+
 \opt{HAVE_REMOTE_LCD}{
   \item[Remote While Playing Screen.]
     Opens the \setting{File Browser} in the \fname{/.rockbox/wps} directory and
@@ -68,6 +76,14 @@ customize the visual appearance of Rockbox.
       display.
     }
 }
+
+\opt{recording}{\opt{HAVE_REMOTE_LCD}{
+  \item[Remote Recording Screen.]
+    Opens the \setting{File Browser} in the \fname{/.rockbox/wps} directory and
+    displays all \fname{.rwrs} files, the recording screen skins for the
+    remote display. Selecting one will activate it, \ActionStdCancel{} will
+    exit back to the menu.
+}}
 
 \item[Show Icons.]
   Rockbox has the ability to display an icon to the left of the file

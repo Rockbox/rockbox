@@ -159,7 +159,7 @@ enum
 enum { SHOW_ALL, SHOW_SUPPORTED, SHOW_MUSIC, SHOW_PLAYLIST, SHOW_ID3DB,
        NUM_FILTER_MODES,
        SHOW_WPS, SHOW_RWPS, SHOW_FMS, SHOW_RFMS, SHOW_SBS, SHOW_RSBS, SHOW_FMR, SHOW_CFG,
-       SHOW_LNG, SHOW_MOD, SHOW_FONT, SHOW_PLUGINS, SHOW_M3U};
+       SHOW_LNG, SHOW_MOD, SHOW_FONT, SHOW_PLUGINS, SHOW_M3U, SHOW_WRS, SHOW_RWRS};
 
 /* file and dir sort options */
 enum { SORT_ALPHA, SORT_DATE, SORT_DATE_REVERSED, SORT_TYPE, /* available as settings */
@@ -943,6 +943,15 @@ struct user_settings
     bool playback_log; /* ROCKBOX_DIR/playback.log for tracks played */
 #if defined(HAVE_GENERAL_PURPOSE_LED)
     bool use_led_indicators;
+#endif
+#ifdef HAVE_RECORDING
+    /* last wrs, "-" for none: without one, or without the file for this
+     * screen size, the recording screen draws itself. At the end, not with
+     * the other skins, to keep the layout plugins see. */
+    unsigned char wrs_file[MAX_FILENAME+1];
+#ifdef HAVE_REMOTE_LCD
+    unsigned char rwrs_file[MAX_FILENAME+1];  /* last remote-wrs */
+#endif
 #endif
 };
 

@@ -81,6 +81,12 @@ static const struct filetype_inbuilt inbuilt_filetypes[] = {
     { "fmr",  FILE_ATTR_FMR },
     { "fms",  FILE_ATTR_FMS },
 #endif
+#ifdef HAVE_RECORDING
+    { "wrs",  FILE_ATTR_WRS },
+#ifdef HAVE_REMOTE_LCD
+    { "rwrs", FILE_ATTR_RWRS },
+#endif
+#endif
     { "log",  FILE_ATTR_LOG   },
     { "lng",  FILE_ATTR_LNG   },
     { "rock", FILE_ATTR_ROCK  },
@@ -123,6 +129,12 @@ static const struct fileattr_icon_voice inbuilt_attr_icons_voices[] = {
 #if CONFIG_TUNER
     { FILE_ATTR_FMR,   Icon_Preset,    LANG_FMR },
     { FILE_ATTR_FMS,   Icon_Wps,       VOICE_EXT_FMS },
+#endif
+#ifdef HAVE_RECORDING
+    { FILE_ATTR_WRS,   Icon_Wps,       VOICE_EXT_WRS },
+#ifdef HAVE_REMOTE_LCD
+    { FILE_ATTR_RWRS,  Icon_Wps,       VOICE_EXT_RWRS },
+#endif
 #endif
     { FILE_ATTR_LNG,   Icon_Language,  LANG_LANGUAGE },
     { FILE_ATTR_ROCK,  Icon_Plugin,    VOICE_EXT_ROCK },

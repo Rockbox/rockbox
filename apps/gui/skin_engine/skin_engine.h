@@ -33,6 +33,9 @@ enum skinnable_screens {
 #if CONFIG_TUNER
     FM_SCREEN,
 #endif
+#ifdef HAVE_RECORDING
+    RECORDING_SCREEN,   /* none unless a theme sets one */
+#endif
 
     SKINNABLE_SCREENS_COUNT
 };
@@ -71,6 +74,13 @@ void skin_backdrop_set_buffer(int backdrop_id, struct skin_viewport *svp);
 int skin_wait_for_action(enum skinnable_screens skin, int context, int timeout);
 
 struct gui_wps *skin_get_gwps(enum skinnable_screens skin, enum screen_type screen);
+/* Whether a skin file was loaded for the screen - false when it has none, or
+ * only a built-in default */
+bool skin_has_file(enum skinnable_screens skin, enum screen_type screen);
+/* The area a skin sets aside for the screen's own list, %Vi(-,...), or NULL
+ * if it has none */
+struct viewport *skin_get_info_vp(enum skinnable_screens skin,
+                                  enum screen_type screen);
 void gui_sync_skin_init(void);
 
 bool skin_do_full_update(enum skinnable_screens skin, enum screen_type screen);

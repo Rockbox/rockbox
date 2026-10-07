@@ -68,6 +68,10 @@ static const struct gui_skin_helper * const skin_helpers[SKINNABLE_SCREENS_COUNT
 #if CONFIG_TUNER
     [FM_SCREEN] = SKH(dummy_process, default_radio_skin, false),
 #endif
+#ifdef HAVE_RECORDING
+    /* no default: without a skin file the recording screen draws itself */
+    [RECORDING_SCREEN] = SKH(dummy_process, NULL, false),
+#endif
 };
 
 static struct gui_skin {
@@ -281,6 +285,22 @@ static char* get_skin_filename(enum skinnable_screens skin, enum screen_type scr
             }
             break;
 #endif
+#ifdef HAVE_RECORDING
+        case RECORDING_SCREEN:
+#if defined(HAVE_REMOTE_LCD) && NB_SCREENS > 1
+            if (screen == SCREEN_REMOTE)
+            {
+                setting = global_settings.rwrs_file;
+                ext = "rwrs";
+            }
+            else
+#endif
+            {
+                setting = global_settings.wrs_file;
+                ext = "wrs";
+            }
+            break;
+#endif
         default:
             return NULL;
     }
@@ -307,6 +327,29 @@ struct gui_wps *skin_get_gwps(enum skinnable_screens skin, enum screen_type scre
         cpu_boost(false);
     }
     return &skins[skin][screen].gui_wps;
+}
+
+bool skin_has_file(enum skinnable_screens skin, enum screen_type screen)
+{
+    struct gui_skin *s = &skins[skin][screen];
+
+    return s->data.wps_loaded && !s->failsafe_loaded;
+}
+
+struct viewport *skin_get_info_vp(enum skinnable_screens skin,
+                                  enum screen_type screen)
+{
+    struct wps_data *data = &skins[skin][screen].data;
+    struct skin_viewport *vp;
+
+    if (!data->wps_loaded)
+        return NULL;
+    vp = skin_find_item(VP_DEFAULT_LABEL_STRING, SKIN_FIND_UIVP, data);
+    if (!vp)
+        return NULL;
+    if (vp->parsed_fontid == 1)
+        vp->vp.font = screens[screen].getuifont();
+    return &vp->vp;
 }
 
 /* This is called to find out if we the screen needs a full update.
