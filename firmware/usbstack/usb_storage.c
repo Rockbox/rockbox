@@ -449,9 +449,13 @@ static int usb_storage_get_config_descriptor(unsigned char *dest,int max_packet_
 static int usb_handle = 0;
 #endif
 
-static int usb_storage_init_connection(void)
+/* Sets up the buffers and primes the rx endpoint for the first command.
+ * The buffers are allocated only once Rockbox has handed the storage over:
+ * the host configures the device before every thread has acknowledged the
+ * connect, while for example the recording buffer still holds all free
+ * memory. Until then the host's first command waits at the endpoint. */
+static void start_receiving_commands(void)
 {
-    logf("ums: set config");
     /* prime rx endpoint. We only need room for commands */
     state = WAITING_FOR_COMMAND;
 
@@ -469,6 +473,9 @@ static int usb_storage_init_connection(void)
 #endif
 #else
     unsigned char * buffer;
+
+    if (usb_handle > 0)
+        return; /* already receiving */
 
     // Add 31 to handle worst-case misalignment
     usb_handle = core_alloc_ex(ALLOCATE_BUFFER_SIZE + MAX_CBW_SIZE + 31,
@@ -489,6 +496,25 @@ static int usb_storage_init_connection(void)
 #endif
 #endif
     usb_drv_recv_nonblocking(EP_OUT, cbw_buffer, MAX_CBW_SIZE);
+}
+
+static bool receiving_commands(void)
+{
+#ifdef USB_STATIC_ALLOC
+    return true;
+#else
+    return usb_handle > 0;
+#endif
+}
+
+static int usb_storage_init_connection(void)
+{
+    logf("ums: set config");
+    state = WAITING_FOR_COMMAND;
+#ifndef USB_STATIC_ALLOC
+    if(usb_exclusive_storage())
+#endif
+        start_receiving_commands();
 
     int i;
     for(i=0;i<storage_num_drives();i++) {
@@ -719,19 +745,19 @@ static void usb_storage_send_smart(uint8_t cmd)
 /* called by usb_core_control_request() */
 static bool usb_storage_control_request(struct usb_ctrlrequest* req, uint8_t* reqdata, size_t reqdata_size)
 {
-    (void)reqdata;
     (void)reqdata_size;
 
     bool handled = false;
 
     switch (req->bRequest) {
         case USB_BULK_GET_MAX_LUN: {
-            *tb.max_lun = storage_num_drives() - 1;
+            /* comes before the handover, without the transfer buffer */
+            reqdata[0] = storage_num_drives() - 1;
 #if defined(HAVE_MULTIDRIVE)
-            if(skip_first) (*tb.max_lun) --;
+            if(skip_first) reqdata[0]--;
 #endif
             logf("ums: getmaxlun");
-            usb_core_control_response(USB_CONTROL_ACK, tb.max_lun, 1);
+            usb_core_control_response(USB_CONTROL_ACK, reqdata, 1);
             handled = true;
             break;
         }
@@ -1450,6 +1476,11 @@ static void handle_scsi(struct command_block_wrapper* cbw)
 static void usb_storage_notify_event(intptr_t data)
 {
     (void)data;
+    if(!receiving_commands()) {
+        if(usb_exclusive_storage())
+            start_receiving_commands();
+        return;
+    }
     if(state == WAITING_FOR_STORAGE && usb_exclusive_storage())
         handle_scsi((struct command_block_wrapper*)cbw_buffer);
 }
