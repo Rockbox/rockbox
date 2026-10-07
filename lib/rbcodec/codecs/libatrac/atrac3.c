@@ -86,6 +86,13 @@ static int          vlcs_initialized = 0;
                           int32_t *inlo,
                           int32_t *inhi,
                           unsigned int nIn);
+    /* The same, with the results scaled up by ATRAC3_OUT_SHIFT bits
+     * (ARMv5 and later) */
+    extern void
+    atrac3_iqmf_matrixing_out(int32_t *p3,
+                              int32_t *inlo,
+                              int32_t *inhi,
+                              unsigned int nIn);
 #else
     static inline void
     atrac3_iqmf_matrixing(int32_t *p3,
@@ -99,6 +106,22 @@ static int          vlcs_initialized = 0;
             p3[2*i+1] = inlo[i  ] - inhi[i  ];
             p3[2*i+2] = inlo[i+1] + inhi[i+1];
             p3[2*i+3] = inlo[i+1] - inhi[i+1];
+        }
+    }
+
+    /* The same, with the results scaled up by ATRAC3_OUT_SHIFT bits */
+    static inline void
+    atrac3_iqmf_matrixing_out(int32_t *p3,
+                              int32_t *inlo,
+                              int32_t *inhi,
+                              unsigned int nIn)
+    {
+        uint32_t i;
+        for(i=0; i<nIn; i+=2){
+            p3[2*i+0] = (inlo[i  ] + inhi[i  ]) * (1 << ATRAC3_OUT_SHIFT);
+            p3[2*i+1] = (inlo[i  ] - inhi[i  ]) * (1 << ATRAC3_OUT_SHIFT);
+            p3[2*i+2] = (inlo[i+1] + inhi[i+1]) * (1 << ATRAC3_OUT_SHIFT);
+            p3[2*i+3] = (inlo[i+1] - inhi[i+1]) * (1 << ATRAC3_OUT_SHIFT);
         }
     }
 #endif
@@ -150,6 +173,15 @@ static int          vlcs_initialized = 0;
                             int32_t *in,
                             int32_t *win,
                             unsigned int nIn);    
+    /* The same, with the results scaled up by ATRAC3_OUT_SHIFT bits. The
+     * ARMv4 multiplier takes longer for large operands, so there the last
+     * stage is scaled here and not in its matrixing. */
+    #define ATRAC3_SCALE_IN_DEWINDOWING
+    extern void
+    atrac3_iqmf_dewindowing_out(int32_t *out,
+                                int32_t *in,
+                                int32_t *win,
+                                unsigned int nIn);
                             
 #elif defined (CPU_COLDFIRE)
     #define MULTIPLY_ADD_BLOCK \
@@ -274,19 +306,35 @@ atrac3_imdct_windowing(int32_t *buffer,
  * @param pOut      out buffer
  * @param delayBuf  delayBuf buffer
  * @param temp      temp buffer
+ * @param last      true for the stage that makes the output, which is
+ *                  scaled up by ATRAC3_OUT_SHIFT bits
  */
  
-static void iqmf (int32_t *inlo, int32_t *inhi, unsigned int nIn, int32_t *pOut, int32_t *delayBuf, int32_t *temp)
+static void iqmf (int32_t *inlo, int32_t *inhi, unsigned int nIn, int32_t *pOut, int32_t *delayBuf, int32_t *temp, bool last)
 {
 
     /* Restore the delay buffer */
     memcpy(temp, delayBuf, 46*sizeof(int32_t));
 
+#ifdef ATRAC3_SCALE_IN_DEWINDOWING
     /* loop1: matrixing */
     atrac3_iqmf_matrixing(temp + 46, inlo, inhi, nIn);
 
     /* loop2: dewindowing */
+    if (last)
+        atrac3_iqmf_dewindowing_out(pOut, temp, qmf_window, nIn);
+    else
+        atrac3_iqmf_dewindowing(pOut, temp, qmf_window, nIn);
+#else
+    /* loop1: matrixing */
+    if (last)
+        atrac3_iqmf_matrixing_out(temp + 46, inlo, inhi, nIn);
+    else
+        atrac3_iqmf_matrixing(temp + 46, inlo, inhi, nIn);
+
+    /* loop2: dewindowing */
     atrac3_iqmf_dewindowing(pOut, temp, qmf_window, nIn);
+#endif
 
     /* Save the delay buffer */
     memcpy(delayBuf, temp + (nIn << 1), 46*sizeof(int32_t));
@@ -1105,9 +1153,9 @@ static int decodeFrame(ATRAC3Context *q, const uint8_t* databuf, int off)
         p2= p1+256;
         p3= p2+256;
         p4= p3+256;
-        iqmf (p1, p2, 256, p1, q->pUnits[i].delayBuf1, q->tempBuf);
-        iqmf (p4, p3, 256, p3, q->pUnits[i].delayBuf2, q->tempBuf);
-        iqmf (p1, p3, 512, p1, q->pUnits[i].delayBuf3, q->tempBuf);
+        iqmf (p1, p2, 256, p1, q->pUnits[i].delayBuf1, q->tempBuf, false);
+        iqmf (p4, p3, 256, p3, q->pUnits[i].delayBuf2, q->tempBuf, false);
+        iqmf (p1, p3, 512, p1, q->pUnits[i].delayBuf3, q->tempBuf, true);
         p1 +=1024;
     }
 

@@ -35,6 +35,13 @@
 #define ICONST_ATTR_LARGE_IRAM
 #endif
 
+/* The decoder works on samples with two fractional bits, s15.2. The last
+ * stage of the synthesis filter is scaled up by this many more bits, so the
+ * output has 28 bits below the sign like that of most codecs and the
+ * precision of that stage's multiplications is not thrown away. */
+#define ATRAC3_OUT_SHIFT    11
+#define ATRAC3_OUTPUT_DEPTH (17 + ATRAC3_OUT_SHIFT)
+
 /* These structures are needed to store the parsed gain control data. */
 typedef struct {
     int   num_gain_data;

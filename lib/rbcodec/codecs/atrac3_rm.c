@@ -92,7 +92,7 @@ enum codec_status codec_run(void)
     init_rm(&rmctx);
 
     ci->configure(DSP_SET_FREQUENCY, ci->id3->frequency);
-    ci->configure(DSP_SET_SAMPLE_DEPTH, 17); /* Remark: atrac3 uses s15.0 by default, s15.2 was hacked. */
+    ci->configure(DSP_SET_SAMPLE_DEPTH, ATRAC3_OUTPUT_DEPTH);
     ci->configure(DSP_SET_STEREO_MODE, rmctx.nb_channels == 1 ?
         STEREO_MONO : STEREO_NONINTERLEAVED);
 

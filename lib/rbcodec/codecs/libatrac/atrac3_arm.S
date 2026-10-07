@@ -71,6 +71,58 @@ atrac3_iqmf_matrixing:
 .atrac3_iqmf_matrixing_end:
     .size   atrac3_iqmf_matrixing,.atrac3_iqmf_matrixing_end-atrac3_iqmf_matrixing
 
+
+/* ATRAC3_OUT_SHIFT of atrac3.h */
+#define OUT_SHIFT 11
+
+/****************************************************************************
+ * void atrac3_iqmf_matrixing_out(int32_t *dest,
+ *                                int32_t *inlo,
+ *                                int32_t *inhi,
+ *                                unsigned int count);
+ *
+ * The matrixing step of the last iqmf stage: as atrac3_iqmf_matrixing, with
+ * the results scaled up by OUT_SHIFT bits, which then is the scale of the
+ * decoder's output. Not used on ARMv4, where the multiplications of the
+ * dewindowing would take longer for it: see atrac3_iqmf_dewindowing_out.
+ ****************************************************************************/
+#if ARM_ARCH >= 5
+    .align  2
+    .global atrac3_iqmf_matrixing_out
+    .type   atrac3_iqmf_matrixing_out, %function
+
+atrac3_iqmf_matrixing_out:
+    /* r0 = dest */
+    /* r1 = inlo */
+    /* r2 = inhi */
+    /* r3 = counter */
+    stmfd   sp!, {r4-r9, lr}       /* save non-scratch registers */
+
+.iqmf_matrixing_out_loop:
+    ldmia r1!, { r4, r6, r8, r12}   /* load inlo[0...3] */
+    ldmia r2!, { r5, r7, r9, lr }   /* load inhi[0...3] */
+    add   r4, r4, r5                /* r4  = inlo[0] + inhi[0] */
+    mov   r4, r4, asl #OUT_SHIFT
+    sub   r5, r4, r5, asl #OUT_SHIFT+1 /* r5  = inlo[0] - inhi[0] */
+    add   r6, r6, r7                /* r6  = inlo[1] + inhi[1] */
+    mov   r6, r6, asl #OUT_SHIFT
+    sub   r7, r6, r7, asl #OUT_SHIFT+1 /* r7  = inlo[1] - inhi[1] */
+    add   r8, r8, r9                /* r8  = inlo[2] + inhi[2] */
+    mov   r8, r8, asl #OUT_SHIFT
+    sub   r9, r8, r9, asl #OUT_SHIFT+1 /* r9  = inlo[2] - inhi[2] */
+    add   r12, r12, lr              /* r12 = inlo[3] + inhi[3] */
+    mov   r12, r12, asl #OUT_SHIFT
+    sub   lr , r12, lr, asl #OUT_SHIFT+1 /* lr  = inlo[3] - inhi[3] */
+    stmia r0!, {r4-r9, r12, lr}     /* store results to dest */
+    subs r3, r3, #4                 /* counter -= 4 */
+    bgt .iqmf_matrixing_out_loop
+
+    ldmpc   regs=r4-r9              /* restore registers */
+
+.atrac3_iqmf_matrixing_out_end:
+    .size   atrac3_iqmf_matrixing_out,.atrac3_iqmf_matrixing_out_end-atrac3_iqmf_matrixing_out
+#endif /* ARM_ARCH >= 5 */
+
     
 /****************************************************************************
  * atrac3_iqmf_dewindowing(int32_t *out,
@@ -122,11 +174,16 @@ atrac3_iqmf_matrixing:
     smlal lr , r9, r7, r10;         /* s1 += win[2k+3] * in[44-2k] */ \
     smlal r12, r8, r6, r11;         /* s2 += win[2k+2] * in[45-2k] */
 
+/* atrac3_iqmf_dewindowing is the function above. atrac3_iqmf_dewindowing_out
+ * is the same for the last iqmf stage, with the result scaled up by OUT_SHIFT
+ * bits, which then is the scale of the decoder's output: the bits are taken
+ * from the 64-bit sums, that have them. */
+.macro DEWINDOWING name, shift
     .align  2
-    .global atrac3_iqmf_dewindowing
-    .type   atrac3_iqmf_dewindowing, %function
-    
-atrac3_iqmf_dewindowing:
+    .global \name
+    .type   \name, %function
+
+\name:
     /* r0 = dest */
     /* r1 = input samples */
     /* r2 = window coefficients */
@@ -136,7 +193,7 @@ atrac3_iqmf_dewindowing:
     stmfd   sp!, {r3}
     add     r3, r1, #192            /* r3 = end of the 48 inputs */
     
-.iqmf_dewindow_outer_loop:          /* outer loop 0...counter-1 */
+1:                                  /* outer loop 0...counter-1 */
     
     DEWIN_8_SAMPLES_ASM(smull, smull)   /* in[ 0.. 3], in[44..47] */
     DEWIN_8_SAMPLES_ASM(smlal, smlal)   /* in[ 4.. 7], in[40..43] */
@@ -145,10 +202,10 @@ atrac3_iqmf_dewindowing:
     DEWIN_8_SAMPLES_ASM(smlal, smlal)   /* in[16..19], in[28..31] */
     DEWIN_8_SAMPLES_ASM(smlal, smlal)   /* in[20..23], in[24..27] */
 
-    mov   lr , lr , lsr #31
-    orr   r9, lr , r9, lsl #1       /* s1 = low>>31 || hi<<1 */
-    mov   r12, r12, lsr #31
-    orr   r8, r12, r8, lsl #1       /* s2 = low>>31 || hi<<1 */
+    mov   lr , lr , lsr #31-\shift
+    orr   r9, lr , r9, lsl #1+\shift /* s1 = low>>31 || hi<<1, << shift */
+    mov   r12, r12, lsr #31-\shift
+    orr   r8, r12, r8, lsl #1+\shift /* s2 = low>>31 || hi<<1, << shift */
 
     stmia r0!, {r8, r9}             /* store result out[0]=s2, out[1]=s1 */
     ldr   r4, [sp]                  /* end of dest */
@@ -157,10 +214,13 @@ atrac3_iqmf_dewindowing:
     sub   r2, r2, #96               /* roll back 24 entries = win[0] */
 
     cmp   r0, r4
-    bne .iqmf_dewindow_outer_loop
+    bne   1b
     
     add     sp, sp, #4
     ldmpc   regs=r4-r11             /* restore registers */
     
-.atrac3_iqmf_dewindowing_end:
-    .size   atrac3_iqmf_dewindowing,.atrac3_iqmf_dewindowing_end-atrac3_iqmf_dewindowing
+    .size   \name, .-\name
+.endm
+
+    DEWINDOWING atrac3_iqmf_dewindowing, 0
+    DEWINDOWING atrac3_iqmf_dewindowing_out, OUT_SHIFT
