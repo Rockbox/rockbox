@@ -73,6 +73,7 @@ Name: cabbiev2
 Authors: Johannes Voggenthaler, Apoo Maha, Marc Guay, Alex Vanderpol, Jerry Lange, Keith Perri, Mark Fawcus, and Marianne Arnold with support from Rockbox developers and forums. Based on Cabbie by Yohann Misquitta.
 WPS: yes
 FMS: yes
+WRS: yes
 RWPS: yes
 SBS: no
 RSBS: no
@@ -116,6 +117,25 @@ wps.96x96x(16|24|32):    cabbiev2.96x96x16.wps
 fms.400x240x(16|24|32):  cabbiev2-400x240x16.fms
 fms.160x128x2:   cabbiev2-160x128x2.fms
 fms.128x128x2:   cabbiev2-128x128x2.fms
+
+# override implicit .wrs filename
+wrs.400x240x(16|24|32):  cabbiev2-400x240x16.wrs
+wrs.240x320x(16|24|32):  cabbiev2-240x320x16.wrs
+wrs.320x240x(16|24|32):    cabbiev2-320x240x16.wrs
+wrs.240x400x(16|24|32):    cabbiev2-240x400x16.wrs
+wrs.220x176x(16|24|32):    cabbiev2-220x176x16.wrs
+wrs.176x220x(16|24|32):    cabbiev2-176x220x16.wrs
+wrs.176x132x(16|24|32):    cabbiev2-176x132x16.wrs
+wrs.160x128x(16|24|32):    cabbiev2-160x128x16.wrs
+wrs.128x160x(16|24|32):    cabbiev2-128x160x16.wrs
+wrs.132x80x(16|24|32):     cabbiev2-132x80x16.wrs
+wrs.128x128x(16|24|32):    cabbiev2-128x128x16.wrs
+wrs.128x96x(16|24|32):     cabbiev2-128x96x16.wrs
+wrs.96x96x(16|24|32):      cabbiev2-96x96x16.wrs
+wrs.160x128x2:    cabbiev2-160x128x2.wrs
+wrs.128x128x2:    cabbiev2-128x128x2.wrs
+wrs.128x96x2:     cabbiev2-128x96x2.wrs
+wrs.128x64x1:     cabbiev2-128x64x1.wrs
 
 # Preferred font (including .fnt extension - leave blank for player):
 Font.480x720x(16|24|32): 35-Adobe-Helvetica.fnt

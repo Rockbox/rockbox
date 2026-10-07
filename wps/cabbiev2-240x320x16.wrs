@@ -1,0 +1,64 @@
+# Cabbie v2.0
+# (C) 2010-2026 The Authors (see /rockbox/wps/AUTHORS)
+# Derived from "Cabbie v2.0" (C) 2007-2012 The Authors
+#
+# Recording screen: the WPS backdrop and header, the settings list where
+# the track info is, the peak meters in the progress bar.
+#
+# Disable Status Bar
+%wd
+#
+# Load Backdrop
+%X(backdrop-240x320x16.bmp)
+#
+# Header font
+%Fl(2,12-Adobe-Helvetica-Bold.fnt)
+#
+# Preload Images
+%xl(lock,lock-240x320x16.bmp,0,0,2)
+%xl(battery,battery-240x320x16.bmp,0,0,10)
+%xl(volume,volume-240x320x16.bmp,0,0,10)
+%xl(recmode,recmode-240x320x16.bmp,0,0,3)
+#
+# Header
+%V(22,8,198,12,2)%Vf(0F0B00)
+%acRECORDING
+#
+# Source - for FM radio the station, RDS name else preset name, and the
+# frequency - and gain
+%V(11,28,218,20,1)
+%al%?Ri<%Ri|%Ri|%Ri|%?ty<%ty|%?Tn<%Tn|%Ri>> %tf MHz>%ar%?Rg<%Rg dB|>
+#
+# Settings list
+%Vi(-,11,50,218,178,1)
+#
+# Warning, pre-recording or trigger state
+%V(11,230,218,20,1)
+%al%?Rw<! %Rw|%?RP<%Sx(Pre-Recording) %RPs|%?Rt<|%Sx(Trigger)|%Sx(Trigger)|%Sx(Trigger)|%Sx(Trigger)|%Sx(Trigger)|%Sx(Trigger)>>>
+#
+# Peak meters, left over right, in the progress bar: each the half of the
+# WPS progress bar image, rounded ends and all; they fall back slowly and
+# mark the held peak
+%V(22,254,199,13,-)%Vf(E6C54A)
+%pL(0,0,199,6,image,pbl-240x320x16.bmp,hold,2)
+%pR(0,7,199,6,image,pbr-240x320x16.bmp,hold,2)
+#
+# Recording time, file size, clips
+%V(21,270,199,20,1)
+%al%Rh:%Rn:%Rs%ac%RS%ar%Sx(CLIP:) %Rc
+#
+# Hold
+%V(11,292,31,28,-)
+%xd(lock,%mh)
+#
+# Battery
+%V(46,292,45,28,-)
+%?bp<%?bc<%xd(battery,1)|%xd(battery,2)>|%?bl<|%xd(battery,3)|%xd(battery,4)|%xd(battery,5)|%xd(battery,6)|%xd(battery,7)|%xd(battery,8)|%xd(battery,9)|%xd(battery,10)>>
+#
+# Volume
+%V(98,292,34,28,-)
+%xd(volume,%pv)
+#
+# Recording, paused or ready, where the WPS shows play or pause
+%V(206,292,24,28,-)
+%?mp<%xd(recmode,1)|%xd(recmode,1)|%xd(recmode,1)|%xd(recmode,1)|%xd(recmode,1)|%xd(recmode,2)|%xd(recmode,3)|%xd(recmode,1)|%xd(recmode,1)>
