@@ -79,8 +79,9 @@ static const int32_t window_lookup[128] ICONST_ATTR MEM_ALIGN_ATTR = {
 /* The window above is the first 128 points of the 512 point mdct window.
  * Points 128..255 are these values plus one, scaled by 2^31; they rise to
  * 1.207 and fall back to 1. The second half of the window mirrors the
- * first. */
-static const int32_t window_lookup_mid[128] ICONST_ATTR MEM_ALIGN_ATTR = {
+ * first. In IRAM only where there is room: with it the codec does not fit
+ * the 48KB of the smaller targets. */
+static const int32_t window_lookup_mid[128] ICONST_ATTR_LARGE_IRAM MEM_ALIGN_ATTR = {
     0x00c7d1c8, 0x024fd962, 0x03cd6738, 0x05401bc8, 0x06a79e95, 0x08039e75,
     0x0953d1d1, 0x0a97f6df, 0x0bcfd3c6, 0x0cfb36c3, 0x0e19f636, 0x0f2bf0a8,
     0x10310cc9, 0x11293955, 0x12146d01, 0x12f2a64e, 0x13c3eb59, 0x148849a0,
