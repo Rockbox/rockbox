@@ -2634,7 +2634,6 @@ fi
    80|ipodnano3g)
     target_id=117
     modelname="ipodnano3g"
-    blonly="yes"
     target="IPOD_NANO3G"
     memory=32 # always
     arm926ejscc
