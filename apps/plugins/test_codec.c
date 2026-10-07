@@ -726,6 +726,11 @@ static enum plugin_status test_track(const char* filename)
 
     if (use_dsp) {
         rb->dsp_configure(ci.dsp, DSP_RESET, 0);
+        /* The DSP is told its output samplerate when a track is played.
+         * Tell it here as well, or it is that of the last track and not
+         * what playback would use now. */
+        rb->dsp_configure(ci.dsp, DSP_SET_OUT_FREQUENCY,
+                          rb->mixer_get_frequency());
         rb->dsp_configure(ci.dsp, DSP_FLUSH, 0);
     }
 
