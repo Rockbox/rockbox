@@ -429,6 +429,8 @@
 #define GPIO_PECON             (*(volatile unsigned long *)(APB0_GPIO1 + 0x04))
 #define GPIO_PFDR              (*(volatile unsigned long *)(APB0_GPIO1 + 0x08))
 #define GPIO_PFCON             (*(volatile unsigned long *)(APB0_GPIO1 + 0x0C))
+/* undocumented, kept over a reset: the OF leaves its boot request here */
+#define GPIO1_BOOTMODE         (*(volatile unsigned long *)(APB0_GPIO1 + 0x1C))
 
 #define GPIO1_TEST             (*(volatile unsigned long *)(APB0_GPIO1 + 0x20))
 #define GPIO_IEE               (*(volatile unsigned long *)(APB0_GPIO1 + 0x24))

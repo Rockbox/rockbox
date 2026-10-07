@@ -139,6 +139,14 @@ void main(void)
     if (DEV_INFO & (1<<20))
         boot = of;
 
+    /* The OF asks for a mode before it resets itself, e.g. at the end of
+     * a firmware update, and the cell survives the reset. Rockbox never
+     * sets it, so after a cold start it reads 0: anything else is a
+     * request from the OF, which expects to come back up.
+     */
+    if (GPIO1_BOOTMODE & 0xff)
+        boot = of;
+
     lcd_clear_display();
 
     ret = storage_init();
