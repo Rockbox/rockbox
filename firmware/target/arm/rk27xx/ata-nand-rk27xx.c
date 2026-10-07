@@ -83,11 +83,7 @@ void nand_get_info(IF_MD(int drive,) struct storage_info *info)
     (*info).sector_size = SECTOR_SIZE;
     (*info).num_sectors = ftl_get_sectors(d);
     (*info).vendor = "Rockchip";
-#ifdef HAVE_RK27XX_NAND_SYS
-    (*info).product = (d == FTL_DRIVE_SYS) ? "NAND SYS" : "NAND USER";
-#else
-    (*info).product = "NAND USER";
-#endif
+    (*info).product = ftl_drive_is_sys(d) ? "NAND SYS" : "NAND USER";
     (*info).revision = "1.0";
 }
 

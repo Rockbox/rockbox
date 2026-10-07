@@ -2910,6 +2910,24 @@ static bool dbg_ftl_scheme(void)
 }
 #endif
 
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE) && defined(CONFIG_NAND) \
+    && (CONFIG_NAND == NAND_RK27XX) \
+    && (CONFIG_STORAGE & STORAGE_NAND)
+#include "ftl-target.h"
+#endif
+
+#ifdef FTL_SYS_ON_USB
+/* The NAND's hidden SYS volume, shown to a USB host in place of USER for
+ * one connection */
+static bool dbg_nand_sys_usb(void)
+{
+    ftl_set_sys_on_usb(!ftl_get_sys_on_usb());
+    splashf(HZ, "NAND SYS on next USB %sabled",
+            ftl_get_sys_on_usb() ? "en" : "dis");
+    return false;
+}
+#endif
+
 /****** The menu *********/
 static const struct {
     unsigned char *desc; /* string or ID */
@@ -2966,6 +2984,9 @@ static const struct {
     && (CONFIG_NAND == NAND_RK27XX) \
     && !(CONFIG_STORAGE & STORAGE_NAND)
         { "View FTL scheme", dbg_ftl_scheme },
+#endif
+#ifdef FTL_SYS_ON_USB
+        { "NAND SYS on next USB", dbg_nand_sys_usb },
 #endif
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
         { "View partitions", dbg_partitions },

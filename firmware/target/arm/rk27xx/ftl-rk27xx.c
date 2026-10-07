@@ -30,6 +30,9 @@
 #include "ftl-target.h"
 #include "nand-target.h"
 #include "flash-rk27xx.h"
+#ifdef FTL_SYS_ON_USB
+#include "usb.h"
+#endif
 
 #if CONFIG_RK27XX_FTL == RK27XX_FTL_SCHEME_A
 #include "ftl-scheme-a.h"
@@ -65,12 +68,72 @@ struct idb_info
 
 static bool ftl_mounted = false;
 
-#if CONFIG_RK27XX_FTL == RK27XX_FTL_SCHEME_B
+/* The volumes behind the drives. Both are known to the FTL even when SYS
+ * is not a drive. */
+#if CONFIG_RK27XX_FTL == RK27XX_FTL_SCHEME_A
+#define VOL_SYS   FTL_A_VOL_SYS
+#define VOL_USER  FTL_A_VOL_USER
+#else
+#define VOL_SYS   0
+#define VOL_USER  1
+#define NUM_VOLS  2
+
 /* Scheme B's logical space holds the volumes back to back: SYS, the system
  * data area, then USER to the end */
-static uint32_t vol_base[FTL_NUM_DRIVES];
-static uint32_t vol_size[FTL_NUM_DRIVES];
+static uint32_t vol_base[NUM_VOLS];
+static uint32_t vol_size[NUM_VOLS];
 #endif
+
+#ifdef FTL_SYS_ON_USB
+/* Asked for in the debug menu: show SYS through the USER drive while a USB
+ * host has the storage. Decided once per connection, so asking during one
+ * waits for the next, and used up when that connection ends. */
+static bool sys_requested = false;
+static enum { USB_VIEW_NONE, USB_VIEW_USER, USB_VIEW_SYS } usb_view;
+
+static bool sys_on_usb(void)
+{
+    if (!usb_exclusive_storage())
+    {
+        if (usb_view == USB_VIEW_SYS)
+        {
+            sys_requested = false;
+        }
+        usb_view = USB_VIEW_NONE;
+    }
+    else if (usb_view == USB_VIEW_NONE)
+    {
+        usb_view = sys_requested ? USB_VIEW_SYS : USB_VIEW_USER;
+    }
+    return usb_view == USB_VIEW_SYS;
+}
+
+void ftl_set_sys_on_usb(bool on)
+{
+    sys_requested = on;
+}
+
+bool ftl_get_sys_on_usb(void)
+{
+    return sys_requested;
+}
+#endif
+
+static int drive_volume(int drive)
+{
+#ifdef HAVE_RK27XX_NAND_SYS
+    return (drive == FTL_DRIVE_SYS) ? VOL_SYS : VOL_USER;
+#else
+    (void)drive;
+#ifdef FTL_SYS_ON_USB
+    if (sys_on_usb())
+    {
+        return VOL_SYS;
+    }
+#endif
+    return VOL_USER;
+#endif
+}
 
 /* ID block 1, the sector after ID block 0:
  *
@@ -179,12 +242,10 @@ static uint32_t mount_scheme(const struct idb_info *idb)
     }
     else
     {
-#ifdef HAVE_RK27XX_NAND_SYS
-        vol_base[FTL_DRIVE_SYS] = 0;
-        vol_size[FTL_DRIVE_SYS] = idb->sys_sectors;
-#endif
-        vol_base[FTL_DRIVE_USER] = user_base;
-        vol_size[FTL_DRIVE_USER] = ftl_b_capacity() - user_base;
+        vol_base[VOL_SYS] = 0;
+        vol_size[VOL_SYS] = idb->sys_sectors;
+        vol_base[VOL_USER] = user_base;
+        vol_size[VOL_USER] = ftl_b_capacity() - user_base;
     }
     return ret;
 }
@@ -219,81 +280,65 @@ static bool drive_valid(int drive)
 }
 
 #if CONFIG_RK27XX_FTL == RK27XX_FTL_SCHEME_A
-/* The FTL volume behind a drive. SYS is reachable only when exposed. */
-static int ftl_volume(int drive)
+static uint32_t vol_sectors(int vol)
 {
-    int volume = FTL_A_VOL_USER;
-
-#ifdef HAVE_RK27XX_NAND_SYS
-    if (drive == FTL_DRIVE_SYS)
-    {
-        volume = FTL_A_VOL_SYS;
-    }
-#else
-    (void)drive;
-#endif
-    return volume;
+    return ftl_a_capacity(vol);
 }
 
-static uint32_t drive_sectors(int drive)
+static int vol_read(int vol, uint32_t sector, uint32_t count, void *buffer)
 {
-    return ftl_a_capacity(ftl_volume(drive));
-}
-
-static int drive_read(int drive, uint32_t sector, uint32_t count, void *buffer)
-{
-    return ftl_a_read(ftl_volume(drive), sector, buffer, count);
+    return ftl_a_read(vol, sector, buffer, count);
 }
 
 #ifdef FTL_ALLOW_WRITE
-static int drive_write(int drive, uint32_t sector, uint32_t count,
-                       const void *buffer)
+static int vol_write(int vol, uint32_t sector, uint32_t count,
+                     const void *buffer)
 {
-    return ftl_a_write(ftl_volume(drive), sector, buffer, count);
+    return ftl_a_write(vol, sector, buffer, count);
 }
 #endif
 
-static void drive_sync(void)
+static void vol_sync(void)
 {
     ftl_a_sync();
 }
 #else
-static uint32_t drive_sectors(int drive)
+static uint32_t vol_sectors(int vol)
 {
-    return vol_size[drive];
+    return vol_size[vol];
 }
 
-static bool in_volume(int drive, uint32_t sector, uint32_t count)
+static bool in_volume(int vol, uint32_t sector, uint32_t count)
 {
-    return sector < vol_size[drive] && count <= vol_size[drive] - sector;
+    return sector < vol_size[vol] && count <= vol_size[vol] - sector;
 }
 
-static int drive_read(int drive, uint32_t sector, uint32_t count, void *buffer)
+static int vol_read(int vol, uint32_t sector, uint32_t count, void *buffer)
 {
     int ret = 1;
 
-    if (in_volume(drive, sector, count))
+    if (in_volume(vol, sector, count))
     {
-        ret = ftl_b_read(vol_base[drive] + sector, buffer, count);
+        ret = ftl_b_read(vol_base[vol] + sector, buffer, count);
     }
     return ret;
 }
 
 #ifdef FTL_ALLOW_WRITE
-static int drive_write(int drive, uint32_t sector, uint32_t count,
-                       const void *buffer)
+static int vol_write(int vol, uint32_t sector, uint32_t count,
+                     const void *buffer)
 {
     int ret = 1;
 
-    if (in_volume(drive, sector, count))
+    if (in_volume(vol, sector, count))
     {
-        ret = ftl_b_write(vol_base[drive] + sector, buffer, count);
+        ret = ftl_b_write(vol_base[vol] + sector, buffer, count);
     }
     return ret;
 }
 #endif
 
-static void drive_sync(void)
+static void vol_sync(void)
 {
     ftl_b_sync();
 }
@@ -305,9 +350,14 @@ uint32_t ftl_get_sectors(int drive)
 
     if (drive_valid(drive))
     {
-        sectors = drive_sectors(drive);
+        sectors = vol_sectors(drive_volume(drive));
     }
     return sectors;
+}
+
+bool ftl_drive_is_sys(int drive)
+{
+    return drive_valid(drive) && drive_volume(drive) == VOL_SYS;
 }
 
 uint32_t ftl_read(int drive, uint32_t sector, uint32_t count, void *buffer)
@@ -316,7 +366,7 @@ uint32_t ftl_read(int drive, uint32_t sector, uint32_t count, void *buffer)
 
     if (drive_valid(drive))
     {
-        ret = drive_read(drive, sector, count, buffer) ? 2 : 0;
+        ret = vol_read(drive_volume(drive), sector, count, buffer) ? 2 : 0;
     }
     return ret;
 }
@@ -329,7 +379,7 @@ uint32_t ftl_write(int drive, uint32_t sector, uint32_t count,
 #ifdef FTL_ALLOW_WRITE
     if (drive_valid(drive))
     {
-        ret = drive_write(drive, sector, count, buffer) ? 2 : 0;
+        ret = vol_write(drive_volume(drive), sector, count, buffer) ? 2 : 0;
     }
 #else
     /* refuse rather than pretend: a silent success would let the filesystem
@@ -343,7 +393,7 @@ uint32_t ftl_sync(void)
 {
     if (ftl_mounted)
     {
-        drive_sync();
+        vol_sync();
     }
     flash_sync();
     return 0;
