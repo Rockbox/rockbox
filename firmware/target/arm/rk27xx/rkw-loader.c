@@ -19,12 +19,89 @@
  ****************************************************************************/
 
 #include <stdio.h>
+#include <stdbool.h>
 #include "config.h"
 #include "loader_strerror.h"
 #include "rkw-loader.h"
 #include "crc32-rkw.h"
 #include "file.h"
 #include "panic.h"
+
+#ifdef BOOTLOADER
+/* Before the NAND bootloader jumps to an image it writes three words at
+ * the address in header field 0x14: a magic, its own version and which
+ * copy of the image it loaded. The OF never initialises them; it reports
+ * the version over USB and counts its reboots in the third word. When we
+ * start the OF ourselves we pass on what the NAND bootloader gave us, so
+ * the OF sees the same as when it is started directly.
+ */
+#define RKW_HANDOFF_MAGIC    0x03df479a
+/* written over the magic once the words have been read */
+#define RKW_HANDOFF_CONSUMED 0x123456ad
+
+/* The last 12 bytes of DRAM. tools/rkw.c puts this address in every
+ * Rockbox RKW, so the NAND bootloader leaves our words here.
+ */
+#define RKW_HANDOFF_ADDR     (0x60000000 + MEMORYSIZE * 0x100000 - 12)
+#if MEMORYSIZE != 16
+#error "tools/rkw.c assumes 16 MB of DRAM, update RKW_HANDOFF_ADDR there"
+#endif
+
+struct rkw_handoff_t {
+    uint32_t magic;
+    uint32_t version;
+    uint32_t source;
+};
+
+/* The NAND bootloader's words, read once: loading an image may overwrite
+ * them, and a reboot keeps DRAM, so they are marked consumed.
+ */
+static struct rkw_handoff_t *rkw_own_handoff(void)
+{
+    static struct rkw_handoff_t own;
+    static bool read_done = false;
+    volatile struct rkw_handoff_t *h =
+        (volatile struct rkw_handoff_t *)RKW_HANDOFF_ADDR;
+
+    if (!read_done)
+    {
+        if (h->magic == RKW_HANDOFF_MAGIC)
+        {
+            own.version = h->version;
+            own.source = h->source;
+        }
+        else
+        {
+            /* not started by the NAND bootloader, e.g. over USB */
+            own.version = 0;
+            own.source = 0;
+        }
+        own.magic = RKW_HANDOFF_MAGIC;
+        h->magic = RKW_HANDOFF_CONSUMED;
+        read_done = true;
+    }
+
+    return &own;
+}
+
+/* Hand the words on to an image loaded at its own address, when its
+ * header points past the image and below us.
+ */
+static void rkw_pass_handoff(const struct rkw_header_t *hdr,
+                             const unsigned char *buf, int len,
+                             int buffer_size)
+{
+    uintptr_t addr = hdr->handoff;
+    uintptr_t lo = (uintptr_t)buf + len;
+    uintptr_t hi = (uintptr_t)buf + buffer_size;
+
+    if ((uintptr_t)buf != hdr->load_address || (addr & 3) ||
+        addr < lo || addr > hi - sizeof(struct rkw_handoff_t))
+        return;
+
+    *(struct rkw_handoff_t *)addr = *rkw_own_handoff();
+}
+#endif /* BOOTLOADER */
 
 /* loosely based on load_firmware()
  * on success we return size of loaded image
@@ -116,6 +193,11 @@ int load_rkw(unsigned char* buf, const char* firmware, int buffer_size)
         goto end;
     }
 
+#ifdef BOOTLOADER
+    /* before the image can overwrite them */
+    rkw_own_handoff();
+#endif
+
     /* skip header */
     lseek(fd, sizeof(rkw_info), SEEK_SET);
 
@@ -140,6 +222,10 @@ int load_rkw(unsigned char* buf, const char* firmware, int buffer_size)
             goto end;
         }
     }
+
+#ifdef BOOTLOADER
+    rkw_pass_handoff(&rkw_info, buf, len, buffer_size);
+#endif
 
     ret = len;
 end:

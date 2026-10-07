@@ -30,7 +30,9 @@ struct rkw_header_t {
     uint32_t image_base;      /* Base address of the firmware image */
     uint32_t load_address;    /* Load address */
     uint32_t load_limit;      /* End of the firmware image */
-    uint32_t bss_start;       /* This is the start of .bss section of the firmware I suppose */
+    uint32_t handoff;         /* Where the loader leaves its three handoff
+                               * words for the image (see rkw-loader.c)
+                               */
     uint32_t reserved0;       /* reserved - I've seen only zeros in this field so far */
     uint32_t reserved1;       /* reserved - I've seen only zeros in this field so far */
     uint32_t entry_point;     /* Entry point address */

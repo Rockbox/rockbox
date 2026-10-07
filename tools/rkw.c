@@ -26,6 +26,14 @@
 #define RKLD_MAGIC 0x4c44524b
 #define RKW_HEADER_SIZE 0x2c
 
+/* The NAND bootloader writes three handoff words at the address in
+ * header field 0x14 before it jumps to the image. Point it at the last
+ * 12 bytes of DRAM, which nothing touches before our bootloader reads
+ * them. Every rk27xx target has 16 MB; keep in step with
+ * RKW_HANDOFF_ADDR in firmware/target/arm/rk27xx/rkw-loader.c.
+ */
+#define RKW_HANDOFF_ADDR (0x60000000 + 16 * 0x100000 - 12)
+
 /* slightly modified version from crc32.c in rockbox */
 static uint32_t rkw_crc32(const void *src, uint32_t len)
 {
@@ -114,7 +122,7 @@ int rkw_encode(char *iname, char *oname, unsigned long modelnum)
     int2le(0x60000000, outbuf+0x08);           /* base address */
     int2le(0x60000000, outbuf+0x0c);           /* load address */
     int2le(0x60000000+length, outbuf+0x10);    /* end address */
-    int2le(0x6035a5e4, outbuf+0x14);           /* points to some unknown struct */
+    int2le(RKW_HANDOFF_ADDR, outbuf+0x14);     /* loader handoff words */
     int2le(modelnum, outbuf+0x18);             /* reserved (we abuse the format
                                                 * to store modelnum here
                                                 */
