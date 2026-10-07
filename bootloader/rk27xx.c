@@ -135,9 +135,13 @@ void main(void)
     if ((btn & ~POWEROFF_BUTTON))
         boot = of;
 
-    /* if we are woken up by USB insert boot into OF */
+#ifndef FTL_ALLOW_WRITE
+    /* if we are woken up by USB insert boot into OF: only it can give
+     * the host write access to the NAND
+     */
     if (DEV_INFO & (1<<20))
         boot = of;
+#endif
 
     /* The OF asks for a mode before it resets itself, e.g. at the end of
      * a firmware update, and the cell survives the reset. Rockbox never
