@@ -47,7 +47,7 @@ $(BUILDDIR)/fontbundle.h: $(ROOTDIR)/fonts/*bdf
 	$(SILENT)echo "  NULL, " >> $@
 	$(SILENT)echo "};" >> $@
 
-$(BUILDDIR)/themeassets.h: $(ROOTDIR)/firmware/export/config/$(MODELNAME).h $(ROOTDIR)/wps/WPSLIST
+$(BUILDDIR)/themeassets.h: $(ROOTDIR)/wps/WPSLIST
 	@echo THEMEASSETS
 	$(SILENT)rm -Rf $(BUILDDIR)/.rockbox
 	$(SILENT)mkdir $(BUILDDIR)/.rockbox
