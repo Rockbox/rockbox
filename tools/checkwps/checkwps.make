@@ -42,10 +42,21 @@ $(BUILDDIR)/$(BINARY): $$(CHECKWPS_OBJ) $$(CORE_LIBS)
 
 $(BUILDDIR)/fontbundle.h: $(ROOTDIR)/fonts/*bdf
 	@echo FONTBUNDLE
-	$(SILENT)echo "static unsigned char* bundledfonts[] = {" > $@
+	$(SILENT)echo "static const unsigned char* bundledfonts[] = {" > $@
 	$(SILENT)ls $(ROOTDIR)/fonts/*bdf | perl -pne 's|.*/(\d+-.*)\.bdf|  "$$1",|;' >> $@
 	$(SILENT)echo "  NULL, " >> $@
 	$(SILENT)echo "};" >> $@
+
+$(BUILDDIR)/themeassets.h: $(ROOTDIR)/firmware/export/config/$(MODELNAME).h $(ROOTDIR)/wps/WPSLIST
+	@echo THEMEASSETS
+	$(SILENT)rm -Rf $(BUILDDIR)/.rockbox
+	$(SILENT)mkdir $(BUILDDIR)/.rockbox
+	$(SILENT)echo "static const unsigned char* themeassets[] = {" > $@
+	$(SILENT)$(ROOTDIR)/wps/wpsbuild.pl $(ROOTDIR)/wps/WPSLIST $(TARGET) > /dev/null 2>&1
+	$(SILENT)find $(BUILDDIR)/.rockbox -type f | perl -pne 's|.*/(\S+)\.\S+|  "$$1",|;' >> $@
+	$(SILENT)echo "  NULL, " >> $@
+	$(SILENT)echo "};" >> $@
+	$(SILENT)rm -Rf $(BUILDDIR)/.rockbox
 
 #### Everything below is hacked in from apps.make and lang.make
 

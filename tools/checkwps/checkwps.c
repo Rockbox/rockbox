@@ -227,6 +227,7 @@ bool radio_hardware_present(void)
 #endif
 
 #include "fontbundle.h"
+#include "themeassets.h"
 
 static int loaded_fonts = 0;
 static struct font _font;
@@ -277,29 +278,57 @@ static int checkwps_loader(const char *path, const char *search, int mode)
             int missing = 1;
             if (final) *final = 0;
 
-            /* Check if font is included in the bundle */
-            for (int i = 0 ; bundledfonts[i] != NULL ; i++)
+            /* Check if font is a default theme asset */
+            for (int i = 0 ; themeassets[i] != NULL; i++)
             {
-                if (first && !strcmp(first+1, bundledfonts[i]))
+                if (first && !strcmp(first+1, themeassets[i]))
                 {
                     missing = 0;
                     break;
                 }
             }
 
+            /* Check if font is included in the bundle */
             if (missing)
+            {
+                for (int i = 0 ; bundledfonts[i] != NULL ; i++)
+                {
+                     if (first && !strcmp(first+1, bundledfonts[i]))
+                     {
+                         missing = 2;
+                         break;
+                     }
+                 }
+            }
+
+            if (missing == 1)
             {
                 printf("Font missing >%s<\n", first+1);
                 return -4;
-            } else {
+            } else if (missing == 2) {
                 printf("INFO: Theme requires rockbox font bundle\n");
             }
         }
-
-        if (mode == 2)
+        else if (mode == 2) /* Not found and it's an asset */
         {
-            printf("ERROR: File missing: %s\n", path);
-            return -5;
+             char *first = strrchr(buf, '/');
+             char *final = strrchr(buf, '.');
+             int missing = 1;
+             if (final) *final = 0;
+
+             for (int i = 0 ; themeassets[i] != NULL; i++)
+             {
+                 if (first && !strcmp(first+1, themeassets[i]))
+                 {
+                     missing = 0;
+                     break;
+                 }
+             }
+             if (missing)
+             {
+                 printf("ERROR: File missing: %s\n", path);
+                 return -5;
+             }
         }
     }
 
