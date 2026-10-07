@@ -20,6 +20,12 @@
                        | SAMPR_CAP_48 | SAMPR_CAP_24 | SAMPR_CAP_12 \
                        | SAMPR_CAP_32 | SAMPR_CAP_16 | SAMPR_CAP_8)
 
+/* Line gain, used for the FM radio, in 0.01 dB: start at the +12 dB the
+ * radio is heard at when not recording (wm8751.c), so recording it is as
+ * loud as listening to it */
+#define DEFAULT_REC_LEFT_GAIN   1200
+#define DEFAULT_REC_RIGHT_GAIN  1200
+
 /* define this if you have a colour LCD */
 #define HAVE_LCD_COLOR
 
