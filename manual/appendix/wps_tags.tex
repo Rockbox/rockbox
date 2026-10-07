@@ -515,6 +515,39 @@ Examples:
 For general information where to put album art see \reference{ref:album_art}.
 }
 
+\opt{recording}{
+\section{Recording}
+These tags show the state of recording, in any skin.
+  \begin{tagmap}
+    \config{\%Rp} & Can this \dap{} record?\\
+    \config{\%Rr} & Is a recording in progress?\\
+    \config{\%Rh} & Hours of the current recording.\\
+    \config{\%Rn} & Minutes of the current recording, 00 to 59.\\
+    \config{\%Rs} & Seconds of the current recording, 00 to 59.\\
+    \config{\%RS} & Size of the current recording, e.g. ``1.5MB''.\\
+    \config{\%RP} & Seconds in the pre-record buffer; empty unless
+      pre-recording.\\
+    \config{\%Re} & Recording format: wav, aiff, wv or mp3. As a conditional:
+      \config{\%?Re<wav|aiff|wv|mp3>}.\\
+    \config{\%Rf} & Sample rate in kHz, e.g. ``44.1''. As a conditional, 1 to
+      12: 96, 88.2, 64, 48, 44.1, 32, 24, 22.05, 16, 12, 11.025 and 8~kHz.\\
+    \config{\%Rb} & MP3 bitrate in kbps; empty for the other formats. As a
+      conditional, 1 to 18 for 8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128,
+      144, 160, 192, 224, 256 and 320~kbps.\\
+    \config{\%Rm} & Is the recording mono?\\
+    \config{\%Ri} & Recording source, by name. As a conditional, the same on
+      every \dap{}: \config{\%?Ri<mic|line in|digital|FM radio>}.\\
+    \config{\%Rg} & Gain of the recording source in dB -- for line in and
+      FM radio the left channel's. Empty for a source without a gain.\\
+    \config{\%Rc} & Number of clips the peak meter has counted.\\
+    \config{\%Rt} & Trigger state: off, ready, steady, go, postrec, retrig or
+      continue. As a conditional:
+      \config{\%?Rt<off|ready|steady|go|postrec|retrig|continue>}.\\
+    \config{\%Rw} & Recording warnings, as a hexadecimal number; empty while
+      there are none.\\
+  \end{tagmap}
+}
+
 \opt{radio}{
 \section{FM Radio}
   \begin{tagmap}

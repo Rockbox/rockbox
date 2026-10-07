@@ -1917,6 +1917,106 @@ const char *get_token_value(struct gui_wps *gwps,
             goto gtv_ret_numeric_tag_info;
         }
 
+        /* bytes recorded to the current file, as "1.5MB" */
+        case SKIN_TOKEN_REC_SIZE:
+            return output_dyn_value(buf, buf_size, audio_num_recorded_bytes(),
+                                    byte_units, 4, true);
+
+        /* seconds in the pre-record buffer; nothing unless pre-recording */
+        case SKIN_TOKEN_REC_PRERECORD:
+            if (!(audio_status() & AUDIO_STATUS_PRERECORD))
+                return NULL;
+            numeric_ret = audio_prerecorded_time() / HZ;
+            itoa_buf(buf, buf_size, numeric_ret);
+            numeric_buf = buf;
+            goto gtv_ret_numeric_tag_info;
+
+        case SKIN_TOKEN_REC_CLIPCOUNT:
+            numeric_ret = pm_get_clipcount();
+            itoa_buf(buf, buf_size, numeric_ret);
+            numeric_buf = buf;
+            goto gtv_ret_numeric_tag_info;
+
+        /* trigger state; as a conditional: off, ready, steady, go,
+         * post-record, retrigger, continue */
+        case SKIN_TOKEN_REC_TRIGGER:
+        {
+            static const char * const trig_name[] =
+                { "off", "ready", "steady", "go", "postrec", "retrig",
+                  "continue" };
+            int trig = peak_meter_trigger_status();
+
+            if (trig < 0 || trig >= (int)ARRAYLEN(trig_name))
+                return NULL;
+            numeric_ret = trig + 1;
+            numeric_buf = (char *)trig_name[trig];
+            goto gtv_ret_numeric_tag_info;
+        }
+
+        /* recording warnings, in hex; nothing while there are none */
+        case SKIN_TOKEN_REC_WARNING:
+            if (!(audio_status() & AUDIO_STATUS_WARNING))
+                return NULL;
+            snprintf(buf, buf_size, "%08lX",
+                     (unsigned long)pcm_rec_get_warnings());
+            return buf;
+
+        /* input source; as a conditional, the same on every target: mic,
+         * line in, digital, FM radio */
+        case SKIN_TOKEN_REC_SOURCE:
+            switch (global_settings.rec_source)
+            {
+#ifdef HAVE_MIC_REC
+                case AUDIO_SRC_MIC:
+                    numeric_ret = 1;
+                    numeric_buf = (char *)str(LANG_RECORDING_SRC_MIC);
+                    break;
+#endif
+#ifdef HAVE_LINE_REC
+                case AUDIO_SRC_LINEIN:
+                    numeric_ret = 2;
+                    numeric_buf = (char *)str(LANG_LINE_IN);
+                    break;
+#endif
+#ifdef HAVE_SPDIF_REC
+                case AUDIO_SRC_SPDIF:
+                    numeric_ret = 3;
+                    numeric_buf = (char *)str(LANG_RECORDING_SRC_DIGITAL);
+                    break;
+#endif
+#ifdef HAVE_FMRADIO_REC
+                case AUDIO_SRC_FMRADIO:
+                    numeric_ret = 4;
+                    numeric_buf = (char *)str(LANG_FM_RADIO);
+                    break;
+#endif
+                default:
+                    return NULL;
+            }
+            goto gtv_ret_numeric_tag_info;
+
+        /* gain of the current source in dB - the left channel's for line
+         * in and FM radio; nothing for a source without one */
+        case SKIN_TOKEN_REC_GAIN:
+            switch (global_settings.rec_source)
+            {
+#ifdef HAVE_MIC_REC
+                case AUDIO_SRC_MIC:
+                    format_sound_value_ex(buf, buf_size, SOUND_MIC_GAIN,
+                                          global_settings.rec_mic_gain, true);
+                    return buf;
+#endif
+#if defined(HAVE_LINE_REC) || defined(HAVE_FMRADIO_REC)
+                HAVE_LINE_REC_(case AUDIO_SRC_LINEIN:)
+                HAVE_FMRADIO_REC_(case AUDIO_SRC_FMRADIO:)
+                    format_sound_value_ex(buf, buf_size, SOUND_LEFT_GAIN,
+                                          global_settings.rec_left_gain, true);
+                    return buf;
+#endif
+                default:
+                    return NULL;
+            }
+
 #endif /* HAVE_RECORDING */
 
         case SKIN_TOKEN_CURRENT_SCREEN:
