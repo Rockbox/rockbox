@@ -426,8 +426,8 @@ talkclips-force: talkclips
 
 endif
 
-ifeq (,$(findstring android, $(APP_TYPE)))
-
+# only simulators get a 'make install'
+ifneq (,$(findstring sdl,$(APP_TYPE)))
 simext1:
 	$(SILENT)mkdir -p $@
 
