@@ -492,6 +492,14 @@ void peak_meter_init_times(int release, int hold_ms, int clip_hold_sec)
     pm_clip_hold = HZ * clip_hold_sec;
 }
 
+/* The release, in pixels per tick, and the peak hold time in ticks, as set
+ * by peak_meter_init_times(): for peak meters drawn elsewhere */
+void peak_meter_get_times(int *release, int *hold_ticks)
+{
+    *release = pm_peak_release;
+    *hold_ticks = pm_peak_hold;
+}
+
 #ifdef HAVE_RECORDING
 /**
  * Enable/disable clip counting

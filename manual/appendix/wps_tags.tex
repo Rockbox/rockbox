@@ -810,6 +810,13 @@ display cycling round the defined sublines. See
     specify an image.
   \item[nobar] -- don't draw the bar or its frame (for use with the
     ``slider'' option).
+  \item[hold] -- for the peak meter bars (\config{\%pL}, \config{\%pR}):
+    the bar falls back at the peak meter's release rate instead of
+    following each drop, and the highest level is held for the peak hold
+    time. The next param may be a number, the thickness of the held peak in
+    pixels (default 1). With a fill image the held peak is drawn from that
+    part of the image, so for a bar drawn as LED segments set it to the size
+    of one segment.
     \opt{touchscreen}{
         \item[notouch] -- don't create the touchregion for progress/volume bars.
         \item[touchlabel] -- the next option sets the label of the bar touch area, for linking with the \%Tl tag.

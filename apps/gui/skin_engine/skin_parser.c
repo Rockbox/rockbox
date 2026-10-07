@@ -998,6 +998,10 @@ static int parse_progressbar_tag(struct skin_element* element,
     pb->nofill = false;
     pb->noborder = false;
     pb->nobar = false;
+    pb->hold = false;
+    pb->hold_size = 1;
+    pb->level = pb->hold_pos = 0;
+    pb->last_tick = pb->hold_tick = 0;
     pb->image = PTRTOSKINOFFSET(skin_buffer, NULL);
     pb->slider = PTRTOSKINOFFSET(skin_buffer, NULL);
     pb->backdrop = PTRTOSKINOFFSET(skin_buffer, NULL);
@@ -1083,14 +1087,16 @@ static int parse_progressbar_tag(struct skin_element* element,
     {
         eINVERT = 0, eNOFILL, eNOBORDER, eNOBAR, eSLIDER, eIMAGE,
         eBACKDROP, eVERTICAL, eHORIZONTAL, eNOTOUCH, eSETTING, eSETTING_OFFSET,
-        e_PB_TAG_COUNT
+        eHOLD, e_PB_TAG_COUNT
     };
 
     static const char *pb_options[e_PB_TAG_COUNT + 1] = {[eINVERT] = "invert",
                  [eNOFILL] = "nofill", [eNOBORDER] = "noborder", [eNOBAR] = "nobar",
                  [eSLIDER] = "slider", [eIMAGE] = "image", [eBACKDROP] = "backdrop",
                  [eVERTICAL] = "vertical", [eHORIZONTAL] = "horizontal",
-                 [eNOTOUCH] = "notouch", [eSETTING] = "setting", [eSETTING_OFFSET] = "soffset", [e_PB_TAG_COUNT] = NULL};
+                 [eNOTOUCH] = "notouch", [eSETTING] = "setting",
+                 [eSETTING_OFFSET] = "soffset", [eHOLD] = "hold",
+                 [e_PB_TAG_COUNT] = NULL};
     int pb_op;
 
     while (curr_param < element->params_count)
@@ -1108,6 +1114,32 @@ static int parse_progressbar_tag(struct skin_element* element,
             pb->noborder = true;
         else if (pb_op == eNOBAR)
             pb->nobar = true;
+        else if (pb_op == eHOLD)
+        {
+            pb->hold = true;
+            /* optional: the thickness of the held peak */
+            if (curr_param+1 < element->params_count)
+            {
+                struct skin_tag_parameter *next = param + 1;
+                int size = -1;
+                if (next->type == INTEGER)
+                    size = next->data.number;
+                else if (next->type == STRING)
+                {
+                    text = SKINOFFSETTOPTR(skin_buffer, next->data.text);
+                    if (isdigit(*text))
+                        size = atoi(text);
+                }
+                if (size >= 0)
+                {
+                    if (size == 0)
+                        return WPS_ERROR_INVALID_PARAM;
+                    pb->hold_size = size;
+                    curr_param++;
+                    param++;
+                }
+            }
+        }
         else if (pb_op == eSLIDER)
         {
             if (curr_param+1 < element->params_count)

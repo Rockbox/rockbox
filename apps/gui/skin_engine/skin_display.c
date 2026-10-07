@@ -170,6 +170,34 @@ void ab_draw_markers(struct screen * screen, int capacity,
 
 #endif
 
+/* A peak meter bar with the hold option: the level falls back by the peak
+ * release rate - pixels per tick, here of a bar of the given size - and
+ * the highest recent level is held for the peak hold time. */
+static unsigned long peak_bar_hold(struct progressbar *pb, unsigned long end,
+                                   int size)
+{
+    int release, hold_ticks;
+    long delta = current_tick - pb->last_tick;
+    int level = end;
+
+    peak_meter_get_times(&release, &hold_ticks);
+    pb->last_tick = current_tick;
+    if (size <= 0)
+        size = 1;
+    if (delta >= 0 && delta < HZ)
+        level = MAX(level, pb->level - delta * release * MAX_PEAK / size);
+    pb->level = level;
+
+    if (TIME_AFTER(current_tick, pb->hold_tick))
+        pb->hold_pos = 0;
+    if (level > pb->hold_pos)
+    {
+        pb->hold_pos = level;
+        pb->hold_tick = current_tick + hold_ticks;
+    }
+    return level;
+}
+
 void draw_progressbar(struct gui_wps *gwps, struct skin_viewport* skin_viewport,
                       int line, struct progressbar *pb)
 {
@@ -230,6 +258,8 @@ void draw_progressbar(struct gui_wps *gwps, struct skin_viewport* skin_viewport,
         val = pb->type == SKIN_TOKEN_PEAKMETER_LEFTBAR ? left : right;
         length = MAX_PEAK;
         end = peak_meter_scale_value(val, length);
+        if (pb->hold)
+            end = peak_bar_hold(pb, end, pb->horizontal ? width : height);
     }
     else if (pb->type == SKIN_TOKEN_PLAYLIST_PERCENTBAR)
     {
@@ -343,6 +373,59 @@ void draw_progressbar(struct gui_wps *gwps, struct skin_viewport* skin_viewport,
         else
             gui_scrollbar_draw(display, x, y, width, height,
                                length, 0, end, flags);
+    }
+
+    /* the held peak of a peak meter bar: a block hold_size pixels thick
+     * ending at the held level, cut from the fill image if the bar has one,
+     * so that a bar drawn as LED segments holds a segment */
+    if (pb->hold && pb->hold_pos > 0 &&
+        (pb->type == SKIN_TOKEN_PEAKMETER_LEFTBAR ||
+         pb->type == SKIN_TOKEN_PEAKMETER_RIGHTBAR))
+    {
+        struct gui_img *img = pb->nobar ? NULL :
+                        SKINOFFSETTOPTR(get_skin_buffer(gwps->data), pb->image);
+        int hx = x, hy = y, hw = width, hh = height;
+        int len, pos, off, size = pb->hold_size;
+
+        if (!img && !(flags&BORDER_NOFILL))
+        {
+            /* inside the frame, like the bar */
+            hx++; hy++; hw -= 2; hh -= 2;
+        }
+        len = (flags&HORIZONTAL) ? hw : hh;
+        pos = len * pb->hold_pos / MAX_PEAK;
+        off = pos - size;
+        if (off < 0)
+        {
+            size += off;
+            off = 0;
+        }
+        if (flags&INVERTFILL)
+            off = len - pos;
+
+        if (flags&HORIZONTAL)
+        {
+            hx += off;
+            hw = size;
+        }
+        else
+        {
+            hy += off;
+            hh = size;
+        }
+
+        if (img)
+        {
+            /* the image maps onto the bar 1:1, as in the bar itself */
+            int bx = hx - x, by = hy - y;
+            img->bm.data = core_get_data(img->buflib_handle);
+            hw = MIN(hw, img->bm.width - bx);
+            hh = MIN(hh, img->bm.height - by);
+            if (hw > 0 && hh > 0)
+                display->bmp_part(&img->bm, bx, by, hx, hy, hw, hh);
+        }
+        else if (hw > 0 && hh > 0)
+            display->fillrect(hx, hy, hw, hh);
     }
 
     if (SKINOFFSETTOPTR(get_skin_buffer(gwps->data), pb->slider))

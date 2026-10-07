@@ -136,6 +136,12 @@ struct progressbar {
     bool nofill;
     bool noborder;
     bool nobar;
+    /* peak meter bars: fall back at the peak release rate and mark the
+     * held peak, as the recording screen's peak meter does */
+    bool hold;
+    int hold_size;          /* thickness of the held peak, in pixels */
+    int level, hold_pos;    /* in units of MAX_PEAK */
+    long last_tick, hold_tick;
     OFFSETTYPE(struct gui_img *) slider;
 
     OFFSETTYPE(struct gui_img *) backdrop;
