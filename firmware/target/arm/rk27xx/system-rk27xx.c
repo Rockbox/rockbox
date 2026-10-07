@@ -184,34 +184,17 @@ void udelay(unsigned usecs)
     );
 }
 
-static void cache_invalidate_way(int way)
-{
-    /* Issue invalidata way command to the cache controler */
-    CACHEOP = ((way<<31)|0x2);
-
-    /* wait for invalidate process to complete */
-    while (CACHEOP & 0x03);
-}
-
+/* No whole-cache invalidate at run time, as in the original firmware: it
+ * invalidates the ways once, at power-on with the cache off (crt0.S), and
+ * after that only single lines. Invalidating the ways while running from
+ * cached SDRAM crashed depending on where code happened to lie - with the
+ * cache on in the poll loop, and with it off later, as code was fetched
+ * again. None is needed: the cache is unified and write-through, so what
+ * the CPU writes, code included, is in memory and in any cached copy, and
+ * every DMA into memory discards the lines of its own buffer first
+ * (commit_discard_dcache_range()). */
 void commit_discard_idcache(void)
 {
-    int old_irq = disable_irq_save();
-    unsigned long devid = DEVID;
-
-    /* Invalidate with the cache off, as crt0 does. This code runs from
-     * cached SDRAM: invalidating the ways while fetching through them fails
-     * when the poll loop starts on a cache line of its own, depending on
-     * where the linker happened to put it. The cache is write-through, so
-     * nothing is lost by turning it off. */
-    DEVID = devid & ~(1UL << 31);
-
-    cache_invalidate_way(0);
-
-    cache_invalidate_way(1);
-
-    DEVID = devid;
-
-    restore_irq(old_irq);
 }
 void commit_discard_dcache (void) __attribute__((alias("commit_discard_idcache")));
 
