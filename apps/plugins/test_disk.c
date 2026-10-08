@@ -23,8 +23,7 @@
 
 
 
-#define TESTBASEDIR HOME_DIR "/__TEST__"
-#define TEST_FILE   TESTBASEDIR "/test_disk.tmp"
+#define TESTDIRNAME "__TEST__"
 #define FRND_SEED   0x78C3     /* arbirary */
 
 #if (CONFIG_STORAGE & STORAGE_MMC)
@@ -42,7 +41,20 @@ static int line = 0;
 static int max_line = 0;
 static int log_fd;
 static char logfilename[MAX_PATH];
-static const char testbasedir[] = TESTBASEDIR;
+
+/* The disk under test: HOME_DIR, or where there are several volumes the
+   one chosen from the menu.  Its test directory, test file and log are all
+   on it, so nothing is written anywhere else. */
+#ifdef HAVE_MULTIVOLUME
+#define MAX_DISKS (NUM_VOLUMES + 1)
+#else
+#define MAX_DISKS 1
+#endif
+static char disks[MAX_DISKS][24];
+static int ndisks;
+static int disk;
+static char testbasedir[MAX_PATH];
+static char testfile[MAX_PATH];
 
 static void mem_fill_frnd(unsigned char *addr, int len)
 {
@@ -82,8 +94,8 @@ static bool log_init(void)
     rb->lcd_clear_display();
     rb->lcd_update();
 
-    rb->create_numbered_filename(logfilename, HOME_DIR, "test_disk_log_", ".txt",
-                                 2 IF_CNFN_NUM_(, NULL));
+    rb->create_numbered_filename(logfilename, disks[disk], "test_disk_log_",
+                                 ".txt", 2 IF_CNFN_NUM_(, NULL));
     log_fd = rb->open(logfilename, O_RDWR|O_CREAT|O_TRUNC, 0666);
     return log_fd >= 0;
 }
@@ -105,6 +117,84 @@ static void log_close(void)
     rb->close(log_fd);
 }
 
+/* The name of the i'th of the many small files the speed test makes. */
+static void tmp_name(char *buf, size_t size, int i)
+{
+    rb->snprintf(buf, size, "%s/%08x.tmp", testbasedir, i);
+}
+
+/* The disks there are to test: HOME_DIR, and each volume the root lists. */
+static void find_disks(void)
+{
+    rb->strlcpy(disks[0], HOME_DIR, sizeof disks[0]);
+    ndisks = 1;
+#ifdef HAVE_MULTIVOLUME
+    {
+        DIR *dir = rb->opendir(PATH_ROOTSTR);
+        struct dirent *entry;
+
+        if (dir == NULL)
+            return;
+        while (ndisks < MAX_DISKS && (entry = rb->readdir(dir)) != NULL)
+        {
+            if (!(rb->dir_get_info(dir, entry).attribute & ATTR_VOLUME))
+                continue;
+            rb->snprintf(disks[ndisks], sizeof disks[0], PATH_ROOTSTR "%s",
+                         entry->d_name);
+            ndisks++;
+        }
+        rb->closedir(dir);
+    }
+#endif
+}
+
+/* Make disk n the one under test.  The test directory on the one before
+   is removed and one made here. */
+static bool use_disk(int n)
+{
+    DIR *dir;
+
+    if (testbasedir[0])
+        rb->rmdir(testbasedir);
+    disk = n;
+    rb->snprintf(testbasedir, sizeof testbasedir, "%s/" TESTDIRNAME,
+                 disks[disk]);
+    rb->snprintf(testfile, sizeof testfile, "%s/test_disk.tmp", testbasedir);
+
+    if ((dir = rb->opendir(testbasedir)) == NULL)
+    {
+        if (rb->mkdir(testbasedir) < 0)
+        {
+            rb->splashf(HZ*2, "Can't create %s", testbasedir);
+            testbasedir[0] = '\0';
+            return false;
+        }
+    }
+    else
+    {
+        rb->closedir(dir);
+    }
+    return true;
+}
+
+#ifdef HAVE_MULTIVOLUME
+/* Ask which disk to test. */
+static bool select_disk(void)
+{
+    struct opt_items names[MAX_DISKS];
+    int n = disk;
+    int i;
+
+    for (i = 0; i < ndisks; i++)
+    {
+        names[i].string = disks[i];
+        names[i].voice_id = -1;
+    }
+    rb->set_option("Disk to test", &n, RB_INT, names, ndisks, NULL);
+    return use_disk(n);
+}
+#endif
+
 static bool test_fs(void)
 {
     unsigned char text_buf[32];
@@ -113,6 +203,7 @@ static bool test_fs(void)
 
     log_init();
     log_text("test_disk WRITE&VERIFY", true);
+    log_text(disks[disk], true);
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
     rb->snprintf(text_buf, sizeof(text_buf), "CPU clock: %ld Hz",
                  *rb->cpu_frequency);
@@ -122,7 +213,7 @@ static bool test_fs(void)
     rb->snprintf(text_buf, sizeof text_buf, "Data size: %dKB", (TEST_SIZE>>10));
     log_text(text_buf, true);
 
-    fd = rb->creat(TEST_FILE, 0666);
+    fd = rb->creat(testfile, 0666);
     if (fd < 0)
     {
         rb->splashf(HZ, "creat() failed: %d", fd);
@@ -152,7 +243,7 @@ static bool test_fs(void)
     }
     rb->close(fd);
 
-    fd = rb->open(TEST_FILE, O_RDONLY);
+    fd = rb->open(testfile, O_RDONLY);
     if (fd < 0)
     {
         rb->splashf(0, "open() failed: %d", fd);
@@ -192,7 +283,7 @@ static bool test_fs(void)
 
 error:
     log_close();
-    rb->remove(TEST_FILE);
+    rb->remove(testfile);
     rb->button_clear_queue();
     rb->button_get(true);
 
@@ -212,7 +303,7 @@ static bool file_speed(int chunksize, bool align)
     log_text("--------------------", true);
 
     /* File creation write speed */
-    fd = rb->creat(TEST_FILE, 0666);
+    fd = rb->creat(testfile, 0666);
     if (fd < 0)
     {
         rb->splashf(HZ, "creat() failed: %d", fd);
@@ -237,7 +328,7 @@ static bool file_speed(int chunksize, bool align)
     log_text(text_buf, true);
 
     /* Existing file write speed */
-    fd = rb->open(TEST_FILE, O_WRONLY);
+    fd = rb->open(testfile, O_WRONLY);
     if (fd < 0)
     {
         rb->splashf(0, "open() failed: %d", fd);
@@ -261,7 +352,7 @@ static bool file_speed(int chunksize, bool align)
     log_text(text_buf, true);
 
     /* File read speed */
-    fd = rb->open(TEST_FILE, O_RDONLY);
+    fd = rb->open(testfile, O_RDONLY);
     if (fd < 0)
     {
         rb->splashf(0, "open() failed: %d", fd);
@@ -283,11 +374,11 @@ static bool file_speed(int chunksize, bool align)
     rb->snprintf(text_buf, sizeof text_buf, "Read   (%d,%c): %ld KB/s",
                  chunksize, align ? 'A' : 'U', (25 * (filesize>>8) / time) );
     log_text(text_buf, true);
-    rb->remove(TEST_FILE);
+    rb->remove(testfile);
     return true;
 
   error:
-    rb->remove(TEST_FILE);
+    rb->remove(testfile);
     return false;
 }
 
@@ -303,6 +394,7 @@ static bool test_speed(void)
     rb->memset(audiobuf, 'T', audiobuflen);
     log_init();
     log_text("test_disk SPEED TEST", true);
+    log_text(disks[disk], true);
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
     rb->snprintf(text_buf, sizeof(text_buf), "CPU clock: %ld Hz",
                  *rb->cpu_frequency);
@@ -314,7 +406,7 @@ static bool test_speed(void)
     time = *rb->current_tick + TEST_TIME*HZ;
     for (i = 0; TIME_BEFORE(*rb->current_tick, time); i++)
     {
-        rb->snprintf(text_buf, sizeof(text_buf), TESTBASEDIR "/%08x.tmp", i);
+        tmp_name(text_buf, sizeof(text_buf), i);
         fd = rb->creat(text_buf, 0666);
         if (fd < 0)
         {
@@ -335,7 +427,7 @@ static bool test_speed(void)
     {
         if (i >= last_file)
             i = 0;
-        rb->snprintf(text_buf, sizeof(text_buf), TESTBASEDIR "/%08x.tmp", i);
+        tmp_name(text_buf, sizeof(text_buf), i);
         fd = rb->open(text_buf, O_RDONLY);
         if (fd < 0)
         {
@@ -397,7 +489,7 @@ static bool test_speed(void)
     time = *rb->current_tick;
     for (i = 0; i < last_file; i++)
     {
-        rb->snprintf(text_buf, sizeof(text_buf), TESTBASEDIR "/%08x.tmp", i);
+        tmp_name(text_buf, sizeof(text_buf), i);
         rb->remove(text_buf);
     }
     rb->snprintf(text_buf, sizeof(text_buf), "Delete:  %ld files/s",
@@ -420,7 +512,7 @@ static bool test_speed(void)
   error:
     for (i = 0; i < last_file; i++)
     {
-        rb->snprintf(text_buf, sizeof(text_buf), TESTBASEDIR "/%08x.tmp", i);
+        tmp_name(text_buf, sizeof(text_buf), i);
         rb->remove(text_buf);
     }
     log_text("DONE", false);
@@ -434,26 +526,26 @@ static bool test_speed(void)
 /* this is the plugin entry point */
 enum plugin_status plugin_start(const void* parameter)
 {
+#ifdef HAVE_MULTIVOLUME
+    MENUITEM_STRINGLIST(menu, "Test Disk", NULL,
+                        "Disk speed", "Write & verify", "Select disk");
+#else
     MENUITEM_STRINGLIST(menu, "Test Disk", NULL,
                         "Disk speed", "Write & verify");
+#endif
     int selected=0;
     bool quit = false;
-    DIR *dir;
 
     (void)parameter;
 
-    if ((dir = rb->opendir(testbasedir)) == NULL)
-    {
-        if (rb->mkdir(testbasedir) < 0)
-        {
-            rb->splash(HZ*2, "Can't create test directory.");
-            return PLUGIN_ERROR;
-        }
-    }
-    else
-    {
-        rb->closedir(dir);
-    }
+    find_disks();
+#ifdef HAVE_MULTIVOLUME
+    if (ndisks > 1 ? !select_disk() : !use_disk(0))
+        return PLUGIN_ERROR;
+#else
+    if (!use_disk(0))
+        return PLUGIN_ERROR;
+#endif
 
     audiobuf = rb->plugin_get_audio_buffer(&audiobuflen);
 #ifdef STORAGE_WANTS_ALIGN
@@ -480,6 +572,12 @@ enum plugin_status plugin_start(const void* parameter)
             case 1:
                 test_fs();
                 break;
+#ifdef HAVE_MULTIVOLUME
+            case 2:
+                if (!select_disk())
+                    quit = true;
+                break;
+#endif
             default:
                 quit = true;
                 break;
@@ -489,7 +587,8 @@ enum plugin_status plugin_start(const void* parameter)
     /* Turn on backlight timeout (revert to settings) */
     backlight_use_settings();
 
-    rb->rmdir(testbasedir);
+    if (testbasedir[0])
+        rb->rmdir(testbasedir);
 
     return PLUGIN_OK;
 }
