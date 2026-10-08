@@ -20,6 +20,7 @@
 
 #include "plugin.h"
 #include "lib/helper.h"
+#include "lib/xlcd.h"
 
 
 
@@ -39,6 +40,7 @@ static size_t audiobuflen;
 static unsigned short frnd_buffer;
 static int line = 0;
 static int max_line = 0;
+static int line_height = 0;
 static int log_fd;
 static char logfilename[MAX_PATH];
 
@@ -86,10 +88,8 @@ static bool mem_cmp_frnd(unsigned char *addr, int len)
 
 static bool log_init(void)
 {
-    int h;
-
-    rb->lcd_getstringsize("A", NULL, &h);
-    max_line = LCD_HEIGHT / h;
+    rb->lcd_getstringsize("A", NULL, &line_height);
+    max_line = LCD_HEIGHT / line_height;
     line = 0;
     rb->lcd_clear_display();
     rb->lcd_update();
@@ -102,12 +102,17 @@ static bool log_init(void)
 
 static void log_text(char *text, bool advance)
 {
+    if (line >= max_line)
+    {
+        /* The screen is full: scroll up to make room for this line */
+        xlcd_scroll_up(line_height);
+        line = max_line - 1;
+    }
     rb->lcd_puts(0, line, text);
     rb->lcd_update();
     if (advance)
     {
-        if (++line >= max_line)
-            line = 0;
+        line++;
         rb->fdprintf(log_fd, "%s\n", text);
     }
 }
