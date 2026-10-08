@@ -10,7 +10,7 @@ AS		= $(TOOLCHAIN)as
 OBJCOPY	= $(TOOLCHAIN)objcopy
 OBJDUMP	= $(TOOLCHAIN)objdump
 
-CFLAGS	= -Wundef -marm -march=armv5te -nostdlib -mfpu=fpa -O0 -c
+CFLAGS	= -Wundef -marm -march=armv5te -nostdlib -O0 -c
 #ASFLAGS	= -mcpu=arm926ej-s
 
 OBJS	= crt0.o main.o irq.o
@@ -20,7 +20,7 @@ LDSCRIPT= stage2.lds
 #LIBS	= -lgcc
 LIBS    =
 LDFLAGS	= -Wundef -marm -march=armv5te -T$(LDSCRIPT) -nostartfiles  \
-	-mfpu=fpa -nostdlib -Xlinker -Map=$(TARGET).map
+	 -nostdlib -Xlinker -Map=$(TARGET).map
 
 all		: $(TARGET).bin
 		ls -ls $(TARGET).bin
