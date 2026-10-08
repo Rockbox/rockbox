@@ -1,7 +1,7 @@
 mikmod (https://mikmod.sourceforge.net/)
 
-Based on upstream commit 72424e1bebab470fbf8a2914dcd7903b742205e6
-corresponding to mikmod 3.2.9 / libmikmod 3.3.12
+Based on upstream commit 0c6c2f7f8fb8dd6954ab0407b400e9646b9c2cf0
+corresponding to pre mikmod 3.2.10 / libmikmod 3.3.14
 
 Heavily customized for rockbox use:
 

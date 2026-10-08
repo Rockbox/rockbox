@@ -282,7 +282,12 @@ static int OKT_doPBOD(int patnum)
 	int u;
 
 	if (!patnum) {
-		of.numtrk = of.numpat * of.numchn;
+		const unsigned int numtrk = of.numpat * of.numchn;
+		if (numtrk > 65535) {
+			_mm_errno = MMERR_LOADING_PATTERN;
+			return 0;
+		}
+		of.numtrk = (UWORD)numtrk;
 
 		if (!AllocTracks() || !AllocPatterns())
 			return 0;

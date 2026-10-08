@@ -424,8 +424,15 @@ static int AMF_Load(int curious)
 	if(mh->version>=11) {
 		memset(mh->panpos,0,32);
 		_mm_read_SBYTES(mh->panpos,(mh->version>=13)?32:16,modreader);
-	} else if(mh->version>=9)
+	} else if(mh->version>=9) {
 		_mm_read_UBYTES(channel_remap,16,modreader);
+		for(t = 0; t < 16 && t < mh->numchannels; t++) {
+			if(channel_remap[t] >= mh->numchannels) {
+				_mm_errno=MMERR_NOT_A_MODULE;
+				return 0;
+			}
+		}
+	}
 
 	if (mh->version>=13) {
 		mh->songbpm=_mm_read_UBYTE(modreader);

@@ -132,14 +132,14 @@ static const char *_mm_errmsg[MMERR_MAX+1] =
 #endif
 
 /* SGI driver errors */
-#ifdef DRV_SGI
 	"Unsupported sample rate",
+#ifdef DRV_SGI
 	"Hardware does not support 16 bit sound",
 	"Hardware does not support 8 bit sound",
 	"Hardware does not support stereo sound",
 	"Hardware does not support mono sound",
 #else
-	_mmerr_invalid, _mmerr_invalid, _mmerr_invalid,
+	_mmerr_invalid, _mmerr_invalid,
 	_mmerr_invalid, _mmerr_invalid,
 #endif
 

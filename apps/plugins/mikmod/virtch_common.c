@@ -107,7 +107,6 @@ static int (*VC_VoiceStopped_ptr)(UBYTE);
 static SLONG (*VC_VoiceGetPosition_ptr)(UBYTE);
 static ULONG (*VC_VoiceRealVolume_ptr)(UBYTE);
 
-#if defined __STDC__ || defined _MSC_VER || defined __WATCOMC__ || defined MPW_C
 #define VC_PROC0(suffix) \
 MIKMODAPI void VC_##suffix (void) { VC_##suffix##_ptr(); }
 
@@ -125,27 +124,6 @@ MIKMODAPI void VC_##suffix (typ1 a,typ2 b) { VC_##suffix##_ptr(a,b); }
 
 #define VC_FUNC2(suffix,ret,typ1,typ2) \
 MIKMODAPI ret VC_##suffix (typ1 a,typ2 b) { return VC_##suffix##_ptr(a,b); }
-
-#else
-
-#define VC_PROC0(suffix) \
-MIKMODAPI void VC_/**/suffix (void) { VC_/**/suffix/**/_ptr(); }
-
-#define VC_FUNC0(suffix,ret) \
-MIKMODAPI ret VC_/**/suffix (void) { return VC_/**/suffix/**/_ptr(); }
-
-#define VC_PROC1(suffix,typ1) \
-MIKMODAPI void VC_/**/suffix (typ1 a) { VC_/**/suffix/**/_ptr(a); }
-
-#define VC_FUNC1(suffix,ret,typ1) \
-MIKMODAPI ret VC_/**/suffix (typ1 a) { return VC_/**/suffix/**/_ptr(a); }
-
-#define VC_PROC2(suffix,typ1,typ2) \
-MIKMODAPI void VC_/**/suffix (typ1 a,typ2 b) { VC_/**/suffix/**/_ptr(a,b); }
-
-#define VC_FUNC2(suffix,ret,typ1,typ2) \
-MIKMODAPI ret VC_/**/suffix (typ1 a,typ2 b) { return VC_/**/suffix/**/_ptr(a,b); }
-#endif
 
 VC_FUNC0(Init,int)
 VC_PROC0(Exit)

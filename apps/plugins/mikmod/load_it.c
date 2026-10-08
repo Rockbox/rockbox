@@ -194,7 +194,7 @@ static int IT_Init(void)
 {
 	if(!(mh=(ITHEADER*)MikMod_malloc(sizeof(ITHEADER)))) return 0;
 	if(!(poslookup=(UBYTE*)MikMod_malloc(256*sizeof(UBYTE)))) return 0;
-	if(!(itpat=(ITNOTE*)MikMod_malloc(200*64*sizeof(ITNOTE)))) return 0;
+	if(!(itpat=(ITNOTE*)MikMod_malloc(256*64*sizeof(ITNOTE)))) return 0;
 	if(!(mask=(UBYTE*)MikMod_calloc(64,sizeof(UBYTE)))) return 0;
 	if(!(last=(ITNOTE*)MikMod_calloc(64,sizeof(ITNOTE)))) return 0;
 
@@ -338,10 +338,10 @@ static int IT_ReadPattern(UWORD patrows)
 	int row=0,flag,ch;
 	unsigned int blah;
 	ITNOTE *itt=itpat,dummy,*n,*l;
-	ITNOTE *ite=&itpat[200*64 -1];
+	ITNOTE *ite=&itpat[256*64 -1];
 	UBYTE *m;
 
-	memset(itt,255,200*64*sizeof(ITNOTE));
+	memset(itt,255,256*64*sizeof(ITNOTE));
 
 	do {
 		if(_mm_eof(modreader)) {
@@ -783,7 +783,6 @@ static int IT_Load(int curious)
 				}
 			} else {
 				/* load IT 2xx volume, pan and pitch envelopes */
-#if defined __STDC__ || defined _MSC_VER || defined __WATCOMC__ || defined MPW_C
 #define IT_LoadEnvelope(name,type) 										\
 				ih. name##flg   =_mm_read_UBYTE(modreader);				\
 				ih. name##pts   =_mm_read_UBYTE(modreader);				\
@@ -798,22 +797,6 @@ static int IT_Load(int curious)
 					ih. name##tick[lp]=_mm_read_I_UWORD(modreader);		\
 				}														\
 				_mm_skip_BYTE(modreader)
-#else
-#define IT_LoadEnvelope(name,type) 										\
-				ih. name/**/flg   =_mm_read_UBYTE(modreader);			\
-				ih. name/**/pts   =_mm_read_UBYTE(modreader);			\
-				if (ih. name/**/pts > ITENVCNT)							\
-					ih. name/**/pts = ITENVCNT;							\
-				ih. name/**/beg   =_mm_read_UBYTE(modreader);			\
-				ih. name/**/end   =_mm_read_UBYTE(modreader);			\
-				ih. name/**/susbeg=_mm_read_UBYTE(modreader);			\
-				ih. name/**/susend=_mm_read_UBYTE(modreader);			\
-				for(lp=0;lp<ITENVCNT;lp++) {							\
-					ih. name/**/node[lp]=_mm_read_/**/type (modreader);	\
-					ih. name/**/tick[lp]=_mm_read_I_UWORD(modreader);	\
-				}														\
-				_mm_skip_BYTE(modreader)
-#endif
 
 				IT_LoadEnvelope(vol,UBYTE);
 				IT_LoadEnvelope(pan,SBYTE);
@@ -875,7 +858,6 @@ static int IT_Load(int curious)
 					d->rpanvar = ih.rpanvar;
 				}
 
-#if defined __STDC__ || defined _MSC_VER || defined __WATCOMC__ || defined MPW_C
 #define IT_ProcessEnvelope(name) 										\
 				if(ih. name##flg&1) d-> name##flg|=EF_ON;				\
 				if(ih. name##flg&2) d-> name##flg|=EF_LOOP;				\
@@ -891,23 +873,6 @@ static int IT_Load(int curious)
 																		\
 				if((d-> name##flg&EF_ON)&&(d-> name##pts<2))			\
 					d-> name##flg&=~EF_ON
-#else
-#define IT_ProcessEnvelope(name) 									\
-				if(ih. name/**/flg&1) d-> name/**/flg|=EF_ON;		\
-				if(ih. name/**/flg&2) d-> name/**/flg|=EF_LOOP;		\
-				if(ih. name/**/flg&4) d-> name/**/flg|=EF_SUSTAIN;	\
-				d-> name/**/pts=ih. name/**/pts;					\
-				d-> name/**/beg=ih. name/**/beg;					\
-				d-> name/**/end=ih. name/**/end;					\
-				d-> name/**/susbeg=ih. name/**/susbeg;				\
-				d-> name/**/susend=ih. name/**/susend;				\
-																	\
-				for(u=0;u<ih. name/**/pts;u++)						\
-					d-> name/**/env[u].pos=ih. name/**/tick[u];		\
-																	\
-				if((d-> name/**/flg&EF_ON)&&(d-> name/**/pts<2))	\
-					d-> name/**/flg&=~EF_ON
-#endif
 
 				IT_ProcessEnvelope(vol);
 

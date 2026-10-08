@@ -33,6 +33,14 @@ extern "C" {
 
 #include <stdarg.h>
 
+#if defined(_MSC_VER)
+#pragma warning(disable:4389) /* signed/unsigned mismatch ( <, <=, >, >= ) */
+#pragma warning(disable:4018) /* signed/unsigned mismatch ( ==, != ) */
+#pragma warning(disable:4761) /* integral size mismatch in argument; conversion supplied (for MSVC6 and older.) */
+#pragma warning(disable:4244) /* conversion from 'type' to 'int', possible loss of data */
+#pragma warning(disable:4267) /* conversion from 'size_t' to 'type', possible loss of data */
+#endif
+
 #if defined(_MSC_VER) && !defined(__cplusplus) && !defined(HAVE_CONFIG_H)
 #define inline __inline
 #endif
@@ -902,5 +910,3 @@ void MikMod_afree(void *);  /* frees if ptr != NULL */
 #endif
 
 #endif /* _MIKMOD_INTERNALS_H */
-
-/* ex:set ts=4: */

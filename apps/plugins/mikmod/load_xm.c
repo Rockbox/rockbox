@@ -533,7 +533,6 @@ static int LoadInstruments(void)
 					d->samplenumber[u]=pth.what[u]+of.numsmp;
 				d->volfade = pth.volfade;
 
-#if defined __STDC__ || defined _MSC_VER || defined __WATCOMC__ || defined MPW_C
 #define XM_ProcessEnvelope(name) 										\
 				for (u = 0; u < XMENVPTS; u++) {					\
 					d-> name##env[u].pos = pth. name##env[u << 1];		\
@@ -553,28 +552,6 @@ static int LoadInstruments(void)
 																		\
 				if ((d-> name##flg&EF_ON)&&(d-> name##pts<2))			\
 					d-> name##flg&=~EF_ON
-#else
-#define XM_ProcessEnvelope(name) 											\
-				for (u = 0; u < XMENVPTS; u++) {						\
-					d-> name/**/env[u].pos = pth. name/**/env[u << 1];		\
-					d-> name/**/env[u].val = pth. name/**/env[(u << 1)+ 1];	\
-				}															\
-				if (pth. name/**/flg&1) d-> name/**/flg|=EF_ON;				\
-				if (pth. name/**/flg&2) d-> name/**/flg|=EF_SUSTAIN;		\
-				if (pth. name/**/flg&4) d-> name/**/flg|=EF_LOOP;			\
-				d-> name/**/susbeg=d-> name/**/susend=						\
-				                      pth. name/**/sus;						\
-				d-> name/**/beg=pth. name/**/beg;							\
-				d-> name/**/end=pth. name/**/end;							\
-				d-> name/**/pts=pth. name/**/pts;							\
-																			\
-				/* scale envelope */										\
-				for (p = 0; p < XMENVPTS; p++)									\
-					d-> name/**/env[p].val<<=2;								\
-																			\
-				if ((d-> name/**/flg&EF_ON)&&(d-> name/**/pts<2))			\
-					d-> name/**/flg&=~EF_ON
-#endif
 
 				XM_ProcessEnvelope(vol);
 				XM_ProcessEnvelope(pan);

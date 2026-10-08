@@ -93,6 +93,9 @@ static void _mm_registeralldrivers(void)
 #ifdef DRV_OS2
 	_mm_registerdriver(&drv_os2);
 #endif
+#ifdef DRV_WASAPI
+	_mm_registerdriver(&drv_wasapi);
+#endif
 #ifdef DRV_XAUDIO2
 	_mm_registerdriver(&drv_xaudio2);
 #endif
@@ -122,6 +125,9 @@ static void _mm_registeralldrivers(void)
 #endif
 #ifdef DRV_N64
 	_mm_registerdriver(&drv_n64);
+#endif
+#ifdef DRV_VITA
+	_mm_registerdriver(&drv_vita);
 #endif
 
 	/* dos drivers - wss first, since some cards emulate sb */

@@ -145,13 +145,13 @@ typedef unsigned short int UWORD;
 #if defined(_LP64) || defined(__LP64__) || defined(__arch64__) || defined(__alpha) || defined(__x86_64) || defined(__powerpc64__)
         /* 64 bit architectures: */
 typedef signed int         SLONG;
-#if !defined(_MIKMOD_AMIGA) && !defined(WIN32)
+#if !(defined(_WIN32) || defined(_MIKMOD_AMIGA))
 typedef unsigned int       ULONG;
 #endif
 
 #else  /* 32 bit architectures: */
 typedef signed long int    SLONG;
-#if !(defined(_MIKMOD_OS2) || defined(_MIKMOD_AMIGA))
+#if !(defined(_MIKMOD_OS2) || defined(_MIKMOD_WIN32) || defined(_MIKMOD_AMIGA))
 typedef unsigned long int  ULONG;
 #endif
 #endif
@@ -293,6 +293,7 @@ enum {
 
     MMERR_MAX
 };
+#define MMERR_WASAPI_SAMPLERATE MMERR_SGI_SPEED
 
 /*
  *  ========== Error handling
@@ -826,6 +827,7 @@ MIKMODAPI extern struct MDRIVER drv_dart;   /* OS/2 Direct Audio RealTime */
 MIKMODAPI extern struct MDRIVER drv_os2;    /* OS/2 MMPM/2 */
 
 MIKMODAPI extern struct MDRIVER drv_ds;     /* Win32 DirectSound driver */
+MIKMODAPI extern struct MDRIVER drv_wasapi; /* Win32 WASAPI driver */
 MIKMODAPI extern struct MDRIVER drv_xaudio2;/* Win32 XAudio2 driver */
 MIKMODAPI extern struct MDRIVER drv_win;    /* Win32 multimedia API driver */
 
@@ -836,6 +838,7 @@ MIKMODAPI extern struct MDRIVER drv_dc;     /* Dreamcast driver */
 MIKMODAPI extern struct MDRIVER drv_gp32;   /* GP32 Sound driver */
 MIKMODAPI extern struct MDRIVER drv_psp;    /* PlayStation Portable driver */
 MIKMODAPI extern struct MDRIVER drv_n64;    /* Nintendo64 driver */
+MIKMODAPI extern struct MDRIVER drv_vita;   /* PlayStation Vita driver */
 
 MIKMODAPI extern struct MDRIVER drv_wss;    /* DOS WSS driver */
 MIKMODAPI extern struct MDRIVER drv_sb;     /* DOS S/B driver */

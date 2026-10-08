@@ -307,7 +307,6 @@ static int loadinstr6(void)
 		i->rpanvar      = _mm_read_UBYTE(modreader);
 		i->volfade      = _mm_read_M_UWORD(modreader);
 
-#if defined __STDC__ || defined _MSC_VER || defined __WATCOMC__ || defined MPW_C
 #define UNI_LoadEnvelope6(name) 										\
 		i-> name##flg=_mm_read_UBYTE(modreader);						\
 		i-> name##pts=_mm_read_UBYTE(modreader);						\
@@ -315,23 +314,11 @@ static int loadinstr6(void)
 		i-> name##susend=_mm_read_UBYTE(modreader);						\
 		i-> name##beg=_mm_read_UBYTE(modreader);						\
 		i-> name##end=_mm_read_UBYTE(modreader);						\
+		if (i-> name##pts > ENVPOINTS) goto fail;				\
 		for(w=0;w<(universion>=0x100?32:i-> name##pts);w++) {			\
 			i-> name##env[w].pos=_mm_read_M_SWORD(modreader);			\
 			i-> name##env[w].val=_mm_read_M_SWORD(modreader);			\
 		}
-#else
-#define UNI_LoadEnvelope6(name) 										\
-		i-> name/**/flg=_mm_read_UBYTE(modreader);						\
-		i-> name/**/pts=_mm_read_UBYTE(modreader);						\
-		i-> name/**/susbeg=_mm_read_UBYTE(modreader);					\
-		i-> name/**/susend=_mm_read_UBYTE(modreader);					\
-		i-> name/**/beg=_mm_read_UBYTE(modreader);						\
-		i-> name/**/end=_mm_read_UBYTE(modreader);						\
-		for (w=0;w<(universion>=0x100?32:i-> name/**/pts);w++) {		\
-			i-> name/**/env[w].pos=_mm_read_M_SWORD(modreader);			\
-			i-> name/**/env[w].val=_mm_read_M_SWORD(modreader);			\
-		}
-#endif
 
 		UNI_LoadEnvelope6(vol);
 		UNI_LoadEnvelope6(pan);
@@ -348,6 +335,7 @@ static int loadinstr6(void)
 		i->insname=readstring();
 
 		if(_mm_eof(modreader)) {
+		fail:
 			_mm_errno = MMERR_LOADING_SAMPLEINFO;
 			return 0;
 		}
@@ -372,7 +360,6 @@ static int loadinstr5(void)
 		for(u=0;u<96;u++)
 			i->samplenumber[u]=of.numsmp+_mm_read_UBYTE(modreader);
 
-#if defined __STDC__ || defined _MSC_VER || defined __WATCOMC__ || defined MPW_C
 #define UNI_LoadEnvelope5(name) 									\
 		i-> name##flg=_mm_read_UBYTE(modreader);					\
 		i-> name##pts=_mm_read_UBYTE(modreader);					\
@@ -384,19 +371,6 @@ static int loadinstr5(void)
 			i-> name##env[u].pos=_mm_read_I_SWORD(modreader);		\
 			i-> name##env[u].val=_mm_read_I_SWORD(modreader);		\
 		}
-#else
-#define UNI_LoadEnvelope5(name) 									\
-		i-> name/**/flg=_mm_read_UBYTE(modreader);					\
-		i-> name/**/pts=_mm_read_UBYTE(modreader);					\
-		i-> name/**/susbeg=_mm_read_UBYTE(modreader);				\
-		i-> name/**/susend=i-> name/**/susbeg;						\
-		i-> name/**/beg=_mm_read_UBYTE(modreader);					\
-		i-> name/**/end=_mm_read_UBYTE(modreader);					\
-		for(u=0;u<12;u++) {											\
-			i-> name/**/env[u].pos=_mm_read_I_SWORD(modreader);		\
-			i-> name/**/env[u].val=_mm_read_I_SWORD(modreader);		\
-		}
-#endif
 
 		UNI_LoadEnvelope5(vol);
 		UNI_LoadEnvelope5(pan);
@@ -619,6 +593,10 @@ static int UNI_Load(int curious)
 	/* positions */
 	if(!AllocPositions(of.numpos)) return 0;
 	if(universion>=6) {
+		if(mh.numchn>UF_MAXCHAN) {
+			_mm_errno=MMERR_LOADING_HEADER;
+			return 0;
+		}
 		if(universion>=0x100)
 			_mm_read_M_UWORDS(of.positions,of.numpos,modreader);
 		else
