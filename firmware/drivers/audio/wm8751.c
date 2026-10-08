@@ -188,7 +188,10 @@ void audiohw_preinit(void)
     or_l((1<<5), &GPIO1_ENABLE);
     or_l((1<<5), &GPIO1_FUNCTION);
 #elif defined(SAMSUNG_YPCP3)
-    /* headphone amplifier enable, GPIO F2 active high: off for now */
+    /* headphone amplifier enable, GPIO F2 active high: off for now. The
+     * pin is SDRAM A12 until switched to GPIO, which the 16 MB of SDRAM
+     * does not need; the original firmware switches it. */
+    SCU_IOMUXB_CON |= IOMUX_GPIO_F2;
     GPIO_PFDR &= ~(1<<2);
     GPIO_PFCON |= (1<<2);
 #endif
