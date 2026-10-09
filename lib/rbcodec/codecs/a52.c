@@ -158,14 +158,15 @@ enum codec_status codec_run(void)
 
     samplesdone = 0;
 
-    if (ci->id3->offset) {
-        sample_loc = (ci->id3->offset / ci->id3->bytesperframe) *
-                        A52_SAMPLESPERFRAME;
+    if (ci->id3->offset > ci->id3->first_frame_offset) {
+        sample_loc = ((ci->id3->offset - ci->id3->first_frame_offset) /
+                        ci->id3->bytesperframe) * A52_SAMPLESPERFRAME;
         param = ci->id3->offset;
     }
     else if (ci->id3->elapsed) {
         sample_loc = ci->id3->elapsed/1000 * ci->id3->frequency;
-        param = sample_loc/A52_SAMPLESPERFRAME*ci->id3->bytesperframe;
+        param = sample_loc/A52_SAMPLESPERFRAME*ci->id3->bytesperframe +
+                    ci->id3->first_frame_offset;
     }
     else {
         sample_loc = 0;
@@ -190,7 +191,8 @@ enum codec_status codec_run(void)
             sample_loc = param/1000 * ci->id3->frequency;
 
             if (ci->seek_buffer((sample_loc/A52_SAMPLESPERFRAME)*
-                                ci->id3->bytesperframe)) {
+                                ci->id3->bytesperframe +
+                                ci->id3->first_frame_offset)) {
                 samplesdone = sample_loc;
                 ci->set_elapsed(samplesdone/(ci->id3->frequency/1000));
             }

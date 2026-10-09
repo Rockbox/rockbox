@@ -19,6 +19,7 @@
  ****************************************************************************/
 
 #include <stdio.h>
+#include <string.h>
 #include "metadata.h"
 #include "logf.h"
 #include "metadata_parsers.h"
@@ -42,37 +43,107 @@ static const unsigned short a52_441framesizes[] =
     1254 * 2, 1393 * 2, 1394 * 2
 };
 
+/* How far into the file to look for the first frame */
+#define A52_MAX_SCAN (64 * 1024)
+#define A52_HEADER_SIZE 6
+
+/* Return the size in bytes of the frame starting with hdr, or 0 if hdr is
+   not a valid frame header. */
+static int a52_frame_size(const unsigned char *hdr)
+{
+    int frmsizecod = hdr[4] & 0x3f;
+    int bitrate;
+
+    if ((hdr[0] != 0x0b) || (hdr[1] != 0x77) || (frmsizecod > 37)
+        || (hdr[5] >= 0x60))   /* bsid >= 12 is not A52 */
+    {
+        return 0;
+    }
+
+    bitrate = a52_bitrates[frmsizecod >> 1];
+
+    switch (hdr[4] & 0xc0)
+    {
+    case 0x00:
+        return bitrate * 2 * 2;
+    case 0x40:
+        return a52_441framesizes[frmsizecod];
+    case 0x80:
+        return bitrate * 3 * 2;
+    default:
+        return 0;
+    }
+}
+
+/* Find the first frame in the file, which is not at the start if the file
+   was cut from a longer stream. A match must be followed by a second valid
+   header so that sync words inside the audio data are skipped. Returns the
+   offset of the frame and leaves its header in hdr, or -1 if none found. */
+static off_t a52_find_first_frame(int fd, unsigned char *buf, size_t bufsize,
+                                  unsigned char *hdr)
+{
+    unsigned char next[A52_HEADER_SIZE];
+    off_t pos = 0;
+    ssize_t n;
+    int i, size;
+
+    while (pos < A52_MAX_SCAN)
+    {
+        if ((lseek(fd, pos, SEEK_SET) < 0)
+            || ((n = read(fd, buf, bufsize)) < A52_HEADER_SIZE))
+        {
+            return -1;
+        }
+
+        for (i = 0; i <= n - A52_HEADER_SIZE; i++)
+        {
+            size = a52_frame_size(&buf[i]);
+            if (!size)
+                continue;
+
+            /* A frame at the very start is accepted as before, even if the
+               file holds only one frame */
+            if ((pos + i == 0)
+                || ((lseek(fd, pos + i + size, SEEK_SET) >= 0)
+                    && (read(fd, next, sizeof(next)) == sizeof(next))
+                    && a52_frame_size(next)))
+            {
+                memcpy(hdr, &buf[i], A52_HEADER_SIZE);
+                return pos + i;
+            }
+        }
+
+        /* Overlap so a header split across reads is still found */
+        pos += n - (A52_HEADER_SIZE - 1);
+    }
+
+    return -1;
+}
+
 bool get_a52_metadata(int fd, struct mp3entry *id3)
 {
     /* Use the trackname part of the id3 structure as a temporary buffer */
     unsigned char* buf = (unsigned char *)id3->path;
+    unsigned char hdr[A52_HEADER_SIZE];
     unsigned long totalsamples;
+    off_t offset;
     int i;
 
-    if ((lseek(fd, 0, SEEK_SET) < 0) || (read(fd, buf, 5) < 5))
-    {
-        return false;
-    }
-
-    if ((buf[0] != 0x0b) || (buf[1] != 0x77))
+    offset = a52_find_first_frame(fd, buf, sizeof(id3->path), hdr);
+    if (offset < 0)
     {
         logf("not an A52/AC3 file\n");
         return false;
     }
 
-    i = buf[4] & 0x3e;
-
-    if (i > 36)
-    {
-        logf("A52: Invalid frmsizecod: %d\n",i);
-        return false;
-    }
+    i = hdr[4] & 0x3e;
 
     id3->bitrate = a52_bitrates[i >> 1];
     id3->vbr = false;
     id3->filesize = ffilesize(fd);
+    id3->first_frame_offset = offset;
 
-    switch (buf[4] & 0xc0)
+    switch (hdr[4] & 0xc0)
     {
     case 0x00:
         id3->frequency = 48000;
@@ -88,15 +159,10 @@ bool get_a52_metadata(int fd, struct mp3entry *id3)
         id3->frequency = 32000;
         id3->bytesperframe = id3->bitrate * 3 * 2;
         break;
-    
-    default: 
-        logf("A52: Invalid samplerate code: 0x%02x\n", buf[4] & 0xc0);
-        return false;
-        break;
     }
 
     /* One A52 frame contains 6 blocks, each containing 256 samples */
-    totalsamples = id3->filesize / id3->bytesperframe * 6 * 256;
+    totalsamples = (id3->filesize - offset) / id3->bytesperframe * 6 * 256;
     id3->length = totalsamples / id3->frequency * 1000;
     return true;
 }
