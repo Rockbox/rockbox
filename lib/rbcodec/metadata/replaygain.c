@@ -138,6 +138,26 @@ static long get_replaygain(const char* str)
     return fp_atof(str, FP_BITS);
 }
 
+/* Get the gain in Q19.12 format from an Opus R128 gain tag (RFC 7845).
+ * Returns false if the tag is not a valid integer.
+ *
+ * str   Gain in dB as a Q7.8 integer, relative to -23 LUFS.
+ */
+static bool get_r128_gain(const char* str, long* gain)
+{
+    char* end;
+    long q8 = strtol(str, &end, 10);
+
+    if (end == str || q8 < -32768 || q8 > 32767)
+    {
+        return false;
+    }
+
+    /* ReplayGain targets -18 LUFS, so add 5 dB to match its loudness */
+    *gain = q8 * (FP_ONE / 256) + 5 * FP_ONE;
+    return true;
+}
+
 /* Get the peak volume in Q7.24 format.
  *
  * str  Peak volume. Full scale is specified as "1.0". Returns 0 for no peak.
@@ -158,7 +178,8 @@ long get_replaygain_int(long int_gain)
 
 /* Parse a ReplayGain tag conforming to the "VorbisGain standard". If a
  * valid tag is found, update mp3entry struct accordingly. Existing values 
- * are not overwritten.
+ * are not overwritten, except by the R128 gain tags in Opus files, which
+ * take priority over REPLAYGAIN tags.
  *
  * key     Name of the tag.
  * value   Value of the tag.
@@ -170,9 +191,30 @@ void parse_replaygain(const char* key, const char* value,
     static const char *rg_options[] = {"replaygain_track_gain", "rg_radio",
                                        "replaygain_album_gain", "rg_audiophile",
                                        "replaygain_track_peak", "rg_peak",
-                                       "replaygain_album_peak", NULL};
+                                       "replaygain_album_peak",
+                                       "r128_track_gain", "r128_album_gain",
+                                       NULL};
 
     int rg_op = string_option(key, rg_options, true);
+    long gain;
+
+    if (rg_op == 7 || rg_op == 8)
+    {  /*r128_track_gain||r128_album_gain, only defined for Opus*/
+        if (entry->codectype == AFMT_OPUS && get_r128_gain(value, &gain))
+        {
+            if (rg_op == 7)
+            {
+                entry->track_level = gain;
+                entry->track_gain  = convert_gain(gain);
+            }
+            else
+            {
+                entry->album_level = gain;
+                entry->album_gain  = convert_gain(gain);
+            }
+        }
+        return;
+    }
 
     if ((rg_op == 0 || rg_op == 1) && !entry->track_gain)
     {  /*replaygain_track_gain||rg_radio*/
