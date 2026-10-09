@@ -146,6 +146,10 @@ static bool checksum;
 static uint32_t crc32;
 
 static volatile unsigned int elapsed;
+/* Codecs such as SID never end on their own, so limit how long they run */
+#define SID_MAX_SECONDS 120
+static unsigned long codec_frequency;  /* Codec output rate before DSP */
+static unsigned long decoded_samples;  /* Samples output by the codec */
 static volatile bool codec_playing;
 static volatile long codec_action;
 static volatile long endtick;
@@ -274,6 +278,8 @@ static int process_dsp(const void *ch1, const void *ch2, int count)
 /* Null output */
 static void pcmbuf_insert_null(const void *ch1, const void *ch2, int count)
 {
+    decoded_samples += count;
+
     if (use_dsp)
         process_dsp(ch1, ch2, count);
 
@@ -323,6 +329,8 @@ static int fill_buffer(int new_offset){
 /* WAV output or calculate crc32 of output*/
 static void pcmbuf_insert_wav_checksum(const void *ch1, const void *ch2, int count)
 {
+    decoded_samples += count;
+
     /* Prevent idle poweroff */
     rb->reset_poweroff_timer();
 
@@ -506,6 +514,15 @@ static void seek_complete(void)
 static long get_command(intptr_t *param)
 {
     rb->yield();
+
+    /* SID files play forever, so stop them after a fixed time */
+    if (track.id3.codectype == AFMT_SID && codec_frequency >= 1000)
+    {
+        elapsed = decoded_samples / (codec_frequency / 1000);
+        if (decoded_samples >= SID_MAX_SECONDS * codec_frequency)
+            return CODEC_ACTION_HALT;
+    }
+
     return codec_action;
     (void)param;
 }
@@ -531,6 +548,7 @@ static void configure(int setting, intptr_t value)
     {
         case DSP_SET_FREQUENCY:
             DEBUGF("samplerate=%d\n",(int)value);
+            codec_frequency = value;
             if (use_dsp) {
                 wavinfo.samplerate = rb->dsp_configure(
                     ci.dsp, DSP_GET_OUT_FREQUENCY, 0);
@@ -698,6 +716,11 @@ static enum plugin_status test_track(const char* filename)
         goto exit;
     }
 
+    /* SID length is the subsong count, use the decode limit instead so the
+       benchmark results are meaningful */
+    if (track.id3.codectype == AFMT_SID)
+        track.id3.length = SID_MAX_SECONDS * 1000;
+
     if (track.filesize > audiosize)
     {
         audiobufsize=audiosize;
@@ -742,6 +765,8 @@ static enum plugin_status test_track(const char* filename)
 
     codec_playing = true;
     codec_action = CODEC_ACTION_NULL;
+    codec_frequency = 0;
+    decoded_samples = 0;
 
     rb->codec_thread_do_callback(codec_thread, NULL);
 
