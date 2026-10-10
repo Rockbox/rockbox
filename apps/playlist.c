@@ -2006,6 +2006,7 @@ void playlist_shutdown(void)
     struct playlist_info* playlist = &current_playlist;
     playlist_write_lock(playlist);
     logf("Closing Control %s", __func__);
+    pl_close_playlist(playlist);
     if (playlist->control_fd >= 0)
         pl_close_control(playlist);
 
