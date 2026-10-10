@@ -3,7 +3,7 @@
 # Derived from "cabbie" (C) Yohann Misquitta
 #
 %wd
-%X(wpsbackdrop-240x400x16.bmp)
+%X(backdrop-240x400x16.bmp)
 %Cl(55,50,130,130,c,c)
 %pb(22,284,199,13,pb-240x320x16.bmp)
 %T(90,238,60,20,playlist)
@@ -75,3 +75,10 @@
 %Vl(u,70,335,-,30,1)
 #purposely left blank
 
+#
+# Header font
+%Fl(2,12-Adobe-Helvetica-Bold.fnt)
+#
+# Header
+%V(22,25,198,12,2)%Vf(0F0B00)
+%acNOW PLAYING

@@ -6,14 +6,16 @@
 %wd
 #
 # Load Backdrop
-%X(wpsbackdrop-128x96x16.bmp)
+%X(backdrop-128x96x16.bmp)
 #
 # Preload Images
 %xl(A,lock-96x96x16.bmp,0,0,2)
 %xl(B,battery-96x96x16.bmp,0,0,10)
 %xl(C,volume-96x96x16.bmp,0,0,10)
 %xl(D,shuffle-96x96x16.bmp,0,0)
-%xl(E,repeat-96x96x16.bmp,0,0,4)
+%xl(E,repeat-96x96x16.bmp,0,3,4)
+%xl(shuffleoff,shuffleoff-128x96x16.bmp,0,1)
+%xl(repeatoff,repeatoff-128x96x16.bmp,1,0)
 %xl(F,playmode-96x96x16.bmp,0,0,5)
 #
 # Album Art/Info Viewport Conditional
@@ -37,11 +39,11 @@
 #
 # Shuffle
 %V(74,85,20,10,-)
-%?ps<%xd(D)>
+%?ps<%xd(D)|%xd(shuffleoff)>
 #
 # Repeat
-%V(97,85,8,10,-)
-%?mm<|%xd(Ea)|%xd(Eb)|%xd(Ec)|%xd(Ed)>
+%V(97,82,8,13,-)
+%?mm<%xd(repeatoff)|%xd(Ea)|%xd(Eb)|%xd(Ec)|%xd(Ed)>
 #
 # Playmode
 %V(111,85,11,10,-)
@@ -73,3 +75,10 @@
 %s%ac%?it<%it|%fn>
 %s%ac%?ia<%ia|%?iA<%iA|%?d(2)<%d(2)|%(root%)>>>
 %s%ac%?iy<%iy>
+#
+# Header font
+%Fl(2,05-Cabbie-Bold.fnt)
+#
+# Header
+%V(2,2,124,5,2)%Vf(0F0B00)
+%acNOW PLAYING

@@ -1,20 +1,28 @@
 # Cabbie v2.0
-# (C) 2007-2012 The Authors (see /rockbox/wps/AUTHORS)
+# (C) 2007-2026 The Authors (see /rockbox/wps/AUTHORS)
 # Derived from "cabbie" (C) Yohann Misquitta
+#
+# One backdrop for all the screens of this size: the header label is
+# drawn, rather than painted into it.
 #
 # Disable Status Bar
 %wd
 #
 # Load Backdrop
-%X(wpsbackdrop-480x272x16.bmp)
+%X(backdrop-480x272x16.bmp)
+#
+# Header font
+%Fl(2,14-Adobe-Helvetica-Bold.fnt)
 #
 # Preload Images
 %xl(A,lock-480x272x16.bmp,0,0,2)
 %xl(B,battery-480x272x16.bmp,0,0,10)
 %xl(C,volume-480x272x16.bmp,0,0,10)
-%xl(D,shuffle-480x272x16.bmp,0,0)
+%xl(D,shuffle-480x272x16.bmp,0,1)
 %xl(E,repeat-480x272x16.bmp,0,0,4)
 %xl(F,playmode-480x272x16.bmp,0,0,5)
+%xl(G,shuffleoff-480x272x16.bmp,0,0)
+%xl(H,repeatoff-480x272x16.bmp,0,0)
 #
 # Album Art/Info Viewport Conditional
 %?C<%Vd(a)|%Vd(b)>
@@ -36,12 +44,12 @@
 %?pv<%xd(Ca)|%xd(Cb)|%xd(Cc)|%xd(Cd)|%xd(Ce)|%xd(Cf)|%xd(Cg)|%xd(Ch)|%xd(Ci)|%xd(Cj)>
 #
 # Shuffle
-%V(336,235,50,23,-)
-%?ps<%xd(D)>
+%V(336,234,50,24,-)
+%?ps<%xd(D)|%xd(G)>
 #
 # Repeat
 %V(396,226,30,40,-)
-%?mm<|%xd(Ea)|%xd(Eb)|%xd(Ec)|%xd(Ed)>
+%?mm<%xd(H)|%xd(Ea)|%xd(Eb)|%xd(Ec)|%xd(Ed)>
 #
 # Playmode
 %V(434,231,32,30,-)
@@ -77,3 +85,7 @@
 %ac%Sx(Next Track:)
 %s%ac%?It<%It|%Fn>
 %s%ac%?Ia<%Ia|%?IA<%IA>>
+#
+# Header
+%V(15,15,450,14,2)%Vf(0F0B00)
+%acNOW PLAYING

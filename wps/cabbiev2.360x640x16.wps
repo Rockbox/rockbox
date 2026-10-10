@@ -2,24 +2,27 @@
 # (C) 2007-2012 The Authors (see /rockbox/wps/AUTHORS)
 # Derived from "cabbie" (C) Yohann Misquitta
 #
-# Laid out against wpsbackdrop-360x640x16.bmp, whose fixed landmarks are:
+# Laid out against backdrop-360x640x16.bmp, whose fixed landmarks are:
 #   title bar       x=30..329 y=6..27
 #   progress trough x=30..329 y=516..537
-#   status row      y=605..633, with shuffle baked at x=209 and repeat at x=273
+#   status row      y=605..633, with shuffle at x=209 and repeat at x=273
+#                   (drawn greyed out while off, as shuffleoff/repeatoff)
 # Everything below is anchored to those; the content area is y=28..515.
 #
 # Disable Status Bar
 %wd
 #
 # Load Backdrop
-%X(wpsbackdrop-360x640x16.bmp)
+%X(backdrop-360x640x16.bmp)
 #
 # Preload Images
 %xl(A,lock-360x640x16.bmp,0,0,2)
 %xl(B,battery-360x640x16.bmp,0,0,10)
 %xl(C,volume-360x640x16.bmp,0,0,10)
-%xl(D,shuffle-360x640x16.bmp,0,0)
-%xl(E,repeat-360x640x16.bmp,0,0,4)
+%xl(D,shuffle-360x640x16.bmp,4,0)
+%xl(E,repeat-360x640x16.bmp,0,4,4)
+%xl(shuffleoff,shuffleoff-360x640x16.bmp,0,5)
+%xl(repeatoff,repeatoff-360x640x16.bmp,0,0)
 %xl(F,playmode-360x640x16.bmp,0,0,5)
 #
 # Album Art/Info Viewport Conditional
@@ -43,12 +46,12 @@
 %?pv<%xd(Ca)|%xd(Cb)|%xd(Cc)|%xd(Cd)|%xd(Ce)|%xd(Cf)|%xd(Cg)|%xd(Ch)|%xd(Ci)|%xd(Cj)>
 #
 # Shuffle
-%V(208,605,55,29,-)
-%?ps<%xd(D)>
+%V(204,605,63,29,-)
+%?ps<%xd(D)|%xd(shuffleoff)>
 #
 # Repeat
-%V(273,605,27,29,-)
-%?mm<|%xd(Ea)|%xd(Eb)|%xd(Ec)|%xd(Ed)>
+%V(273,601,27,35,-)
+%?mm<%xd(repeatoff)|%xd(Ea)|%xd(Eb)|%xd(Ec)|%xd(Ed)>
 #
 # Playmode
 %V(309,605,36,29,-)
@@ -85,3 +88,10 @@
 %s%ac%?Id<%Id|%?D(1)<%D(1)|%(root%)>>
 %ac%s%?It<%It|%Fn>
 %s%ac%?Ia<%Ia|%?IA<%IA|%?D(2)<%D(2)|%(root%)>>>
+#
+# Header font
+%Fl(2,16-Adobe-Helvetica-Bold.fnt)
+#
+# Header
+%V(30,9,300,16,2)%Vf(0F0B00)
+%acNOW PLAYING

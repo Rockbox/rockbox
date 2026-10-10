@@ -6,7 +6,7 @@
 %wd
 #
 # Load Backdrop
-%X(fmsbackdrop-160x128x2.bmp)
+%X(backdrop-160x128x2.bmp)
 #
 # Preload Images
 %xl(lock,lock-160x128x2.bmp,0,0,2)
@@ -51,7 +51,7 @@
 # Station Art
 # Preset present
 %ax%Vl(art_preset,70,17,-,16,-)
-%Vp(0,%s%ac%?Ti<Station: |>%?Tn<%Tn|%Tf>)
+%Vp(0,%s%ac%?Ti<%Sx(Station:) |>%?Tn<%Tn|%Tf>)
 %ax%Vl(art_preset,70,33,-,16,-)
 %Vp(1,%s%ac%?Ti<Next station: |>%?Tn<%Tn|%Tf>)
 #
@@ -68,7 +68,7 @@
 # No station art
 # Preset present
 %Vl(noart_preset,0,17,-,16,-)
-%Vp(0,%s%ac%?Ti<Station: |>%?Tn<%Tn|%Tf>)
+%Vp(0,%s%ac%?Ti<%Sx(Station:) |>%?Tn<%Tn|%Tf>)
 %Vl(noart_preset,0,33,-,16,-)
 %Vp(1,%s%ac%?Ti<Next station: |>%?Tn<%Tn|%Tf>)
 #
@@ -81,3 +81,10 @@
 %Vl(noart_nopreset_rds,0,37,-,32,-)
 %s%ty
 %s%tz
+#
+# Header font
+%Fl(2,06-Cabbie-Bold.fnt)
+#
+# Header
+%V(2,4,156,6,2)%Vf(3)
+%acFM RADIO

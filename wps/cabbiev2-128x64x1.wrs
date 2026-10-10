@@ -23,8 +23,8 @@
 # Settings list
 %Vi(-,0,16,128,24,1)
 #
-# Peak meters, left over right, in the progress bar
-# They fall back slowly and mark the held peak
+# Peak meters, left over right, in the progress bar; they fall back
+# slowly and mark the held peak
 %V(0,0,128,6,1)
 %pL(2,0,124,2,noborder,hold,1)
 %pR(2,3,124,2,noborder,hold,1)

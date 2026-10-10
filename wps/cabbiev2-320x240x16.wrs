@@ -33,10 +33,15 @@
 %Vi(-,16,54,288,102,1)
 #
 # Peak meters, left over right, in the progress bar: each the half of the
-# WPS progress bar image; they fall back slowly and mark the held peak
-%V(10,162,300,15,-)
+# WPS progress bar image; they fall back slowly and mark the held peak.
+# A strip of the background splits the progress bar's trough between them;
+# each meter has a viewport of its own, so that redrawing it keeps the strip.
+%V(8,169,304,1,-)
+%x(pbgap,pbgap-320x240x16.bmp,0,0)
+%V(10,162,300,7,-)
 %pL(0,0,300,7,image,pbl-320x240x16.bmp,hold,2)
-%pR(0,8,300,7,image,pbr-320x240x16.bmp,hold,2)
+%V(10,170,300,7,-)
+%pR(0,0,300,7,image,pbr-320x240x16.bmp,hold,2)
 #
 # Recording time, file size, clips
 %V(16,180,288,20,1)

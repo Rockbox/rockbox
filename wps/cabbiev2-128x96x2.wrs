@@ -12,7 +12,7 @@
 %X(backdrop-128x96x2.bmp)
 #
 # Header font
-%Fl(2,05-Tiny.fnt)
+%Fl(2,05-Cabbie-Bold.fnt)
 #
 # Preload Images
 %xl(lock,lock-160x128x2.bmp,0,1,2)
@@ -21,7 +21,7 @@
 %xl(recmode,recmode-160x128x2.bmp,0,1,3)
 #
 # Header
-%V(2,3,124,5,2)%Vf(3)
+%V(2,2,124,5,2)%Vf(3)
 %acRECORDING
 #
 # Source - for FM radio the station and frequency - or a warning,
@@ -33,10 +33,15 @@
 %Vi(-,0,10,128,36,1)
 #
 # Peak meters, left over right, in the progress bar: each the half of the
-# WPS progress bar image; they fall back slowly and mark the held peak
-%V(1,61,125,7,-)
+# WPS progress bar image; they fall back slowly and mark the held peak.
+# A strip of the background splits the progress bar's trough between them;
+# each meter has a viewport of its own, so that redrawing it keeps the strip.
+%V(0,64,128,1,-)
+%x(pbgap,pbgap-128x96x2.bmp,0,0)
+%V(1,61,125,3,-)
 %pL(0,0,125,3,image,pbl-128x96x2.bmp,hold,2)
-%pR(0,4,125,3,image,pbr-128x96x2.bmp,hold,2)
+%V(1,65,125,3,-)
+%pR(0,0,125,3,image,pbr-128x96x2.bmp,hold,2)
 #
 # Recording time, file size, clips
 %V(3,70,122,12,1)

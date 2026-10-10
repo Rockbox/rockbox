@@ -8,12 +8,14 @@
 %T(46,292,84,24,menu)
 %T(139,292,24,24,shuffle)
 %T(182,292,24,24,repmode)
-%X(wpsbackdrop-240x320x16.bmp)
+%X(backdrop-240x320x16.bmp)
 %xl(A,lock-240x320x16.bmp,11,292,2)
 %xl(B,battery-240x320x16.bmp,46,292,10)
 %xl(C,volume-240x320x16.bmp,98,292,10)
 %xl(D,shuffle-240x320x16.bmp,139,292)
 %xl(E,repeat-240x320x16.bmp,182,292,4)
+%xl(shuffleoff,shuffleoff-240x320x16.bmp,135,296)
+%xl(repeatoff,repeatoff-240x320x16.bmp,182,292)
 %xl(F,playmode-240x320x16.bmp,206,292,5)
 %Cl(55,30,130,130,c,c)
 %pb(22,254,199,13,pb-240x320x16.bmp)
@@ -38,8 +40,15 @@
 %?mh<%xd(Aa)|%xd(Ab)>
 %?bp<%?bc<%xd(Ba)|%xd(Bb)>|%?bl<|%xd(Bc)|%xd(Bd)|%xd(Be)|%xd(Bf)|%xd(Bg)|%xd(Bh)|%xd(Bi)|%xd(Bj)>>
 %?pv<%xd(Ca)|%xd(Cb)|%xd(Cc)|%xd(Cd)|%xd(Ce)|%xd(Cf)|%xd(Cg)|%xd(Ch)|%xd(Ci)|%xd(Cj)>
-%?ps<%xd(D)>
-%?mm<|%xd(Ea)|%xd(Eb)|%xd(Ec)|%xd(Ed)>
+%?ps<%xd(D)|%xd(shuffleoff)>
+%?mm<%xd(repeatoff)|%xd(Ea)|%xd(Eb)|%xd(Ec)|%xd(Ed)>
 %?mp<%xd(Fa)|%xd(Fc)|%xd(Fb)|%xd(Fd)|%xd(Fe)>
 %?C<%Cd>
 
+#
+# Header font
+%Fl(2,12-Adobe-Helvetica-Bold.fnt)
+#
+# Header
+%V(22,8,198,12,2)%Vf(0F0B00)
+%acNOW PLAYING

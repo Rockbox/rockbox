@@ -12,7 +12,7 @@
 %X(backdrop-160x128x2.bmp)
 #
 # Header font
-%Fl(2,06-Tiny.fnt)
+%Fl(2,06-Cabbie-Bold.fnt)
 #
 # Preload Images
 %xl(lock,lock-160x128x2.bmp,0,0,2)
@@ -33,10 +33,15 @@
 %Vi(-,0,13,160,60,1)
 #
 # Peak meters, left over right, in the progress bar: each the half of the
-# WPS progress bar image; they fall back slowly and mark the held peak
-%V(1,86,158,8,-)
+# WPS progress bar image; they fall back slowly and mark the held peak.
+# A strip of the background splits the progress bar's trough between them;
+# each meter has a viewport of its own, so that redrawing it keeps the strip.
+%V(0,89,160,2,-)
+%x(pbgap,pbgap-160x128x2.bmp,0,0)
+%V(1,86,158,3,-)
 %pL(0,0,158,3,image,pbl-160x128x2.bmp,hold,2)
-%pR(0,5,158,3,image,pbr-160x128x2.bmp,hold,2)
+%V(1,91,158,3,-)
+%pR(0,0,158,3,image,pbr-160x128x2.bmp,hold,2)
 #
 # Recording time, file size, clips
 %V(1,96,158,12,1)

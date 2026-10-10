@@ -6,7 +6,7 @@
 %wd
 #
 # Load Backdrop
-%X(wpsbackdrop-220x176x16.bmp)
+%X(backdrop-220x176x16.bmp)
 #
 # Preload Images
 %xl(A,lock-220x176x16.bmp,0,0,2)
@@ -14,6 +14,8 @@
 %xl(C,volume-220x176x16.bmp,0,0,10)
 %xl(D,shuffle-220x176x16.bmp,0,0)
 %xl(E,repeat-220x176x16.bmp,0,0,4)
+%xl(shuffleoff,shuffleoff-220x176x16.bmp,0,0)
+%xl(repeatoff,repeatoff-220x176x16.bmp,0,0)
 %xl(F,playmode-220x176x16.bmp,0,0,5)
 #
 # Album Art/Info Viewport Conditional
@@ -37,11 +39,11 @@
 #
 # Shuffle
 %V(155,153,20,10,-)
-%?ps<%xd(D)>
+%?ps<%xd(D)|%xd(shuffleoff)>
 #
 # Repeat
 %V(182,151,11,15,-)
-%?mm<|%xd(Ea)|%xd(Eb)|%xd(Ec)|%xd(Ed)>
+%?mm<%xd(repeatoff)|%xd(Ea)|%xd(Eb)|%xd(Ec)|%xd(Ed)>
 #
 # Playmode
 %V(200,152,12,13,-)
@@ -73,3 +75,10 @@
 
 %ac%Sx(Next Track:)
 %s%ac%?It<%It|%Fn>
+#
+# Header font
+%Fl(2,10-Adobe-Helvetica-Bold.fnt)
+#
+# Header
+%V(11,9,199,10,2)%Vf(0F0B00)
+%acNOW PLAYING

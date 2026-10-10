@@ -5,7 +5,7 @@
 # TODO:
 #  * images for battery, hold button
 %wd
-%X(wpsbackdrop-800x480x16.bmp)
+%X(backdrop-800x480x16.bmp)
 
 %Cl(0,0,225,225,c,c)
 
@@ -56,15 +56,17 @@
 %T(small_vol,0,0,108,60,none)
 
 # shuffle
-%V(468,415,92,43,-)
-%xl(D,shuffle-800x480x16.bmp,0,0)
-%?ps<%xd(D)>
+%V(464,415,100,43,-)
+%xl(D,shuffle-800x480x16.bmp,4,0)
+%?ps<%xd(D)|%xd(shuffleoff)>
 %T(0,0,92,43,shuffle)
 
 # repeat
-%V(590,404,50,66,-)
-%xl(E,repeat-800x480x16.bmp,0,0,4)
-%xd(E, %mm, -1)
+%V(586,404,58,66,-)
+%xl(E,repeat-800x480x16.bmp,4,0,4)
+%xl(shuffleoff,shuffleoff-800x480x16.bmp,0,0)
+%xl(repeatoff,repeatoff-800x480x16.bmp,0,0)
+%?mm<%xd(repeatoff)|%xd(E, %mm, -1)>
 %T(0,0,50,66,repmode)
 
 # playmode
@@ -108,3 +110,10 @@
 # needs to be at the end since touch regions need to be declared
 # before %Tl can be used
 %?Tl(small_vol,2.0)<%vs(show_vol,set,3)|%?mv(2.0)<%vs(show_vol,set,3)|%?Tl<%vs(show_vol,set,2)|%vs(show_vol,set,1)>>>
+#
+# Header font
+%Fl(2,27-Adobe-Helvetica-Bold.fnt)
+#
+# Header
+%V(26,30,750,27,2)%Vf(0F0B00)
+%acNOW PLAYING

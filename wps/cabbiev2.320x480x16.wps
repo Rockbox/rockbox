@@ -5,13 +5,15 @@
 # TODO:
 #  * images for battery, hold button
 %wd
-%X(wpsbackdrop-320x480x16.bmp)
+%X(backdrop-320x480x16.bmp)
 
 #%xl(A,lock-240x320x16.bmp,11,0,2)
 #%xl(B,battery-240x320x16.bmp,46,0,10)
 %xl(C,volume-320x480x16.bmp,91,71,10)
 %xl(D,shuffle-320x480x16.bmp,156,76)
 %xl(E,repeat-320x480x16.bmp,231,66,4)
+%xl(shuffleoff,shuffleoff-320x480x16.bmp,152,76)
+%xl(repeatoff,repeatoff-320x480x16.bmp,231,66)
 %xl(F,playmode-320x480x16.bmp,273,68,5)
 %xl(G,popup-320x480x16.bmp,0,0)
 %xl(H,rew-320x480x16.bmp,0,8)
@@ -71,11 +73,11 @@
 %T(small_vol,91,71,55,50,none)
 #
 # shuffle
-%?ps<%xd(D)>
+%?ps<%xd(D)|%xd(shuffleoff)>
 %T(156,76,65,50,shuffle)
 #
 # repeat
-%xd(E, %mm, -1)
+%?mm<%xd(repeatoff)|%xd(E, %mm, -1)>
 %T(231,66,36,50,repmode)
 #
 # playmode
@@ -112,3 +114,10 @@
 # needs to be at the end since touch regions need to be declared
 # before %Tl can be used
 %?Tl(small_vol,2.0)<%vs(show_vol,set,3)|%?mv(2.0)<%vs(show_vol,set,3)|%?Tl<%vs(show_vol,set,2)|%vs(show_vol,set,1)>>>
+#
+# Header font
+%Fl(2,18-Adobe-Helvetica-Bold.fnt)
+#
+# Header
+%V(20,19,280,18,2)%Vf(0F0B00)
+%acNOW PLAYING

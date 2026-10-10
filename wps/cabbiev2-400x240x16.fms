@@ -62,7 +62,7 @@
 # Station Art
 # Preset present
 %ax%Vl(art_preset,153,40,-,20,1)
-%Vp(0,%s%al%?Ti<Station: |>%?Tn<%Tn|%Tf>)
+%Vp(0,%s%al%?Ti<%Sx(Station:) |>%?Tn<%Tn|%Tf>)
 %ax%Vl(art_preset,153,62,-,20,1)
 %Vp(1,%s%al%?Ti<Next station: |>%?Tn<%Tn|%Tf>)
 #
@@ -79,7 +79,7 @@
 # No station art
 # Preset present
 %Vl(noart_preset,10,40,380,20,1)
-%Vp(0,%s%ac%?Ti<Station: |>%?Tn<%Tn|%Tf>)
+%Vp(0,%s%ac%?Ti<%Sx(Station:) |>%?Tn<%Tn|%Tf>)
 %Vl(noart_preset,10,62,380,20,1)
 %Vp(1,%s%ac%?Ti<Next station: |>%?Tn<%Tn|%Tf>)
 #
