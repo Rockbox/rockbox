@@ -1540,7 +1540,10 @@ int talk_spell(const char* spell, bool enqueue)
 void talk_disable(bool disable)
 {
     if (disable)
+    {
+        talk_force_shutup();
         talk_temp_disable_count++;
+    }
     else
         talk_temp_disable_count--;
 }
