@@ -58,7 +58,7 @@ static const char* inbuilt_audio_filetypes[] = {
     "ape", "mac", "sap", "rm", "ra", "rmvb", "cmc", "cm3", "cmr", "cms", "dmc",
     "dlt", "mpt", "mpd", "rmt", "tmc", "tm8", "tm2", "oma", "aa3", "at3", "mmf",
     "au", "snd", "vox", "w64", "tta", "ay", "vtx", "gbs", "hes", "sgc", "vgm",
-    "vgz", "kss", "aac",
+    "vgz", "kss", "aac", "dsf", "dff", "iso",
 };
 
 struct filetype_inbuilt {

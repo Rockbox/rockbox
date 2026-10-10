@@ -119,6 +119,10 @@
     Windows Media Audio Professional
         & \fname{.wma}, \fname{.wmv}, \fname{.asf}
         & \\
+    Direct Stream Digital (DSD)
+        & \fname{.dsf}, \fname{.dff}, \fname{.iso}
+        & DSD64 and beyond are decodable but may require downsampling.
+        Also supports SACD ISOs \\
   \end{rbtabular}
 
   \note{AAC-HE profiles \opt{codec_aac_he}{might not play in realtime on all devices}\nopt{codec_aac_he}{are disabled on this device} due to CPU
@@ -239,6 +243,7 @@
     Musepack                                    & x & x & x \\
     OGG/Vorbis                                  & x & x & x \\
     Sony Audio                                  & x & x &   \\
+    Direct Stream Digital                       & x & x & x \\
     RealAudio                                   & x & x &   \\
     Dialogic telephony type                     & x & x &   \\
     Windows Media Audio Standard                & x & x &   \\
@@ -287,7 +292,8 @@
     \begin{rbtabular}{\textwidth}{lX}%
     {\textbf{Tag type} & \textbf{File extension}}{}{}
       ID3               & \fname{.mp1}, \fname{.mpa}, \fname{.mp2}, \fname{.mp3},
-                          \fname{.rm}, \fname{.ra}, \fname{.rmvb}, \fname{.tta} \\
+                          \fname{.rm}, \fname{.ra}, \fname{.rmvb}, \fname{.tta},
+                          \fname{.dsf} \\
       APE               & \fname{.mpc}, \fname{.ape}, \fname{.mac}, \fname{.wv} \\
       Vorbis            & \fname{.ogg}, \fname{.oga}, \fname{.spx}, \fname{.flac} \\
       MP4               & \fname{.m4a}, \fname{.m4b}, \fname{.mp4} \\
@@ -300,7 +306,7 @@
                           \fname{.snd}, \fname{.shn}, \fname{.vox}, \fname{.w64},
                           \fname{.wav}, \fname{.cmc}, \fname{.cm3}, \fname{.cmr},
                           \fname{.cms}, \fname{.dmc}, \fname{.dlt}, \fname{.mpt},
-                          \fname{.mpd}, \fname{.hes}, \fname{.vgz} \\
+                          \fname{.mpd}, \fname{.hes}, \fname{.vgz}, \fname{.dff} \\
     \end{rbtabular}
 
     \subsection{Featureset for generic metadata tags}

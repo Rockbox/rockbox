@@ -46,6 +46,7 @@ sid.c
 kss.c
 #endif
 aac_bsf.c
+dsd.c
 
 /* warble is decoder-only */
 #if defined(HAVE_RECORDING) && !defined(WARBLE)
