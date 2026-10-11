@@ -26,12 +26,18 @@ CODEC_HEADER
 #define PCM_FRAMES 512
 #define ISO_SECTOR 2048
 
+#if (ARCH == ARCH_M68K) || (CONFIG_CPU == PP5020) || (CONFIG_CPU == PP5002)
+#define IBSS_ATTR_LARGE
+#else
+#define IBSS_ATTR_LARGE IBSS_ATTR
+#endif
+
 static int32_t pcm[PCM_FRAMES * 2] IBSS_ATTR;  /* 4KB */
 static unsigned char left_block[DSF_BLOCK];
 static unsigned char right_block[DSF_BLOCK];
 static unsigned char iso_sector[ISO_SECTOR];
 static unsigned char dst_frame[65536 + 8]; /* 64KB */
-static unsigned char dst_output[DST_FRAME_BYTES * 2] IBSS_ATTR; /* 9K */
+static unsigned char dst_output[DST_FRAME_BYTES * 2] IBSS_ATTR_LARGE; /* 9K */
 static struct dst_decoder dst_state IBSS_ATTR; /* 2K */
 static int16_t cic_table[2][256][3] IBSS_ATTR; /* 3K */
 
