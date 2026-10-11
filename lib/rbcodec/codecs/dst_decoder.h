@@ -209,7 +209,7 @@ static inline void dst_push_status(uint32_t status[4], int value)
     status[0] = (status[0] << 1) | value;
 }
 
-static inline int dst_predict(const int16_t filter[16][256],
+static inline int dst_predict(int16_t filter[16][256],
                               const uint32_t words[4])
 {
     const unsigned char *status = (const unsigned char *)words;
@@ -225,7 +225,7 @@ static inline int dst_predict(const int16_t filter[16][256],
 
 static inline __attribute__((always_inline))
 int dst_decode_channel(struct dst_decoder *decoder,
-                       const int16_t filter[16][256],
+                       int16_t filter[16][256],
                        const int *probabilities, unsigned int probability_count,
                        uint32_t status[4])
 {
@@ -323,8 +323,8 @@ dst_decode(struct dst_decoder *decoder, const unsigned char *input,
         }
     }
 
-    const int16_t (*filter0)[256] = decoder->filter[fset_map[0]];
-    const int16_t (*filter1)[256] = decoder->filter[fset_map[1]];
+    int16_t (*filter0)[256] = decoder->filter[fset_map[0]];
+    int16_t (*filter1)[256] = decoder->filter[fset_map[1]];
     const int *prob0 = decoder->probs.coeff[prob_map[0]];
     const int *prob1 = decoder->probs.coeff[prob_map[1]];
     unsigned int prob0_count = decoder->probs.length[prob_map[0]];

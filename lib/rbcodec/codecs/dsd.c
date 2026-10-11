@@ -386,8 +386,8 @@ static int output_dst_frame(size_t frame_size, int *frames)
 
 static enum codec_status decode_iso(void)
 {
-    uint32_t start, end;
-    unsigned long duration_ms;
+    uint32_t start = 0, end = 0;
+    unsigned long duration_ms = 0;
     bool dst_encoded;
     if (!find_iso_area(&start, &end, &duration_ms, &dst_encoded))
         return CODEC_ERROR;
