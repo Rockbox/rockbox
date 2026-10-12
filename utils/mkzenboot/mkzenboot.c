@@ -523,7 +523,7 @@ enum zen_error_t build_firmware(void *exec, size_t exec_size, void *boot, size_t
     uint8_t *jrm = malloc(jrm_size);
     if(jrm == NULL)
         errorf(ZEN_ERROR, "[ERR] Couldn't allocate memory\n");
-    memset(buffer, 0, jrm_size);
+    memset(jrm, 0, jrm_size);
 
     /** decompress firmware */
     printf("[INFO] Decompressing encoded block... ");
