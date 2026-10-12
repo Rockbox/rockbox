@@ -1,6 +1,6 @@
 DEFINES=
-CC := gcc
-LD := gcc
+CC ?= gcc
+LD = $(CC)
 
 TOMCRYPT_DIR := ../../tomcrypt/
 
