@@ -65,11 +65,13 @@ beastpatcher-ppc: $(SOURCES) $(HEADERS) $(MTPSRCS_MTP) usb.h libmtp.h libusb-ppc
 	gcc -framework iokit -framework coreservices -arch ppc -o beastpatcher-ppc $(OBJS) libusb-ppc.a libmtp-ppc.a -liconv
 	strip beastpatcher-ppc
 
-bin2c: ../../../rbutil/tools/bin2c.c
-	$(NATIVECC) $(CFLAGS) -o bin2c ../../../rbutil/tools/bin2c.c
+bin2c: ../../tools/bin2c.c
+	$(NATIVECC) $(CFLAGS) -o bin2c ../../tools/bin2c.c
 
 bootimg.c: bootloader.bin bin2c
 	./bin2c bootloader.bin bootimg
+
+bootimg.h: bootimg.c
 
 mknkboot: mknkboot.c md5.c
 	$(SILENT)$(NATIVECC) $(CFLAGS) $+ -o $@
