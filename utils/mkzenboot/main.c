@@ -118,5 +118,5 @@ int main(int argc, char *argv[])
 
     enum zen_error_t err = mkzenboot(infile, bootfile, outfile, opt);
     printf("Result: %d\n", err);
-    return 0;
+    return err == ZEN_SUCCESS ? 0 : 1;
 }
