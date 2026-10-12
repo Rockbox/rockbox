@@ -484,8 +484,12 @@ int disk_mount(int drive)
         }
 
 #if defined(MAX_VIRT_SECTOR_SIZE) && defined(MAX_PHYS_SECTOR_SIZE)
+#if (CONFIG_STORAGE & STORAGE_ATA)
         if (mounted)
             ata_set_phys_sector_mult(disk_sector_multiplier[IF_MD_DRV(drive)]);
+#else
+#error "MAX_VIRT_SECTOR_SIZE + MAX_PHYS_SECTOR_SIZE on non-ATA device; is this intentional?"
+#endif
 #endif
     }
 
