@@ -677,6 +677,12 @@ enum zen_error_t mkzenboot(const char *infile, const char *bootfile,
         errorf(err, "[ERR] Cannot read boot file\n");
     }
     /* validate checksum */
+    if(boot_size < 8)
+    {
+        free(fw);
+        free(boot);
+        errorf(ZEN_BOOT_INVALID, "[ERR] Boot file is too small\n");
+    }
     if(memcmp(boot + 4, zen_models[opt.model].rb_model_name, 4) != 0)
     {
         free(fw);
