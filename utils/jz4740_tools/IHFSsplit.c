@@ -101,7 +101,7 @@ void mkdir_p(const char *path)
     char *dir;
 
     dir = dirname(strdup(path));
-    if (strchr(dir, '/'))
+    if (strchr(dir, '/') && strcmp(dir, path) != 0)
         mkdir_p(dir);
 
 #ifdef _WIN32
