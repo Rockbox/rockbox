@@ -19,7 +19,7 @@
 #
 # Invoke this as "./gnuplot.sh < logf.txt"
 
-TMP=`tempfile`
+TMP=$(mktemp)
 
 awk 'BEGIN {
     FS=","
