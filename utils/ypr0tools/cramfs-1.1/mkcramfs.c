@@ -25,6 +25,7 @@
 #include <sys/types.h>
 #include <stdio.h>
 #include <sys/stat.h>
+#include <sys/sysmacros.h>
 #include <unistd.h>
 #include <sys/mman.h>
 #include <fcntl.h>
