@@ -1,3 +1,4 @@
+cmake_minimum_required(VERSION 3.5)
 PROJECT(zenutils)
 
 SET(EXECUTABLE_OUTPUT_PATH ${zenutils_SOURCE_DIR}/bin/${CMAKE_SYSTEM_NAME})
