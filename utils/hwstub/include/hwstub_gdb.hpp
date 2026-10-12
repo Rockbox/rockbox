@@ -96,6 +96,9 @@ protected:
     virtual error get_dev_desc(uint16_t desc, void *buf, size_t& buf_sz);
     virtual error get_dev_log(void *buf, size_t& buf_sz);
     virtual error exec_dev(uint32_t addr, uint16_t flags);
+    virtual error cop_dev(uint8_t, uint8_t[HWSTUB_COP_ARGS], const void *,
+        size_t, void *, size_t *)
+    { return error::UNSUPPORTED; }
     virtual error status() const;
     virtual size_t get_buffer_size();
 
