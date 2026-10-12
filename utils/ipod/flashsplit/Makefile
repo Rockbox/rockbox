@@ -9,7 +9,7 @@
 all: flashsplit
 
 flashsplit: flashsplit.c
-	gcc -W -Wall -o flashsplit flashsplit.c
+	$(CC) -W -Wall -o flashsplit flashsplit.c
 
 clean:
 	rm -f flashsplit
