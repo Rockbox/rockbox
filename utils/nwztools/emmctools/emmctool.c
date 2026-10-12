@@ -104,7 +104,7 @@ static uint32_t do_image(uint32_t start, const char *name)
      * must be ronded to the next sector */
     size = ROUND_UP(size + 8, SECTOR);
 
-    print_entry(start, start + size, name);
+    print_entry(start, start + size, "%s", name);
 
     /* Check U-Boot crc (must be 0) */
     uint32_t crc_buffer[SECTOR / 4];
@@ -284,4 +284,3 @@ int main(int argc, char **argv)
 
     return ret;
 }
-
