@@ -191,6 +191,7 @@ int main(int argc, char *argv[])
         fclose(infile);
         fclose(outfile);
         fprintf(stderr, "[ERR]  Cannot open %s\n", argv[3]);
+        return 6;
     }
     
     int fw_filesize = _filesize(fw);
