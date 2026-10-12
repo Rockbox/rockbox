@@ -201,6 +201,7 @@ bool add_keys_from_file(const char *key_file)
         if(g_debug)
             perror("Cannot read key file");
         fclose(fd);
+        free(buf);
         return false;
     }
     buf[size] = 0;
@@ -217,6 +218,7 @@ bool add_keys_from_file(const char *key_file)
         {
             if(g_debug)
                 printf("invalid key file\n");
+            free(buf);
             return false;
         }
         if(g_debug)
@@ -230,6 +232,7 @@ bool add_keys_from_file(const char *key_file)
         {
             if(g_debug)
                 printf("invalid key file\n");
+            free(buf);
             return false;
         }
         /* skip whitespace */
