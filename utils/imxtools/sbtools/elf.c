@@ -676,12 +676,13 @@ bool elf_read_file(struct elf_params_t *params, elf_read_fn_t read,
     }
     char *strtab = elf_load_section(&shdr[ehdr.e_shstrndx], read, printf, user);
     if(!strtab)
+    {
         printf(user, false, OFF, "elf file has no valid section string table\n");
+        goto Lerr;
+    }
     for(int i = 1; i < ehdr.e_shnum; i++)
     {
         const char *sec_name = &strtab[shdr[i].sh_name];
-        if(strtab == NULL)
-            sec_name = NULL;
 
         if(shdr[i].sh_type == SHT_PROGBITS && shdr[i].sh_flags & SHF_ALLOC)
         {
