@@ -1798,6 +1798,7 @@ Information for them was gathered solely by reverse-engineering Apple's firmware
 #define ORSTCON     (*((REG32_PTR_T)(PHYBASE + 0x08)))
 #define OPHYUNK3    (*((REG32_PTR_T)(PHYBASE + 0x18)))
 #define OPHYUNK1    (*((REG32_PTR_T)(PHYBASE + 0x1c)))
+#define OPHYSTAT    (*((REG32_PTR_T)(PHYBASE + 0x28)))  /* S5L8720 */
 #define OPHYUNK2    (*((REG32_PTR_T)(PHYBASE + 0x44)))
 #endif
 

@@ -53,6 +53,20 @@ void usb_dw_target_enable_clocks()
     clockgate_enable(CLOCKGATE_USBOTG, true);
     clockgate_enable(CLOCKGATE_USBPHY, true);
 
+#if (CONFIG_CPU == S5L8720)
+    /* S5L8720 BootROM DFU PHY bring-up at 0x20009ec8. */
+    OPHYPWR = 0;
+    udelay(10);
+    ORSTCON = 1;
+    udelay(10);
+    ORSTCON = 0;
+    udelay(10);
+    OPHYUNK1 = 6;
+    OPHYCLK = (*(REG32_PTR_T)0x3d100008 & 1) ? 1 : 0;
+    udelay(400);
+    for (int i = 0; i < 10000 && !(OPHYSTAT & 0x20); i++)
+        udelay(10);
+#else
     OPHYPWR = 0;  /* PHY: Power up */
     udelay(10);
     OPHYUNK1 = 1;
@@ -64,6 +78,7 @@ void usb_dw_target_enable_clocks()
     OPHYUNK3 = 0x600;
     OPHYCLK = USB_DW_CLOCK;
     udelay(400);
+#endif
 }
 
 void usb_dw_target_disable_clocks()
@@ -74,9 +89,12 @@ void usb_dw_target_disable_clocks()
     ORSTCON = 7;  /* PHY: Assert Software Reset */
     udelay(10);
 #elif (CONFIG_CPU == S5L8720)
-    OPHYPWR = 0x1f;  /* PHY: Power down */
-    ORSTCON = 1;  /* PHY: Assert Software Reset */
-    udelay(1000);
+    /* S5L8720 BootROM shutdown at 0x20009e98. */
+    OPHYPWR = 0xff;  /* PHY: Power down */
+    udelay(10);
+    ORSTCON = 0xff;  /* PHY: Assert Software Reset */
+    udelay(10);
+    OPHYUNK1 = 4;
 #endif
 
     clockgate_enable(CLOCKGATE_USBOTG, false);
