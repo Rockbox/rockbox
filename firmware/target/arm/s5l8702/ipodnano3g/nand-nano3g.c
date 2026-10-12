@@ -108,11 +108,13 @@ struct nand_chip_info
  * the check image, which reads a chip without mounting it writable. */
 static const struct nand_chip_info nand_chip_table[] =
 {
-    /* Hynix: the 4GB unit this port was developed on, and the 8GB one */
+    /* SK Hynix */
     { 0xA514D3AD, 4,  8, 4096, 128, 2048, 3872, true  },
     { 0xA555D5AD, 4,  8, 8192, 128, 2048, 7744, true  },
-    /* Micron, 2 chip enables */
-    { 0xA5D5D52C, 2,  4, 8192, 128, 2048, 7744, true  },
+    /* Micronas */
+    { 0xB614D5EC, 2,  8, 4096, 128, 4096, 3872, true  },
+    /* Toshiba */
+    { 0x3E94D589, 2,  3, 4096, 128, 4096, 3872, true  },
 #ifdef NAND_CHECK
     /* The rest of the chips the original firmware knows. They are here for
      * the check image alone, which identifies a chip and reads it to
@@ -124,23 +126,22 @@ static const struct nand_chip_info nand_chip_table[] =
      * tagged "checked" has a check archive that mounts and replays
      * correctly in the host FTL suite - real evidence, short only of the
      * write test. */
-    /* Micronas (ITT Intermetall, acquired by TDK 2016): 0xEC, not Samsung */
-    { 0xB614D5EC, 2,  8, 4096, 128, 4096, 3872, false },   /* checked */
-    { 0xB614D5EC, 4,  1, 4096, 128, 4096, 3872, false },   /* checked */
-    { 0x2555D5EC, 4,  9, 8192, 128, 2048, 7744, false },
-    /* Hynix */
+    /* SK Hynix */
     { 0xB614D5AD, 4,  1, 4096, 128, 4096, 3872, false },
+    /* Micronas */
+    { 0x2555D5EC, 4,  9, 8192, 128, 2048, 7744, false },
+    { 0xB614D5EC, 4,  1, 4096, 128, 4096, 3872, false },
     /* Toshiba */
     { 0xA585D598, 2, 13, 8320, 128, 2048, 7744, false },
     { 0xA585D598, 4, 13, 8320, 128, 2048, 7744, false },
     { 0xBA94D598, 2, 12, 4096, 128, 4096, 3872, false },
-    { 0xBA94D598, 4,  1, 4096, 128, 4096, 3872, false },   /* checked */
+    { 0xBA94D598, 4,  1, 4096, 128, 4096, 3872, false },
     /* Intel */
-    { 0xA5D5D589, 2,  4, 8192, 128, 2048, 7744, false },   /* checked */
-    { 0xA5D5D589, 4,  2, 8192, 128, 2048, 7744, false },   /* checked */
-    { 0x3E94D589, 2,  3, 4096, 128, 4096, 3872, false },   /* checked */
     { 0x3ED5D789, 2,  2, 8192, 128, 4096, 7744, false },
+    { 0xA5D5D589, 2,  4, 8192, 128, 2048, 7744, false },
+    { 0xA5D5D589, 4,  2, 8192, 128, 2048, 7744, false },
     /* Micron */
+    { 0xA5D5D52C, 2,  4, 8192, 128, 2048, 7744, false },
     { 0xA5D5D52C, 4,  2, 8192, 128, 2048, 7744, false },
     { 0x3E94D52C, 2,  3, 4096, 128, 4096, 3872, false },
     { 0x3ED5D72C, 2,  2, 8192, 128, 4096, 7744, false },
