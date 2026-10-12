@@ -1,8 +1,8 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import sys
 import struct
-import usb
+import usb.core
 
 
 class rbpms:
@@ -24,14 +24,14 @@ class rbpms:
     if offset & 15 != 0:
       raise Exception("Unaligned data read!")
 
-    data = ""
+    data = b""
 
     while True:
       blocklen = size
       if blocklen == 0: break
       if blocklen > 256 * 1024: blocklen = 256 * 1024
-      self.handle.write(4, struct.pack("<II", offset, blocklen), 0, 100)
-      block = struct.unpack("%ds" % blocklen, self.handle.read(0x83, blocklen, 0, 1000))[0]
+      self.handle.write(4, struct.pack("<II", offset, blocklen), timeout=100)
+      block = struct.unpack("%ds" % blocklen, self.handle.read(0x83, blocklen, timeout=1000))[0]
       offset += blocklen
       data += block
       size -= blocklen
