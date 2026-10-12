@@ -184,7 +184,7 @@ void misc_std_printf(void *user, const char *fmt, ...)
 
 bool add_keys_from_file(const char *key_file)
 {
-    int size;
+    long size;
     FILE *fd = fopen(key_file, "r");
     if(fd == NULL)
     {
@@ -192,10 +192,15 @@ bool add_keys_from_file(const char *key_file)
             perror("cannot open key file");
         return false;
     }
-    fseek(fd, 0, SEEK_END);
-    size = ftell(fd);
-    fseek(fd, 0, SEEK_SET);
-    char *buf = xmalloc(size + 1);
+    if(fseek(fd, 0, SEEK_END) != 0 || (size = ftell(fd)) < 0 ||
+       fseek(fd, 0, SEEK_SET) != 0)
+    {
+        if(g_debug)
+            printf("Invalid key file size\n");
+        fclose(fd);
+        return false;
+    }
+    char *buf = xmalloc((size_t)size + 1);
     if(fread(buf, 1, size, fd) != (size_t)size)
     {
         if(g_debug)
