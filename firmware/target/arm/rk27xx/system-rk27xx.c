@@ -174,6 +174,8 @@ void udelay(unsigned usecs)
     }
 
     delay = (usecs * cycles_per_usec) / 4;
+    if (delay == 0)                 /* the loop below would run 2^32 times */
+        return;
 
     asm volatile(
         "1: subs %0, %0, #1  \n"    /* 1 cycle  */
