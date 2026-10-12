@@ -164,7 +164,7 @@ static int find_model2(const char *model_str)
     return model;
 }
 
-static bool get_model_keysig(int model, char key[NWZ_KEY_SIZE], char sig[NWZ_SIG_SIZE])
+static bool get_model_keysig(int model, char **key, char **sig)
 {
     const char *codename = nwz_models[model].codename;
     for(int i = 0; g_model_list[i].model; i++)
@@ -172,6 +172,8 @@ static bool get_model_keysig(int model, char key[NWZ_KEY_SIZE], char sig[NWZ_SIG
         {
             if(decrypt_keysig(g_model_list[i].kas, key, sig) == 0)
                 return true;
+            free(*key);
+            free(*sig);
             printf("[ERR] Cannot decrypt kas '%s'\n", g_model_list[i].kas);
             return false;
         }
@@ -216,10 +218,11 @@ int mknwzboot(const char *bootfile, const char *outfile, bool debug)
         return 2;
     }
     /* find keys */
-    char key[NWZ_KEY_SIZE];
-    char sig[NWZ_SIG_SIZE];
-    if(!get_model_keysig(model, key, sig))
+    char *key = NULL;
+    char *sig = NULL;
+    if(!get_model_keysig(model, &key, &sig))
     {
+        free(boot);
         printf("[ERR][INTERNAL] Cannot get keys for model\n");
         return 3;
     }
@@ -235,6 +238,8 @@ int mknwzboot(const char *bootfile, const char *outfile, bool debug)
     /* write file to buffer */
     size_t upg_size;
     void *upg_buf = upg_write_memory(upg, key, sig, &upg_size, &debug, nwz_printf);
+    free(key);
+    free(sig);
     upg_free(upg);
     if(upg_buf == NULL)
     {
@@ -261,9 +266,9 @@ int mknwzboot_uninst(const char *model_string, const char *outfile, bool debug)
         return 2;
     }
     /* find keys */
-    char key[NWZ_KEY_SIZE];
-    char sig[NWZ_SIG_SIZE];
-    if(!get_model_keysig(model, key, sig))
+    char *key = NULL;
+    char *sig = NULL;
+    if(!get_model_keysig(model, &key, &sig))
     {
         printf("[ERR][INTERNAL] Cannot get keys for model\n");
         return 3;
@@ -276,6 +281,8 @@ int mknwzboot_uninst(const char *model_string, const char *outfile, bool debug)
     /* write file to buffer */
     size_t upg_size;
     void *upg_buf = upg_write_memory(upg, key, sig, &upg_size, &debug, nwz_printf);
+    free(key);
+    free(sig);
     upg_free(upg);
     if(upg_buf == NULL)
     {

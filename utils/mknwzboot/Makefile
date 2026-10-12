@@ -26,12 +26,12 @@ $(foreach l,$(LIBCRYPTO_NAMES),\
 	$(eval CFLAGS += $(shell $(PKGCONFIG) --silence-errors --cflags $(l))))
 $(foreach l,$(LIBCRYPTO_NAMES),\
 	$(eval CXXFLAGS += $(shell $(PKGCONFIG) --silence-errors --cflags $(l))))
-LDOPTS += -lpthread
+LDOPTS += -lpthread -lz
 
 OUTPUT = mknwzboot
 
 # inputs for lib
-UPGTOOLS_SOURCES = misc.c upg.c fwp.c mg.cpp md5.cpp
+UPGTOOLS_SOURCES = misc.c upg.c mg.cpp
 LIBSOURCES := mknwzboot.c install_script.c uninstall_script.c \
 	      $(addprefix $(UPGTOOLS_DIR),$(UPGTOOLS_SOURCES))
 # inputs for binary only
@@ -41,11 +41,15 @@ EXTRADEPS :=
 
 include ../libtools.make
 
-install_script.c install_script.h: install_script.sh $(BIN2C)
+install_script.c: install_script.sh $(BIN2C)
 	$(BIN2C) install_script.sh install_script
 
-uninstall_script.c uninstall_script.h: uninstall_script.sh $(BIN2C)
+install_script.h: install_script.c
+
+uninstall_script.c: uninstall_script.sh $(BIN2C)
 	$(BIN2C) uninstall_script.sh uninstall_script
+
+uninstall_script.h: uninstall_script.c
 
 # explicit dependencies on install_script.{c,h} and mknwzboot.h
 $(OBJDIR)mknwzboot.o: install_script.h install_script.c uninstall_script.h uninstall_script.c mknwzboot.h
