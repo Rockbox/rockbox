@@ -640,6 +640,8 @@ enum zen_error_t mkzenboot(const char *infile, const char *bootfile,
     void *fw;
     size_t fw_size;
     enum zen_error_t err = read_file(infile, &fw, &fw_size);
+    if(err != ZEN_SUCCESS)
+        return err;
     uint8_t file_md5sum[16];
     err = compute_md5sum_buf(fw, fw_size, file_md5sum);
     if(err != ZEN_SUCCESS)
