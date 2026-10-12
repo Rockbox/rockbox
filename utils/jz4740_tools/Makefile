@@ -8,13 +8,13 @@ CC=gcc
 linux: usbtool HXFmerge HXFreplace HXFsplit IHFSsplit HXF2IHFS DLanalyser
 win: usbtool_win HXFmerge_win HXFsplit_win HXFreplace_win IHFSsplit_win HXF2IHFS_win DLanalyser_win
 
-bin2c: ../../rbutil/tools/bin2c.c
-	$(CC) $(CFLAGS) -o bin2c ../../rbutil/tools/bin2c.c
+bin2c: ../tools/bin2c.c
+	$(CC) $(CFLAGS) -o bin2c ../tools/bin2c.c
 
-bin2c.exe: ../../rbutil/tools/bin2c.c
-	$(CC) $(CFLAGS) -o bin2c.exe ../../rbutil/tools/bin2c.c
+bin2c.exe: ../tools/bin2c.c
+	$(CC) $(CFLAGS) -o bin2c.exe ../tools/bin2c.c
 
-jz_xloader.c: jz_xloader.bin
+jz_xloader.c: jz_xloader.bin bin2c
 	./bin2c jz_xloader.bin jz_xloader
 
 usbtool: jz4740_usbtool.c bin2c jz_xloader.c
