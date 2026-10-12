@@ -19,7 +19,7 @@ WINDRES = $(CROSS)windres
 all: $(OUTPUT)
 
 e200rpatcher: e200rpatcher.c bootimg.c
-	gcc $(CFLAGS) $(LIBS) -o e200rpatcher e200rpatcher.c bootimg.c
+	gcc $(CFLAGS) -o e200rpatcher e200rpatcher.c bootimg.c $(LIBS)
 	strip e200rpatcher
 
 e200rpatcher.exe:  e200rpatcher.c bootimg.c  e200rpatcher-rc.o
