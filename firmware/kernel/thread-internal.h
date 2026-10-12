@@ -321,7 +321,7 @@ static inline void rtr_queue_remove(struct __rtr_queue *rtrp,
     lldc_remove(rtrp, &thread->rtr);
 }
 
-#define TMO_NOT_QUEUED (NULL + 1)
+#define TMO_NOT_QUEUED ((struct __tmo_queue_node *)1)
 
 static inline bool tmo_is_queued(struct thread_entry *thread)
 {
