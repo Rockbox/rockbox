@@ -443,6 +443,7 @@ int disk_mount(int drive)
         {
             if (pinfo[i].type == 0x05 ||
                 pinfo[i].type == 0x0f ||
+                pinfo[i].type == 0x3f ||
                 (i != 0 && pinfo[i].type == 0))
                 continue;  /* skip free/extended partitions */
 
