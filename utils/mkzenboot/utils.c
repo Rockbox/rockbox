@@ -59,22 +59,24 @@ void int2le(unsigned int val, unsigned char* addr)
 
 const char* find_firmware_key(const unsigned char* buffer, size_t len)
 {
-    char szkey1[] = "34d1";
-    size_t cchkey1 = strlen(szkey1);
-    char szkey2[] = "TbnCboEbn";
-    size_t cchkey2 = strlen(szkey2);
-    uint32_t i;
-    for (i = 0; i < (uint32_t)len; i++)
+    /* These identify prefixes; the full key may be longer. */
+    static const char prefix1[] = "34d1";
+    static const char prefix2[] = "TbnCboEbn";
+
+    for (size_t i = 0; i < len; i++)
     {
-        if (len >= cchkey1)
+        const unsigned char* candidate = buffer + i;
+        size_t remaining = len - i;
+
+        /* Require room for a terminator, but compare only the prefix. */
+        if ((remaining >= sizeof(prefix1) &&
+             memcmp(candidate, prefix1, sizeof(prefix1) - 1) == 0) ||
+            (remaining >= sizeof(prefix2) &&
+             memcmp(candidate, prefix2, sizeof(prefix2) - 1) == 0))
         {
-            if (!strncmp((char*)&buffer[i], szkey1, cchkey1))
-                return (const char*)&buffer[i];
-        }
-        if (len >= cchkey2)
-        {
-            if (!strncmp((char*)&buffer[i], szkey2, cchkey2))
-                return (const char*)&buffer[i];
+            /* No NUL here means no later candidate can be terminated. */
+            return memchr(candidate, '\0', remaining)
+                ? (const char*)candidate : NULL;
         }
     }
     return NULL;
