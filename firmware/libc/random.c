@@ -1,119 +1,75 @@
-/*
-   A C-program for MT19937, with initialization improved 2002/2/10.
-   Coded by Takuji Nishimura and Makoto Matsumoto.
-   This is a faster version by taking Shawn Cokus's optimization,
-   Matthe Bellew's simplification.
+/*  Written in 2018 by David Blackman and Sebastiano Vigna (vigna@acm.org)
 
-   Before using, initialize the state by using srand(seed).
+To the extent possible under law, the author has dedicated all copyright
+and related and neighboring rights to this software to the public domain
+worldwide.
 
-   Copyright (C) 1997 - 2002, Makoto Matsumoto and Takuji Nishimura,
-   All rights reserved.
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted.
 
-   Redistribution and use in source and binary forms, with or without
-   modification, are permitted provided that the following conditions
-   are met:
-
-     1. Redistributions of source code must retain the above copyright
-        notice, this list of conditions and the following disclaimer.
-
-     2. Redistributions in binary form must reproduce the above copyright
-        notice, this list of conditions and the following disclaimer in the
-        documentation and/or other materials provided with the distribution.
-
-     3. The names of its contributors may not be used to endorse or promote
-        products derived from this software without specific prior written
-        permission.
-
-   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-   "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-   A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR
-   CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-   EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-   PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-   PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-   LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-   NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-   Any feedback is very welcome.
-   http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/emt.html
-   email: m-mat @ math.sci.hiroshima-u.ac.jp (remove space)
-*/
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
+IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE. */
 
 /*
-   Adapted to Rockbox by Jens Arnold
+   Adapted to Rockbox by Skye Green
 */
- 
-#include <stdlib.h>
 
-/* Period parameters */
-#define N            624
-#define M            397
-#define MATRIX_A     0x9908b0dfUL /* constant vector a */
-#define UMASK        0x80000000UL /* most significant w-r bits */
-#define LMASK        0x7fffffffUL /* least significant r bits */
-#define MIXBITS(u,v) ( ((u) & UMASK) | ((v) & LMASK) )
-#define TWIST(u,v)   ((MIXBITS(u,v) >> 1) ^ ((v)&1UL ? MATRIX_A : 0UL))
+#include <limits.h>
+#include <stdint.h>
 
-static unsigned long state[N]; /* the array for the state vector  */
-static int left = 0;
-static unsigned long *next;
+/* This is xoroshiro64** 1.0, our 32-bit all-purpose, rock-solid,
+   small-state generator. It is extremely fast and it passes all tests we
+   are aware of, but its state space is not large enough for any parallel
+   application.
 
-/* initializes state[N] with a seed */
-void srand(unsigned int seed)
-{
-    unsigned long x = seed  & 0xffffffffUL;
-    unsigned long *s = state;
-    int j;
+   For generating just single-precision (i.e., 32-bit) floating-point
+   numbers, xoroshiro64* is even faster.
 
-    for (*s++ = x, j = 1; j < N; j++) {
-        x = (1812433253UL * (x ^ (x >> 30)) + j) & 0xffffffffUL;
-        *s++ = x;
-        /* See Knuth TAOCP Vol2. 3rd Ed. P.106 for multiplier. */
-        /* In the previous versions, MSBs of the seed affect   */
-        /* only MSBs of the array state[].                     */
-        /* 2002/01/09 modified by Makoto Matsumoto             */
-    }
-    left = 1;
+   The state must be seeded so that it is not everywhere zero. */
+
+
+static inline uint32_t rotl(const uint32_t x, int k) {
+	return (x << k) | (x >> (32 - k));
 }
 
-static void next_state(void)
-{
-    unsigned long *p = state;
-    int j;
+// Initialize with a default seed.
+// Constant is the first 16 digits of fractional part of pi
+static uint32_t s[2] = {
+	0x243F6A88U,
+	0x85A308D3U,
+};
 
-    /* if srand() has not been called, */
-    /* a default initial seed is used  */
-    if (left < 0)
-        srand(5489UL);
+/* seeds the RNG using a single run of SplitMix64 */
+void srand(unsigned int seed) {
+	/* This is a fixed-increment version of Java 8's SplittableRandom generator
+		See http://dx.doi.org/10.1145/2714064.2660195 and 
+		http://docs.oracle.com/javase/8/docs/api/java/util/SplittableRandom.html
 
-    left = N;
-    next = state;
-    
-    for (j = N - M + 1; --j; p++)
-        *p = p[M] ^ TWIST(p[0], p[1]);
-
-    for (j = M; --j; p++)
-        *p = p[M-N] ^ TWIST(p[0], p[1]);
-
-    *p = p[M-N] ^ TWIST(p[0], state[0]);
+		It is a very fast generator passing BigCrush, and it can be useful if
+		for some reason you absolutely want 64 bits of state. */
+	uint64_t z = (((uint64_t) seed) + 0x9e3779b97f4a7c15);
+	z = (z ^ (z >> 30)) * 0xbf58476d1ce4e5b9;
+	z = (z ^ (z >> 27)) * 0x94d049bb133111eb;
+	z = z ^ (z >> 31);
+	s[0] = z & 0xFFFFFFFF;
+	s[1] = (z >> 32) & 0xFFFFFFFF;
 }
+
 
 /* generates a random number on [0,RAND_MAX]-interval */
-int rand(void)
-{
-    unsigned long y;
+int rand(void) {
+	const uint32_t s0 = s[0];
+	uint32_t s1 = s[1];
+	const uint32_t result = rotl(s0 * 0x9E3779BB, 5) * 5;
 
-    if (--left <= 0)
-        next_state();
-    y = *next++;
+	s1 ^= s0;
+	s[0] = rotl(s0, 26) ^ s1 ^ (s1 << 9); // a, b
+	s[1] = rotl(s1, 13); // c
 
-    /* Tempering */
-    y ^= (y >> 11);
-    y ^= (y << 7) & 0x9d2c5680UL;
-    y ^= (y << 15) & 0xefc60000UL;
-    y ^= (y >> 18);
-
-    return ((unsigned int)y) >> 1;
+	return result & INT_MAX;
 }
