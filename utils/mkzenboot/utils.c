@@ -85,7 +85,12 @@ const char* find_firmware_key(const unsigned char* buffer, size_t len)
 uint32_t find_firmware_offset(unsigned char* buffer, size_t len)
 {
     uint32_t i;
-    for (i = 0; i < (uint32_t)len; i += 0x10)
+
+    /* Each candidate needs a size word and four payload bytes to inspect. */
+    if (len < 2 * sizeof(uint32_t))
+        return 0;
+
+    for (i = 0; i <= len - 2 * sizeof(uint32_t); i += 0x10)
     {
         if (buffer[i + sizeof(uint32_t)] != 0
             && buffer[i + sizeof(uint32_t) + 1] != 0
