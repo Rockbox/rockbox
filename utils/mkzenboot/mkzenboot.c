@@ -429,6 +429,9 @@ enum zen_error_t build_firmware(void *exec, size_t exec_size, void *boot, size_t
     if(fw_offset == 0)
         errorf(ZEN_FW_INVALID, "[ERR] Couldn't find firmware offset\n");
     uint32_t fw_size = le2int(&buffer[data_ptr + fw_offset]);
+    size_t payload_offset = (size_t)data_ptr + fw_offset + 4;
+    if(payload_offset > exec_size || fw_size > exec_size - payload_offset)
+        errorf(ZEN_FW_INVALID, "[ERR] Firmware extends beyond input file\n");
     printf("[INFO] Firmware offset is at 0x%x with size 0x%x\n", data_ptr + fw_offset, fw_size);
     const char *fw_key = find_firmware_key(exec, exec_size);
     if(fw_key == NULL)
@@ -437,7 +440,7 @@ enum zen_error_t build_firmware(void *exec, size_t exec_size, void *boot, size_t
 
     /** descramble firmware */
     printf("[INFO] Descrambling firmware... ");
-    if(!crypt_firmware(fw_key, &buffer[data_ptr + fw_offset + 4], fw_size))
+    if(!crypt_firmware(fw_key, &buffer[payload_offset], fw_size))
         errorf(ZEN_ERROR, "Fail!\n");
     else
         printf("Done!\n");
@@ -448,7 +451,7 @@ enum zen_error_t build_firmware(void *exec, size_t exec_size, void *boot, size_t
     memset(out_buffer, 0, fw_size * 2);
     printf("[INFO] Decompressing firmware... ");
     char *err_msg;
-    if(!inflate_to_buffer(&buffer[data_ptr + fw_offset + 4], fw_size, out_buffer,
+    if(!inflate_to_buffer(&buffer[payload_offset], fw_size, out_buffer,
             fw_size * 2, &err_msg))
         errorf(ZEN_ERROR, "Fail!\n[ERR] ZLib error: %s\n", err_msg);
     else
