@@ -1372,7 +1372,7 @@ static unsigned int jewels_initlevel(struct game_context* bj) {
 ******************************************************************************/
 static void jewels_init(struct game_context* bj) {
     /* seed the rand generator */
-    rb->srand(*rb->current_tick);
+
 
     bj->type = bj->tmp_type;
     bj->level = 1;

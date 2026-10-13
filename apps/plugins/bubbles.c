@@ -1427,7 +1427,7 @@ static int  bubbles(struct game_context* bb);
 static void bubbles_init(struct game_context* bb) {
     bubbles_setcolors();
     /* seed the rand generator */
-    rb->srand(*rb->current_tick);
+
 
     /* check for resumed game */
     if (resume)

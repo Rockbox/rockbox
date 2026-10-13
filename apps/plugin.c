@@ -1103,6 +1103,9 @@ int plugin_load(const char* plugin, const void* parameter)
 
     status_save(false);
 
+    /* Reseed the RNG as plugins may have mucked with it */
+    srand(prng_newseed());
+
     if (rc == PLUGIN_ERROR)
         splash(HZ*2, str(LANG_PLUGIN_ERROR));
 

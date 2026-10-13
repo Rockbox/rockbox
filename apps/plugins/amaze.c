@@ -1592,7 +1592,7 @@ enum plugin_status plugin_start(const void *parameter)
     (void) parameter;
     int ret;
 
-    rb->srand(*rb->current_tick);
+
 
     /* hard-code in program default options */
     show_map=1;

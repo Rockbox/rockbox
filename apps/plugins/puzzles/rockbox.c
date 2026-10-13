@@ -1447,7 +1447,7 @@ void fatal(const char *fmt, ...)
 void get_random_seed(void **randseed, int *randseedsize)
 {
     *randseed = snew(long);
-    long seed = *rb->current_tick;
+    long seed = rb->rand();
     rb->memcpy(*randseed, &seed, sizeof(seed));
     *randseedsize = sizeof(seed);
 }

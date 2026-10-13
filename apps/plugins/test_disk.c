@@ -561,8 +561,6 @@ enum plugin_status plugin_start(const void* parameter)
     ALIGN_BUFFER(audiobuf, audiobuflen, 4);
 #endif
 
-    rb->srand(*rb->current_tick);
-
     /* Turn off backlight timeout */
     backlight_ignore_timeout();
 

@@ -239,7 +239,7 @@ enum plugin_status plugin_start(const void* parameter)
     struct jackpot game;
     (void)parameter;
     atexit(jackpot_exit);
-    rb->srand(*rb->current_tick);
+
     jackpot_init(&game);
 
     FOR_NB_SCREENS(i){

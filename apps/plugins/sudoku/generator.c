@@ -1131,7 +1131,7 @@ bool sudoku_generate_board(struct sudoku_state_t* state, char** difficulty)
 {
     int r,c,i;
 
-    rb->srand(*rb->current_tick);
+
 
     rb->button_clear_queue();
 

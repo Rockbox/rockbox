@@ -85,7 +85,7 @@ enum plugin_status plugin_start(const void* parameter) {
     int action;
 
     dice_init(&dice);
-    rb->srand(*rb->current_tick);
+
 
     configfile_load(CFG_FILE, config, 2, 0);
     dice.nb_sides = nb_sides_values[sides_index];

@@ -91,7 +91,7 @@ static void matrix_init(void) {
     int i,j;
 
     /* Seed rand */
-    rb->srand(*rb->current_tick);
+
 
     /* Make the matrix */
     for (i = 0; i < ROWS; i++) {

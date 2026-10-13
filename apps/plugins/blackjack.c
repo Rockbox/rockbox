@@ -737,7 +737,7 @@ static struct highscore highscores[NUM_SCORES];
 ******************************************************************************/
 static void blackjack_init(struct game_context* bj) {
     /* seed the rand generator */
-    rb->srand(*rb->current_tick);
+
 
     /* reset card positions */
     dealer_x = 4;

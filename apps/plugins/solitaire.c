@@ -1727,7 +1727,7 @@ static int solitaire( int skipmenu )
     int c,h,prevcard;
     int biggest_col_length;
 
-    rb->srand( *rb->current_tick );
+
     if( skipmenu != SOLITAIRE_QUIT )
     {
         switch( solitaire_menu(false) )

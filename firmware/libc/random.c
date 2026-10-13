@@ -47,7 +47,7 @@ static uint32_t s[2] = {
 /* seeds the RNG using a single run of SplitMix64 */
 void srand(unsigned int seed) {
 	/* This is a fixed-increment version of Java 8's SplittableRandom generator
-		See http://dx.doi.org/10.1145/2714064.2660195 and 
+		See http://dx.doi.org/10.1145/2714064.2660195 and
 		http://docs.oracle.com/javase/8/docs/api/java/util/SplittableRandom.html
 
 		It is a very fast generator passing BigCrush, and it can be useful if

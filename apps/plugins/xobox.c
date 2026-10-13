@@ -615,12 +615,6 @@ static inline int get_newy (int y, int len, int deg)
         return y - len * 2;
 }
 
-/* make random function get it's value from the device ticker */
-static inline void randomize (void)
-{
-    rb->srand (*rb->current_tick);
-}
-
 /* get a random number between 0 and range-1 */
 static int t_rand (int range)
 {
@@ -1332,9 +1326,7 @@ enum plugin_status plugin_start (const void *parameter)
         rb->splash(HZ, "Failed to load saved game");
     }
 
-    randomize ();
     ret = xobox_loop ();
-
 
     /* Turn on backlight timeout (revert to settings) */
     backlight_use_settings();

@@ -1756,7 +1756,7 @@ enum plugin_status plugin_start (const void *parameter)
 
     (void) parameter;
 
-    rb->srand (*rb->current_tick);
+
 
     /* Load HighScore if any */
     highscore_load(SCORE_FILE, highscores, NUM_SCORES);

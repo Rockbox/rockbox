@@ -1763,9 +1763,6 @@ static void init_invadrox(void)
 {
     int i;
 
-    /* Seed random number generator with a "random" number */
-    rb->srand(rb->get_time()->tm_sec + rb->get_time()->tm_min * 60);
-
     /* Precalculate start of each scanline */
     for (i = 0; i < LCD_HEIGHT; i++) {
 #if (LCD_DEPTH >= 8)

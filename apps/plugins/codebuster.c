@@ -412,7 +412,7 @@ static void main_menu(void) {
 enum plugin_status plugin_start(const void* parameter) {
     (void)parameter;
 
-    rb->srand(*rb->current_tick);
+
     rb->lcd_setfont(FONT_SYSFIXED);
     rb->lcd_set_backdrop(NULL);
     rb->lcd_set_foreground(LCD_WHITE);

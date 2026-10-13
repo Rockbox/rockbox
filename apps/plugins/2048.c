@@ -1084,7 +1084,6 @@ static enum plugin_status do_2048_menu(void)
 enum plugin_status plugin_start(const void* param)
 {
     (void)param;
-    rb->srand(*rb->current_tick);
     load_hs();
     rb->lcd_setfont(WHAT_FONT);
 

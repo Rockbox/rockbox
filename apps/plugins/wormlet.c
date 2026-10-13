@@ -2367,16 +2367,15 @@ static void test_make_argh(void)
 
     rb->lcd_update();
 
-    for (seed = 0; hit < 20; seed += 2) {
+    while (hit < 20) {
         int x, y;
-        rb->srand(seed);
+        ;
         x = rb->rand() % (FIELD_RECT_WIDTH  - argh_size);
         y = rb->rand() % (FIELD_RECT_HEIGHT - argh_size);
 
         for (worm_idx = 0; worm_idx < worm_count; worm_idx++){
             if (expensive_worm_in_rect(&worms[worm_idx], x, y, argh_size, argh_size)) {
                 int tries = 0;
-                rb->srand(seed);
 
                 tries = make_argh(0);
                 if ((x == arghx[0] && y == arghy[0]) || tries < 2) {

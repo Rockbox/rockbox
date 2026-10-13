@@ -907,7 +907,7 @@ static enum minesweeper_status minesweeper( void )
     mine_raster.height = height*TileSize;
 #endif
 
-    rb->srand( *rb->current_tick );
+
     minesweeper_init();
     x = 0;
     y = 0;

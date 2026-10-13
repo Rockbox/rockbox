@@ -572,7 +572,7 @@ static int play_shuffled(struct rfa_scan *scan)
     }
 
     /* shuffle the thing */
-    rb->srand(*rb->current_tick);
+
     if(scan->dirs->count > (int) max_shuffle_size)
     {
         rb->splashf(HZ*2, "Too many folders: %d (room for %d)",

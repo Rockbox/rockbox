@@ -1162,7 +1162,7 @@ void OpeningBook()
   unsigned r,r0;
   int o_c=0 , m_c=0 ;
 
-  rb->srand ( *rb->current_tick ) ;
+
   r0 = 0;
   m = 0;
   while ( o_c < MAX_OPENING )  {

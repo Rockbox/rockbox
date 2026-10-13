@@ -2160,7 +2160,7 @@ enum plugin_status plugin_start(const void* parameter)
     backlight_ignore_timeout();
 
     highscore_load(SCORE_FILE, highscores, NUM_SCORES);
-    rb->srand(*rb->current_tick);
+
 
     /* create stars once, and once only: */
     create_stars();

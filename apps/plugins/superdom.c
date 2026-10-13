@@ -209,7 +209,7 @@ static const struct button_mapping *plugin_contexts[] = { pla_main_ctx };
 static void init_board(void)
 {
     int i,j;
-    rb->srand(*rb->current_tick);
+
     for(i=0;i<12;i++)
     {  /* Hopefully about 50% each colour */
         for(j=0;j<BOARD_SIZE+2;j++)
@@ -2421,7 +2421,7 @@ static int average_strength(int colour)
 
 enum plugin_status plugin_start(const void* parameter)
 {
-    rb->srand(*rb->current_tick);
+
 #if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
     rb->lcd_set_foreground(LCD_BLACK);

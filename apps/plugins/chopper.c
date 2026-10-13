@@ -1104,7 +1104,7 @@ enum plugin_status plugin_start(const void* parameter)
     backlight_ignore_timeout();
 
 
-    rb->srand( *rb->current_tick );
+
 
     configfile_load(CFG_FILE, config, 1, 0);
 

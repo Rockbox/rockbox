@@ -490,7 +490,7 @@ static void clix_init_new_level(struct clix_game_state_t* state)
     state->y = BOARD_HEIGHT / 2;
     state->x = BOARD_WIDTH / 2;
 
-    rb->srand( *rb->current_tick);
+
     /* create a random colored board, according to the current level */
     for(i = 0; i < BOARD_HEIGHT * BOARD_WIDTH; ++i)
     {

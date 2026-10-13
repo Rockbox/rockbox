@@ -239,8 +239,6 @@ static void init_explode(int x, int y, int firework, int points)
 
     for(i=0; i<points; i++)
     {
-        rb->srand(*rb->current_tick * i);
-
         firework_xpoints[firework][i] = x;
         firework_ypoints[firework][i] = y;
 
@@ -259,8 +257,6 @@ static void init_explode(int x, int y, int firework, int points)
  * prepares said rocket to start moving towards its destination. */
 static void init_rocket(int rocket)
 {
-    rb->srand(*rb->current_tick);
-
     rocket_xpos[rocket] = rb->rand() % LCD_WIDTH;
     rocket_ypos[rocket] = LCD_HEIGHT;
 

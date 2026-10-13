@@ -2149,7 +2149,7 @@ int tagtree_enter(struct tree_context* c, bool is_visible)
         is_random_item = true;
         if(c->filesindir<=c->special_entry_count) /* Menu contains only special entries */
             return 0;
-        srand(current_tick);
+        srand(prng_newseed());
         dptr = (tagtree_get_entry(c, c->special_entry_count+(rand() % (c->filesindir-c->special_entry_count))));
         seek = dptr->extraseek;
     }
@@ -2486,7 +2486,7 @@ static bool insert_all_playlist(struct tree_context *c,
 
         if (fill_randomly)
         {
-            srand(current_tick);
+            srand(prng_newseed());
             size_t bufsize = 0;
             bool *buffer = (bool *) plugin_get_buffer(&bufsize);
             rand_bool_array = fill_random_playlist_indexes(buffer, bufsize,

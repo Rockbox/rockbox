@@ -504,7 +504,7 @@ enum plugin_status plugin_start(const void* parameter)
     backlight_ignore_timeout();
 
     /* Seed the RNG */
-    rb->srand(*rb->current_tick);
+
 
     FOR_NB_SCREENS(i)
         rb->screens[i]->set_viewport(NULL);

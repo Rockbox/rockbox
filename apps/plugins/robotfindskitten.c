@@ -983,7 +983,7 @@ enum plugin_status plugin_start(const void* parameter)
 
   exit_rfk = false;
 
-  rb->srand(*rb->current_tick);
+
 
   initialize_arrays();
 

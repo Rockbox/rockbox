@@ -953,7 +953,7 @@ enum plugin_status plugin_start(const void* parameter)
     }
     rb->lcd_update();
     rb->sleep(HZ*3/2);
-    rb->srand(*rb->current_tick);
+
 
     rc = flipit_loop();
     return rc;

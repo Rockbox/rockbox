@@ -80,7 +80,7 @@ enum plugin_status plugin_start(const void* parameter) {
 
     (void)parameter;
 
-    rb->srand(*rb->current_tick);
+
     dx = rb->rand()%(2*RAND_SCALE+1) - RAND_SCALE;
     dy = rb->rand()%(2*RAND_SCALE+1) - RAND_SCALE;
 

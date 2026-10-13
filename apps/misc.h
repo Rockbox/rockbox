@@ -295,4 +295,7 @@ long from_normalized_volume(long norm, long min_vol, long max_vol, long max_norm
  * will be written to the lcd */
 void clear_screen_buffer(bool update);
 
+/* Reseed the PRNG using the best entropy source available */
+unsigned int prng_newseed(void);
+
 #endif /* MISC_H */

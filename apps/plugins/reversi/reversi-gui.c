@@ -613,7 +613,6 @@ enum plugin_status plugin_start(const void *parameter) {
     /* Avoid compiler warnings */
     (void)parameter;
 
-    rb->srand(*rb->current_tick); /* Some AIs use rand() */
     white_strategy = &strategy_human;
     black_strategy = &strategy_human;
 

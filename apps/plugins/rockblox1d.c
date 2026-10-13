@@ -166,7 +166,7 @@ enum plugin_status plugin_start(const void* parameter)
     /***********
     ** GAMELOOP
     */
-    rb->srand( *rb->current_tick );
+
     
     type_cur_brick = 2 + mrand(3);
     type_next_brick = 2 + mrand(3);

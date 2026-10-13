@@ -2634,7 +2634,7 @@ enum plugin_status plugin_start(const void* parameter)
     backlight_ignore_timeout();
 
     /* now go ahead and have fun! */
-    rb->srand( *rb->current_tick );
+
     brickmania_loadgame();
     resume_file = resume;
     while(!brickmania_game_loop())

@@ -59,7 +59,6 @@ void PRNM(init)(void)
 
   DANM(mem) = a64kmalloc(NUM64KSEGS);
 
-  rb->srand((unsigned int)( rb->get_time()->tm_sec+rb->get_time()->tm_min*60 + rb->get_time()->tm_hour*3600));
   for(i = 0; i < 0x10000; i++) DANM(mem)[i] = (byte) rb->rand();
 
   for(i = 0; i < NUMDREGS; i++) {
