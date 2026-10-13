@@ -110,7 +110,10 @@ bool crypt_firmware(const char* key, unsigned char* buffer, size_t len)
     char key_cpy[255];
     unsigned int i;
     unsigned int tmp = 0;
-    int key_length = strlen(key);
+    size_t key_length = strlen(key);
+
+    if (key_length == 0 || key_length >= sizeof(key_cpy))
+        return false;
 
     strcpy(key_cpy, key);
     for(i=0; i < strlen(key); i++)
