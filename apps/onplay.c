@@ -319,7 +319,6 @@ static int add_to_playlist(void* arg)
     if (position == PLAYLIST_INSERT_SHUFFLED ||
         position == PLAYLIST_INSERT_LAST_SHUFFLED)
     {
-        srand(prng_newseed());
         if (position == PLAYLIST_INSERT_LAST_SHUFFLED)
             playlist_set_last_shuffled_start();
     }

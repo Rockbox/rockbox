@@ -916,7 +916,7 @@ static int get_next_dir(char *dir, int direction)
                    times as many tries as there are directories. */
                 unsigned long allowed_tries = folder_count * 4;
                 int i;
-                srand(prng_newseed());
+
                 *(tc->dirfilter) = SHOW_MUSIC;
                 tc->sort_dir = global_settings.sort_dir;
                 while (!exit && allowed_tries--)
