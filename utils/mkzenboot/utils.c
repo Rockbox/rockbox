@@ -35,12 +35,18 @@ int filesize(FILE* fd)
 
 unsigned int le2int(unsigned char* buf)
 {
-   return ((buf[3] << 24) | (buf[2] << 16) | (buf[1] << 8) | buf[0]);
+    return (((unsigned int)buf[3] << 24)
+        | ((unsigned int)buf[2] << 16)
+        | ((unsigned int)buf[1] << 8)
+        | buf[0]);
 }
 
 unsigned int be2int(unsigned char* buf)
 {
-   return ((buf[0] << 24) | (buf[1] << 16) | (buf[2] << 8) | buf[3]);
+    return (((unsigned int)buf[0] << 24)
+        | ((unsigned int)buf[1] << 16)
+        | ((unsigned int)buf[2] << 8)
+        | buf[3]);
 }
 
 void int2le(unsigned int val, unsigned char* addr)
