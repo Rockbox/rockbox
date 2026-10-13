@@ -864,24 +864,28 @@ enum zen_error_t find_pe_data(void *fw, size_t fw_size, uint32_t *data_ptr, uint
 {
     uint8_t *buffer = fw;
     /* Rudimentary Win32 PE reading to find .data section */
-    if(memcmp(&buffer[0], "MZ", 2) != 0 && memcmp(&buffer[0x118], "PE", 2) != 0)
+    if(fw_size < 0x11a || memcmp(&buffer[0], "MZ", 2) != 0 ||
+       memcmp(&buffer[0x118], "PE", 2) != 0)
     {
         printf("[ERR]  Input file isn't an executable\n");
         return ZEN_FW_INVALID;
     }
     *data_ptr = 0, *data_size = 0;
-    uint32_t start_sec_addr = /*sizeof NT headers */ 0xf8 +
-        /* address of opt header */*(uint32_t *)&buffer[0x3c];
-    for(uint32_t i = start_sec_addr; i < 0x1000; i += 0x28)
+    uint32_t pe_offset = le2int(&buffer[0x3c]);
+    if(pe_offset > 0x1000 - 0xf8)
+        return ZEN_FW_INVALID;
+    uint32_t start_sec_addr = /*sizeof NT headers */ 0xf8 + pe_offset;
+    for(uint32_t i = start_sec_addr; i < 0x1000 && i + 0x28 <= fw_size; i += 0x28)
     {
-        if(strcmp((char*)&buffer[i], ".data") == 0)
+        if(memcmp(&buffer[i], ".data", 6) == 0)
         {
             *data_ptr = le2int(&buffer[i + 0x14]);
             *data_size = le2int(&buffer[i + 0x10]);
             break;
         }
     }
-    if(*data_ptr == 0 || *data_size == 0)
+    if(*data_ptr == 0 || *data_size == 0 ||
+       *data_ptr > fw_size || *data_size > fw_size - *data_ptr)
     {
         printf("[ERR]  Couldn't find .data section\n");
         return ZEN_FW_INVALID;
