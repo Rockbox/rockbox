@@ -2768,7 +2768,7 @@ static int tagtree_play_folder(struct tree_context* c)
 
     if (global_settings.playlist_shuffle)
     {
-        start_index = playlist_shuffle(current_tick, start_index);
+        start_index = playlist_shuffle(0, start_index);
         if (!global_settings.play_selected)
             start_index = 0;
     }

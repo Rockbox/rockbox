@@ -154,7 +154,7 @@ bool ft_play_playlist(char* pathname, char* dirname, char* filename)
     if (playlist_create(dirname, filename) != -1)
     {
         if (global_settings.playlist_shuffle)
-            playlist_shuffle(current_tick, -1);
+            playlist_shuffle(0, -1);
 
         playlist_start(0, 0, 0);
         return true;
@@ -585,7 +585,6 @@ int ft_enter(struct tree_context* c)
         c->selected_item=0;
     }
     else {
-        int seed = current_tick;
         bool play = false;
         int start_index=0;
 
@@ -630,7 +629,7 @@ int ft_enter(struct tree_context* c)
                         start_index = ft_build_playlist(c, c->selected_item);
                         if (global_settings.playlist_shuffle)
                         {
-                            start_index = playlist_shuffle(seed, start_index);
+                            start_index = playlist_shuffle(0, start_index);
                             /* when shuffling dir.: play all files
                                even if the file selected by user is
                                not the first one */

@@ -4349,7 +4349,7 @@ static bool start_playback(bool return_to_WPS)
             return false;
         }
         if (shuffle)
-            start_index = rb->playlist_shuffle(*rb->current_tick, pf_tracks.sel);
+            start_index = rb->playlist_shuffle(0, pf_tracks.sel);
     }
     rb->playlist_start(start_index, 0, 0);
     old_shuffle = shuffle;

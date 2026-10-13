@@ -1893,7 +1893,7 @@ void playlist_set_modified(struct playlist_info *playlist, bool modified)
 
 int playlist_shuffle(int random_seed, int start_index)
     \group playback control
-    \param random_seed
+    \param random_seed non-zero to specify a desired seed
     \param start_index
     \return
     \description
