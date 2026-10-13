@@ -19,6 +19,8 @@ IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE. */
    Adapted to Rockbox by Skye Green
 */
 
+#include "tick.h"
+#include "misc.h"
 #include <limits.h>
 #include <stdint.h>
 
@@ -44,6 +46,9 @@ static uint32_t s[2] = {
 	0x85A308D3U,
 };
 
+static unsigned long next_reseed = 0;
+#define RESEED_PERIOD HZ*60*15
+
 /* seeds the RNG using a single run of SplitMix64 */
 void srand(unsigned int seed) {
 	/* This is a fixed-increment version of Java 8's SplittableRandom generator
@@ -58,11 +63,17 @@ void srand(unsigned int seed) {
 	z = z ^ (z >> 31);
 	s[0] = z & 0xFFFFFFFF;
 	s[1] = (z >> 32) & 0xFFFFFFFF;
+
+	next_reseed = current_tick;
 }
 
 
 /* generates a random number on [0,RAND_MAX]-interval */
 int rand(void) {
+	if (TIME_AFTER(current_tick, next_reseed)) {
+		next_reseed = current_tick + RESEED_PERIOD;
+		srand(prng_newseed());
+	}
 	const uint32_t s0 = s[0];
 	uint32_t s1 = s[1];
 	const uint32_t result = rotl(s0 * 0x9E3779BB, 5) * 5;
