@@ -5,7 +5,7 @@ BEGIN { FS="[|)]" }
     blonly="no"
 }
 
-/^[ \t]*blonly="[^"]+"$/ {
+/^[ \t]*bootloader_only="[^"]+"$/ {
     blonly="yes"
 }
 

@@ -1691,7 +1691,7 @@ cat <<EOF
  14) H10 5/6Gb             24) 4G Grayscale
                            25) Mini 1G           ==SanDisk==
  ==Toshiba==               26) Mini 2G           50) Sansa e200
- 40) Gigabeat F/X          27) 1G, 2G            51) Sansa e200R
+ 40) Gigabeat F/X          27) 1G, 2G            51) Sansa e200R (bl only)
  41) Gigabeat S            28) Nano 2G           52) Sansa c200
                            29) Classic/6G        55) Sansa Clip
  ==Olympus=                80) Nano 3G (WIP)     56) Sansa e200v2
@@ -2656,7 +2656,7 @@ fi
    81|ipodnano4g)
     target_id=118
     modelname="ipodnano4g"
-    blonly="yes"
+    bootloader_only="1"
     target="IPOD_NANO4G"
     memory=32 # always
     arm1176jzscc
@@ -3976,7 +3976,7 @@ fi
    248|erosqnative_v3)
     target_id=116
     modelname="erosqnative_v3"
-    blonly="yes"
+    bootloader_only="1"
     target="EROS_QN"
     memory=32
     mipsr2elcc
@@ -4000,13 +4000,12 @@ fi
     # player version, for bootloader usage
     # version 3
     extradefines="$extradefines -DEROSQN_VER=3"
-    bootloader_only=1
     ;;
 
     249|erosqnative_v4)
     target_id=116
     modelname="erosqnative_v4"
-    blonly="yes"
+    bootloader_only="1"
     target="EROS_QN"
     memory=32
     mipsr2elcc
@@ -4030,7 +4029,6 @@ fi
     # player version, for bootloader usage
     # version 4
     extradefines="$extradefines -DEROSQN_VER=4"
-    bootloader_only=1
     ;;
 
    232|ihifi770c)
@@ -4378,10 +4376,7 @@ fi
       echo "Bootloader build selected"
       ;;
     [Ss])
-      if [ "$modelname" = "sansae200r" ]; then
-          echo "Do not use the e200R target for simulator builds.  Use e200 instead."
-          exit 8
-      elif [ "$modelname" = "sdlapp" ]; then
+      if [ "$modelname" = "sdlapp" ]; then
           echo "Do not use sdlapp for simulator builds; it is already a native SDL application."
           exit 8
       fi
@@ -4438,10 +4433,6 @@ fi
       echo "Warble build selected"
       ;;
     *)
-      if [ "$modelname" = "sansae200r" ]; then
-          echo "Do not use the e200R target for regular builds.  Use e200 instead."
-          exit 8
-      fi
       debug=""
       btype="N" # set it explicitly since RET only gets here as well
       echo "Normal build selected"
@@ -4466,7 +4457,7 @@ if [ -z "$debug" ]; then
 fi
 
 if [ "$bootloader_only" = "1" -a "$bootloader" != "1" ]; then
-    echo "Target can only be used for bootloader builds."
+    echo "Target can only be used for bootloader builds.\n"
     exit 9
 fi
 
