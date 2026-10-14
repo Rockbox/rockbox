@@ -1,0 +1,401 @@
+#             __________               __   ___.
+#   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+#   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+#   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+#   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+#                     \/            \/     \/    \/            \/
+#
+# Copyright (C) 2026 Marcin Bukat
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+# KIND, either express or implied.
+#
+# ZSP500 instruction encodings, recovered from the disassembler in the
+# vendor's ZSP debugger DLL (abizsp.dll, from the RK27xx SDK) and checked
+# on the RK27xx with hwstub. Documented in the ZSP500 DSP programming
+# manual: https://www.rockbox.org/wiki/pub/Main/Rockchip27xx/ZSP500_DSP_Programming_Manual.pdf
+#
+# pattern: bit15..0 of first halfword [then bit15..0 of second]; 0/1 fixed, x ignored, letters = fields (MSB first)
+# syntax placeholders: {a} unsigned, {a:s} signed, {2a}/{4a} pair/quad register number, {a+6} a6/a7,
+#   {a:TABLE[+k]} name from table (index = field + k), {n+1} count, {o:rel8|rel16} branch target
+# lines are tried in order; 16-bit forms come first
+0000 cccc oooo oooo                       | {c:br_cond} {o:rel8}
+0110 010a aaa1 1nnn                       | cexer (r{a},nz,u) { } !{n+1}
+0110 010a aaa1 0nnn                       | cexer (r{a},nz,nu) { } !{n+1}
+0110 010a aaa0 1nnn                       | cexer (r{a},z,u) { } !{n+1}
+0110 010a aaa0 0nnn                       | cexer (r{a},z,nu) { } !{n+1}
+0110 0110 cccc 1nnn                       | cexe ({c:cexe_cond},u) { } !{n+1}
+0110 0110 cccc 0nnn                       | cexe ({c:cexe_cond},nu) { } !{n+1}
+0110 0111 cccc 1nnn                       | cexes ({c:cexe_cond},u) { } !{n+1}
+0110 0111 cccc 0nnn                       | cexes ({c:cexe_cond},nu) { } !{n+1}
+0000 0000 0000 0000                       | nop
+0000 0000 1000 aaaa                       | call r{a}
+0000 0000 1010 0aaa                       | call a{a}
+0000 0000 1100 0000                       | ret
+0000 0000 1110 0000                       | reti
+0001 000c caaa abbb                       | ldu r{a},a{b},{c:mod_u}
+0001 0010 0caa abbb                       | lddu r{2a},a{b},{c:mod_d}
+0001 0010 1caa xbbb                       | ldqu r{4a},a{b},{c:mod_q}
+0001 0011 0caa abbb                       | lddu a{a},a{b},{c:mod_d}
+0001 0100 0aaa abbb                       | ldxu r{a},a{b}
+0001 0100 10aa abbb                       | lddxu a{a},a{b}
+0001 0100 11aa abbb                       | ldxu n{a},a{b}
+0001 0101 00aa abbb                       | lddxu r{2a},a{b}
+0001 0101 01aa xbbb                       | ldqxu r{4a},a{b}
+0001 0110 000a aaab                       | pop r{a},a{b+6}
+0001 0110 0010 aaab                       | popd r{2a},a{b+6}
+0001 0110 0100 aaab                       | popd a{a},a{b+6}
+0001 0110 0110 aaab                       | pop n{a},a{b+6}
+0001 0110 1000 0aab                       | popq r{4a},a{b+6}
+0001 0110 1010 0aab                       | popq a{2a},a{b+6}
+0001 0110 1100 0aab                       | popd n{2a},a{b+6}
+0001 0110 1110 00ab                       | popq n{4a},a{b+6}
+0001 0111 0000 00ab                       | popd g{4a},a{b+6}
+0001 0111 0010 000a                       | popq g0,a{a+6}
+0001 100c caaa abbb                       | stu r{a},a{b},{c:mod_u}
+0001 1010 0caa abbb                       | stdu r{2a},a{b},{c:mod_d}
+0001 1010 1caa xbbb                       | stqu r{4a},a{b},{c:mod_q}
+0001 1011 0caa abbb                       | stdu a{a},a{b},{c:mod_d}
+0001 1100 0aaa abbb                       | stxu r{a},a{b}
+0001 1100 10aa abbb                       | stdxu a{a},a{b}
+0001 1100 11aa abbb                       | stxu n{a},a{b}
+0001 1101 00aa abbb                       | stdxu r{2a},a{b}
+0001 1101 01aa xbbb                       | stqxu r{4a},a{b}
+0001 1110 000a aaab                       | push r{a},a{b+6}
+0001 1110 0010 aaab                       | pushd r{2a},a{b+6}
+0001 1110 0100 aaab                       | pushd a{a},a{b+6}
+0001 1110 0110 aaab                       | push n{a},a{b+6}
+0001 1110 1000 0aab                       | pushq r{4a},a{b+6}
+0001 1110 1010 0aab                       | pushq a{2a},a{b+6}
+0001 1110 1100 0aab                       | pushd n{2a},a{b+6}
+0001 1110 1110 00ab                       | pushq n{4a},a{b+6}
+0001 1111 0000 00ab                       | pushd g{4a},a{b+6}
+0001 1111 0010 000a                       | pushq g0,a{a+6}
+0010 00cc ccca aaab                       | ld r{a},a{b+6},{c}
+0010 010c cccc aaab                       | ldd a{a},a{b+6},{c}
+0010 011c cccc aaab                       | ldd r{2a},a{b+6},{c}
+0010 1000 0aaa abbb                       | ld r{a},a{b}
+0010 1000 1aaa xbbb                       | ldd r{2a},a{b}
+0010 1001 0aax xbbb                       | ldq r{4a},a{b}
+0010 1001 10aa abbb                       | ldd a{a},a{b}
+0010 1001 11aa abbb                       | ld n{a},a{b}
+0010 1100 0aaa abbb                       | ldx r{a},a{b}
+0010 1100 1aaa xbbb                       | lddx r{2a},a{b}
+0010 1101 0aax xbbb                       | ldqx r{4a},a{b}
+0010 1101 10aa abbb                       | lddx a{a},a{b}
+0010 1101 11aa abbb                       | ldx n{a},a{b}
+0011 00cc ccca aaab                       | st r{a},a{b+6},{c}
+0011 010c cccc aaab                       | std a{a},a{b+6},{c}
+0011 011c cccc aaab                       | std r{2a},a{b+6},{c}
+0011 1000 0aaa abbb                       | st r{a},a{b}
+0011 1000 1aaa xbbb                       | std r{2a},a{b}
+0011 1001 0aax xbbb                       | stq r{4a},a{b}
+0011 1001 10aa abbb                       | std a{a},a{b}
+0011 1001 11aa abbb                       | st n{a},a{b}
+0011 1100 0aaa abbb                       | stx r{a},a{b}
+0011 1100 1aaa xbbb                       | stdx r{2a},a{b}
+0011 1101 0aax xbbb                       | stqx r{4a},a{b}
+0011 1101 10aa abbb                       | stdx a{a},a{b}
+0011 1101 11aa abbb                       | stx n{a},a{b}
+0100 0000 0aaa 00bb                       | shll a{a},{b:shift_imm}
+0100 0000 0aaa 01bb                       | shrl a{a},{b:shift_imm}
+0100 0000 0aaa 10bb                       | shll n{a},{b:shift_imm}
+0100 0000 0aaa 11bb                       | shrl n{a},{b:shift_imm}
+0100 0000 1aaa bbbb                       | add a{a},{b:s}
+0100 0001 0aaa bbbb                       | add n{a},{b:s}
+0100 0100 0aaa bbbx                       | mov.e a{a},r{2b}
+0100 0100 1aaa bbbb                       | mov n{a},r{b}
+0100 0101 00aa abbb                       | mov a{a},a{b}
+0100 0101 01aa abbb                       | mov n{a},n{b}
+0100 0101 10aa abbb                       | swap a{a},a{b}
+0100 0101 11aa abbb                       | swap n{a},n{b}
+0100 1000 0aaa bbbb                       | add a{a},r{b}
+0100 1000 1aaa bbbb                       | sub a{a},r{b}
+0100 1001 0aaa bbbb                       | movhw a{a},r{b}
+0100 1001 1aaa bbbb                       | movlw a{a},r{b}
+0100 1010 0aaa bbbx                       | add.e a{a},r{2b}
+0100 1010 1aaa bbbx                       | sub.e a{a},r{2b}
+0100 1011 0aaa bbbb                       | add n{a},r{b}
+0100 1011 1aaa bbbb                       | sub n{a},r{b}
+0100 1100 00aa abbb                       | add a{a},a{b}
+0100 1100 01aa abbb                       | sub a{a},a{b}
+0100 1100 10aa abbb                       | add n{a},n{b}
+0100 1100 11aa abbb                       | sub n{a},n{b}
+0100 1101 00aa abbb                       | add a{a},n{b}
+0100 1101 01aa abbb                       | sub a{a},n{b}
+0101 00cc aaaa bbbb                       | ldu r{a},r{b},{c:mod_u}
+0101 0100 caaa bbbb                       | lddu r{2a},r{b},{c:mod_d}
+0101 0101 aaaa bbbb                       | ld r{a},r{b}
+0101 0110 0aaa abbb                       | ldx r{a},r{2b}
+0101 10cc aaaa bbbb                       | stu r{a},r{b},{c:mod_u}
+0101 1100 caaa bbbb                       | stdu r{2a},r{b},{c:mod_d}
+0101 1101 aaaa bbbb                       | st r{a},r{b}
+0101 1110 0aaa abbb                       | stx r{a},r{2b}
+0110 000a aaab bbbb                       | mov r{a},{b:creg_e7e4}
+0110 001a aaaa bbbb                       | mov {a:creg_e724},r{b}
+0110 1000 aabb bccc                       | vit_a r{a},r{2b},r{2c}
+0110 1001 aabb bccc                       | vit_b r{a},r{2b},r{2c}
+0111 0000 aaaa bbb0                       | ins r{a},r{2b}
+0111 0000 aaax bbb1                       | ins.e r{2a},r{2b}
+0111 0001 aaa0 bbbb                       | ext r{2a},r{b}
+0111 0001 aaa1 bbbb                       | exts r{2a},r{b}
+0111 0010 aaax bbb0                       | ext.e r{2a},r{2b}
+0111 0010 aaax bbb1                       | exts.e r{2a},r{2b}
+0111 0011 0000 aaaa                       | vxor r{a}
+0111 0011 0001 aaax                       | vxor.e r{2a}
+0111 0100 00aa aabb                       | cmp r{a},{b:cmp_imm}
+0111 0100 010a axbb                       | cmp.e r{2a},{b:cmp_imm}
+0111 0100 100a aabb                       | cmp a{a},{b:cmp_imm}
+0111 0100 110a aabb                       | cmp n{a},{b:cmp_imm}
+0111 0110 aaaa bbbb                       | cmp r{a},r{b}
+0111 0111 0aaa bbbb                       | cmp n{a},r{b}
+0111 0111 1aaa bbbx                       | cmp.e a{a},r{2b}
+0111 1000 aaaa bbbb                       | swap r{a},r{b}
+0111 1001 00aa bbbb                       | mov {a:creg_e664},r{b}
+0111 1010 0aaa bbb0                       | mov.e {a:creg_e6c4},r{2b}
+0111 1010 0xxa bbb1                       | mov.e {a:creg_e65c},r{2b}
+0111 1011 0aaa abbb                       | mov r{a},{b:creg_e864}
+0111 1011 10aa abbb                       | mov.e a{a},{b:creg_e864}
+0111 1100 0aaa xbbb                       | mov.e r{2a},{b:creg_e6c4}
+0111 1100 1aaa xbbb                       | mov.e r{2a},a{b}
+0111 1101 0aaa abbb                       | mov.e {a:creg_e7a4},a{b}
+0111 1101 1aaa abbb                       | movhw r{a},a{b}
+0111 1110 0aaa abbb                       | movlw r{a},a{b}
+0111 1110 1aaa abbb                       | mov r{a},n{b}
+0111 1111 000a abbb                       | mov {a:creg_e674},n{b}
+1000 000a bbbb cccc                       | mul r{2a},r{b},r{c}
+1000 001a bbbb cccc                       | muln r{2a},r{b},r{c}
+1000 010a bbbb cccc                       | imul r{2a},r{b},r{c}
+1000 0110 aaaa bbbb                       | imulc r{a},r{b}
+1000 0111 bbbb cccc                       | imulc r2,r{b},r{c}
+1000 100a bbbb cccc                       | mac r{2a},r{b},r{c}
+1000 101a bbbb cccc                       | macn r{2a},r{b},r{c}
+1001 0000 0abb bccc                       | padd r{2a},r{2b},r{2c}
+1001 0000 1abb bccc                       | psub r{2a},r{2b},r{2c}
+1001 0001 0abb bccc                       | pmul r{2a},r{2b},r{2c}
+1001 0001 1abb bccc                       | idmulc r{2a},r{2b},r{2c}
+1001 0010 0abb bccc                       | cmulr r{2a},r{2b},r{2c}
+1001 0010 1abb bccc                       | cmuli r{2a},r{2b},r{2c}
+1001 0011 0abb bccc                       | mul2 r{2a},r{2b},r{2c}
+1001 0100 0abb bccc                       | pmac r{2a},r{2b},r{2c}
+1001 0100 1abb bccc                       | mac2 r{2a},r{2b},r{2c}
+1001 0101 0abb bccc                       | cmacr r{2a},r{2b},r{2c}
+1001 0101 1abb bccc                       | cmaci r{2a},r{2b},r{2c}
+1001 1000 00aa abbb                       | add.e r{2a},r{2b}
+1001 1000 01aa abbb                       | sub.e r{2a},r{2b}
+1001 1000 10aa abbb                       | addc.e r{2a},r{2b}
+1001 1000 11aa abbb                       | subc.e r{2a},r{2b}
+1001 1001 00aa abbb                       | min.e r{2a},r{2b}
+1001 1001 01aa abbb                       | max.e r{2a},r{2b}
+1001 1001 10aa abbb                       | iadd.e r{2a},r{2b}
+1001 1001 11aa abbb                       | isub.e r{2a},r{2b}
+1001 1010 00aa abbb                       | and.e r{2a},r{2b}
+1001 1010 01aa abbb                       | or.e r{2a},r{2b}
+1001 1010 10aa abbb                       | xor.e r{2a},r{2b}
+1001 1010 11aa abbb                       | cmp.e r{2a},r{2b}
+1001 1100 00aa abbb                       | add.f r{2a},r{2b}
+1001 1100 01aa abbb                       | sub.f r{2a},r{2b}
+1001 1100 10aa axxx                       | sxtn.f r{2a}
+1001 1100 11aa axxx                       | zxtn.f r{2a}
+1001 1101 00aa axxx                       | sat.f r{2a}
+1001 1101 01aa abbb                       | cmp.f r{2a},r{2b}
+1010 0000 00aa bbbb                       | bitc {a:creg_e664},{b}
+1010 0000 10aa bbbb                       | bits {a:creg_e664},{b}
+1010 0001 00aa bbbb                       | biti {a:creg_e664},{b}
+1010 0001 1aaa bbbb                       | bitc {a:creg_e6a4},{b}
+1010 0010 0aaa bbbb                       | bits {a:creg_e6a4},{b}
+1010 0010 1aaa bbbb                       | biti {a:creg_e6a4},{b}
+1010 0100 0aaa bbbb                       | bitt g{a},{b}
+1010 0101 aaaa bbbb                       | bitt {a:creg_e6e4},{b}
+1010 1000 aaaa bbbb                       | shll r{a},{b}
+1010 1001 aaaa bbbb                       | shrl r{a},{b}
+1010 1010 aaaa bbbb                       | shla r{a},{b}
+1010 1011 aaaa bbbb                       | shra r{a},{b}
+1010 1100 aaaa bbbb                       | bitt r{a},{b}
+1010 1101 aaaa bbbb                       | mov r{a},0x{b:s}
+1010 1110 aaaa bbbb                       | add r{a},{b:s}
+1010 1111 aaaa bbbb                       | iadd r{a},{b:s}
+1011 0000 aaaa bbbb                       | not r{a},r{b}
+1011 0001 aaaa bbbb                       | mov r{a},r{b}
+1011 0010 aaaa bbbb                       | norm r{a},r{b}
+1011 0011 aaaa bbbb                       | abs r{a},r{b}
+1011 0100 aaaa bbbb                       | neg r{a},r{b}
+1011 1000 aaaa bbbx                       | norm.e r{a},r{2b}
+1011 1001 aaa0 bbbx                       | abs.e r{2a},r{2b}
+1011 1001 aaa1 bbbx                       | neg.e r{2a},r{2b}
+1011 1010 aaa0 bbbx                       | round.e r{2a},r{2b}
+1011 1010 aaa1 bbbx                       | not.e r{2a},r{2b}
+1011 1011 aaa0 bbbx                       | mov.e r{2a},r{2b}
+1011 1011 aaa1 bbbx                       | mov.f r{2a},r{2b}
+1100 0000 aaaa bbbb                       | shll r{a},r{b}
+1100 0001 aaaa bbbb                       | shrl r{a},r{b}
+1100 0010 aaaa bbbb                       | shla r{a},r{b}
+1100 0011 aaaa bbbb                       | shra r{a},r{b}
+1100 0100 aaaa bbbb                       | shbl r{a},r{b}
+1100 0101 aaaa bbbb                       | shba r{a},r{b}
+1100 0110 aaaa bbbb                       | and r{a},r{b}
+1100 0111 aaaa bbbb                       | or r{a},r{b}
+1100 1000 aaaa bbbb                       | xor r{a},r{b}
+1100 1001 aaaa bbbb                       | add r{a},r{b}
+1100 1010 aaaa bbbb                       | sub r{a},r{b}
+1100 1011 aaaa bbbb                       | min r{a},r{b}
+1100 1100 aaaa bbbb                       | max r{a},r{b}
+1100 1101 aaaa bbbb                       | iadd r{a},r{b}
+1100 1110 aaaa bbbb                       | isub r{a},r{b}
+1100 1111 aaaa bbbb                       | revb r{a},r{b}
+1101 0000 aaab bbbb                       | shll.e r{2a},{b}
+1101 0001 aaab bbbb                       | shrl.e r{2a},{b}
+1101 0010 aaab bbbb                       | shla.e r{2a},{b}
+1101 0011 aaab bbbb                       | shra.e r{2a},{b}
+1101 0100 aaab bbbb                       | shrl.f r{2a},{b}
+1101 0101 aaab bbbb                       | shll.f r{2a},{b}
+1101 1000 0aaa bbbb                       | shll.e r{2a},r{b}
+1101 1000 1aaa bbbb                       | shrl.e r{2a},r{b}
+1101 1001 0aaa bbbb                       | shla.e r{2a},r{b}
+1101 1001 1aaa bbbb                       | shra.e r{2a},r{b}
+1101 1010 0aaa bbbb                       | shbl.e r{2a},r{b}
+1101 1010 1aaa bbbb                       | shba.e r{2a},r{b}
+1101 1011 0aaa bbbb                       | diva r{2a},r{b}
+1101 1011 1aaa bbbb                       | shbl.f r{2a},r{b}
+1111 0000 0000 0000 oooo oooo oooo oooo   | br {o:rel16}
+1111 0000 0000 1000 oooo oooo oooo oooo   | call {o:rel16}
+1111 0000 cccc 0000 oooo oooo oooo oooo   | {c:br_cond} {o:rel16}
+1111 0001 0000 0xxx xxxx xccc aaaa bbbb   | ld r{a},r{b},{c:s}
+1111 0001 0000 1xxx xxxx xxxx aaaa bbbx   | ldxu r{a},r{2b}
+1111 0001 0001 0xxx xxxx xccc aaaa bbbb   | st r{a},r{b},{c:s}
+1111 0001 0001 1xxx xxxx xxxx aaaa bbbx   | stxu r{a},r{2b}
+1111 0010 0aaa abbb cccc cccc cccc cccc   | ld r{a},a{b},{c:s}
+1111 0010 10aa abbb cccc cccc cccc cccc   | ldd a{a},a{b},{c:s}
+1111 0010 11aa abbb cccc cccc cccc cccc   | ld n{a},a{b},{c:s}
+1111 0011 00aa abbb cccc cccc cccc cccc   | ldd r{2a},a{b},{c:s}
+1111 0011 01aa abbb cccc cccc cccc cccc   | ldf r{2a},a{b},{c:s}
+1111 0100 0aaa abbb cccc cccc cccc cccc   | st r{a},a{b},{c:s}
+1111 0100 10aa abbb cccc cccc cccc cccc   | std a{a},a{b},{c:s}
+1111 0100 11aa abbb cccc cccc cccc cccc   | st n{a},a{b},{c:s}
+1111 0101 00aa abbb cccc cccc cccc cccc   | std r{2a},a{b},{c:s}
+1111 0101 01aa abbb cccc cccc cccc cccc   | stf r{2a},a{b},{c:s}
+1111 0110 0000 0000 xxxc aaax xbbb xxxx   | ldfu r{2a},a{b},{c:mod_f}
+1111 0110 0000 1000 xxxx aaax xbbb xxxx   | popf r{2a},a{b}
+1111 0110 0001 0000 xxxx aaaa xbbb xccc   | ldxu r{a},a{b},n{c}
+1111 0110 0001 1000 xxxx xaaa xbbb xccc   | lddxu a{a},a{b},n{c}
+1111 0110 0010 0000 xxxx xaaa xbbb xccc   | ldxu n{a},a{b},n{c}
+1111 0110 0010 1000 xxxx aaax xbbb xccc   | lddxu r{2a},a{b},n{c}
+1111 0110 0011 0000 xxxx aaxx xbbb xccc   | ldqxu r{4a},a{b},n{c}
+1111 0110 0100 0000 xxxx aaaa xbbb xccc   | ldx r{a},a{b},n{c}
+1111 0110 0100 1000 xxxx xaaa xbbb xccc   | lddx a{a},a{b},n{c}
+1111 0110 0101 0000 xxxx xaaa xbbb xccc   | ldx n{a},a{b},n{c}
+1111 0110 0101 1000 xxxx aaax xbbb xccc   | lddx r{2a},a{b},n{c}
+1111 0110 0110 0000 xxxx aaxx xbbb xccc   | ldqx r{4a},a{b},n{c}
+1111 0110 1000 0000 xxxc aaax xbbb xxxx   | stfu r{2a},a{b},{c:mod_f}
+1111 0110 1000 1000 xxxx aaax xbbb xxxx   | pushf r{2a},a{b}
+1111 0110 1001 0000 xxxx aaaa xbbb xccc   | stxu r{a},a{b},n{c}
+1111 0110 1001 1000 xxxx xaaa xbbb xccc   | stdxu a{a},a{b},n{c}
+1111 0110 1010 0000 xxxx xaaa xbbb xccc   | stxu n{a},a{b},n{c}
+1111 0110 1010 1000 xxxx aaax xbbb xccc   | stdxu r{2a},a{b},n{c}
+1111 0110 1011 0000 xxxx aaxx xbbb xccc   | stqxu r{4a},a{b},n{c}
+1111 0110 1100 0000 xxxx aaaa xbbb xccc   | stx r{a},a{b},n{c}
+1111 0110 1100 1000 xxxx xaaa xbbb xccc   | stdx a{a},a{b},n{c}
+1111 0110 1101 0000 xxxx xaaa xbbb xccc   | stx n{a},a{b},n{c}
+1111 0110 1101 1000 xxxx aaax xbbb xccc   | stdx r{2a},a{b},n{c}
+1111 0110 1110 0000 xxxx aaxx xbbb xccc   | stqx r{4a},a{b},n{c}
+1111 0111 0000 0aaa bbbb bbbb bbbb bbbb   | add a{a},{b:s}
+1111 0111 0000 1aaa bbbb bbbb bbbb bbbb   | add n{a},{b:s}
+1111 0111 0001 0aaa bbbb bbbb bbbb bbbb   | movhw a{a},0x{b}
+1111 0111 0001 1aaa bbbb bbbb bbbb bbbb   | movlw a{a},0x{b}
+1111 0111 0010 0aaa bbbb bbbb bbbb bbbb   | mov a{a},0x{b}
+1111 0111 0010 1aaa bbbb bbbb bbbb bbbb   | mov n{a},0x{b}
+1111 1000 0000 aaaa bbbb bbbb bbbb bbbb   | mov r{a},0x{b}
+1111 1000 0001 aaaa bbbb bbbb bbbb bbbb   | and r{a},0x{b}
+1111 1000 0010 aaaa bbbb bbbb bbbb bbbb   | or r{a},0x{b}
+1111 1000 0011 aaaa bbbb bbbb bbbb bbbb   | xor r{a},0x{b}
+1111 1000 0100 aaaa bbbb bbbb bbbb bbbb   | iadd r{a},{b:s}
+1111 1000 0101 aaaa bbbb bbbb bbbb bbbb   | add r{a},{b:s}
+1111 1000 0110 aaaa bbbb bbbb bbbb bbbb   | cmp r{a},{b:s}
+1111 1000 1000 aaax bbbb bbbb bbbb bbbb   | iadd.e r{2a},{b:s}
+1111 1000 1001 aaax bbbb bbbb bbbb bbbb   | cmp.e r{2a},{b:s}
+1111 1000 1010 aaax bbbb bbbb bbbb bbbb   | movlw.f r{2a},{b:s}
+1111 1000 1011 aaax bbbb bbbb bbbb bbbb   | movhw.f r{2a},{b:s}
+1111 1001 0000 xaaa xxxx xxxx bbbb bbbb   | and g{a},0x{b}
+1111 1001 0001 xaaa xxxx xxxx bbbb bbbb   | or g{a},0x{b}
+1111 1001 0010 xaaa xxxx xxxx bbbb bbbb   | xor g{a},0x{b}
+1111 1001 0011 xaaa xxxx xxxx bbbb bbbb   | mov g{a},0x{b}
+1111 1001 0100 xaaa xxxx xxxx bbbb bbbb   | movl {a:creg_e684},0x{b}
+1111 1001 0101 xaaa xxxx xxxx bbbb bbbb   | movh {a:creg_e684},0x{b}
+1111 1001 0110 0aaa bbbb bbbb bbbb bbbb   | mov {a:creg_e684},0x{b}
+1111 1001 1000 aaaa xxxx xxxx xxxx bbbb   | revb r{a},{b}
+1111 1001 1001 aaaa xxxx xxxx bbbb bbbb   | movl r{a},0x{b}
+1111 1001 1010 aaaa xxxx xxxx bbbb bbbb   | movh r{a},0x{b}
+1111 1010 0000 00aa aabb bbcc cccd dddd   | ins r{a},r{b},{c},{d}
+1111 1010 0000 10aa axbb bbcc cccd dddd   | ins.e r{2a},r{b},{c},{d}
+1111 1010 0001 00aa aabb bbcc cccd dddd   | ext r{a},r{b},{c},{d}
+1111 1010 0001 10aa aabb bbcc cccd dddd   | exts r{a},r{b},{c},{d}
+1111 1010 0010 00aa aabb bxcc cccd dddd   | ext.e r{a},r{2b},{c},{d}
+1111 1010 0010 10aa aabb bxcc cccd dddd   | exts.e r{a},r{2b},{c},{d}
+1111 1010 0100 0000 xxxx aaaa bbbb cccc   | ins r{a},r{b},r{c}
+1111 1010 0100 1000 xxxx aaax bbbb cccc   | ins.e r{2a},r{b},r{c}
+1111 1010 0101 0000 xxxx aaaa bbbb cccc   | ext r{a},r{b},r{c}
+1111 1010 0101 1000 xxxx aaaa bbbb cccc   | exts r{a},r{b},r{c}
+1111 1010 0110 0000 xxxx aaaa bbbx cccc   | ext.e r{a},r{2b},r{c}
+1111 1010 0110 1000 xxxx aaaa bbbx cccc   | exts.e r{a},r{2b},r{c}
+1111 1010 1000 0000 xxxx xxxx xxaa bbbb   | mov g{2a},r{b}
+1111 1010 1000 1000 xxxx xxxx aaaa xxbb   | mov r{a},g{2b}
+1111 1011 0000 0xxx xxxx aaaa bbbb cccc   | add r{a},r{b},r{c}
+1111 1011 0000 1xxx xxxx aaaa bbbb cccc   | sub r{a},r{b},r{c}
+1111 1011 0001 0xxx xxxx aaaa bbbb cccc   | imulc r{a},r{b},r{c}
+1111 1011 0001 1xxx xxxx aaaa bbbb cccc   | mulsu r{a},r{b},r{c}
+1111 1011 0010 0xxx xxxx aaaa bbbb cccc   | muluu r{a},r{b},r{c}
+1111 1011 0010 1xxx xxxx aaaa bbbb cccc   | mul r{a},r{b},r{c}
+1111 1011 0011 0xxx xxxx aaaa bbbb cccc   | muln r{a},r{b},r{c}
+1111 1011 0011 1xxx xxxx aaaa bbbb cccc   | imul r{a},r{b},r{c}
+1111 1011 0100 0xxx xxxx aaaa bbbb cccc   | pmul r{a},r{b},r{c}
+1111 1011 0100 1xxx xxxx aaaa bbbb cccc   | mul2 r{a},r{b},r{c}
+1111 1011 0101 0xxx xxxx aaaa bbbb cccc   | dmul r{a},r{b},r{c}
+1111 1011 0101 1xxx xxxx aaaa bbbb cccc   | cmulr r{a},r{b},r{c}
+1111 1011 0110 0xxx xxxx aaaa bbbb cccc   | cmuli r{a},r{b},r{c}
+1111 1011 0110 1xxx xxxx aaaa bbbb cccc   | padd r{a},r{b},r{c}
+1111 1011 0111 0xxx xxxx aaaa bbbb cccc   | psub r{a},r{b},r{c}
+1111 1011 0111 1xxx xxxx aaaa bbbb cccc   | idmulc r{a},r{b},r{c}
+1111 1011 1000 0xxx xxxx aaaa bbbb cccc   | macsu r{a},r{b},r{c}
+1111 1011 1000 1xxx xxxx aaaa bbbb cccc   | macuu r{a},r{b},r{c}
+1111 1011 1001 0xxx xxxx aaaa bbbb cccc   | mac r{a},r{b},r{c}
+1111 1011 1001 1xxx xxxx aaaa bbbb cccc   | macn r{a},r{b},r{c}
+1111 1011 1010 0xxx xxxx aaaa bbbb cccc   | pmac r{a},r{b},r{c}
+1111 1011 1010 1xxx xxxx aaaa bbbb cccc   | mac2 r{a},r{b},r{c}
+1111 1011 1011 0xxx xxxx aaaa bbbb cccc   | dmac r{a},r{b},r{c}
+1111 1011 1011 1xxx xxxx aaaa bbbb cccc   | cmacr r{a},r{b},r{c}
+1111 1011 1100 0xxx xxxx aaaa bbbb cccc   | cmaci r{a},r{b},r{c}
+1111 1100 00aa abbb cccc cccc cccc cccc   | cpcom.e r{2a},a{b},0x{c}
+1111 1100 01aa abbb cccc cccc cccc cccc   | cpcom a{a},a{b},0x{c}
+1111 1100 1000 aaaa bbbb bbbb bbbb bbbb   | cpcom r{a},0x{b}
+1111 1100 1001 0aaa bbbb bbbb bbbb bbbb   | cpcom.e r{2a},0x{b}
+1111 1100 1001 1aaa bbbb bbbb bbbb bbbb   | cpcom a{a},0x{b}
+1111 1101 00aa abbb cccc cccc cccc cccc   | cpout.e r{2a},a{b},0x{c}
+1111 1101 01aa abbb cccc cccc cccc cccc   | cpout a{a},a{b},0x{c}
+1111 1101 1000 0000 aaaa aaaa aaaa aaaa   | cpout 0x{a}
+1111 1101 1001 0aaa bbbb bbbb bbbb bbbb   | cpout.e r{2a},0x{b}
+
+# name tables (index order)
+@creg_e65c = %vitr -
+@creg_e664 = %hwflag %shwflag %vitr %vitr %loop0 %loop1 %loop2 %loop3
+@creg_e674 = %loop0 %loop1 %loop2 %loop3
+@creg_e684 = %fmode %loop2 %loop3 - - %loop0 %loop1 -
+@creg_e6a4 = %fmode %tc %imask %ip0 %ip1 %ireq %amode %smode
+@creg_e6c4 = %pc %rpc %tpc %vitr - - - %ded
+@creg_e6e4 = %fmode %tc %imask %ip0 %ip1 - - %psmode %hwflag %ireq - %vitr %vitr %shwflag %amode %smode
+@creg_e724 = %fmode %tc %imask %ip0 %ip1 %loop0 %loop1 %psmode - %ireq %cb2_beg %cb2_end - - %amode %smode %pc %rpc %tpc %cb0_beg %cb1_beg %cb0_end %cb1_end %timer0 %timer1 %loop2 %loop3 %cb3_beg %cb3_end - %dei %ded
+@creg_e7a4 = %pc %rpc %tpc %cb0_beg %cb1_beg %cb0_end %cb1_end %cb3_beg %cb3_end - %cb2_beg %cb2_end - - - -
+@creg_e7e4 = %fmode %tc %imask %ip0 %ip1 %loop0 %loop1 %psmode %hwflag %ireq - - %vitr %shwflag %amode %smode %pc %rpc %tpc - - - - %timer0 %timer1 %loop2 %loop3 - - - %dei %ded
+@creg_e864 = %cb0_beg %cb0_end %cb1_beg %cb1_end %cb2_beg %cb2_end %cb3_beg %cb3_end
+@cexe_cond = nv v ngv gv nsv sv ngsv gsv nc c lt ge le gt nz z
+@br_cond = - - agn0 agn1 agn2 agn3 bz bnz bge blt bgt ble bov bnov bc bnc
+@mod_u = 2 1 -2 -1
+@mod_d = 2 -2
+@mod_q = 4 -4
+@mod_f = 3 -3
+@cmp_imm = 0 1 -2 -1
+@shift_imm = 3 2 1 4
