@@ -361,13 +361,8 @@ static void init_controller(void)
     MMU_CTRL = MMU_MMU0_BUFII | MMU_CPU_BUFI | MMU_BUFII_RESET |
                MMU_BUFII_BYTE | MMU_BUFI_RESET | MMU_BUFI_WORD;
 
-    /* setup A2A DMA CH0 for SD reads */
-    A2A_ISRC0 = (unsigned long)(&MMU_DATA);
-    A2A_ICNT0 = 512;
-    A2A_LCNT0 = 1;
-
-    /* setup A2A DMA CH1 for SD writes */
-    A2A_IDST1 = (unsigned long)(&MMU_DATA);
+    /* setup A2A DMA CH1 for SD reads and writes (source and destination
+     * are set for each transfer); CH0 is core_sleep()'s */
     A2A_ICNT1 = 512;
     A2A_LCNT1 = 1;
 
@@ -409,15 +404,16 @@ static inline void read_sd_data(unsigned char **dst)
     commit_discard_dcache_range((const void *)buf, 512);
 
 
-    A2A_IDST0 = (unsigned long)buf;
-    A2A_CON0  = (3<<9) |    /* burst 16 */
+    A2A_ISRC1 = (unsigned long)(&MMU_DATA);
+    A2A_IDST1 = (unsigned long)buf;
+    A2A_CON1  = (3<<9) |    /* burst 16 */
                 (1<<6) |    /* fixed src */
                 (1<<3) |    /* DMA start */
                 (2<<1) |    /* word transfer size */
                 (1<<0);     /* software mode */
 
     /* wait for DMA engine to finish transfer */
-    while (A2A_DMA_STS & 1);
+    while (A2A_DMA_STS & 2);
 
 #ifdef ALIGN_BUF
     if (buf == aligned_buf)
@@ -442,6 +438,7 @@ static inline void write_sd_data(unsigned char **src)
     commit_discard_dcache_range((const void *)buf, 512);
 
     A2A_ISRC1 = (unsigned long)buf;
+    A2A_IDST1 = (unsigned long)(&MMU_DATA);
     A2A_CON1  = (3<<9) |    /* burst 16 */
                 (1<<5) |    /* fixed dst */
                 (1<<3) |    /* DMA start */
