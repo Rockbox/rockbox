@@ -20,7 +20,7 @@ IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE. */
 */
 
 #include "tick.h"
-#include "misc.h"
+#include "general.h"
 #include <limits.h>
 #include <stdint.h>
 

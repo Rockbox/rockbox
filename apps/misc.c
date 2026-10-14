@@ -2068,16 +2068,4 @@ void validate_start_directory_init(void) /* INIT_ATTR */
     }
 }
 
-/* Re-initialize seed to something appropriate */
-unsigned int prng_newseed(void) {
-	unsigned int seed;
-
-	struct tm *tm = get_time();
-	seed = tm->tm_sec + tm->tm_min * 60 + tm->tm_hour *360 + tm->tm_yday * 24*360 + tm->tm_year * 31536000;
-	seed ^= current_tick;
-	seed ^= rand();
-	// TODO: use HW entropy if available?
-	return seed;
-}
-
 #endif /* ndef __PCTOOL__ */

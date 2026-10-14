@@ -84,4 +84,7 @@ void ** find_array_ptr(void **arr, void *ptr);
    no gaps exist. Returns 0 on success and -1 if the element wasn't found. */
 int remove_array_ptr(void **arr, void *ptr);
 
+/* Reseed the PRNG using the best entropy source available */
+unsigned int prng_newseed(void);
+
 #endif /* GENERAL_H */

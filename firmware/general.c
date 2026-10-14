@@ -132,7 +132,7 @@ char *create_numbered_filename(char *buffer, const char *path,
 
         if (strncasecmp((char *)entry->d_name, prefix, prefixlen))
             continue;
-            
+
         namelen = strlen((char *)entry->d_name);
         if ((namelen <= prefixlen + suffixlen)
             || strcasecmp((char *)entry->d_name + namelen - suffixlen, suffix))
@@ -227,4 +227,16 @@ int remove_array_ptr(void **arr, void *ptr)
     while (curr != NULL);
 
     return 0;
+}
+
+/* Re-initialize seed to something appropriate */
+unsigned int prng_newseed(void) {
+    unsigned int seed;
+
+    struct tm *tm = get_time();
+    seed = tm->tm_sec + tm->tm_min * 60 + tm->tm_hour *360 + tm->tm_yday * 24*360 + tm->tm_year * 31536000;
+    seed ^= current_tick;
+    seed ^= rand();
+    // TODO: use HW entropy if available?
+    return seed;
 }
