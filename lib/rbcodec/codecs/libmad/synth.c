@@ -532,10 +532,18 @@ void dct32(mad_fixed_t const in[32], unsigned int slot,
 #  endif
 # endif
 
+/* ARMv5E and later have 32x16-bit multiplies, used with a 16-bit copy of
+   the window (see synth_full() below) */
+# if defined(FPM_ARM) && ARM_ARCH >= 5
+#  define SYNTH_ARMV5E
+# endif
+
+# ifndef SYNTH_ARMV5E
 static
 mad_fixed_t const D[17][32] ICONST_ATTR MEM_ALIGN_ATTR = {
 # include "D.dat"
 };
+# endif
 
 /*
  * NAME:        synth->full()
@@ -757,6 +765,163 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
         pcm[0] = -(hi0 << 3);
       }
       pcm  += 16;
+      phase = (phase + 1) % 16;
+    }
+  }
+}
+
+#elif defined(SYNTH_ARMV5E)
+
+/*
+ * Each output sample is the sum of 16 products of filter values and window
+ * coefficients, taken as two dot products of eight.  Here the coefficients
+ * are rounded to 14 fractional bits and stored by D_armv5e.dat so that the
+ * eight of each dot product are consecutive halfwords: one load fetches two
+ * of them and smlaw{b,t} multiplies by either half in one cycle.  smlaw
+ * keeps the top 32 bits of the 48-bit product, so the sums have 26
+ * fractional bits and are shifted up by 2 at the end.
+ */
+static
+int16_t const Dpk[17][4][16] ICONST_ATTR MEM_ALIGN_ATTR = {
+# include "D_armv5e.dat"
+};
+
+/* tables within a row of Dpk */
+#define DPK_O  0
+#define DPK_E  1
+#define DPK_RO 2
+#define DPK_RE 3
+#define DPK_ROW_WORDS (4 * 16 / 2)
+
+#define SMULW(x, acc, f, d) \
+    asm ("smulw" #x " %0, %1, %2" : "=r" (acc) : "r" (f), "r" (d))
+#define SMLAW(x, acc, f, d) \
+    asm ("smlaw" #x " %0, %1, %2, %0" : "+r" (acc) : "r" (f), "r" (d))
+
+/* acc (+)= f * halfword q of w; first, q are constants */
+static inline __attribute__((always_inline))
+int32_t synth_mac(int32_t acc, int first, mad_fixed_t f,
+                  uint32_t const *w, int q)
+{
+  uint32_t d = w[q >> 1];
+
+  if (first) {
+    if (q & 1) SMULW(t, acc, f, d); else SMULW(b, acc, f, d);
+  }
+  else {
+    if (q & 1) SMLAW(t, acc, f, d); else SMLAW(b, acc, f, d);
+  }
+  return acc;
+}
+
+/*
+ * Dot product of f[0..7] with the eight coefficients c[i] at halfword h + i
+ * of w.  fwd pairs f[0] with c[0] and f[k] with c[8 - k], as PROD_O and
+ * PROD_A do; otherwise f[k] is paired with c[7 - k].
+ */
+#define SYNTH_IDX(k)  (fwd ? ((8 - (k)) & 7) : 7 - (k))
+#define SYNTH_MAC(k)  acc = synth_mac(acc, first && (k) == 0, f[k], w, \
+                                      h + SYNTH_IDX(k))
+static inline __attribute__((always_inline))
+int32_t synth_dot(int32_t acc, int first, mad_fixed_t const *f,
+                  uint32_t const *w, int h, int fwd)
+{
+  SYNTH_MAC(0); SYNTH_MAC(1); SYNTH_MAC(2); SYNTH_MAC(3);
+  SYNTH_MAC(4); SYNTH_MAC(5); SYNTH_MAC(6); SYNTH_MAC(7);
+  return acc;
+}
+#undef SYNTH_MAC
+#undef SYNTH_IDX
+
+/*
+ * One time slot: the 32 samples at pcm.  o is the phase's parity and al the
+ * parity of a = p / 2, both constants.  For window row r, the original
+ * code's D[r][p + k] (odd p + k) is -O[a + k / 2], its D[r][p + k] (even
+ * p + k) is E[a + k / 2 + (1 - o)], and its D[r][k - p] are Ro[a ...] and
+ * Re[a + (1 - o) ...].  dp points at row 0 of Dpk, halfword a - al.
+ */
+#define SYNTH_GRP(row, tbl, d) \
+  ((row) + (tbl) * 8 + ((al + (d)) >> 1)), ((al + (d)) & 1)
+/* synth_full_armv5e.S: the loop over sb of synth_slot() for each value of
+   phase & 3, which fixes o and al */
+typedef void synth_loop_fn(mad_fixed_t *pcm, mad_fixed_t const *fo,
+                           mad_fixed_t const *fe, uint32_t const *dp);
+synth_loop_fn synth_full_armv5e_0, synth_full_armv5e_1,
+              synth_full_armv5e_2, synth_full_armv5e_3;
+
+static inline __attribute__((always_inline))
+void synth_slot(mad_fixed_t *pcm, mad_fixed_t (*fe)[8],
+                mad_fixed_t (*fx)[8], mad_fixed_t (*fo)[8],
+                uint32_t const *dp, int o, int al, synth_loop_fn *loop)
+{
+  int32_t acc;
+  int const de = !o;  /* E and Re start one halfword later for even phases */
+
+  /* O holds the window negated */
+  acc = synth_dot(0, 1, *fx, SYNTH_GRP(dp, DPK_O, 0), 1);
+  acc = synth_dot(acc, 0, *fe, SYNTH_GRP(dp, DPK_E, de), 1);
+  pcm[0] = acc << 2;
+  pcm   += 16;
+
+  /* pcm[-sb] and pcm[sb] for sb = 15..1, from window rows 1..15 */
+  loop(pcm - 16, *fo, *(fe + 1), dp + DPK_ROW_WORDS);
+  fo += 15;
+
+  dp += 16 * DPK_ROW_WORDS;
+  acc = synth_dot(0, 1, *fo, SYNTH_GRP(dp, DPK_O, 0), 1);
+  pcm[0] = acc << 2;
+}
+#undef SYNTH_GRP
+
+static
+void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
+                unsigned int nch, unsigned int ns) ICODE_ATTR_MPA_SYNTH;
+static
+void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
+                unsigned int nch, unsigned int ns)
+{
+  unsigned int phase, ch, s, p;
+  mad_fixed_t *pcm, (*filter)[2][2][16][8];
+  mad_fixed_t (*sbsample)[36][32];
+  mad_fixed_t (*fe)[8], (*fx)[8], (*fo)[8];
+  uint32_t const *dp;
+
+  for (ch = 0; ch < nch; ++ch) {
+    sbsample = &(*frame->sbsample_prev)[ch];
+    filter   = &synth->filter[ch];
+    phase    = synth->phase;
+    pcm      = synth->pcm.samples[ch];
+
+    for (s = 0; s < ns; ++s) {
+      dct32((*sbsample)[s], phase >> 1,
+            (*filter)[0][phase & 1], (*filter)[1][phase & 1]);
+
+      p = (phase - 1) & 0xf;
+
+      /* calculate 32 samples */
+      fe = &(*filter)[0][ phase & 1][0];
+      fx = &(*filter)[0][~phase & 1][0];
+      fo = &(*filter)[1][~phase & 1][0];
+
+      /* the word holding halfword (p / 2) & ~1 of row 0 */
+      dp = (uint32_t const *)Dpk + (p >> 2);
+
+      /* The other implementations choose by s & 1, which equals phase & 1
+         since every frame has an even number of slots.  phase & 3 also
+         gives the alignment, which s & 3 does not: MPEG-2 layer III frames
+         have 18 slots. */
+      switch (phase & 3) {
+      case 0: synth_slot(pcm, fe, fx, fo, dp, 0, 1, synth_full_armv5e_0);
+              break;
+      case 1: synth_slot(pcm, fe, fx, fo, dp, 1, 0, synth_full_armv5e_1);
+              break;
+      case 2: synth_slot(pcm, fe, fx, fo, dp, 0, 0, synth_full_armv5e_2);
+              break;
+      case 3: synth_slot(pcm, fe, fx, fo, dp, 1, 1, synth_full_armv5e_3);
+              break;
+      }
+
+      pcm  += 32;
       phase = (phase + 1) % 16;
     }
   }

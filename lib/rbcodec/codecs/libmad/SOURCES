@@ -10,4 +10,7 @@ imdct_mcf5249.S
 #elif defined(CPU_ARM_CLASSIC)
 imdct_l_arm.S
 synth_full_arm.S
+#if ARM_ARCH >= 5
+synth_full_armv5e.S
+#endif
 #endif

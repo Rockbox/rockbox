@@ -24,6 +24,7 @@
     .syntax     unified
     .section    ICODE_SECTION_MPA_ARM,"ax",%progbits
 
+#if ARM_ARCH < 5 /* ARMv5E and later use the C version in synth.c */
     .global synth_full_odd_sbsample
     .global synth_full_even_sbsample
 
@@ -247,6 +248,7 @@ synth_full_even_sbsample:
     bne     .l2
 
     ldmpc   regs="r0,r4-r11"
+#endif /* ARM_ARCH < 5 */
 
     .global III_aliasreduce
 
