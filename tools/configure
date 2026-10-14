@@ -2317,6 +2317,7 @@ fi
     # makes the bootloader output file name in all lower case.
     target_id=27
     modelname="sansae200r"
+    bootloader_only="1"
     target="SANSA_E200"
     memory=32 # supposedly
     arm7tdmicc
@@ -4351,6 +4352,9 @@ case $modelname in
 esac
 if [ "$ARG_TYPE" ]; then
   btype=$ARG_TYPE
+elif [ "$bootloader_only" = "1" ]; then
+  echo "Build (B)ootloader$gdbstub: (Defaults to B)"
+  btype=`input`;
 else
   echo "Build (N)ormal, (A)dvanced, (S)imulator, (B)ootloader, (C)heckWPS, (D)atabase tool, (W)arble codec tool$gdbstub: (Defaults to N)"
   btype=`input`;
@@ -4434,8 +4438,13 @@ fi
       ;;
     *)
       debug=""
-      btype="N" # set it explicitly since RET only gets here as well
-      echo "Normal build selected"
+      if [ "$bootloader_only" = "1" ]; then
+        do_bootloader
+        echo "Bootloader build selected"
+      else
+        btype="N" # set it explicitly since RET only gets here as well
+        echo "Normal build selected"
+      fi
       ;;
 
   esac
@@ -4457,7 +4466,7 @@ if [ -z "$debug" ]; then
 fi
 
 if [ "$bootloader_only" = "1" -a "$bootloader" != "1" ]; then
-    echo "Target can only be used for bootloader builds.\n"
+    echo "Target can only be used for bootloader builds."
     exit 9
 fi
 
