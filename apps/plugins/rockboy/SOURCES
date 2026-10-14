@@ -1,4 +1,4 @@
-../../../firmware/libc/sscanf.c
+sscanf.c
 cpu.c
 emu.c
 events.c
