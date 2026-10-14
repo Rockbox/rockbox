@@ -39,7 +39,7 @@ $(ROCKBOY_OBJDIR)/rockboy.ovl: $(ROCKBOY_OBJ) $(ROCKBOY_OUTLDS)
 	$(call PRINTS,LD $(@F))$(call objcopy_plugin,$(basename $@).elf,$@)
 
 # special rule to build with devkitarm gcc
-ifeq ($(APP_TYPE),ctru-app)
+ifeq ($(APP_TYPE),3ds-homebrew)
 $(ROCKBOY_OBJDIR)/rockboy.rock: PLUGINFLAGS += -O3
 endif
 

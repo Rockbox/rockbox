@@ -2113,6 +2113,7 @@ target/hosted/game_console/3ds/lcd-bitmap-3ds.c
 target/hosted/game_console/3ds/lc-program-resolver.c
 target/hosted/game_console/3ds/luminance-3ds.c
 target/hosted/game_console/3ds/pcm-3ds.c
+target/hosted/game_console/3ds/pcm-recording-3ds.c
 target/hosted/game_console/3ds/powermgmt-3ds.c
 target/hosted/game_console/3ds/system-3ds.c
 #endif /* N3DS */

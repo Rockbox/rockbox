@@ -40,8 +40,6 @@
 /*#define LOGF_ENABLE*/
 #include "logf.h"
 
-fb_data *dev_fb = 0;
-
 static u8 system_model = CFG_MODEL_3DS;
 
 typedef struct
@@ -49,96 +47,86 @@ typedef struct
     int width, height;
 } dimensions_t;
 
-int get_dest_offset(int x, int y, int dest_width)
+typedef struct
 {
-    return dest_width - y - 1 + dest_width * x;
-}
+    int x, y, w, h;
+} rect_t;
 
-int get_source_offset(int x, int y, int source_width)
+static inline void copy_framebuffer_16_rect(u16 *dest, const dimensions_t dest_dim,
+    const u16 *src, const dimensions_t src_dim, const rect_t src_rect)
 {
-    return x + y * source_width;
-}
+    const int dst_stride = dest_dim.width;
+    const int src_stride = src_dim.width;
 
-void copy_framebuffer_16(u16 *dest, const dimensions_t dest_dim, const u16 *source, const dimensions_t source_dim)
-{
-    int rows = MIN(dest_dim.width, source_dim.height);
-    int cols = MIN(dest_dim.height, source_dim.width);
-    for (int y = 0; y < rows; ++y) {
-        for (int x = 0; x < cols; ++x) {
-            const u16 *s = source + get_source_offset(x, y, source_dim.width);
-            u16 *d = dest + get_dest_offset(x, y, dest_dim.width);
-            *d = *s;
+    const u16 *s = src +
+                   src_rect.y * src_stride +
+                   src_rect.x;
+
+    u16 *d = dest +
+             src_rect.x * dst_stride +
+             (dst_stride - src_rect.y - 1);
+
+    for (int row = 0; row < src_rect.h; ++row) {
+        const u16 *sp = s;
+        u16 *dp = d;
+
+        int col = src_rect.w;
+
+        while (col >= 4) {
+            dp[0]              = sp[0];
+            dp[dst_stride]     = sp[1];
+            dp[dst_stride * 2] = sp[2];
+            dp[dst_stride * 3] = sp[3];
+
+            sp += 4;
+            dp += dst_stride * 4;
+            col -= 4;
         }
+
+        while (col--) {
+            *dp = *sp++;
+            dp += dst_stride;
+        }
+
+        s += src_stride;
+        --d;
     }
 }
 
-void copy_framebuffer_24(u8 *dest, const dimensions_t dest_dim, const u8 *source, const dimensions_t source_dim)
-{
-    int rows = MIN(dest_dim.width, source_dim.height);
-    int cols = MIN(dest_dim.height, source_dim.width);
-    for (int y = 0; y < rows; ++y) {
-        for (int x = 0; x < cols; ++x) {
-            const u8 *s = source + get_source_offset(x, y, source_dim.width) * 3;
-            u8 *d = dest + get_dest_offset(x, y, dest_dim.width) * 3;
-            d[0] = s[0];
-            d[1] = s[1];
-            d[2] = s[2];
-        }
-    }
-}
-
-void copy_framebuffer_32(u32 *dest, const dimensions_t dest_dim, const u32 *source, const dimensions_t source_dim)
-{
-    int rows = MIN(dest_dim.width, source_dim.height);
-    int cols = MIN(dest_dim.height, source_dim.width);
-    for (int y = 0; y < rows; ++y) {
-        for (int x = 0; x < cols; ++x) {
-            const u32 *s = source + get_source_offset(x, y, source_dim.width);
-            u32 *d = dest + get_dest_offset(x, y, dest_dim.width);
-            *d = *s;
-        }
-    }
-}
-
-void update_framebuffer(void)
+void update_framebuffer_rect(const u16 *src, const rect_t src_rect)
 {
     u16 fb_width, fb_height;
     u32 bufsize;
-	u8* fb = gfxGetFramebuffer(GFX_BOTTOM, GFX_LEFT, &fb_width, &fb_height);
-	bufsize = fb_width * fb_height * 2;
+    u8* fb = gfxGetFramebuffer(GFX_BOTTOM, GFX_LEFT, &fb_width, &fb_height);
+    bufsize = fb_width * fb_height * 2;
 
-    /* lock_window_mutex() */
+    copy_framebuffer_16_rect((void *)fb, (dimensions_t){ fb_width, fb_height },
+                             src, (dimensions_t){ LCD_WIDTH, LCD_HEIGHT }, src_rect);
 
-    if (FB_DATA_SZ == 2) {
-        copy_framebuffer_16((void *)fb, (dimensions_t){ fb_width, fb_height },
-                                 (u16 *)dev_fb, (dimensions_t){ LCD_WIDTH, LCD_HEIGHT });
-    }
-    else if (FB_DATA_SZ == 3) {
-        copy_framebuffer_24((void *)fb, (dimensions_t){ fb_width, fb_height },
-                                 (u8 *)dev_fb, (dimensions_t){ LCD_WIDTH, LCD_HEIGHT });
-    }
-    else {
-        copy_framebuffer_32((void *)fb, (dimensions_t){ fb_width, fb_height },
-                                 (u32 *)dev_fb, (dimensions_t){ LCD_WIDTH, LCD_HEIGHT });
-    }
+    // do not swap buffers for a partial blit
+    GSPGPU_FlushDataCache(fb, bufsize);
+    /* gspWaitForVBlank(); */
+}
 
-    // Flush and swap framebuffers
+void update_framebuffer(const u16 *src)
+{
+    u16 fb_width, fb_height;
+    u32 bufsize;
+    u8* fb = gfxGetFramebuffer(GFX_BOTTOM, GFX_LEFT, &fb_width, &fb_height);
+    bufsize = fb_width * fb_height * 2;
+
+    copy_framebuffer_16_rect((void *)fb, (dimensions_t){ fb_width, fb_height },
+                             src, (dimensions_t){ LCD_WIDTH, LCD_HEIGHT }, (rect_t){0, 0, LCD_WIDTH, LCD_HEIGHT});
+
+    // flush cache and swap framebuffer
     /* gfxFlushBuffers(); */
     GSPGPU_FlushDataCache(fb, bufsize);
     gfxSwapBuffers();
     gspWaitForVBlank();
-
-    /* unlock_window_mutex() */
 }
-
-/* lcd-as-memframe.c */
-extern void lcd_copy_buffer_rect(fb_data *dst, const fb_data *src,
-                                 int width, int height);
 
 void lcd_update_rect(int x, int y, int width, int height)
 {
-    fb_data *dst, *src;
-
     if (x + width > LCD_WIDTH)
         width = LCD_WIDTH - x; /* Clip right */
     if (x < 0)
@@ -153,28 +141,15 @@ void lcd_update_rect(int x, int y, int width, int height)
     if (height <= 0)
         return; /* nothing left to do */
 
-    dst = LCD_FRAMEBUF_ADDR(x, y);
-    src = FBADDR(x,y);
-
-    /* Copy part of the Rockbox framebuffer to the second framebuffer */
-    if (width < LCD_WIDTH)
-    {
-        /* Not full width - do line-by-line */
-        lcd_copy_buffer_rect(dst, src, width, height);
-    }
-    else
-    {
-        /* Full width - copy as one line */
-        lcd_copy_buffer_rect(dst, src, LCD_WIDTH*height, 1);
-    }
-
-    update_framebuffer();
+    fb_data *src = FBADDR(0,0);
+    update_framebuffer_rect(src, (rect_t){x, y, width, height});
 }
 
 void lcd_update(void)
 {
     /* update a full screen rect */
-    lcd_update_rect(0, 0, LCD_WIDTH, LCD_HEIGHT);
+    fb_data *src = FBADDR(0,0);
+    update_framebuffer(src);
 }
 
 void sys_console_init(void)
@@ -189,30 +164,12 @@ void lcd_init_device(void)
 
     /* hidInit(); */
 
-    u16 fb_width, fb_height;
-    gfxGetFramebuffer(GFX_BOTTOM, GFX_LEFT, &fb_width, &fb_height);
-    u32 bufsize = fb_width * fb_height * 2;
-
-    dev_fb = (fb_data *) linearAlloc(bufsize);
-    if (dev_fb == NULL) {
-        logf("could not allocate dev_fb size %d bytes\n",
-               bufsize);
-        exit(EXIT_FAILURE);
-    }
-
-    memset(dev_fb, 0x00, bufsize);
-    
     /* Set dpi value from system model */
     CFGU_GetSystemModel(&system_model);
 }
 
 void lcd_shutdown(void)
 {
-    if (dev_fb) {
-        linearFree(dev_fb);
-        dev_fb = 0;
-    }
-
     /* hidExit(); */
     gfxExit();
 }
@@ -246,4 +203,3 @@ int lcd_get_dpi(void)
     };
     return (int) roundf(dpi);
 }
-

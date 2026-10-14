@@ -22,12 +22,5 @@
 
 #include "lcd.h"
 
-/*
-    Framebuffer device and framebuffer access.
-    See lcd-memframe.c
-*/
-extern fb_data *dev_fb;
-#define LCD_FRAMEBUF_ADDR(col, row) (dev_fb + row * LCD_WIDTH + col)
-
 #endif /* LCD_TARGET_H */
 

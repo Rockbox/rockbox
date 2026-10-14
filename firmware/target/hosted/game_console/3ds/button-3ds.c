@@ -41,7 +41,6 @@
 #include "settings.h"
 #include "sound.h"
 #include "misc.h"
-
 #include "touchscreen.h"
 
 static u8 old_slider_level = 0;
@@ -151,6 +150,12 @@ int button_read_device(int* data)
     }
     if (kDown & KEY_DDOWN) {
         key |= BUTTON_DOWN;
+    }
+    if (kDown & KEY_L) {
+        key |= BUTTON_PREV;
+    }
+    if (kDown & KEY_R) {
+        key |= BUTTON_NEXT;
     }
 
     touchPosition touch;

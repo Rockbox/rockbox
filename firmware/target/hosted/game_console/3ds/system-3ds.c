@@ -30,6 +30,7 @@
 #include <3ds/types.h>
 #include <3ds/allocator/linear.h>
 #include <3ds/services/cfgu.h>
+#include <3ds/env.h>
 
 #include "system.h"
 #include "kernel.h"
@@ -79,6 +80,53 @@ void sim_do_exit()
     exit(EXIT_SUCCESS);
 }
 
+int test_stream_exists_internal(const char *path);
+bool dump_dsp_firmware(void)
+{
+    DEBUGF("dump_dsp_firmware: fetching dsp component.\n");
+    bool failed = true;
+    Handle rsrc = envGetHandle("hb:ndsp");
+    if (!rsrc)
+    {
+        DEBUGF("dump_dsp_firmware: need to run using *hax 2.0+\n");
+        return false;
+    }
+    else do
+    {
+        Result rc;
+        u32 len;
+        void* bin;
+        extern u32 fake_heap_end;
+        char* filename = "sdmc:/3ds/dspfirm.cdc";
+
+        u32 mapAddr = (fake_heap_end + 0xFFF) &~ 0xFFF;
+        rc = svcMapMemoryBlock(rsrc, mapAddr, 0x3, 0x3);
+        if (R_FAILED(rc)) break;
+
+        len = *(u32*)(mapAddr + 0x104);
+        bin = malloc(len);
+        if (bin)
+            memcpy(bin, (void*)mapAddr, len);
+        svcUnmapMemoryBlock(rsrc, mapAddr);
+        if (!bin) break;
+
+        FILE* file = fopen(filename, "wb");
+        if (!file) break;
+        fwrite(bin, 1, len, file);
+        fclose(file);
+
+        failed = false;
+        DEBUGF("dump_dsp_firmware: done\n");
+        free(bin);
+    } while (0);
+
+    if (rsrc && failed) {
+        DEBUGF("dump_dsp_firmware: unknown error.\n");
+    }
+
+    return true;
+}
+
 uintptr_t *stackbegin;
 uintptr_t *stackend;
 void system_init(void)
@@ -111,9 +159,15 @@ void system_init(void)
         DEBUGF("FSUSER_OpenArchive failed\n");
         exit(-1);
     }
-    
+
     mcuhwc_init();
     cfguInit();
+
+    /* dsp firmware check */
+    if (test_stream_exists_internal("/3ds/dspfirm.cdc") < 0) {
+        DEBUGF("system_init: /3ds/dspfirm.cdc not found.\n");
+        dump_dsp_firmware();
+    }
 }
 
 

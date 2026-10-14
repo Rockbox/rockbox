@@ -61,6 +61,7 @@
 /* Power management */
 #define CONFIG_BATTERY_MEASURE PERCENTAGE_MEASURE
 #define CONFIG_CHARGING        CHARGING_MONITOR
+#define HAVE_POWEROFF_WHILE_CHARGING
 #define HAVE_SW_POWEROFF
 
 /* The number of bytes reserved for loadable codecs */
@@ -76,11 +77,35 @@
 #define CONFIG_KEYPAD N3DS_PAD
 
 #define HAVE_3DS_AUDIO
+#define HAVE_TEAKLITE_CODEC
 #define HAVE_HEADPHONE_DETECTION
 #define HAVE_SW_TONE_CONTROLS
 /* #define HAVE_SW_VOLUME_CONTROL */
 /* #define PCM_SW_VOLUME_UNBUFFERED */
 /* #define PCM_SW_VOLUME_FRACBITS  (16) */
+
+/* Let the console dsp do resampling by hardware */
+#define HW_SAMPR_CAPS      SAMPR_CAP_ALL_48
+
+#define HAVE_RECORDING
+
+#define AUDIOHW_CAPS       MIC_GAIN_CAP
+
+#define REC_SAMPR_CAPS     (SAMPR_CAP_32 | SAMPR_CAP_16 | SAMPR_CAP_11 | SAMPR_CAP_8)
+#define REC_FREQ_DEFAULT   REC_FREQ_32
+#define REC_SAMPR_DEFAULT  SAMPR_32
+
+/* #define CONFIG_SAMPR_TYPES */
+
+/* Default recording levels */
+#define DEFAULT_REC_MIC_GAIN    23
+#define DEFAULT_REC_LEFT_GAIN   23
+#define DEFAULT_REC_RIGHT_GAIN  23
+
+/* Define bitmask of input sources - recordable bitmask can be defined
+   explicitly if different */
+#define INPUT_SRC_CAPS 		SRC_CAP_MIC
+
 
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT

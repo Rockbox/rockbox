@@ -43,13 +43,6 @@
 #include "system.h"
 #include "panic.h"
 
-#ifdef HAVE_RECORDING
-#include "audiohw.h"
-#ifdef HAVE_SPDIF_IN
-#include "spdif.h"
-#endif
-#endif
-
 #include "pcm.h"
 #include "pcm-internal.h"
 #include "pcm_sampr.h"
@@ -80,12 +73,15 @@ static volatile int _pcm_shutdown = 0;
 static RecursiveLock _pcm_lock_mtx;         /* audio device mutex */
 static LightEvent    _dsp_callback_event;   /* dsp callback synchronization flag */
 
-static Thread _pcm_thread;
+static Thread _pcm_thread = NULL;
 static int _pcm_thread_id = -1;
 
 /* DSP wave buffers */
 static ndspWaveBuf _dsp_wave_bufs[3];
 static s16 *_dsp_audio_buffer = NULL;
+
+/* Microphone sampling rate */
+extern int _pcm_encode_rate;
 
 static inline bool is_in_audio_thread(int audio_thread_id)
 {
@@ -182,55 +178,17 @@ void dsp_callback(void *const nul_) {
     if(AtomicGet(&_pcm_shutdown)) {
         return;
     }
-    
+
     LightEvent_Signal(&_dsp_callback_event);
 }
 
 static void sink_set_freq_nolock(uint16_t freq)
 {
-    ndspChnReset(0);
-    
-    ndspSetOutputMode(NDSP_OUTPUT_STEREO);
-
-    ndspChnSetRate(0, hw_freq_sampr[freq]);
-    ndspChnSetFormat(0, NDSP_FORMAT_STEREO_PCM16);
-    /* ndspChnSetInterp(0, NDSP_INTERP_POLYPHASE); */
-    /* ndspChnSetInterp(0, NDSP_INTERP_NONE); */
-    ndspChnSetInterp(0, NDSP_INTERP_LINEAR);
-
-    float mix[12];
-    memset(mix, 0, sizeof(mix));
-    mix[0] = 1.0;
-    mix[1] = 1.0;
-    ndspChnSetMix(0, mix);
-
-    memset(_dsp_wave_bufs, 0, sizeof(ndspWaveBuf) * ARRAY_SIZE(_dsp_wave_bufs));
-    
-    const size_t wave_buffer_size = MIX_FRAME_SAMPLES * 2 * sizeof(s16);
-    size_t buffer_size = wave_buffer_size * ARRAY_SIZE(_dsp_wave_bufs);
-
-    _dsp_audio_buffer = (s16 *)linearAlloc(buffer_size);
-
-    s16 *buffer = _dsp_audio_buffer;
-    for (unsigned i = 0; i < ARRAY_SIZE(_dsp_wave_bufs); i++) {
-        _dsp_wave_bufs[i].data_vaddr = buffer;
-        _dsp_wave_bufs[i].status     = NDSP_WBUF_DONE;
-        
-        buffer += wave_buffer_size / sizeof(buffer[0]);
-    }
-    
     ndspChnSetPaused(0, true);
-    ndspSetCallback(dsp_callback, NULL);
+    ndspChnSetRate(0, hw_freq_sampr[freq]);
+    ndspChnSetPaused(0, false);
 
-    AtomicSet(&_pcm_shutdown, 0);
-    AtomicSet(&_dsp_enabled, 1);
-
-    // Start the thread, passing our opusFile as an argument.
-    _pcm_thread = threadCreate(pcm_thread_run,
-                               NULL,
-                               32 * 1024,       /* 32kB stack size */
-                               0x18,            /* high priority */ 
-                              -1,               /* run on any core */ false);
+    _pcm_encode_rate = hw_freq_sampr[freq];
 }
 
 static void sink_dma_start(const void *addr, size_t size)
@@ -250,71 +208,62 @@ static void sink_dma_stop(void)
     RecursiveLock_Unlock(&_pcm_lock_mtx);
 }
 
-/* TODO: implement recording */
-#ifdef HAVE_RECORDING
-void pcm_rec_lock(void)
-{
-}
-
-void pcm_rec_unlock(void)
-{
-}
-
-void pcm_rec_dma_init(void)
-{
-}
-
-void pcm_rec_dma_close(void)
-{
-}
-
-void pcm_rec_dma_start(void *start, size_t size)
-{
-    (void)start;
-    (void)size;
-    
-    
-}
-
-void pcm_rec_dma_stop(void)
-{
-}
-
-const void * pcm_rec_dma_get_peak_buffer(void)
-{
-    return NULL;
-}
-
-void audiohw_set_recvol(int left, int right, int type)
-{
-    (void)left;
-    (void)right;
-    (void)type;
-}
-
-#ifdef HAVE_SPDIF_IN
-unsigned long spdif_measure_frequency(void)
-{
-    return 0;
-}
-#endif
-
-#endif /* HAVE_RECORDING */
-
 static void sink_dma_init(void)
 {
     Result ndsp_init_res = ndspInit();
     if (R_FAILED(ndsp_init_res)) {
         if ((R_SUMMARY(ndsp_init_res) == RS_NOTFOUND) && (R_MODULE(ndsp_init_res) == RM_DSP)) {
-            logf("DSP init failed: dspfirm.cdc missing!");
+            logf("ndspInit failed: dspfirm.cdc missing!");
         } else {
-            logf("DSP init failed. Error code: 0x%lX", ndsp_init_res);
+            logf("ndspInit failed. Error code: 0x%lX", ndsp_init_res);
         }
         return;
     }
 
     RecursiveLock_Init(&_pcm_lock_mtx);
     LightEvent_Init(&_dsp_callback_event, RESET_ONESHOT);
+
+    /* DSP initial setup */
+    ndspChnReset(0);
+    ndspSetOutputMode(NDSP_OUTPUT_STEREO);
+    ndspChnSetFormat(0, NDSP_FORMAT_STEREO_PCM16);
+    /* ndspChnSetInterp(0, NDSP_INTERP_POLYPHASE); */
+    /* ndspChnSetInterp(0, NDSP_INTERP_NONE); */
+    ndspChnSetInterp(0, NDSP_INTERP_LINEAR);
+
+    float mix[12];
+    memset(mix, 0, sizeof(mix));
+    mix[0] = 1.0;
+    mix[1] = 1.0;
+    ndspChnSetMix(0, mix);
+
+    memset(_dsp_wave_bufs, 0, sizeof(ndspWaveBuf) * ARRAY_SIZE(_dsp_wave_bufs));
+
+    const size_t wave_buffer_size = MIX_FRAME_SAMPLES * 2 * sizeof(s16);
+    size_t buffer_size = wave_buffer_size * ARRAY_SIZE(_dsp_wave_bufs);
+
+    _dsp_audio_buffer = (s16 *)linearAlloc(buffer_size);
+
+    s16 *buffer = _dsp_audio_buffer;
+    for (unsigned i = 0; i < ARRAY_SIZE(_dsp_wave_bufs); i++) {
+        _dsp_wave_bufs[i].data_vaddr = buffer;
+        _dsp_wave_bufs[i].status     = NDSP_WBUF_DONE;
+        
+        buffer += wave_buffer_size / sizeof(buffer[0]);
+    }
+    
+    ndspChnSetPaused(0, true);
+    ndspSetCallback(dsp_callback, NULL);
+
+    AtomicSet(&_pcm_shutdown, 0);
+    AtomicSet(&_dsp_enabled, 1);
+
+    /* start pcm thread */
+    _pcm_thread = threadCreate(pcm_thread_run,
+                               NULL,
+                               32 * 1024,       /* 32kB stack size */
+                               0x18,            /* high priority */ 
+                              -1,               /* run on any core */ false);
 }
 
 static void sink_dma_postinit(void)

@@ -31,6 +31,8 @@
 #define BUTTON_BACK         0x00000040
 #define BUTTON_POWER        0x00000080
 #define BUTTON_SELECT       0x00000100
+#define BUTTON_PREV         0x00000200
+#define BUTTON_NEXT         0x00000400
 
 /* Touch Screen Area Buttons */
 #define BUTTON_TOPLEFT      0x00001000

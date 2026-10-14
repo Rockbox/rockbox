@@ -124,6 +124,8 @@ recorder/bmp.c
 recorder/icons.c
 #if (CONFIG_PLATFORM&PLATFORM_ANDROID)
 hosted/android/keyboard.c
+#elif defined(N3DS_)
+hosted/3ds/keyboard.c
 #else
 recorder/keyboard.c
 #endif

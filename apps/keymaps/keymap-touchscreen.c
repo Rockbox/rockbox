@@ -252,6 +252,19 @@ static const struct button_mapping button_context_pitchscreen[]  = {
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM2|CONTEXT_PITCHSCREEN)
 }; /* button_context_pitchcreen */
 
+static const struct button_mapping button_context_recscreen[] = {
+    {ACTION_REC_PAUSE,          BUTTON_CENTER,                      BUTTON_NONE},
+    {ACTION_REC_NEWFILE,        BUTTON_MIDRIGHT,                    BUTTON_NONE},
+    {ACTION_STD_MENU,           BUTTON_MIDLEFT,                     BUTTON_NONE},
+    {ACTION_STD_CANCEL,         BUTTON_MIDLEFT,                     BUTTON_NONE},
+    {ACTION_SETTINGS_INC,       BUTTON_BOTTOMRIGHT,                 BUTTON_NONE},
+    {ACTION_SETTINGS_INCREPEAT, BUTTON_BOTTOMRIGHT|BUTTON_REPEAT,   BUTTON_NONE},
+    {ACTION_SETTINGS_DEC,       BUTTON_BOTTOMLEFT,                  BUTTON_NONE},
+    {ACTION_SETTINGS_DECREPEAT, BUTTON_BOTTOMLEFT|BUTTON_REPEAT,    BUTTON_NONE},
+
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM2|CONTEXT_RECSCREEN)
+}; /* button_context_recscreen */
+
 static const struct button_mapping button_context_keyboard[]  = {
 
     { ACTION_KBD_LEFT,         BUTTON_MIDLEFT,                    BUTTON_NONE },
@@ -428,6 +441,8 @@ const struct button_mapping* get_context_mapping(int context)
             return button_context_quickscreen;
         case CONTEXT_PITCHSCREEN:
             return button_context_pitchscreen;
+        case CONTEXT_RECSCREEN:
+            return button_context_recscreen;
         case CONTEXT_KEYBOARD:
         case CONTEXT_MORSE_INPUT:
             return button_context_keyboard;

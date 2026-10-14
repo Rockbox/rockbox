@@ -14,8 +14,8 @@ ifneq ($(APP_TYPE),sdl-sim)
 endif
 endif
 
-# Let's enable all plugins for ctru target
-ifeq ($(APP_TYPE),ctru-app)
+# Let's enable all plugins for the 3ds target
+ifeq ($(APP_TYPE),3ds-homebrew)
     is_app_build =
 endif
 
