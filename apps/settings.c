@@ -27,6 +27,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <limits.h>
+#include <string.h>
 #include "inttypes.h"
 #include "config.h"
 #include "rbpaths.h"
@@ -413,6 +414,29 @@ bool settings_load_config(const char* file, bool apply)
     fd = open_utf8(file, O_RDONLY);
     if (fd < 0)
         return false;
+
+    /* if this config is inside the themes dir,
+     * reset all settings to avoid keeping
+     * settings from previous theme cfg */
+    if (apply && strstr(file, THEME_DIR))
+    {
+        for (int i = 0; i < nb_settings; i++)
+        {
+            if (!(settings[i].flags & F_THEMESETTING))
+                continue;
+            else if (settings[i].flags & F_THEMERESET)
+            {
+                if ((settings[i].flags & F_T_MASK) == F_T_CHARPTR ||
+                    (settings[i].flags & F_T_MASK) == F_T_UCHARPTR)
+                {
+                    ((char *) settings[i].setting)[0] = '-';
+                    ((char *) settings[i].setting)[1] = '\0';
+                }
+            }
+            else
+                reset_setting(&settings[i], settings[i].setting);
+        }
+    }
 
     while (read_line(fd, line, sizeof line) > 0)
     {
