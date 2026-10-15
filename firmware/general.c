@@ -229,7 +229,13 @@ int remove_array_ptr(void **arr, void *ptr)
     return 0;
 }
 
-/* Re-initialize seed to something appropriate */
+#if !defined(HAVE_HW_RNG) || defined(SIMULATOR)
+/* Initialize the PRNG subsystem */
+void prng_init(void) {
+    srand(prng_newseed());
+}
+
+/* Reseed the PRNG using the best entropy source available */
 unsigned int prng_newseed(void) {
     unsigned int seed;
 
@@ -237,6 +243,7 @@ unsigned int prng_newseed(void) {
     seed = tm->tm_sec + tm->tm_min * 60 + tm->tm_hour *360 + tm->tm_yday * 24*360 + tm->tm_year * 31536000;
     seed ^= current_tick;
     seed ^= rand();
-    // TODO: use HW entropy if available?
+
     return seed;
 }
+#endif

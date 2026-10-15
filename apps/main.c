@@ -435,6 +435,8 @@ static void init(void)
 #if CONFIG_TUNER
     radio_init();
 #endif
+    prng_init();
+
     /* Keep the order of this 3 (viewportmanager handles statusbars)
      * Must be done before any code uses the multi-screen API */
     gui_syncstatusbar_init(&statusbars);
@@ -460,7 +462,6 @@ static void init(void)
     filetype_init();
     playlist_init();
     shortcuts_init();
-
     audio_init();
     talk_announce_voice_invalid(); /* notify user w/ voice prompt if voice file invalid */
     settings_apply_skins();
@@ -569,6 +570,7 @@ static void init(void)
 #if CONFIG_TUNER
     radio_init();
 #endif
+    prng_init();  /* After RTC */
 
 #ifdef HAVE_HARDWARE_CLICK
     piezo_init();
