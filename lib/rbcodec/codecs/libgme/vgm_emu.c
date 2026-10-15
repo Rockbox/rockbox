@@ -248,10 +248,8 @@ blargg_err_t Vgm_load_mem( struct Vgm_Emu* this, byte const* new_data, long new_
 		
 		// If file was trimmed add an
 		// incomplete token to the game tag
-		if ( get_le32( h->data_size ) > (unsigned) new_size ) {
-			*((char *) this->file_end) = cmd_end;
+		if ( get_le32( h->data_size ) > (unsigned) new_size )
 			strcat(this->info.game, "(Trimmed VGZ file)" );
-		}
 	}
 	
 	// Get loop
@@ -421,6 +419,39 @@ static inline int command_len( int command )
 	return len;
 }
 
+// Bytes a command takes, its own included, as run() reads it. A data block's
+// contents are not counted.
+enum { max_command_size = 7 };
+static int command_size( int cmd )
+{
+	switch ( cmd )
+	{
+	case cmd_gg_stereo:
+	case cmd_psg:
+	case cmd_byte_delay:
+		return 2;
+	case cmd_delay:
+		return 3;
+	case cmd_delay_735:
+	case cmd_delay_882:
+	case cmd_end:
+		return 1;
+	case cmd_data_block:
+		return 7;
+	case cmd_pcm_seek:
+		return 5;
+	}
+	switch ( cmd & 0xF0 )
+	{
+	case cmd_pcm_delay:
+	case cmd_short_delay:
+		return 1;
+	case 0x50:
+		return 3;
+	}
+	return command_len( cmd );
+}
+
 static inline fm_time_t to_fm_time( struct Vgm_Emu* this, vgm_time_t t )
 {
 	return (t * this->fm_time_factor + this->fm_time_offset) >> fm_time_bits;
@@ -456,8 +487,14 @@ blip_time_t run( struct Vgm_Emu* this, vgm_time_t end_time )
 	
 	while ( vgm_time < end_time && pos < this->file_end )
 	{
-		// TODO: be sure there are enough bytes left in stream for particular command
-		// so we don't read past end
+		// A command cut short by the end of the data ends the song
+		if ( this->file_end - pos < max_command_size &&
+		     command_size( *pos ) > this->file_end - pos )
+		{
+			pos = this->file_end;
+			break;
+		}
+
 		switch ( *pos++ )
 		{
 		case cmd_end:
@@ -521,26 +558,36 @@ blip_time_t run( struct Vgm_Emu* this, vgm_time_t end_time )
 		case cmd_data_block: {
 			check( *pos == cmd_end );
 			int type = pos [1];
-			int size = get_le32( pos + 2 );
+			unsigned size = get_le32( pos + 2 );
 			pos += 6;
+			if ( size > (unsigned) (this->file_end - pos) )
+				size = this->file_end - pos;
 			if ( type == pcm_block_type )
+			{
 				this->pcm_data = pos;
+				this->pcm_end  = pos + size;
+			}
 			pos += size;
 			break;
 		}
-		
-		case cmd_pcm_seek:
-			this->pcm_pos = this->pcm_data + pos [3] * 0x1000000 + pos [2] * 0x10000 +
-					pos [1] * 0x100 + pos [0];
+
+		case cmd_pcm_seek: {
+			unsigned offset = get_le32( pos );
+			if ( offset > (unsigned) (this->pcm_end - this->pcm_data) )
+				offset = this->pcm_end - this->pcm_data;
+			this->pcm_pos = this->pcm_data + offset;
 			pos += 4;
 			break;
+		}
 		
 		default: {
 				int cmd = pos [-1];
 				switch ( cmd & 0xF0 )
 				{
 					case cmd_pcm_delay:
-						write_pcm( this, vgm_time, *this->pcm_pos++ );
+						// past the end of the samples the DAC holds its level
+						if ( this->pcm_pos < this->pcm_end )
+							write_pcm( this, vgm_time, *this->pcm_pos++ );
 						vgm_time += cmd & 0x0F;
 						break;
 					
@@ -606,6 +653,9 @@ void update_fm_rates( struct Vgm_Emu* this, int* ym2413_rate, int* ym2612_rate )
 	byte const* p = this->file_begin + 0x40;
 	while ( p < this->file_end )
 	{
+		if ( command_size( *p ) > this->file_end - p )
+			return;
+
 		switch ( *p )
 		{
 		case cmd_end:
@@ -621,6 +671,8 @@ void update_fm_rates( struct Vgm_Emu* this, int* ym2413_rate, int* ym2612_rate )
 			break;
 		
 		case cmd_data_block:
+			if ( get_le32( p + 3 ) > (unsigned) (this->file_end - p - 7) )
+				return;
 			p += 7 + get_le32( p + 3 );
 			break;
 		
@@ -753,6 +805,7 @@ blargg_err_t Vgm_start_track( struct Vgm_Emu* this )
 	this->pos          = this->file_begin + header_size;
 	this->pcm_data     = this->pos;
 	this->pcm_pos      = this->pos;
+	this->pcm_end      = this->file_end;
 	this->dac_amp      = -1;
 	this->vgm_time     = 0;
 	if ( get_le32( header( this )->version ) >= 0x150 )

@@ -82,6 +82,7 @@ struct Vgm_Emu {
 	
 	byte const* pcm_data;
 	byte const* pcm_pos;
+	byte const* pcm_end;
 	int dac_amp;
 	int dac_disabled; // -1 if disabled
 
