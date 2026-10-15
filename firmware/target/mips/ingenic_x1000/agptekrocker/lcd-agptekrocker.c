@@ -24,7 +24,8 @@
 #include "gpio-ingenic.h"
 
 /* Sitronix ST7735S, 128x160, 8-bit 8080 bus (PA0-7, WR=PB17, DC=PB20).
- * CS is tied low on the board and TE is not connected.
+ * CS (PB18) and RD (PB16) are plain GPIOs set up by the OF U-Boot, the
+ * OF kernel never touches them. TE is not connected.
  *
  * Init sequence taken from the OF kernel (jzfb platform data), except
  * COLMOD is set to RGB565 instead of RGB666 and the column/row window
@@ -164,7 +165,7 @@ const struct lcd_tgt_config lcd_tgt_config = {
     .dc_polarity = 0,
     .wr_polarity = 1,
     .te_enable = 0,
-    .big_endian = 1,
+    .big_endian = 0,
     .dma_wr_cmd_buf = &rocker_lcd_dma_wr_cmd,
     .dma_wr_cmd_size = sizeof(rocker_lcd_dma_wr_cmd),
 };
@@ -172,19 +173,24 @@ const struct lcd_tgt_config lcd_tgt_config = {
 void lcd_tgt_enable(bool enable)
 {
     if(enable) {
-        /* OF: power on, 20 ms, release reset, 50 ms */
+        /* Same sequence as the OF U-Boot st7735s_128160 driver */
         gpio_set_level(GPIO_LCD_PWR, 1);
         mdelay(20);
+        gpio_set_level(GPIO_LCD_CE, 1);
+        gpio_set_level(GPIO_LCD_RD, 1);
         gpio_set_level(GPIO_LCD_RST, 0);
-        mdelay(10);
+        mdelay(20);
         gpio_set_level(GPIO_LCD_RST, 1);
-        mdelay(50);
+        mdelay(10);
+        gpio_set_level(GPIO_LCD_CE, 0);
 
-        /* OF uses a 30 MHz pixel clock (33333 ps) */
-        lcd_set_clock(X1000_CLK_MPLL, 30000000);
+        /* ST7735S needs >= 66 ns write cycle (~15 MHz), the SLCD strobes WR
+         * once per pixel clock. The OF's 30 MHz garbles DMA transfers. */
+        lcd_set_clock(X1000_CLK_MPLL, 10000000);
         lcd_exec_commands(rocker_lcd_cmd_enable);
     } else {
         lcd_exec_commands(rocker_lcd_cmd_sleep);
+        gpio_set_level(GPIO_LCD_CE, 1);
         gpio_set_level(GPIO_LCD_RST, 0);
         gpio_set_level(GPIO_LCD_PWR, 0);
     }
