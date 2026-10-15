@@ -2641,9 +2641,9 @@ static bool dbg_boot_data(void)
     if (!boot_data_valid)
     {
         simplelist_setline("Boot data invalid");
-        simplelist_addline("Magic[0]: %08lx", boot_data.magic[0]);
-        simplelist_addline("Magic[1]: %08lx", boot_data.magic[1]);
-        simplelist_addline("Length: %lu", boot_data.length);
+        simplelist_addline("Magic[0]: %08lx", (unsigned long)boot_data.magic[0]);
+        simplelist_addline("Magic[1]: %08lx", (unsigned long)boot_data.magic[1]);
+        simplelist_addline("Length: %lu", (unsigned long)boot_data.length);
     }
     else
     {
