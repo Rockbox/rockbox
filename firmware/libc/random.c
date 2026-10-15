@@ -70,8 +70,10 @@ void srand(unsigned int seed) {
 
 /* generates a random number on [0,RAND_MAX]-interval */
 int rand(void) {
-	if (TIME_AFTER(current_tick, next_reseed))
+	if (TIME_AFTER(current_tick, next_reseed_tick)) {
+		next_reseed_tick = current_tick + RESEED_PERIOD;
 		srand(prng_newseed());
+	}
 	const uint32_t s0 = s[0];
 	uint32_t s1 = s[1];
 	const uint32_t result = rotl(s0 * 0x9E3779BB, 5) * 5;
