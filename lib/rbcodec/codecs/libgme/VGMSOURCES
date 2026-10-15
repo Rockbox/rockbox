@@ -4,7 +4,5 @@ resampler.c
 vgm_emu.c
 ym2612_emu.c
 track_filter.c
-inflate/bbfuncs.c
-inflate/inflate.c
-inflate/mallocer.c
-inflate/mbreader.c
+vgz_stream.c
+inflate/tinfl.c

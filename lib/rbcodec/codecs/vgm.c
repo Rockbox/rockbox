@@ -1,27 +1,19 @@
 
 /* Ripped off from Game_Music_Emu 0.5.2. http://www.slack.net/~ant/ */
-/* Inflate code taken from WikiViewer plugin by Adam Gashlin */
 
 #include <codecs/lib/codeclib.h>
 
 #include "libgme/blargg_endian.h"
 #include "libgme/vgm_emu.h" 
-#include "libgme/inflate/mallocer.h"
-#include "libgme/inflate/inflate.h"
+#include "libgme/vgz_stream.h"
 
 CODEC_HEADER
 
 /* Maximum number of bytes to process in one iteration */
 #define CHUNK_SIZE (1024*4)
-#define MAINMEMBUF 0
 
 static int16_t samples[CHUNK_SIZE] IBSS_ATTR;
 static struct Vgm_Emu vgm_emu;
-
-static void *inflatebuf;              /* heap for gunzip */
-static char *songbuf;               /* destination for uncompressed song */
-static uint32_t songbuflen=0;  /* size of the song buffer */
-static uint32_t songlen=0;       /* used size of the song buffer */
 
 static void codec_vgz_update_length(void)
 {
@@ -99,20 +91,16 @@ enum codec_status codec_run(void)
         DEBUGF("VGM: file was trimmed\n");
     }
     
-    /* If is gzipped decompress it */
+    /* If it is gzipped, unpack it as it plays */
     if ( get_le16( buf ) == 0x8b1f ) {
-        wpw_init_mempool(MAINMEMBUF);
-        inflatebuf=wpw_malloc(MAINMEMBUF,0x13500);
-            
-        /* Will use available remaining memory 
-            as output buffer */
-        songbuflen=wpw_available(MAINMEMBUF);
-        songbuf=wpw_malloc(MAINMEMBUF,songbuflen);
+        struct vgz_stream *stream = vgz_open(buf, n);
 
-        songlen=decompress(buf,n,songbuf,songbuflen,0,inflatebuf);  
-
-        if ((err = Vgm_load_mem(&vgm_emu, songbuf, songlen, true))) {
-            DEBUGF("VGM: Vgm_load_mem failed (%s)\n", err);
+        if (!stream) {
+            DEBUGF("VGM: cannot open the VGZ stream\n");
+            return CODEC_ERROR;
+        }
+        if ((err = Vgm_load_stream(&vgm_emu, stream))) {
+            DEBUGF("VGM: Vgm_load_stream failed (%s)\n", err);
             return CODEC_ERROR;
         }
 

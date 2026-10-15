@@ -20,6 +20,11 @@ typedef int fm_time_t;
 enum { fm_time_bits = 12 };
 enum { blip_time_bits = 12 };
 
+// Sample data blocks of a .vgz that are kept
+enum { max_pcm_blocks = 32 };
+
+struct vgz_stream;
+
 // VGM header format
 enum { header_size = 0x40 };
 struct header_t
@@ -83,6 +88,20 @@ struct Vgm_Emu {
 	byte const* pcm_data;
 	byte const* pcm_pos;
 	byte const* pcm_end;
+
+	// A .vgz played as it is unpacked, or NULL. Then file_begin points at a
+	// copy of the header, pos and file_end into the stream's window, and the
+	// sample data is copied out of the stream as it is met.
+	struct vgz_stream* stream;
+	bool stream_end;            // the song has ended in the stream
+	unsigned loop_offset;       // in the unpacked file; 0 if it does not loop
+	int pcm_block_count;
+	struct {
+		unsigned offset;
+		byte const* data;
+		unsigned size;
+	} pcm_blocks [max_pcm_blocks];
+	byte header_copy [header_size];
 	int dac_amp;
 	int dac_disabled; // -1 if disabled
 
@@ -127,6 +146,10 @@ static inline struct header_t *header( struct Vgm_Emu* this ) { return (struct h
 
 // Basic functionality (see Gme_File.h for file loading/track info functions)
 blargg_err_t Vgm_load_mem( struct Vgm_Emu* this, byte const* new_data, long new_size, bool parse_info );
+
+// Loads a .vgz to play as it is unpacked (see vgz_stream.h)
+blargg_err_t Vgm_load_stream( struct Vgm_Emu* this,
+		struct vgz_stream* stream );
 
 // True if any FM chips are used by file. Always false until init_fm()
 // is called.

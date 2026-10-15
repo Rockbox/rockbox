@@ -1,6 +1,7 @@
 // Game_Music_Emu 0.5.5. http://www.slack.net/~ant/
 
 #include "vgm_emu.h"
+#include "vgz_stream.h"
 
 #include "blargg_endian.h"
 #include <string.h>
@@ -220,6 +221,7 @@ static void set_voice( struct Vgm_Emu* this, int i, struct Blip_Buffer* c, struc
 }
 
 blargg_err_t setup_fm( struct Vgm_Emu* this );
+static blargg_err_t load_common( struct Vgm_Emu* this );
 blargg_err_t Vgm_load_mem( struct Vgm_Emu* this, byte const* new_data, long new_size, bool parse_info )
 {
 	// Unload
@@ -258,6 +260,51 @@ blargg_err_t Vgm_load_mem( struct Vgm_Emu* this, byte const* new_data, long new_
 	// If file was trimmed don't loop
 	if ( get_le32( h->loop_offset ) && get_le32( h->data_size ) <= (unsigned) new_size ) 
 		this->loop_begin = &new_data [get_le32( h->loop_offset ) + offsetof (struct header_t,loop_offset)];
+
+	this->stream = NULL;
+	return load_common( this );
+}
+
+blargg_err_t Vgm_load_stream( struct Vgm_Emu* this, struct vgz_stream* stream )
+{
+	byte const* pos;
+	unsigned got;
+
+	// Unload
+	this->voice_count = 0;
+	clear_track_vars( this );
+	memset( &this->info, 0, sizeof this->info );
+
+	pos = vgz_seek( stream, 0 );
+	if ( !pos )
+		return gme_wrong_file_type;
+	vgz_read( stream, pos, this->header_copy, header_size, &got );
+	if ( got < header_size )
+		return gme_wrong_file_type;
+
+	this->stream     = stream;
+	this->file_begin = this->header_copy;
+	this->file_end   = this->header_copy + header_size;
+
+	struct header_t* h = (struct header_t*) this->header_copy;
+	RETURN_ERR( check_vgm_header( h ) );
+
+	// The GD3 tag is at the end of the file: not read
+	get_vgm_length( h, &this->info );
+
+	this->loop_offset = 0;
+	if ( get_le32( h->loop_offset ) )
+		this->loop_offset = get_le32( h->loop_offset ) +
+				offsetof (struct header_t,loop_offset);
+
+	this->pcm_block_count = 0;
+	return load_common( this );
+}
+
+// What loading a .vgm and a .vgz have in common, once the header is there
+static blargg_err_t load_common( struct Vgm_Emu* this )
+{
+	struct header_t* h = header( this );
 
 	// PSG rate
 	this->psg_rate = get_le32( h->psg_rate );
@@ -420,8 +467,8 @@ static inline int command_len( int command )
 }
 
 // Bytes a command takes, its own included, as run() reads it. A data block's
-// contents are not counted.
-enum { max_command_size = 7 };
+// contents are not counted. At most 7: run() checks it when fewer than
+// vgz_lookahead bytes are left.
 static int command_size( int cmd )
 {
 	switch ( cmd )
@@ -476,6 +523,71 @@ static void write_pcm( struct Vgm_Emu* this, vgm_time_t vgm_time, int amp )
 		this->dac_amp |= this->dac_disabled;
 }
 
+// At the end of a .vgz: go back to its loop, or end. Returns the new pos.
+static byte const* stream_loop( struct Vgm_Emu* this, byte const* pos )
+{
+	byte const* loop = NULL;
+
+	if ( this->loop_offset )
+		loop = vgz_seek( this->stream, this->loop_offset );
+	if ( !loop )
+	{
+		this->stream_end = true;
+		this->file_end = pos;
+		return pos;
+	}
+	this->file_end = vgz_end( this->stream );
+	return loop;
+}
+
+// A data block in a .vgz, pos at its contents. Sample data is copied out of
+// the stream the first time it is met and kept, so that going back to the
+// start, for a loop or a seek, finds it again. Returns the new pos.
+static byte const* stream_data_block( struct Vgm_Emu* this, byte const* pos,
+		int type, unsigned size )
+{
+	struct vgz_stream* s = this->stream;
+	unsigned offset = vgz_tell( s, pos );
+	unsigned got;
+	byte* copy = NULL;
+	int i = 0;
+
+	if ( type == pcm_block_type )
+	{
+		for ( i = 0; i < this->pcm_block_count; i++ )
+			if ( this->pcm_blocks [i].offset == offset )
+				break;
+		if ( i < this->pcm_block_count )
+		{
+			this->pcm_data = this->pcm_blocks [i].data;
+			this->pcm_end  = this->pcm_data + this->pcm_blocks [i].size;
+		}
+		else if ( i < max_pcm_blocks )
+		{
+			copy = (byte*) codec_malloc( size );
+		}
+		if ( !copy && i == this->pcm_block_count )
+		{
+			// no room for it: no samples until the next block
+			this->pcm_data = this->pcm_end = this->pcm_pos = NULL;
+		}
+	}
+
+	pos = vgz_read( s, pos, copy, size, &got );
+	this->file_end = vgz_end( s );
+
+	if ( copy )
+	{
+		this->pcm_blocks [i].offset = offset;
+		this->pcm_blocks [i].data   = copy;
+		this->pcm_blocks [i].size   = got;
+		this->pcm_block_count++;
+		this->pcm_data = copy;
+		this->pcm_end  = copy + got;
+	}
+	return pos;
+}
+
 blip_time_t run( struct Vgm_Emu* this, vgm_time_t end_time )
 {
 	vgm_time_t vgm_time = this->vgm_time; 
@@ -485,20 +597,36 @@ blip_time_t run( struct Vgm_Emu* this, vgm_time_t end_time )
 		warning( "Stream lacked end event" );
 	} */
 	
-	while ( vgm_time < end_time && pos < this->file_end )
+	while ( vgm_time < end_time )
 	{
-		// A command cut short by the end of the data ends the song
-		if ( this->file_end - pos < max_command_size &&
-		     command_size( *pos ) > this->file_end - pos )
+		int left = this->file_end - pos;
+
+		if ( left < vgz_lookahead )
 		{
-			pos = this->file_end;
-			break;
+			// Near the end of the data: of the song, or of what has been
+			// unpacked of it
+			if ( this->stream && !this->stream_end )
+			{
+				pos = vgz_fill( this->stream, pos );
+				this->file_end = vgz_end( this->stream );
+				left = this->file_end - pos;
+			}
+
+			// A command cut short by the end of the data ends the song
+			if ( left <= 0 || command_size( *pos ) > left )
+			{
+				pos = this->file_end;
+				break;
+			}
 		}
 
 		switch ( *pos++ )
 		{
 		case cmd_end:
-			pos = this->loop_begin; // if not looped, loop_begin == data_end
+			if ( this->stream )
+				pos = stream_loop( this, pos );
+			else
+				pos = this->loop_begin; // if not looped, loop_begin == data_end
 			break;
 		
 		case cmd_delay_735:
@@ -560,6 +688,11 @@ blip_time_t run( struct Vgm_Emu* this, vgm_time_t end_time )
 			int type = pos [1];
 			unsigned size = get_le32( pos + 2 );
 			pos += 6;
+			if ( this->stream )
+			{
+				pos = stream_data_block( this, pos, type, size );
+				break;
+			}
 			if ( size > (unsigned) (this->file_end - pos) )
 				size = this->file_end - pos;
 			if ( type == pcm_block_type )
@@ -607,6 +740,16 @@ blip_time_t run( struct Vgm_Emu* this, vgm_time_t end_time )
 		}
 	}
 	vgm_time -= end_time;
+
+	// Keep pos away from the end of what is unpacked, so that it is at
+	// file_end only at the end of the song (see check_end())
+	if ( this->stream && !this->stream_end &&
+	     this->file_end - pos < vgz_lookahead )
+	{
+		pos = vgz_fill( this->stream, pos );
+		this->file_end = vgz_end( this->stream );
+	}
+
 	this->pos = pos;
 	this->vgm_time = vgm_time;
 	
@@ -651,9 +794,24 @@ int play_frame( struct Vgm_Emu* this, blip_time_t blip_time, int sample_count, b
 void update_fm_rates( struct Vgm_Emu* this, int* ym2413_rate, int* ym2612_rate )
 {
 	byte const* p = this->file_begin + 0x40;
-	while ( p < this->file_end )
+	byte const* end = this->file_end;
+
+	if ( this->stream )
 	{
-		if ( command_size( *p ) > this->file_end - p )
+		p = vgz_seek( this->stream, 0x40 );
+		if ( !p )
+			return;
+		end = vgz_end( this->stream );
+	}
+
+	for ( ;; )
+	{
+		if ( this->stream && end - p < vgz_lookahead )
+		{
+			p = vgz_fill( this->stream, p );
+			end = vgz_end( this->stream );
+		}
+		if ( p >= end || command_size( *p ) > end - p )
 			return;
 
 		switch ( *p )
@@ -671,7 +829,16 @@ void update_fm_rates( struct Vgm_Emu* this, int* ym2413_rate, int* ym2612_rate )
 			break;
 		
 		case cmd_data_block:
-			if ( get_le32( p + 3 ) > (unsigned) (this->file_end - p - 7) )
+			if ( this->stream )
+			{
+				unsigned size = get_le32( p + 3 ), got;
+				p = vgz_read( this->stream, p + 7, NULL, size, &got );
+				end = vgz_end( this->stream );
+				if ( got < size )
+					return;
+				break;
+			}
+			if ( get_le32( p + 3 ) > (unsigned) (end - p - 7) )
 				return;
 			p += 7 + get_le32( p + 3 );
 			break;
@@ -801,19 +968,34 @@ blargg_err_t Vgm_start_track( struct Vgm_Emu* this )
 	
 	Sms_apu_reset( &this->psg, get_le16( header( this )->noise_feedback ), header( this )->noise_width );
 	
-	this->dac_disabled = -1;
-	this->pos          = this->file_begin + header_size;
-	this->pcm_data     = this->pos;
-	this->pcm_pos      = this->pos;
-	this->pcm_end      = this->file_end;
-	this->dac_amp      = -1;
-	this->vgm_time     = 0;
+	unsigned data_start = header_size;
 	if ( get_le32( header( this )->version ) >= 0x150 )
 	{
 		int data_offset = get_le32( header( this )->data_offset );
 		check( data_offset );
 		if ( data_offset )
-			this->pos += data_offset + offsetof (struct header_t,data_offset) - 0x40;
+			data_start = data_offset + offsetof (struct header_t,data_offset);
+	}
+
+	this->dac_disabled = -1;
+	this->dac_amp      = -1;
+	this->vgm_time     = 0;
+	if ( this->stream )
+	{
+		byte const* pos = vgz_seek( this->stream, data_start );
+		this->stream_end = !pos;
+		this->pos        = pos ? pos : vgz_end( this->stream );
+		this->file_end   = vgz_end( this->stream );
+		this->pcm_data   = NULL;
+		this->pcm_pos    = NULL;
+		this->pcm_end    = NULL;
+	}
+	else
+	{
+		this->pos      = this->file_begin + data_start;
+		this->pcm_data = this->pos;
+		this->pcm_pos  = this->pos;
+		this->pcm_end  = this->file_end;
 	}
 	
 	if ( uses_fm( this ) )
