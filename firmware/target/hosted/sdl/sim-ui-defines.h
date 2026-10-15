@@ -439,7 +439,7 @@
 #define UI_LCD_POSX                 78
 #define UI_LCD_POSY                 92
 
-#elif defined(AGPTEK_ROCKER)
+#elif defined(AGPTEK_ROCKER) || defined(AGPTEK_ROCKER_NATIVE)
 #define UI_TITLE                    "Agptek Rocker"
 #define UI_WIDTH                    186
 #define UI_HEIGHT                   380

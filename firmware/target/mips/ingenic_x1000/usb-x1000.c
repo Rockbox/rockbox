@@ -170,9 +170,11 @@ void usb_enable(bool on)
 
 void usb_init_device(void)
 {
+#ifndef X1000_USB_NO_DRVVBUS
     /* Disable drvvbus pin -- it is only used when acting as a host,
      * which Rockbox does not support */
     gpio_set_function(GPIO_USB_DRVVBUS, GPIOF_OUTPUT(0));
+#endif
 
     /* Power up the core clocks to allow writing
        to some registers needed to power it down */

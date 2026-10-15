@@ -274,6 +274,7 @@
 #define LCD_SHANLING_Q1   70 /* as used by the Shanling Q1 */
 #define LCD_EROSQ         71 /* as used by the ErosQ (native) */
 #define LCD_ECHO_R1       72 /* ILI9342, as used by the Echo R1 */
+#define LCD_AGPTEK_ROCKER 73 /* ST7735S, as used by the Agptek Rocker (native) */
 
 /* LCD_PIXELFORMAT */
 #define HORIZONTAL_PACKING 1
@@ -575,6 +576,8 @@ Lyre prototype 1 */
 #include "config/aigoerosq.h"
 #elif defined(SHANLING_Q1)
 #include "config/shanlingq1.h"
+#elif defined(AGPTEK_ROCKER_NATIVE)
+#include "config/agptekrockernative.h"
 #elif defined(EROS_QN)
 #include "config/erosqnative.h"
 #elif defined(ECHO_R1)

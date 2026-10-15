@@ -1724,8 +1724,8 @@ cat <<EOF
  223) NWZ-E460 series      209) Anbernic RG Nano 233) 800
  224) NWZ-E470 series                            234) 960
  225) NWZ-E580 series      ==AgpTek==
- 226) NWZ-A10 series       240) Rocker           ==AIGO==
- 227) NW-A20 series                              245) Eros Q / K (hosted)
+ 226) NWZ-A10 series       239) Rocker native    ==AIGO==
+ 227) NW-A20 series        240) Rocker (hosted)  245) Eros Q / K (hosted)
  228) NWZ-A860 series      ==iBasso==            247) Eros Q / K native
  229) NWZ-S750 series      250) DX50                  (hw1/hw2 bl, all hw rb)
                            251) DX90             248) Eros Q / K native
@@ -3783,6 +3783,30 @@ fi
     t_cpu="hosted"
     t_manufacturer="ibasso"
     t_model="dx90"
+    ;;
+
+   239|agptekrockernative)
+    target_id=126
+    modelname="agptekrockernative"
+    target="AGPTEK_ROCKER_NATIVE"
+    memory=32
+    mipsr2elcc
+    appextra=""
+    plugins="yes"
+    tool="$rootdir/tools/scramble -add=rkrn "
+    boottool="$rootdir/tools/mkspl-x1000 -type=nand -ppb=2 -bpp=2 "
+    output="rockbox.rockern"
+    bootoutput="bootloader.rockern"
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
+    toolset="$x1000tools"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="mips"
+    t_manufacturer="ingenic_x1000"
+    t_soc="ingenic"
+    t_model="agptekrocker"
     ;;
 
    240|agptekrocker)

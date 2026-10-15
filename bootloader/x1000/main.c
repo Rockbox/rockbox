@@ -72,7 +72,7 @@ void main(uint32_t saved_cpm_scratch)
      * present, blocking with an "insert SD card" prompt if appropriate. */
     disk_mount_all();
 
-#ifdef SHANLING_Q1
+#if defined(SHANLING_Q1) || defined(AGPTEK_ROCKER_NATIVE)
     /* This is needed for OF updates. The OF extracts the update package
      * to the SD card and reboots to the recovery kernel to complete the
      * update. */

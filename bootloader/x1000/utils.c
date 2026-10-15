@@ -344,7 +344,8 @@ void dump_of_recovery(void)
 
 void dump_entire_flash(void)
 {
-#if defined(FIIO_M3K) || defined(SHANLING_Q1) || defined(EROS_QN)
+#if defined(FIIO_M3K) || defined(SHANLING_Q1) || defined(EROS_QN) || \
+    defined(AGPTEK_ROCKER_NATIVE)
     /* TODO: this should read the real chip size instead of hardcoding it */
     dump_flash_file("/flash.img", 0, 2048 * 64 * 1024);
 #endif

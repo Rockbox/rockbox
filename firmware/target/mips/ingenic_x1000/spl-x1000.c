@@ -51,6 +51,12 @@
 # define SPL_ERROR_PIN          GPIO_PC(25)
 # define BOOT_STORAGE_ADDR      0x6800
 # define BOOT_STORAGE_SIZE      (102 * 1024)
+#elif defined(AGPTEK_ROCKER_NATIVE)
+/* TODO: verify DDR parameters against the OF SPL (UBOOT.BIN offset 0) */
+# define SPL_DDR_MEMORYSIZE     32
+# define SPL_ERROR_PIN          GPIO_PC(25) /* backlight PWM */
+# define BOOT_STORAGE_ADDR      0x6800
+# define BOOT_STORAGE_SIZE      (102 * 1024)
 #else
 # error "please define SPL config"
 #endif

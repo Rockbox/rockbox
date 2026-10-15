@@ -1,0 +1,119 @@
+/***************************************************************************
+ *             __________               __   ___.
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
+ *
+ * Copyright (C) 2026 Marcin Bukat
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
+ *
+ ****************************************************************************/
+
+#include "power.h"
+#include "adc.h"
+#include "system.h"
+#include "kernel.h"
+#ifdef HAVE_USB_CHARGING_ENABLE
+# include "usb_core.h"
+#endif
+#include "axp-pmu.h"
+#include "i2c-ingenic.h"
+
+/* TODO: battery curves copied from the FiiO M3K, measure on the Rocker */
+unsigned short battery_level_disksafe = 3470;
+
+unsigned short battery_level_shutoff = 3400;
+
+/* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
+unsigned short percent_to_volt_discharge[11] =
+{
+    3400, 3639, 3697, 3723, 3757, 3786, 3836, 3906, 3980, 4050, 4159
+};
+
+/* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */
+unsigned short percent_to_volt_charge[11] =
+{
+      3485, 3780, 3836, 3857, 3890, 3930, 3986, 4062, 4158, 4185, 4196
+};
+
+void power_init(void)
+{
+    /* Initialize driver */
+    i2c_x1000_set_freq(AXP_PMU_BUS, I2C_FREQ_400K);
+    axp_init();
+
+    /* 100 Hz sample rate, the keypad ladder is read through the
+     * GPIO0 ADC (same rate as the OF) */
+    axp_adc_set_rate(AXP_ADC_RATE_100HZ);
+
+    /* Enable required ADCs */
+    axp_adc_set_enabled(
+        (1 << ADC_BATTERY_VOLTAGE) |
+        (1 << ADC_CHARGE_CURRENT) |
+        (1 << ADC_DISCHARGE_CURRENT) |
+        (1 << ADC_VBUS_VOLTAGE) |
+        (1 << ADC_VBUS_CURRENT) |
+        (1 << ADC_INTERNAL_TEMP) |
+        (1 << ADC_APS_VOLTAGE));
+
+    /* Rails as set up by the OF:
+     * - DCDC1: I/O (left as set by bootloader)
+     * - DCDC2: CPU core
+     * - DCDC3: core
+     * - LDO2:  CS42L51 codec, switched by audiohw
+     * TODO: dump AXP registers under the OF and check DCDC2 voltage */
+    i2c_reg_modify1(AXP_PMU_BUS, AXP_PMU_ADDR,
+                    AXP_REG_DCDCWORKINGMODE, 0, 0xc0, NULL);
+
+    /* OF charges at 800 mA with the VBUS input limited to 500 mA */
+    axp_set_charge_current(500);
+
+    /* Short delay to give power outputs time to stabilize */
+    mdelay(20);
+}
+
+#ifdef HAVE_USB_CHARGING_ENABLE
+void usb_charging_maxcurrent_change(int maxcurrent)
+{
+    axp_set_charge_current(maxcurrent);
+}
+#endif
+
+void adc_init(void)
+{
+}
+
+void power_off(void)
+{
+    axp_power_off();
+    while(1);
+}
+
+bool charging_state(void)
+{
+    return axp_battery_status() == AXP_BATT_CHARGING;
+}
+
+int _battery_voltage(void)
+{
+    return axp_adc_read(ADC_BATTERY_VOLTAGE);
+}
+
+#if CONFIG_BATTERY_MEASURE & CURRENT_MEASURE
+int _battery_current(void)
+{
+    if(charging_state())
+        return axp_adc_read(ADC_CHARGE_CURRENT);
+    else
+        return axp_adc_read(ADC_DISCHARGE_CURRENT);
+}
+#endif

@@ -334,6 +334,8 @@ int main (int argc, char** argv)
             modelnum = 115;
         else if (!strcmp(&argv[1][5], "erosqnative")) /* Aigo Eros Q Native */
             modelnum = 116;
+        else if (!strcmp(&argv[1][5], "rkrn")) /* Agptek Rocker Native */
+            modelnum = 133;
         else if (!strcmp(&argv[1][5], "nn3g")) /* iPod Nano 3rd Gen */
             modelnum = 117;
         else if (!strcmp(&argv[1][5], "nn4g")) /* iPod Nano 4th Gen */

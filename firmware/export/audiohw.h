@@ -216,6 +216,8 @@ struct sound_settings_info
 #include "nwzlinux_codec.h"
 #elif defined(HAVE_CS4398)
 #include "cs4398.h"
+#elif defined(HAVE_CS42L51)
+#include "cs42l51.h"
 #elif defined(HAVE_ES9018)
 #include "es9018.h"
 #elif defined(HAVE_ES9218)
