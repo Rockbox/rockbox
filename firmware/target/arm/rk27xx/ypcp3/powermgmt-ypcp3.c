@@ -23,16 +23,13 @@
 #include "adc-target.h"
 #include "powermgmt.h"
 
-/*  Battery voltage calculation and discharge/charge curves for the Samsung YP-CP3.
-
-    TODO: copied from the rk27xx generic board - the YP-CP3's battery ADC
-    channel, divider and curves are not measured yet.
-
-    Battery voltage is calculated under the assumption that the adc full-scale
-    readout represents 3.00V and that the battery ADC channel is fed with
-    exactly half of the battery voltage (through a resistive divider).
-    Discharge and charge curves have not been calibrated yet.
-*/
+/* Battery voltage and discharge/charge curves for the Samsung YP-CP3.
+ *
+ * The original firmware (v2.10) measures the battery against the LSADC's
+ * reference channel: mV = 637500 * ADC_BATTERY / (330 * ADC_VREF), each
+ * channel averaged over a few samples. It refuses to boot under 3280 mV.
+ *
+ * TODO: the curves are the rk27xx generic board's, not measured here. */
 
 unsigned short battery_level_disksafe = 3400; /* TODO: this is just an initial guess */
 
@@ -50,12 +47,17 @@ unsigned short percent_to_volt_charge[11] =
     /* TODO: simple uncalibrated curve, linear except for first 10% */
     { 3300, 3600, 3665, 3730, 3795, 3860, 3925, 3990, 4055, 4120, 4185 };
 
-/* full-scale ADC readout (2^10) in millivolt */
-#define BATTERY_SCALE_FACTOR 6000
-
 /* Returns battery voltage from ADC [millivolts] */
 int _battery_voltage(void)
 {
-    return (adc_read(ADC_BATTERY) * BATTERY_SCALE_FACTOR) >> 10;
+    unsigned int vref = adc_read(ADC_VREF);
+    int mv = 0;
+
+    if (vref != 0)
+    {
+        mv = 637500 * adc_read(ADC_BATTERY) / (330 * vref);
+    }
+
+    return mv;
 }
 
