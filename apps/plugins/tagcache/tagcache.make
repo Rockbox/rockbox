@@ -13,7 +13,7 @@ ROCKS += $(TCPLUG_BUILDDIR)/db_commit.rock
 
 TCPLUG_FLAGS = $(PLUGINFLAGS) -fno-strict-aliasing -Wno-unused \
 				-I$(TCPLUG_SRCDIR) -ffunction-sections	       \
-				-fdata-sections -Wl,--gc-sections
+				-fdata-sections
 TCPLUG_SRC := $(call preprocess, $(TCPLUG_SRCDIR)/SOURCES)
 TCPLUG_OBJ := $(call c2obj, $(TCPLUG_SRC))
 
@@ -26,4 +26,3 @@ $(TCPLUG_BUILDDIR)/db_commit.rock: $(TCPLUG_OBJ)
 $(TCPLUG_BUILDDIR)/%.o: $(TCPLUG_SRCDIR)/%.c $(TCPLUG_SRCDIR)/tagcache.make
 	$(SILENT)mkdir -p $(dir $@)
 	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) -I$(dir $<) $(TCPLUG_FLAGS) -c $< -o $@
-
