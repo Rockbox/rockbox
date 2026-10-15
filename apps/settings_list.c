@@ -1344,13 +1344,13 @@ const struct settings_list settings[] = {
                 "scrollbar width",UNIT_INT, 3, MAX(LCD_WIDTH/10,25), 1,
                 NULL, NULL, NULL),
 #ifdef HAVE_TOUCHSCREEN
-    TABLE_SETTING(F_ALLOW_ARBITRARY_VALS, list_line_padding, LANG_LIST_LINE_PADDING,
+    TABLE_SETTING(F_THEMESETTING|F_ALLOW_ARBITRARY_VALS, list_line_padding, LANG_LIST_LINE_PADDING,
                   -1, "list padding", "auto,off", UNIT_PIXEL, list_pad_formatter,
                   list_pad_getlang, NULL, 16,
                   -1,0,2,4,6,8,10,12,16,20,24,28,32,38,44,50),
 #endif
 #if LCD_DEPTH > 1
-    TABLE_SETTING(F_ALLOW_ARBITRARY_VALS, list_separator_height, LANG_LIST_SEPARATOR,
+    TABLE_SETTING(F_THEMESETTING|F_ALLOW_ARBITRARY_VALS, list_separator_height, LANG_LIST_SEPARATOR,
                   0, "list separator height", "auto,off", UNIT_PIXEL,
                   list_pad_formatter, list_pad_getlang, NULL, 15,
                   -1,0,1,2,3,4,5,7,9,11,13,16,20,25,30),
