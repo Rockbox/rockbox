@@ -165,7 +165,7 @@ static bool tv_is_line_break_char(ucschar_t ch)
     if (preferences->word_mode == WM_CHOP)
         return false;
 
-    for (i = 0; i < sizeof(break_chars)/sizeof(ucschar_t); i++)
+    for (i = 0; i < sizeof(break_chars)/sizeof(break_chars[0]); i++)
     {
         if (break_chars[i] == ch)
             return true;
@@ -180,7 +180,7 @@ static bool tv_isspace(ucschar_t ch)
     if (ch < 128 && isspace(ch))
         return true;
 
-    for (i = 0; i < sizeof(extra_spaces)/sizeof(ucschar_t); i++)
+    for (i = 0; i < sizeof(extra_spaces)/sizeof(extra_spaces[0]); i++)
     {
         if (extra_spaces[i] == ch)
             return true;
