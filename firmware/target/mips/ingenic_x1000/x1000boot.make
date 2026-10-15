@@ -66,7 +66,7 @@ $(BUILDDIR)/spl.elf: $$(OBJ) $(FIRMLIB) $(CORE_LIBS) $$(SPLLINK)
 $(BUILDDIR)/spl.bin: $(BUILDDIR)/spl.elf
 	$(call PRINTS,OC $(@F))$(call objcopy,$<,$@)
 
-$(BUILDDIR)/$(SPLBINARY): $(BUILDDIR)/spl.bin
+$(BUILDDIR)/$(SPLBINARY): $(BUILDDIR)/spl.bin $(MKFIRMWARE_TOOL)
 	$(call PRINTS,MKSPL $(@F))$(MKFIRMWARE) $< $@
 
 
