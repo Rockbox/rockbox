@@ -29,4 +29,6 @@ DEFINE_GPIO(CS42L51_RESET,      GPIO_PC(16),    GPIOF_OUTPUT(0))
 DEFINE_GPIO(BT_REG_ON,          GPIO_PC(19),    GPIOF_OUTPUT(0))
 DEFINE_GPIO(HP_DETECT,          GPIO_PC(20),    GPIOF_INPUT)
 DEFINE_GPIO(AXP_IRQ,            GPIO_PC(21),    GPIOF_INPUT)
-DEFINE_GPIO(SAU_PWR,            GPIO_PC(22),    GPIOF_OUTPUT(0))
+/* Anti-clone chip on I2C1. The OF keeps it powered; unpowered it
+ * likely loads the bus (CS42L51 NACKs with it off). */
+DEFINE_GPIO(SAU_PWR,            GPIO_PC(22),    GPIOF_OUTPUT(1))
