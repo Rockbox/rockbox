@@ -64,16 +64,14 @@ void srand(unsigned int seed) {
 	s[0] = z & 0xFFFFFFFF;
 	s[1] = (z >> 32) & 0xFFFFFFFF;
 
-	next_reseed = current_tick;
+	next_reseed = current_tick + RESEED_PERIOD;
 }
 
 
 /* generates a random number on [0,RAND_MAX]-interval */
 int rand(void) {
-	if (TIME_AFTER(current_tick, next_reseed)) {
-		next_reseed = current_tick + RESEED_PERIOD;
+	if (TIME_AFTER(current_tick, next_reseed))
 		srand(prng_newseed());
-	}
 	const uint32_t s0 = s[0];
 	uint32_t s1 = s[1];
 	const uint32_t result = rotl(s0 * 0x9E3779BB, 5) * 5;
