@@ -46,7 +46,7 @@ static uint32_t s[2] = {
 	0x85A308D3U,
 };
 
-static unsigned long next_reseed = 0;
+static unsigned long next_reseed_tick = 0;
 #define RESEED_PERIOD HZ*60*15
 
 /* seeds the RNG using a single run of SplitMix64 */
@@ -64,7 +64,7 @@ void srand(unsigned int seed) {
 	s[0] = z & 0xFFFFFFFF;
 	s[1] = (z >> 32) & 0xFFFFFFFF;
 
-	next_reseed = current_tick + RESEED_PERIOD;
+	next_reseed_tick = current_tick + RESEED_PERIOD;
 }
 
 
