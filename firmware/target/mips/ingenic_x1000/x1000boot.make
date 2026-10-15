@@ -46,7 +46,7 @@ $(BUILDDIR)/bootloader.elf: $$(OBJ) $(FIRMLIB) $(CORE_LIBS) $$(BOOTLINK)
 $(BUILDDIR)/bootloader.bin: $(BUILDDIR)/bootloader.elf
 	$(call PRINTS,OC $(@F))$(call objcopy,$<,$@)
 
-$(BUILDDIR)/bootloader.ucl: $(BUILDDIR)/bootloader.bin
+$(BUILDDIR)/bootloader.ucl: $(BUILDDIR)/bootloader.bin $(TOOLSDIR)/uclpack
 	$(call PRINTS,UCLPACK $(@F))$(TOOLSDIR)/uclpack --nrv2e -9 $< $@ >/dev/null
 
 
