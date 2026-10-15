@@ -24,7 +24,7 @@
 
 /* Buffer for plugins and codecs. */
 #define PLUGIN_BUFFER_SIZE  0x200000 /* 2 MiB */
-#define CODEC_SIZE          0x100000 /* 1 MiB */
+#define CODEC_SIZE          0x80000 /* 512 KiB */
 
 /* LCD defines */
 #define CONFIG_LCD          LCD_ECHO_R1

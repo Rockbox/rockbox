@@ -147,7 +147,7 @@
 
 /* Buffer for plugins and codecs. */
 #define PLUGIN_BUFFER_SIZE  0x200000 /* 2 MiB */
-#define CODEC_SIZE          0x100000 /* 1 MiB */
+#define CODEC_SIZE          0x80000 /* 512 KiB */
 
 /* 6g has a standard battery of 550mAh, except for the thick 6g (2007 160gb)
  * which has a standard battery of 850mAh.

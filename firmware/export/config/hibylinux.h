@@ -36,7 +36,7 @@
 #define HAVE_TAGCACHE
 
 /* The number of bytes reserved for loadable codecs */
-#define CODEC_SIZE 0x100000
+#define CODEC_SIZE 0x80000
 
 /* The number of bytes reserved for loadable plugins */
 #if MEMORYSIZE >= 16
