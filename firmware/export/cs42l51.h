@@ -63,8 +63,12 @@ AUDIOHW_SETTING(VOLUME, "dB", 1, 5, CS42L51_VOLUME_MIN, CS42L51_VOLUME_MAX, -200
 
 /* DAC_OUT_CTL */
 #define CS42L51_HP_GAIN_MASK        0xe0
+#define CS42L51_HP_GAIN_OF          0xc0 /* HP_GAIN = 110b, as set by the OF */
 #define CS42L51_DACB_MUTE           0x02
 #define CS42L51_DACA_MUTE           0x01
+
+/* PCMx_VOL */
+#define CS42L51_PCM_MUTE            0x80
 
 /* DAC_CTL */
 #define CS42L51_DATA_SEL_MASK       0xc0

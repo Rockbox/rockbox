@@ -80,6 +80,10 @@ void audiohw_init(void)
 void audiohw_postinit(void)
 {
     cs42l51_set_mute(false);
+
+    /* The OF releases both mutes when playback starts (k1_snd_trigger),
+     * so the headphone path probably goes through the line mute too. */
+    gpio_set_level(GPIO_LINE_MUTE, 0);
     gpio_set_level(GPIO_HP_MUTE, 0);
 }
 

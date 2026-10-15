@@ -31,7 +31,8 @@
  * - pulse PDN in POWER_CTL1
  * - DAC interface I2S, slave
  * - DAC data from the signal processing engine (needed for AOUTx volume)
- * - HP_GAIN = 111b
+ * - HP_GAIN = 110b
+ * - PCMA/PCMB mixer volume 0 dB, unmuted
  */
 
 int cs42l51_read(int reg)
@@ -73,10 +74,14 @@ int cs42l51_open(void)
                    CS42L51_DATA_SEL_MASK | CS42L51_DAC_SZC_MASK,
                    CS42L51_DATA_SEL_DSP | CS42L51_DAC_AMUTE);
 
-    /* Maximum headphone gain, as in the OF; start muted */
-    cs42l51_modify(CS42L51_REG_DAC_OUT_CTL, 0,
-                   CS42L51_HP_GAIN_MASK |
+    /* Headphone gain as in the OF; start muted */
+    cs42l51_modify(CS42L51_REG_DAC_OUT_CTL, CS42L51_HP_GAIN_MASK,
+                   CS42L51_HP_GAIN_OF |
                    CS42L51_DACA_MUTE | CS42L51_DACB_MUTE);
+
+    /* PCM mixer: 0 dB and unmuted (the OF writes 0x00 to both) */
+    cs42l51_write(CS42L51_REG_PCMA_VOL, 0x00);
+    cs42l51_write(CS42L51_REG_PCMB_VOL, 0x00);
 
     /* Power up, ADC/PGA stay powered down.
      * TODO: check which PDN_xxx bits the OF leaves set. */
