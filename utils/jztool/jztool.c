@@ -36,6 +36,7 @@ void usage_x1000(void)
 "  jztool fiiom3k load <bootloader.m3k>\n"
 "  jztool shanlingq1 load <bootloader.q1>\n"
 "  jztool erosq load <bootloader.erosq>\n"
+"  jztool agptekrocker load <bootloader.rockern>\n"
 "\n"
 "The 'load' command is used to boot the Rockbox bootloader in recovery\n"
 "mode, which allows you to install the Rockbox bootloader and backup or\n"
@@ -55,6 +56,7 @@ void usage_x1000(void)
 "  FiiO M3K    - Volume Down\n"
 "  Shanling Q1 - Play\n"
 "  Eros Q      - Menu\n"
+"  Agptek Rocker - Volume Up\n"
 "\n"
 "Not all players give a visible indication that they are in USB boot mode.\n"
 "If you're having trouble connecting your player, try resetting it by\n"
@@ -241,6 +243,7 @@ int main(int argc, char** argv)
     case JZ_DEVICE_SHANLINGQ1:
     case JZ_DEVICE_EROSQ:
     case JZ_DEVICE_SHANLINGM0PRO:
+    case JZ_DEVICE_AGPTEKROCKER:
         return cmdline_load(argc, argv, usage_x1000, jz_x1000_boot);
 
     case JZ_DEVICE_HIBYR1:

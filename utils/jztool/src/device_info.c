@@ -71,6 +71,15 @@ static const jz_device_info infotable[JZ_NUM_DEVICES] = {
         .vendor_id = 0x0000,
         .product_id = 0x0000,
     },
+    [JZ_DEVICE_AGPTEKROCKER] = {
+        .name = "agptekrocker",
+        .file_ext = "rockern",
+        .description = "Agptek Rocker",
+        .device_type = JZ_DEVICE_AGPTEKROCKER,
+        .cpu_type = JZ_CPU_X1000,
+        .vendor_id = 0xc502,
+        .product_id = 0x0029,
+    },
 };
 
 static const jz_cpu_info cputable[JZ_NUM_CPUS] = {

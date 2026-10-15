@@ -38,6 +38,7 @@ The USB boot key depends on your player:
 - FiiO M3K: Volume Down
 - Shanling Q1: Play
 - Eros Q: Menu
+- Agptek Rocker: Volume Up
 
 ### Linux/Mac
 
@@ -103,6 +104,7 @@ holding a key while booting:
 - FiiO M3K: Volume Up
 - Shanling Q1: Next (button on the lower left)
 - Eros Q: Volume Up
+- Agptek Rocker: Volume Down
 
 ### Known issues
 

@@ -124,6 +124,7 @@ static const struct scramble_model_info {
     {"fiio", 114, 0, 4, 8},
     {"shq1", 115, 0, 4, 8},
     {"eros", 116, 0, 4, 8},
+    {"rkrn", 133, 0, 4, 8},
     {NULL, 0, 0, 0, 0},
 };
 
