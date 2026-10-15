@@ -33,7 +33,7 @@ static inline bool is_rtl_char(ucschar_t c)
            (c >= 0xfb50 && c <= 0xfdff) /* Arabic Pres A */ ||
            (c >= 0xfe70 && c <= 0xfefc) /* Arabic Pres B */
 #ifdef UNICODE32
-           || (c >= 0x10e60 && c <= 0x107ef) /* Rumi Numerals */
+           || (c >= 0x10e60 && c <= 0x10e7f) /* Rumi Numerals */
            || (c >= 0x10ec0 && c <= 0x10eff) /* Arabic Ext C */
            || (c >= 0x1ec70 && c <= 0x1ecbf) /* Indic Siyaq Numerals */
            || (c >= 0x1ed00 && c <= 0x1ed4f) /* Ottoman Siyaq Numerals */
