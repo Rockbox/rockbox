@@ -762,14 +762,14 @@ static void soundfile_finishwrite(void *obj, char *filename, int fd,
     	    long datasize = itemswritten * bytesperframe, mofo;
 	    
 	    if (lseek(fd,
-	    	((char *)(&((t_wave *)0)->w_chunksize)) - (char *)0,
+                offsetof(t_wave, w_chunksize),
 		    SEEK_SET) == 0)
 		    	goto baddonewrite;
 	    mofo = swap4(datasize + sizeof(t_wave) - 8, swap);
     	    if (write(fd, (char *)(&mofo), 4) < 4)
     	    	goto baddonewrite;
 	    if (lseek(fd,
-	    	((char *)(&((t_wave *)0)->w_datachunksize)) - (char *)0,
+                offsetof(t_wave, w_datachunksize),
 		    SEEK_SET) == 0)
 		    	goto baddonewrite;
     	    mofo = swap4(datasize, swap);
@@ -780,7 +780,7 @@ static void soundfile_finishwrite(void *obj, char *filename, int fd,
 	{
     	    long mofo;
     	    if (lseek(fd,
-	    	((char *)(&((t_aiff *)0)->a_nframeshi)) - (char *)0,
+                offsetof(t_aiff, a_nframeshi),
 		    SEEK_SET) == 0)
 		    	goto baddonewrite;
 	    mofo = swap4(nframes, swap);
@@ -2471,4 +2471,3 @@ void d_soundfile_setup(void)
     writesf_setup();
 #endif
 }
-

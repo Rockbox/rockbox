@@ -52,9 +52,7 @@ extern "C" {
 #endif
 
 
-#if !defined(_SIZE_T) && !defined(_SIZE_T_)
-#include <stddef.h> 	/* just for size_t -- how lame! */
-#endif
+#include <stddef.h>
 
 #ifdef ROCKBOX
 #include <inttypes.h>
@@ -434,7 +432,7 @@ EXTERN void class_setdrawcommand(t_class *c);
 EXTERN int class_isdrawcommand(t_class *c);
 EXTERN void class_domainsignalin(t_class *c, int onset);
 #define CLASS_MAINSIGNALIN(c, type, field) \
-    class_domainsignalin(c, (char *)(&((type *)0)->field) - (char *)0)
+    class_domainsignalin(c, (int)offsetof(type, field))
 
     	 /* prototype for functions to save Pd's to a binbuf */
 typedef void (*t_savefn)(t_gobj *x, t_binbuf *b);
@@ -664,4 +662,3 @@ defined, there is a "te_xpix" field in objects, not a "te_xpos" as before: */
 
 #define __m_pd_h_
 #endif /* __m_pd_h_ */
-
