@@ -25,9 +25,6 @@
 #include <3ds/applets/swkbd.h>
 
 static SwkbdState swkbd;
-static char kbd_buf[60];
-static SwkbdStatusData swkbdStatus;
-static SwkbdLearningData swkbdLearning;
 
 int kbd_input(char* text, int buflen, ucschar_t *kbd)
 {

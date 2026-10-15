@@ -212,7 +212,7 @@ static void pcm_rec_thread_run(void* nothing)
                 }
             }
 
-            /* wait for more captured data */ 
+            /* wait for more captured data */
             svcSleepThread(20 * 1000000ULL);
         }
     }
@@ -263,7 +263,7 @@ void pcm_rec_dma_init(void)
     _pcm_rec_thread = threadCreate(pcm_rec_thread_run,
                                    NULL,
                                    32 * 1024,       /* 32kB stack size */
-                                   0x18,            /* high priority */ 
+                                   0x18,            /* high priority */
                                    -1,              /* run on any core */
                                    false);
     sys_mutex_unlock(&_dma_suspended_mtx);
@@ -326,7 +326,7 @@ void pcm_rec_dma_start(void *start, size_t size)
     _pcm_buffer      = start;
     _pcm_buffer_size = size;
 
-    _pcm_frame_samples = _pcm_buffer_size / (2 * sizeof(int16_t)); 
+    _pcm_frame_samples = _pcm_buffer_size / (2 * sizeof(int16_t));
     _pcm_resample_pos = 0;
 
     logf("_pcm_frame_samples = %d\n", _pcm_frame_samples);
