@@ -1,0 +1,34 @@
+# built by make (generated tests, images, listings, checker data)
+/tests/*.bin
+/tests/*.lst
+/tests/*.json
+/tests/.gen_*
+/tests/*.tmp.*
+/tests/bench/
+/tests/t8_alu.s
+/tests/t12_hazards.s
+/tests/t13_inferred.s
+/tests/t14_settle.s
+/tests/t15_rest.s
+/tests/t16_flags.s
+/tests/t17_circ.s
+/tests/t17b_circ.s
+/tests/t18_cp_*.s
+/tests/t19_jump_*.s
+/tests/t20_final.s
+/tests/t21_*.s
+/tests/t22_*.s
+/tests/t23_*.s
+/tests/t24_*.s
+/tests/t25_*.s
+/tests/t26_*.s
+/tests/t27_*.s
+/tests/t28_*.s
+/tests/t29_*.s
+/tests/t3[0-9]_*.s
+/tests/t4[0-9]_*.s
+/tests/t5[0-9]_*.s
+/tests/t6[0-9]_*.s
+# written by zsp.lua on the device
+/results/
+__pycache__/

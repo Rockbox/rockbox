@@ -1,0 +1,131 @@
+RK27xx ZSP500 DSP test suite
+============================
+
+The tests that established how the RK27xx's ZSP500 DSP works: instruction
+set and flags, timers, interrupts and low-power modes, addressing, the
+external bus window, mailbox, DMA, and timing. They run on the device under
+hwstub, driven by ../zsp.lua. What they established is written up in the
+ZSP500 DSP programming manual:
+https://www.rockbox.org/wiki/pub/Main/Rockchip27xx/ZSP500_DSP_Programming_Manual.pdf
+
+  tests/        hand-written tests (*.s), generators of the others
+                (gen_*.py), shared includes (*.inc), and the result checker
+                (expect.py)
+  tools/        gen_bench.py (cycle benchmarks), bench_report.py,
+                bus_sweep.py (bus and DMA timing against the clocks)
+  Makefile      builds the test images with tools/zsp/zspasm.pl
+  results/      written on the device by zsp.lua (not in git)
+
+Requirements: perl and Python 3 on the host, hwstub_shell
+(utils/hwstub/tools), an RK27xx player running the hwstub stub
+(utils/hwstub/stub/rk27xx).
+
+All commands below start in utils/hwstub/tools, which is also where
+hwstub_shell has to run so that the lua/... paths resolve.
+
+
+1. Build
+--------
+
+    make                              # hwstub_shell
+    make -C lua/rk27xx/zsp            # the test images, tests/*.bin
+    make -C lua/rk27xx/zsp bench      # the cycle benchmarks, tests/bench/*.bin
+
+Generated sources, images and listings are not in git; make clean removes
+them.
+
+
+2. Functional tests (inside ./hwstub_shell)
+-------------------------------------------
+
+    dofile("lua/rk27xx/zsp.lua")
+    ZSP.setup()
+    ZSP.run_group("all")
+    ZSP.restore()
+
+"all" runs the groups startup, isa, timers, risky, irq, irq2, smode, misc,
+addr, bus, bus2 and bus3 in that order (ZSP.GROUPS in zsp.lua says what each
+covers); ZSP.run_group(name) runs one, ZSP.run(test) one test. Each test
+writes results/<test>.txt, apart from the bring-up probes of the startup
+group (t0a, t0b, t0d-t0g): they run for a fixed time and print what they
+left in DMEM, as each one's header describes. The risky group may hang the
+DSP, not the host: the DSP is reset before every test. Some tests need the
+ARM during the run (NMI, mailbox, SDRAM, DMA); their groups call the helpers
+for that.
+
+
+3. Cycle benchmarks
+-------------------
+
+    ZSP.setup()
+    ZSP.bench(ZSP.BENCH)                          -- single instruction kinds
+    ZSP.bench(ZSP.BENCH_MIX, { append = true })   -- groups from the MP3 synthesis
+    ZSP.restore()
+
+They take a few minutes and write results/bench.txt. Each repeats an
+instruction group in a hardware loop, timed with the ARM's TMR1 at the DSP
+clock hwstub leaves (160 MHz).
+
+
+4. Bus and DMA timing
+---------------------
+
+The bus and DMA tests count in DSP cycles; run at several DSP clocks they
+show which part of each cost is DSP cycles and which is the AHB/SDRAM clock
+(HCLK). At hwstub's HCLK, 100 MHz (ARM 200 MHz, as Rockbox boosted):
+
+    ZSP.sweep()
+    ZSP.restore()
+    os.execute("mv lua/rk27xx/zsp/results/sweep lua/rk27xx/zsp/results/sweep-hclk100")
+
+At Rockbox's unboosted clocks, ARM 50, HCLK 50 MHz. clk.lua switches the ARM
+clocks with the register writes of set_cpu_frequency(); zsp.lua is loaded
+again after the switch so that ZSP.restore() puts back the switched
+registers, not hwstub's:
+
+    dofile("lua/rk27xx/clk.lua")
+    CLK.set("normal")
+    dofile("lua/rk27xx/zsp.lua")
+    ZSP.sweep()
+    ZSP.restore()
+    CLK.set("hwstub")
+    os.execute("mv lua/rk27xx/zsp/results/sweep lua/rk27xx/zsp/results/sweep-hclk50")
+
+ZSP.sweep() runs t30_bustime, t35_dma and t36_dma2 at DSP clocks of 18 to
+160 MHz (ZSP.SWEEP_MHZ; opts.mhz, opts.tests to change), results in
+results/sweep/<MHz>/. Every result records the DSP, ARM and AHB clocks it
+ran at.
+
+Steps 2 to 4 also run unattended: ./hwstub_shell -b -e '<commands>'.
+
+
+5. Checking the results (in lua/rk27xx/zsp)
+-------------------------------------------
+
+    make results                                       # every test: pass/fail
+    python3 tools/bench_report.py                      # cycles per instruction group
+    python3 tools/bus_sweep.py results/sweep-hclk100   # cycles = fixed + time part
+    python3 tools/bus_sweep.py results/sweep-hclk50
+
+make results reports every check of tests/expect.py; on a Samsung YP-CP3
+all pass. INFO lines carry measured values. tests/expect.py RESULTDIR
+checks another directory, e.g. one sweep step.
+
+
+Also
+----
+
+zsp_clk.lua runs tclk_count in each DSP clock mode (PLL settings, bypass,
+slow mode) and measures the clock it gets:
+
+    dofile("lua/rk27xx/zsp.lua"); dofile("lua/rk27xx/zsp_clk.lua")
+    ZSPCLK.run()
+
+Each mode is announced before it is set: if the device stops answering,
+that mode hung the bus.
+
+Writing a test: a source in tests/ that includes common.inc and
+prologue.inc (a7 = result block) and ends with epilogue.inc (dumps the
+registers and writes the magic the runner waits for). Add it to the
+Makefile, a checker to tests/expect.py and the test to a group in
+ZSP.GROUPS (zsp.lua).
