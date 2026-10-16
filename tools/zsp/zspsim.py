@@ -30,14 +30,17 @@ talks to:
     registers (0xCE0000);
   - "bus memory" (SDRAM, a dict of 32-bit words keyed by byte address);
   - the mailbox (H2C0/H2C0b -> DSP source 4, C2H0/C2H0b -> on_c2h callback);
-  - DWDMA channels: writing ChEnReg runs the programmed block transfer at
-    once and sets RawTfr (no burst/latency model);
+  - DWDMA channels: writing ChEnReg copies the programmed block at once, but
+    RawTfr (and DSP source 3) follow only after the transfer's time;
   - interrupts (vector 0x80 - 8n, %imask, %tpc, reti), wait mode
     (%smode bit 13/14), %timer0/%timer1, hardware loops, cexe/cexes/cexer.
 
-Timing is one cycle per instruction plus a fixed cost per bus access; it is
-only a rough guide, not a cycle model.
+Timing (see TIMING below) is a model of the in-order 4-issue core in whole
+cycles, fitted to the RK27xx benchmarks; bus, write buffer and DMA times are
+in DSP and HCLK cycles (Sim(dsp_hz=..., hclk_hz=...)). %timer0/%timer1
+count these cycles.
 """
+import collections
 import os
 import re
 
@@ -71,8 +74,9 @@ class Spec:
                 self.val |= int(ch) << bit
             elif ch != 'x':
                 self.fields.setdefault(ch, []).append(bit)
-        # placeholders: (field, mul, add, kind, isreg), isreg when the
-        # placeholder is a register number (r{a}, a{b+6}, ...)
+        # placeholders: (field, mul, add, kind, isreg, letter), isreg when
+        # the placeholder is a register number (r{a}, a{b+6}, ...) of the
+        # register file letter ('r', 'a', 'n', 'g')
         self.phs = []
         pos = 0
         for m in PH_RE.finditer(syntax):
@@ -82,7 +86,8 @@ class Spec:
             kind = m.group('kind') or ''
             isreg = (len(lit) >= 1 and lit[-1] in 'rang' and
                      (len(lit) == 1 or not lit[-2].isalnum()) and kind == '')
-            self.phs.append((m.group('f'), m.group('mul'), m.group('add'), kind, isreg))
+            self.phs.append((m.group('f'), m.group('mul'), m.group('add'), kind, isreg,
+                             lit[-1] if isreg else ''))
             pos = m.end()
 
 
@@ -116,8 +121,154 @@ class SimError(Exception):
     pass
 
 
+# ---------------------------------------------------------------- timing
+# In-order 4-issue superscalar, in whole cycles. Up to 4 instructions issue
+# per cycle, those on register pairs or quads within the same budget; on
+# top of that each unit has a capacity per cycle (CAP) of which an
+# instruction takes a share. An instruction issues in the first cycle, not
+# before the previous instruction's, where its slots and units have room
+# and its sources are ready. Fitted to the cycle benchmarks of the DSP test
+# suite (utils/hwstub/tools/lua/rk27xx/zsp, tools/gen_bench.py; measured at
+# 160 MHz) and the manual's sections 7.1-7.3; the
+# comments give the measurements (cycles per instruction or group, or per
+# pass of 8 groups + agn0).
+ISSUE_SLOTS = 4                 # nop 0.25; 8 x ldd + agn0 4.07
+# The ALU capacity is shared: a 16-bit op takes 2 of 6, one on pairs (.e) 3
+# (add x 4 0.33 each; mov.e x 2 1.01 per pair; add.e + add 1.01;
+# mov.e x 2 + add x 2 2.02, the adds not beside the mov.es; dct_bfly 2.15).
+CAP = {'alu': 6,
+       'agu': 2,                # ld 0.5, mov a,a 0.5, mov a + ld 1 per pair
+       'st': 1,                 # st 1, ld + st 1 per pair
+       'mac': 1}                # mac with two accumulators 1.5 (latency)
+# class: (units as (unit, share), result latency, block). block: the next
+# instruction issues at least this many cycles later.
+TIMING = {
+    'nop':   ((), 0, 0),
+    'alu':   ((('alu', 2),), 1, 0),         # dependent add 1
+    'alue':  ((('alu', 3),), 1, 0),         # dependent add.e 1
+    'agu':   ((('agu', 1),), 1, 0),         # add a,imm chain 1, mov a then ld no stall
+    'mac':   ((('mac', 1),), 2, 0),         # mac chain 2, mul r0,r1,r2 2 (reads r1)
+    'ld':    ((('agu', 1),), 1, 0),         # load-use no stall; ldu chain on a 1
+    'st':    ((('agu', 1), ('st', 1)), 0, 0),
+    'stack': ((('agu', 1), ('st', 1)), 1, 3),   # push/pop 3
+    'br':    ((), 0, 1),                    # br 1
+    'brc':   ((), 0, 1),                    # cmp + bz taken or not 1
+    'loop':  ((), 0, 1),                    # agnN: nop 3.09, cmp+nop 5.09, cexe 9.18
+    'call':  ((), 0, 2),                    # call + ret 5
+    'ret':   ((), 0, 3),
+    'cexe':  ((), 0, 1),                    # cmp; cexe; add 1.2
+    'cwr':   ((), 4, 2),                    # creg write 2, write then read 4
+}
+ST_LD_SAME = 5                  # st then ld of the same address: 5 per pair
+                                # (not for push/pop: 3 each)
+AGN_AFTER_BRC = 6               # agnN just after a conditional branch: bz 14.27
+# The core's own IMEM and DMEM are tightly coupled: an access takes the
+# core cycles of TIMING above at any DSP clock and HCLK (t30 int_ld 0.44,
+# int_st 0.5 per access at every clock measured). Everything else goes
+# over the AHB and costs part DSP cycles, part HCLK cycles (the AHB clock,
+# which the SDRAM runs at), fitted to t30_bustime, t35_dma and t36_dma2 run
+# at DSP clocks of 18..160 MHz with HCLK 100 and 50 MHz (rk27xx/zsp.lua
+# ZSP.sweep(), the suite's tools/bus_sweep.py): the HCLK part doubles when
+# HCLK halves.
+# Comments: measured at DSP 18 / 160 MHz with HCLK 50 (and 100).
+#
+# Regions (Bus.region()): 'dmem_ahb' is DMEM reached through the AHB at
+# bus address 0x30000000, through its slave port as the ARM and the DMA
+# reach it: a DSP access through the EPR bus window, or a DMA transfer to
+# or from DMEM. Not the core's own DMEM port, which is free of all this.
+# 'mbox' the mailbox, 'dmareg' the DWDMA registers, 'sdram' anything else.
+#
+# load through the bus, the core waits for it: (DSP cycles, HCLK cycles)
+BUS_LOAD = {'dmem_ahb': (23.5, 15),         # ldd x16: 28.8 / 70.4 (26.2 / 47.8)
+            'mbox': (12.7, 8.3),            # ldd x16: 15.7 / 39.1 (13.9 / 26.0)
+            'dmareg': (12.7, 8.3),          # DWDMA registers: as the mailbox
+            'sdram': (9, 66)}               # ldd x16: 34.4 / 202.8 (25.0 / 124.4);
+                                            # ld x16: 38.4 / 257.6 (27.1 / 137.2)
+# stores: 2.2-2.5 DSP cycles at any clock while the write buffer has room;
+# an entry drains in (HCLK cycles): DMEM std x16 9.9 per store at 160 MHz,
+# SDRAM std x64 176.8 at 160 MHz (94.7 at HCLK 100)
+WB_ENTRIES = 16                 # write buffer
+WB_STORE = 2                    # DSP cycles per store while the buffer has room
+WB_DRAIN = {'dmem_ahb': 3, 'mbox': 1, 'dmareg': 1, 'sdram': 58}
+# DWDMA, 32-bit words: start-up (DSP, HCLK cycles) and per word
+# max(floor DSP cycles, DSP cycles + HCLK cycles). The DMEM side of a
+# transfer is DMEM's AHB slave port, clocked by the DSP: writing it takes
+# at least 2 DSP cycles per word (the floor of DMA_IN, which sets the time
+# at low DSP clocks), reading it 3.3 (DMA_OUT); the AHB/SDRAM side takes
+# HCLK cycles.
+DMA_IN = ((20, 10), (2.0, 0, 5.75))         # SDRAM -> DMEM, 1024 words: 2128 / 18558
+                                            # (2128 / 10138; 1908 at 24 MHz)
+DMA_OUT = ((35, 20), (0, 3.3, 3.2))         # DMEM -> SDRAM, 1024 words: 4477 / 13622
+                                            # (3960 / 8502)
+
+MULS = {'mul', 'mulsu', 'mac', 'macsu', 'macn'}
+WRITE_ONLY = {'mov', 'mov.e', 'ld', 'ldd', 'ldu', 'lddu', 'mul', 'mulsu', 'pop', 'popd'}
+NO_DST = {'st', 'std', 'stu', 'stdu', 'push', 'pushd', 'cmp', 'cmp.e', 'cexer', 'call'}
+POSTMOD_OPS = {'ldu', 'lddu', 'stu', 'stdu', 'push', 'pop', 'pushd', 'popd'}
+REGBASE = {'r': 0, 'a': 16, 'n': 24, 'g': 32}
+
+
+def timing_info(sim, ins):
+    """(class, issue slots, units, latency, block, sources, destinations) of
+    an instruction; registers are 0-15 r, 16-23 a, 24-31 n, 32- g, control
+    registers by name."""
+    syn = ins.spec.syntax
+    m = syn.split()[0]
+    regs = []
+    for (f, mul, add, kind, isreg, letter), v in zip(ins.spec.phs, sim.ops(ins)):
+        if isreg:
+            k = REGBASE[letter] + v
+            regs.append([k, k + 1] if mul == '2' else [k])
+        elif kind.startswith('creg'):
+            regs.append([v])
+    if m in MULS and regs:
+        regs[0] = [regs[0][0], regs[0][0] + 1]      # 32-bit result, a pair
+    first = regs[0] if regs else []
+    rest = [k for r in regs[1:] for k in r]
+    if m in NO_DST:
+        dsts, srcs = [], first + rest
+    elif m in WRITE_ONLY:
+        dsts, srcs = list(first), rest
+    else:
+        dsts, srcs = list(first), first + rest
+    if m in POSTMOD_OPS and len(regs) > 1:
+        dsts += regs[1]
+    creg_dst = bool(first) and isinstance(first[0], str) and m not in NO_DST
+    if m == 'nop':
+        cls = 'nop'
+    elif m.startswith('{c:br_cond}'):
+        cls = 'loop' if sim.ops(ins)[0].startswith('agn') else 'brc'
+    elif m == 'br':
+        cls = 'br'
+    elif m == 'call':
+        cls = 'call'
+    elif m in ('ret', 'reti'):
+        cls = 'ret'
+    elif m.startswith('cexe'):
+        cls = 'cexe'
+    elif creg_dst or m in ('bits', 'bitc'):
+        cls = 'cwr'
+    elif m in MULS:
+        cls = 'mac'
+    elif m.startswith('ld'):
+        cls = 'ld'
+    elif m.startswith('st'):
+        cls = 'st'
+    elif m in ('push', 'pop', 'pushd', 'popd'):
+        cls = 'stack'
+    elif first and isinstance(first[0], int) and 16 <= first[0] < 32:
+        cls = 'agu'
+    else:
+        cls = 'alu'
+    if cls == 'alu' and m.endswith('.e'):
+        cls = 'alue'
+    slots = 1
+    units, lat, block = TIMING[cls]
+    return cls, slots, units, lat, block, srcs, dsts
+
+
 class Inst:
-    __slots__ = ('spec', 'f', 'size', 'key', 'word')
+    __slots__ = ('spec', 'f', 'size', 'key', 'word', 'tm')
 
 
 class Bus:
@@ -228,14 +379,37 @@ class Bus:
             raise SimError('DWDMA ch%d: only 32-bit transfers are simulated' % ch)
         for i in range(n):
             self.write32(dar + 4 * i, self.read32(sar + 4 * i))
-        self.sim.cycles += 10 * n
+        # the data is there at once; completion is seen after the transfer
+        (sc, sh), (floor, pc, ph) = DMA_IN if self.region(dar) == 'dmem_ahb' else DMA_OUT
+        f = self.sim.dsp_hz / self.sim.hclk_hz   # DSP cycles per HCLK cycle
+        t = sc + sh * f + n * max(floor, pc + ph * f)
+        self.chen |= 1 << ch
+        self.sim.events.append((self.sim.tnext + max(1, round(t)), ch))
+
+    def dma_done(self, ch):
+        self.chen &= ~(1 << ch)
         self.raw_tfr |= 1 << ch
         if self.dma.get(0x310, 0) & (1 << ch):   # MaskTfr unmasked
             self.sim.ireq |= 1 << 3
 
+    def region(self, a):
+        """Timing class of a bus address (BUS_LOAD, WB_DRAIN): 'dmem_ahb'
+        is DMEM through its AHB slave port (bus window, DMA), not the
+        core's tightly coupled port."""
+        if self.DMEM_BUS <= a < self.DMEM_BUS + 0x10000:
+            return 'dmem_ahb'
+        if self.MBOX <= a < self.MBOX + 0x100:
+            return 'mbox'
+        if self.DWDMA <= a < self.DWDMA + 0x400:
+            return 'dmareg'
+        return 'sdram'
+
 
 class Sim:
-    def __init__(self, isa=DEFAULT_ISA):
+    def __init__(self, isa=DEFAULT_ISA, dsp_hz=160_000_000, hclk_hz=100_000_000):
+        self.dsp_hz = dsp_hz
+        self.hclk_hz = hclk_hz          # AHB/SDRAM: Rockbox 50 MHz, boosted and hwstub 100
+        self.profile = None             # {pc: cycles} when profiling
         self.specs, self.tables = load_isa(isa)
         self.dec16 = {}
         self.dmem = [0] * 0x8000
@@ -255,7 +429,17 @@ class Sim:
                                  '%ip0', '%ip1', '%rpc', '%tpc', '%vitr', '%ded', '%dei')}
         self.c['%timer0'] = self.c['%timer1'] = 0xffff
         self.pc = 0
-        self.cycles = 0
+        self.cycles = 0                 # cycles elapsed (timers follow it)
+        self.tnext = 0                  # earliest issue cycle of the next instruction
+        self.tcyc = 0                   # cycle the last instruction issued in
+        self.slots = 0                  # issue slots / units used in tcyc
+        self.used = dict.fromkeys(CAP, 0)
+        self.ready = {}                 # register -> cycle its value is ready
+        self.st_dmem = {}               # DMEM address -> cycle of the last store
+        self.acc = []                   # this instruction's accesses: (store, region, addr)
+        self.wb = collections.deque()   # write buffer: drain cycle of each entry
+        self.events = []                # (cycle, DMA channel) completions
+        self.prev_cls = None            # timing class of the last instruction
         self.insts = 0
         self.shadow = 0          # instructions left in a cexe shadow
         self.skip = False
@@ -287,6 +471,13 @@ class Sim:
             mem[start:start + count] = list(words)
         self.cache = {}
 
+    def load_raw(self, data):
+        """A flat little-endian IMEM image from address 0 (zspasm.pl -o)."""
+        import struct
+        n = len(data) // 2
+        self.imem[:n] = list(struct.unpack_from('<%dH' % n, data))
+        self.cache = {}
+
     # ------------------------------------------------------------ decode
     def decode(self, pc):
         hit = self.cache.get(pc)
@@ -315,6 +506,7 @@ class Sim:
         ins = Inst()
         ins.spec, ins.f, ins.size, ins.word = s, f, size, word
         ins.key = (s.syntax, size)
+        ins.tm = None
         self.cache[pc] = ins
         return ins
 
@@ -328,7 +520,7 @@ class Sim:
     def ops(self, ins):
         """Operand values in syntax order: ints, register numbers, table names."""
         out = []
-        for f, mul, add, kind, isreg in ins.spec.phs:
+        for f, mul, add, kind, _, _ in ins.spec.phs:
             v = ins.f[f]
             n = len(ins.spec.fields[f])
             if kind and kind != 's' and not kind.startswith('rel'):
@@ -347,13 +539,14 @@ class Sim:
     # ------------------------------------------------------------ data space
     def dread(self, addr):
         addr &= M24
-        self.cycles += 0 if addr < 0x8000 else 40
-        if addr < 0x8000:
+        if addr < 0x8000:               # tightly coupled DMEM: core cycles only
+            self.acc.append((False, 'dmem', addr))
             return self.dmem[addr]
         if 0xCE0000 <= addr < 0xD00000:
             return self.epr[addr & 7]
         if 0xD00000 <= addr < 0xE00000:
             ba = self.busaddr(addr)
+            self.acc.append((False, self.bus.region(ba), ba))
             w = self.bus.read32(ba & ~3)
             return (w >> 16) & M16 if ba & 2 else w & M16
         return 0
@@ -362,11 +555,13 @@ class Sim:
         addr &= M24
         v &= M16
         if addr < 0x8000:
+            self.acc.append((True, 'dmem', addr))
             self.dmem[addr] = v
         elif 0xCE0000 <= addr < 0xD00000:
             self.epr[addr & 7] = v & 0x7ff
         elif 0xD00000 <= addr < 0xE00000:
             ba = self.busaddr(addr)
+            self.acc.append((True, self.bus.region(ba), ba))
             w = self.bus.read32(ba & ~3)
             w = (w & 0xffff0000) | v if not ba & 2 else (w & 0xffff) | (v << 16)
             self.bus.write32(ba & ~3, w)
@@ -378,14 +573,17 @@ class Sim:
     def dread32(self, addr):
         addr &= M24
         if 0xD00000 <= addr < 0xE00000:      # one 32-bit bus access
-            self.cycles += 40
-            return self.bus.read32(self.busaddr(addr))
+            ba = self.busaddr(addr)
+            self.acc.append((False, self.bus.region(ba), ba))
+            return self.bus.read32(ba)
         return self.dread(addr) | (self.dread(addr + 1) << 16)
 
     def dwrite32(self, addr, v):
         addr &= M24
         if 0xD00000 <= addr < 0xE00000:
-            self.bus.write32(self.busaddr(addr), v)
+            ba = self.busaddr(addr)
+            self.acc.append((True, self.bus.region(ba), ba))
+            self.bus.write32(ba, v)
             return
         self.dwrite(addr, v)
         self.dwrite(addr + 1, v >> 16)
@@ -471,8 +669,90 @@ class Sim:
         self.c['%smode'] &= ~0x0433
         self.pc = 0x80 - 8 * src if src < 15 else 0x08
         self.waiting = False
-        self.cycles += 4
+        self.tnext += 4
         return True
+
+    # ------------------------------------------------------------ timing
+    def hclk(self, n):
+        """Whole DSP cycles for n HCLK cycles (at least 1)."""
+        return max(1, round(n * self.dsp_hz / self.hclk_hz))
+
+    def issue(self, ins):
+        """Issue ins (after it ran) in the timing model and advance tnext."""
+        tm = ins.tm
+        if tm is None:
+            tm = ins.tm = timing_info(self, ins)
+        cls, slots, units, lat, block, srcs, dsts = tm
+        c = self.tnext
+        ready = self.ready
+        for s in srcs:
+            r = ready.get(s, 0)
+            if r > c:
+                c = r
+        acc = self.acc
+        if cls == 'ld':
+            for store, region, addr in acc:
+                if region == 'dmem':
+                    t = self.st_dmem.get(addr)
+                    if t is not None and t + ST_LD_SAME > c:
+                        c = t + ST_LD_SAME
+        elif cls == 'loop' and self.prev_cls == 'brc':
+            block = AGN_AFTER_BRC
+        used = self.used
+        if c > self.tcyc:
+            self.tcyc, self.slots = c, 0
+            for u in used:
+                used[u] = 0
+        while (self.slots + slots > ISSUE_SLOTS or
+               any(used[u] + n > CAP[u] for u, n in units)):
+            self.tcyc += 1
+            self.slots = 0
+            for u in used:
+                used[u] = 0
+        c = self.tcyc
+        self.prev_cls = cls
+        self.slots += slots
+        for u, n in units:
+            used[u] += n
+        for d in dsts:
+            ready[d] = c + lat
+        nxt = c + block
+        if acc:
+            for store, region, addr in acc:
+                if region == 'dmem':
+                    if store and cls == 'st':
+                        self.st_dmem[addr] = c
+                elif store:
+                    nxt = max(nxt, self.wb_store(c, region))
+                else:                   # the core waits for the data
+                    cyc, hc = BUS_LOAD[region]
+                    nxt = max(nxt, c + max(1, round(cyc + hc * self.dsp_hz / self.hclk_hz)))
+            acc.clear()
+        self.tnext = max(nxt, c)
+
+    def wb_store(self, c, region):
+        """A bus store at cycle c into the write buffer; returns the cycle
+        the core can go on."""
+        wb = self.wb
+        while wb and wb[0] <= c:
+            wb.popleft()
+        if len(wb) >= WB_ENTRIES:       # full: wait for an entry to drain
+            c = wb.popleft()
+        start = max(c, wb[-1]) if wb else c
+        wb.append(start + self.hclk(WB_DRAIN[region]))
+        return c + WB_STORE
+
+    def advance(self):
+        """Fire due DMA completions and let the timers follow the cycles."""
+        if self.events:
+            self.events.sort()
+            while self.events and self.events[0][0] <= self.tnext:
+                _, ch = self.events.pop(0)
+                self.bus.dma_done(ch)
+        d = self.tnext - self.cycles
+        if d > 0:
+            self.tick_timers(d)
+            self.cycles = self.tnext
 
     def tick_timers(self, n):
         for t, bit, irq in (('%timer0', 0x80, 5), ('%timer1', 0x8000, 6)):
@@ -493,18 +773,26 @@ class Sim:
             if until and until(self):
                 return 'until'
             if self.shadow == 0 and self.take_interrupt():
-                pass
+                self.advance()
             elif self.waiting:
+                if self.events:         # sleep until the next DMA completion
+                    self.tnext = max(self.tnext, min(self.events)[0])
+                    self.advance()
+                    continue
                 # idle: the caller decides what wakes the core next
                 return 'wait'
             pc = self.pc
             ins = self.decode(pc)
             self.next_pc = (pc + ins.size) & M24
+            t0 = self.tnext
             if self.shadow:
                 self.shadow -= 1
                 if self.skip:
                     if self.update:
                         self.exec_postmod_only(ins)
+                    self.acc.clear()
+                    self.issue(ins)
+                    self.advance()
                     self.pc = self.next_pc
                     n += 1
                     continue
@@ -514,8 +802,10 @@ class Sim:
             h(self, ins, self.ops(ins))
             n += 1
             self.insts += 1
-            self.cycles += 1
-            self.tick_timers(1)
+            self.issue(ins)
+            self.advance()
+            if self.profile is not None:
+                self.profile[pc] = self.profile.get(pc, 0) + self.tnext - t0
             if self.next_pc == pc and not self.shadow:
                 self.pc = pc
                 return 'halt'
@@ -990,15 +1280,39 @@ def _popda(s, i, o):
 def main():
     import argparse
     ap = argparse.ArgumentParser(description='run a ZSP image until it halts or waits')
-    ap.add_argument('image')
+    ap.add_argument('image', help='ZSP1 image (zspasm.pl --image) or, with --raw, a flat IMEM image')
     ap.add_argument('-n', type=int, default=10_000_000)
+    ap.add_argument('--raw', action='store_true')
+    ap.add_argument('--mhz', type=float, default=160, help='DSP clock')
+    ap.add_argument('--hclk', type=float, default=100, help='AHB/SDRAM clock (MHz)')
+    ap.add_argument('--profile', type=int, metavar='N', default=0,
+                    help='print the N instructions that took the most cycles')
     a = ap.parse_args()
-    s = Sim()
-    s.load_image(open(a.image, 'rb').read())
+    s = Sim(dsp_hz=a.mhz * 1e6, hclk_hz=a.hclk * 1e6)
+    data = open(a.image, 'rb').read()
+    s.load_raw(data) if a.raw else s.load_image(data)
+    if a.profile:
+        s.profile = {}
     why = s.run(a.n)
     print('stopped (%s) at %04X after %d instructions, %d cycles' % (why, s.pc, s.insts, s.cycles))
     print('r: ' + ' '.join('%04x' % v for v in s.r))
     print('a: ' + ' '.join('%06x' % v for v in s.a))
+    if a.profile:
+        print_profile(s, a.profile)
+
+
+def print_profile(s, top):
+    """Cycles per class and the instructions that took the most."""
+    per_cls = {}
+    for pc, cyc in s.profile.items():
+        ins = s.decode(pc)
+        cls = ins.tm[0] if ins.tm else '?'
+        per_cls[cls] = per_cls.get(cls, 0) + cyc
+    total = sum(per_cls.values()) or 1
+    print('cycles by class: ' + ', '.join('%s %d (%.0f%%)' % (k, v, 100 * v / total) for k, v in
+                                          sorted(per_cls.items(), key=lambda x: -x[1])))
+    for pc, cyc in sorted(s.profile.items(), key=lambda x: -x[1])[:top]:
+        print('  %04X %8d  %s' % (pc, cyc, s.decode(pc).spec.syntax))
 
 
 if __name__ == '__main__':

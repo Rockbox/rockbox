@@ -101,7 +101,7 @@ results:
 	python3 tests/expect.py results
 
 # cycle benchmarks: make bench, then ZSP.bench() in zsp.lua and
-# tools/bench_report.py
+# tools/bench_report.py (or tools/zsp/zspbench.py to compare zspsim.py)
 bench: tests/bench/cases.json
 	@for s in tests/bench/*.s; do $(ASM) -o $${s%.s}.bin -l $${s%.s}.lst $$s || exit 1; done
 	@echo "built $$(ls tests/bench/*.bin | wc -l) benchmark images"

@@ -7,6 +7,8 @@ external bus window, mailbox, DMA, and timing. They run on the device under
 hwstub, driven by ../zsp.lua. What they established is written up in the
 ZSP500 DSP programming manual:
 https://www.rockbox.org/wiki/pub/Main/Rockchip27xx/ZSP500_DSP_Programming_Manual.pdf
+The DSP simulator's timing model (tools/zsp/zspsim.py) is fitted to their
+cycle benchmarks and bus and DMA timing.
 
   tests/        hand-written tests (*.s), generators of the others
                 (gen_*.py), shared includes (*.inc), and the result checker
@@ -106,6 +108,7 @@ Steps 2 to 4 also run unattended: ./hwstub_shell -b -e '<commands>'.
     python3 tools/bench_report.py                      # cycles per instruction group
     python3 tools/bus_sweep.py results/sweep-hclk100   # cycles = fixed + time part
     python3 tools/bus_sweep.py results/sweep-hclk50
+    python3 ../../../../../../tools/zsp/zspbench.py    # zspsim.py against the benchmarks
 
 make results reports every check of tests/expect.py; on a Samsung YP-CP3
 all pass. INFO lines carry measured values. tests/expect.py RESULTDIR

@@ -6,7 +6,8 @@
 -- (make; make bench for the cycle benchmarks), result checkers
 -- (tests/expect.py, make results) and the benchmark and bus sweep reports
 -- in tools/. ZSP.cfg.dir is that directory unless set otherwise; results
--- are written to results/ below it.
+-- are written to results/ below it. The cycle benchmarks (ZSP.bench) are
+-- what tools/zsp/zspbench.py compares zspsim.py's timing model with.
 --
 -- Usage (inside hwstub_shell, after make in rk27xx/zsp):
 --   dofile("lua/rk27xx/zsp.lua")
@@ -906,7 +907,7 @@ ZSP.BENCH = {
     "cexe_false",
 }
 -- mixed groups typical of DSP filter code (window taps and DCT steps of
--- an MP3 subband synthesis):
+-- an MP3 subband synthesis), for the timing model of tools/zsp/zspsim.py:
 --   ZSP.bench(ZSP.BENCH_MIX, { append = true })
 ZSP.BENCH_MIX = {
     "adde_dep", "adde_indep2", "shrae", "move_indep2", "move_add2",
