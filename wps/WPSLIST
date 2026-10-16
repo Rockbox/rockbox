@@ -75,6 +75,7 @@ WPS: yes
 FMS: yes
 WRS: yes
 RWPS: yes
+RWRS: yes
 SBS: no
 RSBS: no
 
@@ -271,6 +272,8 @@ list separator color: 808080
 <remote>
 rwps.128x96x2: cabbiev2.128x96x2.wps
 rwps.128x64x1: cabbiev2.128x64x1.wps
+rwrs.128x96x2: cabbiev2-128x96x2.wrs
+rwrs.128x64x1: cabbiev2-128x64x1.wrs
 Font.128x64x1: 08-Rockfont.fnt
 statusbar: top
 ui viewport: -
