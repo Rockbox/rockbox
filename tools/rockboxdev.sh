@@ -324,6 +324,21 @@ check_restart() {
     fi
 }
 
+patch_build() {
+    for p in $1; do
+        echo "ROCKBOXDEV: applying patch $p"
+
+        # apply the patch
+        (cd $2 && patch -p1 < "$patch_dir/$p")
+
+        # check if the patch applied cleanly
+        if [ $? -gt 0 ]; then
+            echo "ROCKBOXDEV: failed to apply patch $p"
+            exit
+        fi
+    done
+}
+
 # advanced tool building: create a build directory, run configure, run make
 # and run make install. It is possible to customize all steps or disable them
 # $1=tool
@@ -331,7 +346,7 @@ check_restart() {
 # $3=configure options, or "NO_CONFIGURE" to disable step
 # $4=make options, or "NO_MAKE" to disable step
 # $5=make install options (will be replaced by "install" if left empty)
-# By default, the restary step is the toolname, but it can be changed by setting
+# By default, the restart step is the toolname, but it can be changed by setting
 # RESTART_STEP
 buildtool () {
     tool="$1"
@@ -357,6 +372,10 @@ buildtool () {
 
     cd build-$toolname
 
+    if [ "$tool" == "expat" ] && [ "$version" == "2.1.0" ] && [ "$(arch)" == "aarch64" ]; then
+        patch_build "expat-2.1.0-config.patch" "$builddir/$toolname"
+    fi
+
     # in-tree/out-of-tree build
     case "$tool" in
         linux|alsa-lib)
@@ -365,6 +384,10 @@ buildtool () {
             # copy the source directory to the build directory
             cp -r ../$toolname/* .
             cfg_dir="."
+
+            if [ "$tool" == "alsa-lib" ] && [ "$(arch)" == "aarch64" ]; then
+                patch_build "alsa-lib-$version-config.patch" "$builddir/build-$toolname"
+            fi
             ;;
         *)
             # out-of-tree
@@ -481,18 +504,7 @@ build() {
     extract "$toolname-$version"
 
     # do we have a patch?
-    for p in $patch; do
-        echo "ROCKBOXDEV: applying patch $p"
-
-        # apply the patch
-        (cd $builddir/$toolname-$version && patch -p1 < "$patch_dir/$p")
-
-        # check if the patch applied cleanly
-        if [ $? -gt 0 ]; then
-            echo "ROCKBOXDEV: failed to apply patch $p"
-            exit
-        fi
-    done
+    patch_build "$patch" "$builddir/$toolname-$version"
 
     # kludge to avoid having to install GMP, MPFR, MPC and ISL
     if test -n "$needs_libs"; then
@@ -606,35 +618,9 @@ build_linux_toolchain () {
     extract "glibc-$glibc_ver"
 
     # do we have any patches?
-    for p in $binutils_patches; do
-        echo "ROCKBOXDEV: applying patch $p"
-	(cd $builddir/binutils-$binutils_ver ; patch -p1 < "$patch_dir/$p")
-
-	# check if the patch applied cleanly
-        if [ $? -gt 0 ]; then
-            echo "ROCKBOXDEV: failed to apply patch $p"
-            exit
-        fi
-    done
-    for p in $glibc_patches; do
-        echo "ROCKBOXDEV: applying patch $p"
-	(cd $builddir/glibc-$glibc_ver ; patch -p1 < "$patch_dir/$p")
-
-	# check if the patch applied cleanly
-        if [ $? -gt 0 ]; then
-            echo "ROCKBOXDEV: failed to apply patch $p"
-            exit
-        fi
-    done
-    for p in $linux_patches; do
-        echo "ROCKBOXDEV: applying patch $p"
-	(cd $builddir/linux-$linux_ver ; patch -p1 < "$patch_dir/$p")
-	# check if the patch applied cleanly
-        if [ $? -gt 0 ]; then
-            echo "ROCKBOXDEV: failed to apply patch $p"
-            exit
-        fi
-    done
+    patch_build "$binutils_patches" "$builddir/binutils-$binutils_ver"
+    patch_build "$glibc_patches" "$builddir/glibc-$glibc_ver"
+    patch_build "$linux_patches" "$builddir/linux-$linux_ver"
 
     # we make it possible to restart a build on error by using the RBDEV_RESTART
     # variable, the format is RBDEV_RESTART="tool" where tool is the toolname at which
