@@ -45,16 +45,51 @@ extern char *global_stack;
 #define CHUNKSIZE       (16*1024)
 #define SEEK_CHUNKSIZE 7*CHUNKSIZE
 
+/* The Ogg buffers are allocated once, as large as any legal stream needs,
+   so that they never grow and the heap use doesn't depend on the file:
+   - an Ogg page is at most 27 + 255 + 255*255 bytes;
+   - the sync buffer holds what has arrived of an unfinished page, and one
+     more read;
+   - the stream buffer holds what has arrived of an unfinished packet, and
+     one more page.  RFC 7845 expects a demuxer to take Opus packets of up
+     to 61,440 bytes and lets it drop larger ones (see make_room());
+   - a page has at most 255 lacing values, and a packet of 61,440 bytes
+     241 of them. */
+#define OGG_MAX_PAGE    (27 + 255 + 255*255)
+#define OPUS_MAX_PACKET 61440
+#define SYNC_SIZE       (OGG_MAX_PAGE - 1 + CHUNKSIZE)
+#define BODY_SIZE       (OPUS_MAX_PACKET + 255*255)
+#define LACING_SIZE     1024
+
 static int get_more_data(ogg_sync_state *oy)
 {
     int bytes;
     char *buffer;
 
     buffer = (char *)ogg_sync_buffer(oy, CHUNKSIZE);
+    if (buffer == NULL)
+        return -1;
     bytes = ci->read_filebuf(buffer, CHUNKSIZE);
     ogg_sync_wrote(oy,bytes);
 
     return bytes;
+}
+
+/* Make room for og in the stream buffers.  If it doesn't fit, the packet
+   it continues is larger than an Opus packet can be: drop it. */
+static void make_room(ogg_stream_state *os, ogg_page *og)
+{
+    long body = os->body_fill - os->body_returned + og->body_len;
+    long lacing = os->lacing_fill - os->lacing_returned + og->header[26] + 1;
+
+    if (body >= os->body_storage || lacing >= os->lacing_storage) {
+        /* ogg_stream_reset() counts packets from 0 again, but packet 0
+           is taken to be the header */
+        ogg_int64_t packetno = os->packetno;
+        LOGF("Packet too large, dropped");
+        ogg_stream_reset(os);
+        os->packetno = packetno;
+    }
 }
 
 /* seek to ogg page after given file position */
@@ -391,13 +426,25 @@ enum codec_status codec_run(void)
     os = _ogg_malloc(sizeof(*os));
     oy = _ogg_malloc(sizeof(*oy));
 
-    /* pre-init the ogg_sync_state buffer, so it won't need many reallocs */
+    /* The Ogg buffers, at their largest (see OGG_MAX_PAGE) */
     ogg_sync_init(oy);
-    oy->storage = 64*1024;
+    oy->storage = SYNC_SIZE;
     oy->data = _ogg_malloc(oy->storage);
+    memset(os, 0, sizeof(*os));
+    os->body_storage = BODY_SIZE;
+    os->body_data = _ogg_malloc(BODY_SIZE);
+    os->lacing_storage = LACING_SIZE;
+    os->lacing_vals = _ogg_malloc(LACING_SIZE*sizeof(*os->lacing_vals));
+    os->granule_vals = _ogg_malloc(LACING_SIZE*sizeof(*os->granule_vals));
 
     /* allocate output buffer */
     uint16_t *output = (uint16_t*) _ogg_malloc(MAX_FRAME_SIZE*sizeof(uint16_t));
+
+    if (!oy->data || !os->body_data || !os->lacing_vals ||
+        !os->granule_vals || !output) {
+        LOGF("Not enough memory");
+        goto done;
+    }
 
     ci->seek_buffer(0);
     ci->set_elapsed(0);
@@ -438,7 +485,8 @@ enum codec_status codec_run(void)
         /* Loop for all complete pages we got (most likely only one) */
         while (ogg_sync_pageout(oy, &og) == 1) {
             if (stream_init != 0) {
-                stream_init = ogg_stream_init(os, ogg_page_serialno(&og));
+                stream_init = ogg_stream_reset_serialno(os,
+                                                ogg_page_serialno(&og));
                 if (stream_init != 0) {
                     LOGF("Stream init failed");
                     goto done;
@@ -446,12 +494,20 @@ enum codec_status codec_run(void)
             }
 
             /* Add page to the bitstream */
+            make_room(os, &og);
             ogg_stream_pagein(os, &og);
 
             page_granule = ogg_page_granulepos(&og);
             granule_pos = page_granule;
 
-            while ((ogg_stream_packetout(os, &op) == 1) && !op.e_o_s) {
+            /* Take every packet the page finished, so that the stream
+               buffer holds no more than an unfinished one (see BODY_SIZE) */
+            while (1) {
+                ret = ogg_stream_packetout(os, &op);
+                if (ret < 0)
+                    continue;   /* a gap in the stream, as after a seek */
+                if (ret == 0 || op.e_o_s)
+                    break;
                 if (op.packetno == 0){
                     /* identification header */
 
