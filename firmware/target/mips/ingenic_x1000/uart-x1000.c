@@ -150,6 +150,27 @@ void uart_set_baud(uart_port_t port, int baud) {
     jz_write(UART_UACR(port), uacr);
 }
 
+void uart_set_parity(uart_port_t port, uart_parity_t parity) {
+    switch (parity) {
+        case UART_PARITY_NONE:
+            jz_writef(UART_ULCR(port), PARE(0));
+            break;
+        case UART_PARITY_ODD:
+            jz_writef(UART_ULCR(port), PARE(1), PARM_V(ODD), STPAR(0));
+            break;
+        case UART_PARITY_EVEN:
+            jz_writef(UART_ULCR(port), PARE(1), PARM_V(EVEN), STPAR(0));
+            break;
+    }
+}
+
+void uart_set_flow_control(uart_port_t port, bool enable) {
+    if (enable)
+        jz_overwritef(UART_UMCR(port), MDCE(1), FCM(1));
+    else
+        jz_overwritef(UART_UMCR(port), MDCE(1), FCM(0), RTS(1));
+}
+
 void uart_empty_rx(uart_port_t port) {
     int slots = jz_read(UART_URCR(port));
     while (slots > 0 && rx_available > 0) {
@@ -161,6 +182,12 @@ void uart_empty_rx(uart_port_t port) {
 }
 
 void uart_tx(uart_port_t port, const uint8_t *buf, size_t len) {
+    uart_tx_timeout(port, buf, len, TIMEOUT_BLOCK);
+}
+
+bool uart_tx_timeout(uart_port_t port, const uint8_t *buf, size_t len,
+                     int timeout) {
+    long deadline = current_tick + timeout;
     assert(buf != NULL);
     assert(len > 0);
     tx_dma_desc.cm = jz_orf(DMA_CHN_CM, SAI(1), DAI(0), RDIL(7),
@@ -189,17 +216,39 @@ void uart_tx(uart_port_t port, const uint8_t *buf, size_t len) {
     jz_writef(DMA_CHN_CS(DMA_CHANNEL_UART_TX), DES8(1), NDES(0));
     jz_set(DMA_DB, 1 << DMA_CHANNEL_UART_TX);
     jz_writef(DMA_CHN_CS(DMA_CHANNEL_UART_TX), CTE(1));
-    semaphore_wait(&tx_done_sem, TIMEOUT_BLOCK);
+    if (semaphore_wait(&tx_done_sem, timeout) == OBJ_WAIT_TIMEDOUT) {
+        /* Peer is holding CTS off, or isn't there at all */
+        jz_writef(DMA_CHN_CS(DMA_CHANNEL_UART_TX), CTE(0));
+        semaphore_wait(&tx_done_sem, TIMEOUT_NOBLOCK);
+        jz_writef(UART_UFCR(port), TFRT(1));
+        return false;
+    }
     while (jz_readf(UART_ULSR(port), TEMP) == 0) {
+        if (timeout != TIMEOUT_BLOCK && TIME_AFTER(current_tick, deadline)) {
+            jz_writef(UART_UFCR(port), TFRT(1));
+            return false;
+        }
         yield();
     }
+    return true;
 }
 
 size_t uart_rx(uart_port_t port, uint8_t *buf, size_t len) {
+    return uart_rx_timeout(port, buf, len, TIMEOUT_BLOCK);
+}
+
+size_t uart_rx_timeout(uart_port_t port, uint8_t *buf, size_t len,
+                       int timeout) {
     rx_buf = buf;
     rx_available = len;
     jz_writef(UART_UIER(port), RTOIE(1), RDRIE(1));
-    semaphore_wait(&rx_done_sem, TIMEOUT_BLOCK);
+    if (semaphore_wait(&rx_done_sem, timeout) == OBJ_WAIT_TIMEDOUT) {
+        int irq = disable_irq_save();
+        jz_writef(UART_UIER(port), RDRIE(0), RLSIE(0), RTOIE(0));
+        restore_irq(irq);
+        /* The IRQ may have completed the read before it was masked */
+        semaphore_wait(&rx_done_sem, TIMEOUT_NOBLOCK);
+    }
     size_t rem = rx_available;
     rx_available = 0;
     return len - rem;

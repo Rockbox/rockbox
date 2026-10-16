@@ -32,11 +32,27 @@ typedef enum {
     PORT_MAX = 3,
 } uart_port_t;
 
+typedef enum {
+    UART_PARITY_NONE,
+    UART_PARITY_ODD,
+    UART_PARITY_EVEN,
+} uart_parity_t;
+
 extern void uart_init(uart_port_t port, int baud);
 extern void uart_tx(uart_port_t port, const uint8_t *buf, size_t len);
+/* Returns false if the data couldn't be sent within 'timeout' ticks */
+extern bool uart_tx_timeout(uart_port_t port, const uint8_t *buf, size_t len,
+                            int timeout);
 extern size_t uart_rx(uart_port_t port, uint8_t *buf, size_t len);
+/* Like uart_rx(), but gives up after 'timeout' ticks. Returns the number
+ * of bytes received, which may be zero. */
+extern size_t uart_rx_timeout(uart_port_t port, uint8_t *buf, size_t len,
+                              int timeout);
 extern bool uart_pending_rx(uart_port_t port);
 extern void uart_set_baud(uart_port_t port, int baud);
+extern void uart_set_parity(uart_port_t port, uart_parity_t parity);
+/* Hardware RTS/CTS flow control, enabled by uart_init() */
+extern void uart_set_flow_control(uart_port_t port, bool enable);
 extern void uart_deinit(uart_port_t port);
 
 #endif /* __UART_X1000_H__ */
