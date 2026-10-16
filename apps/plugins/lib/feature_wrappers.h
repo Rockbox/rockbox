@@ -48,6 +48,7 @@
 #ifdef HAVE_JPEG
 #define read_jpeg_file rb->read_jpeg_file
 #define read_jpeg_fd rb->read_jpeg_fd
+#define clip_jpeg_fd rb->clip_jpeg_fd
 #else
 #endif
 

@@ -350,6 +350,10 @@ struct albumart_t {
     struct bitmap input_bmp;
     char pfraw_file[MAX_PATH];
     char file[MAX_PATH];
+#ifdef HAVE_ALBUMART
+    struct mp3_albumart embedded; /* type is AA_TYPE_UNKNOWN unless file
+                                     is a track with the art embedded */
+#endif
     int idx;
     int slides;
     int inspected;
@@ -558,6 +562,7 @@ static struct pf_index_t pf_idx;
 static struct pf_track_t pf_tracks;
 
 static struct mp3entry id3;
+static bool id3_from_ramcache; /* tags only, no embedded album art */
 
 void reset_track_list(void);
 
@@ -2050,21 +2055,100 @@ bool retrieve_id3(struct mp3entry *id3, const char* file)
     if (rb->tagcache_fill_tags(id3, file))
     {
         rb->strlcpy(id3->path, file, sizeof(id3->path));
+        id3_from_ramcache = true;
         return true;
     }
 #endif
 
+    id3_from_ramcache = false;
     return rb->get_metadata(id3, -1, file);
+}
+
+#ifdef HAVE_ALBUMART
+/**
+  Find a JPEG embedded in the track. On success the track's path is in buf
+  and the position of the JPEG in *aa.
+ */
+static bool get_embedded_albumart(struct mp3entry *id3, char *buf, int buflen,
+                                  struct mp3_albumart *aa)
+{
+    /* tags from the database don't say whether the track has album art,
+       so read them from the track. get_metadata() clears id3, path
+       included, so pass it a copy of the path. */
+    rb->strlcpy(buf, id3->path, buflen);
+    if (id3_from_ramcache)
+    {
+        if (!rb->get_metadata(id3, -1, buf))
+        {
+            /* it clears id3 on failure too; fill it from the database
+               again so that image files can still be searched for */
+            retrieve_id3(id3, buf);
+            return false;
+        }
+        id3_from_ramcache = false;
+    }
+
+    /* only JPEG can be decoded */
+    if (!id3->has_embedded_albumart ||
+        (id3->albumart.type & AA_CLEAR_FLAGS_MASK) != AA_TYPE_JPG)
+        return false;
+
+    *aa = id3->albumart;
+    return true;
+}
+
+static int read_embedded_jpeg(const char *path, const struct mp3_albumart *aa,
+                              struct bitmap *bm, int maxsize, int format,
+                              const struct custom_format *cformat)
+{
+    int fd = rb->open(path, O_RDONLY);
+    if (fd < 0)
+        return fd;
+    rb->lseek(fd, aa->pos, SEEK_SET);
+    int ret = clip_jpeg_fd(fd, aa->type, aa->size, bm, maxsize, format,
+                           cformat);
+    rb->close(fd);
+    return ret;
+}
+#endif /* HAVE_ALBUMART */
+
+/**
+  Find the album art of the track: an image file found by
+  search_albumart_files() or a JPEG embedded in the track, in the order
+  the album art setting prefers (files only when album art is switched
+  off). The file name goes in buf, and if the art is embedded, its position
+  in the file goes in aa->embedded.
+ */
+static bool find_track_albumart(struct mp3entry *id3, char *buf, int buflen,
+                                struct albumart_t *aa)
+{
+#ifdef HAVE_ALBUMART
+    int pref = rb->global_settings->album_art;
+    aa->embedded.type = AA_TYPE_UNKNOWN;
+    if (pref == AA_PREFER_EMBEDDED &&
+        get_embedded_albumart(id3, buf, buflen, &aa->embedded))
+        return true;
+#else
+    (void)aa;
+#endif
+    if (search_albumart_files(id3, ":", buf, buflen))
+        return true;
+#ifdef HAVE_ALBUMART
+    if (pref == AA_PREFER_IMAGE_FILE &&
+        get_embedded_albumart(id3, buf, buflen, &aa->embedded))
+        return true;
+#endif
+    return false;
 }
 
 /**
   Determine filename of the album art for the given slide_index and
   store the result in buf.
   The algorithm looks for the first track of the given album uses
-  find_albumart to find the filename.
+  find_track_albumart to find the filename.
  */
 static bool get_albumart_for_index_from_db(const int slide_index, char *buf,
-                                    int buflen)
+                                    int buflen, struct albumart_t *aa)
 {
     bool ret;
     char tcs_buf[TAGCACHE_BUFSZ];
@@ -2081,7 +2165,7 @@ static bool get_albumart_for_index_from_db(const int slide_index, char *buf,
 
     ret = rb->tagcache_get_next(&tcs, tcs_buf, tcs_bufsz) &&
           retrieve_id3(&id3, tcs.result) &&
-          search_albumart_files(&id3, ":", buf, buflen);
+          find_track_albumart(&id3, buf, buflen, aa);
 
     rb->tagcache_search_finish(&tcs);
     return ret;
@@ -2248,7 +2332,8 @@ static bool incremental_albumart_cache(bool verbose)
         goto aa_success;
     }
 
-    if (!get_albumart_for_index_from_db(idx, aa_cache.file, sizeof(aa_cache.file)))
+    if (!get_albumart_for_index_from_db(idx, aa_cache.file,
+                                        sizeof(aa_cache.file), &aa_cache))
         goto aa_failure; //rb->strcpy(aa_cache.file, EMPTY_SLIDE_BMP);
 
 
@@ -2256,8 +2341,15 @@ static bool incremental_albumart_cache(bool verbose)
     aa_cache.input_bmp.width = DISPLAY_WIDTH;
     aa_cache.input_bmp.height = DISPLAY_HEIGHT;
 
-    ret = read_image_file(aa_cache.file, &aa_cache.input_bmp,
-                          aa_cache.buf_sz, format, &format_transposed);
+#ifdef HAVE_ALBUMART
+    if (aa_cache.embedded.type != AA_TYPE_UNKNOWN)
+        ret = read_embedded_jpeg(aa_cache.file, &aa_cache.embedded,
+                                 &aa_cache.input_bmp, aa_cache.buf_sz,
+                                 format, &format_transposed);
+    else
+#endif
+        ret = read_image_file(aa_cache.file, &aa_cache.input_bmp,
+                              aa_cache.buf_sz, format, &format_transposed);
     if (ret <= 0) {
         if (verbose) {
             rb->splashf(HZ, "Album art is bad: %s", get_album_name(idx));
