@@ -19,13 +19,13 @@ target/hosted/cpuinfo-linux.c
 target/hosted/cpufreq-linux.c
 #endif
 
-#if !defined(SAMSUNG_YPR0) || defined(SIMULATOR) /* uses as3514 rtc */
+#if !defined(SAMSUNG_YPR0) && !defined(SONY_PSP) || defined(SIMULATOR) /* uses as3514 rtc */
 target/hosted/rtc.c
 #endif
 
 #if (CONFIG_PLATFORM & PLATFORM_ANDROID) == 0 && \
     !defined(DX50) && !defined(DX90) && \
-    (defined(DEBUG) || defined(SIMULATOR) || defined(N3DS)) /* sim should define DEBUG instead */
+    (defined(DEBUG) || defined(SIMULATOR) || defined(N3DS) || defined(SONY_PSP)) /* sim should define DEBUG instead */
 target/hosted/debug-hosted.c
 #endif
 
@@ -630,6 +630,8 @@ drivers/audio/as3514.c
 drivers/audio/wm8978.c
 #elif defined(N3DS)
 drivers/audio/3ds.c
+#elif defined(SONY_PSP)
+drivers/audio/psp.c
 #endif
 #endif /* (CONFIG_PLATFORM & PLATFORM_NATIVE) */
 #endif /* !defined(BOOTLOADER) */
@@ -2111,6 +2113,7 @@ target/hosted/game_console/lib/sys_file_common.c
 target/hosted/game_console/lib/sys_timer_common.c
 target/hosted/game_console/lib/bfile/bfile-rwmutex.c
 target/hosted/game_console/lib/sys_cond_generic.c
+
 #ifdef N3DS
 target/hosted/game_console/lib/sys_file_3ds.c
 target/hosted/game_console/lib/sys_dir_3ds.c
@@ -2129,7 +2132,27 @@ target/hosted/game_console/3ds/pcm-recording-3ds.c
 target/hosted/game_console/3ds/powermgmt-3ds.c
 target/hosted/game_console/3ds/system-3ds.c
 #endif /* N3DS */
-#endif
+
+#ifdef SONY_PSP
+target/hosted/game_console/lib/sys_file_psp.c
+target/hosted/game_console/lib/sys_dir_psp.c
+target/hosted/game_console/lib/sys_display_psp.c
+target/hosted/game_console/lib/sys_kernel_hook.c
+target/hosted/game_console/lib/sys_thread_psp.c
+target/hosted/game_console/lib/sys_timer_psp.c
+target/hosted/game_console/lib/bfile/bfile-psp.c
+target/hosted/game_console/psp/backlight-psp.c
+target/hosted/game_console/psp/button-psp.c
+target/hosted/game_console/psp/filesystem-psp.c
+target/hosted/game_console/psp/lc-psp.c
+target/hosted/game_console/psp/lcd-bitmap-psp.c
+target/hosted/game_console/psp/pcm-psp.c
+target/hosted/game_console/psp/powermgmt-psp.c
+target/hosted/game_console/psp/rtc-psp.c
+target/hosted/game_console/psp/system-psp.c
+target/hosted/game_console/psp/module/pluginlib.S
+#endif /* SONY_PSP */
+#endif /* PLATFORM_GAME_CONSOLE */
 
 #else /* defined(SIMULATOR) */
 

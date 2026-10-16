@@ -506,6 +506,18 @@ static void setoptions (void)
         options.SELECT = BUTTON_SELECT;
         options.MENU   = BUTTON_POWER;
 
+#elif CONFIG_KEYPAD == PSP_PAD
+        options.UP     = BUTTON_UP;
+        options.DOWN   = BUTTON_DOWN;
+        options.LEFT   = BUTTON_LEFT;
+        options.RIGHT  = BUTTON_RIGHT;
+
+        options.A      = BUTTON_SELECT;
+        options.B      = BUTTON_BACK;
+        options.START  = BUTTON_POWER;
+        options.SELECT = BUTTON_USER;
+        options.MENU   = BUTTON_MENU;
+
 #else
 #error No Keymap Defined!
 #endif

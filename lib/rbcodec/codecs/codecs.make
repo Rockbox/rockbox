@@ -28,7 +28,9 @@ CODECFLAGS := $(CFLAGS) $(RBCODEC_CFLAGS) -fstrict-aliasing \
 ifdef APP_TYPE
  CODECLDFLAGS = $(SHARED_LDFLAGS)
  ifneq ($(UNAME), Darwin)
-  CODECLDFLAGS += -Wl,--gc-sections
+  ifeq (,$(findstring psp, $(MODELNAME)))
+    CODECLDFLAGS += -Wl,--gc-sections
+  endif
  endif
  CODECFLAGS += $(SHARED_CFLAGS) # <-- from Makefile
 else

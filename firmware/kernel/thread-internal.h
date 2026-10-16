@@ -31,7 +31,7 @@
  *
  * simulator (possibly) doesn't simulate stack usage anyway but well ... */
 
-#if defined(HAVE_SDL_THREADS) || defined(__PCTOOL__) || defined(N3DS)
+#if defined(HAVE_SDL_THREADS) || defined(__PCTOOL__) || defined(N3DS) || defined(SONY_PSP)
 struct regs
 {
     void *t;             /* OS thread */
@@ -40,7 +40,9 @@ struct regs
     void (*start)(void); /* Start function */
 };
 
+#ifndef PSP
 #define DEFAULT_STACK_SIZE 0x100 /* tiny, ignored anyway */
+#endif
 #else
 #include "asm/thread.h"
 #endif /* HAVE_SDL_THREADS */

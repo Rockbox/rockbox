@@ -1,6 +1,8 @@
+#ifndef SONY_PSP
 common.c
 format.c
 snprintf.c
+#endif
 
 #if defined(IPOD_NANO2G)
 ipodnano2g.c
@@ -79,4 +81,6 @@ x1000/recovery.c
 x1000/utils.c
 #elif defined(ECHO_R1)
 echoplayer.c
+#elif defined(SONY_PSP)
+psp.c
 #endif

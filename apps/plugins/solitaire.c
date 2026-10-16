@@ -798,6 +798,24 @@ CONFIG_KEYPAD == MROBE500_PAD
 #   define HK_CUR2STACK    "Long A.."
 #   define HK_REM2STACK    "Start"
 
+#elif (CONFIG_KEYPAD == PSP_PAD)
+#   define SOL_QUIT         BUTTON_BACK
+#   define SOL_UP           BUTTON_UP
+#   define SOL_DOWN         BUTTON_DOWN
+#   define SOL_LEFT         BUTTON_LEFT
+#   define SOL_RIGHT        BUTTON_RIGHT
+#   define SOL_MOVE_PRE     BUTTON_SELECT
+#   define SOL_MOVE         (BUTTON_SELECT | BUTTON_REL)
+#   define SOL_DRAW         BUTTON_MENU
+#   define SOL_REM2CUR      (BUTTON_USER | BUTTON_REPEAT)
+#   define SOL_CUR2STACK    (BUTTON_SELECT | BUTTON_REPEAT)
+#   define SOL_REM2STACK    BUTTON_POWER
+#   define HK_MOVE         "Cross"
+#   define HK_DRAW         "Square"
+#   define HK_REM2CUR      "Long Triangle"
+#   define HK_CUR2STACK    "Long Cross.."
+#   define HK_REM2STACK    "Start"
+
 #else
 #error No keymap defined!
 #endif

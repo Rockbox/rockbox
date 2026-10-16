@@ -30,6 +30,34 @@ void __aeabi_unwind_cpp_pr0(void) {}
 struct _reent * _EXFUN(__getreent, (void)) { return NULL; }
 #endif
 
+#ifdef SONY_PSP
+#include <psploadexec.h>
+#include <pspmoduleinfo.h>
+
+PSP_MODULE_INFO("plugin", 0, 0, 1);
+PSP_NO_CREATE_MAIN_THREAD();
+PSP_HEAP_SIZE_KB( 512 );
+
+int module_start (SceSize argc, void* argp)
+{
+    return 0;
+    (void) argc;
+    (void) argp;
+}
+
+/* pluginlib.S export */
+extern const struct plugin_header __header;
+void *plugin_get_header(void)
+{
+    return (void *) &__header;
+}
+
+/* Unresolved symbols */
+int abs (int i) { return (i < 0) ? -i : i; }
+long labs (long i) { return (i < 0) ? -i : i; }
+long long llabs (long long i) { return (i < 0) ? -i : i; }
+#endif
+
 /*
  * EXIT_MAGIC magic, because 0 cannot be used due to setjmp()
  * must be > 0

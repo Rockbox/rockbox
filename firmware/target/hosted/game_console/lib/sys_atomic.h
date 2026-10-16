@@ -27,6 +27,9 @@
 #define AtomicAdd(ptr, value) __sync_fetch_and_add((u32 *)(ptr), value)
 
 bool _AtomicCAS(u32 *ptr, int oldval, int newval);
+#ifdef SONY_PSP
+#define AtomicIncrement(ptr) __sync_fetch_and_add((u32 *)(ptr), 1)
+#endif
 #define AtomicGet(ptr) __atomic_load_n((u32*)(ptr), __ATOMIC_SEQ_CST)
 #define AtomicSet(ptr, value) __sync_lock_test_and_set((u32 *)(ptr), value)
 #define AtomicCAS(ptr, oldvalue, newvalue) _AtomicCAS((u32 *)(ptr), oldvalue, newvalue)

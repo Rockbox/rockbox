@@ -610,7 +610,7 @@ struct plugin_api {
     void (*reset_poweroff_timer)(void);
     void (*set_sleeptimer_duration)(int minutes);
     int (*get_sleep_timer)(void);
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE) || defined(SONY_PSP)
 #if defined(CPU_COLDFIRE)
     int (*system_memory_guard)(int newmode);
 #endif

@@ -200,6 +200,9 @@ jackpot_slots.30x420x1.bmp
     ((LCD_WIDTH >= 480) && (LCD_HEIGHT >= 640))
 bubbles_emblem.640x480x16.bmp
 bubbles_background.640x480x16.bmp
+#elif (LCD_WIDTH == 480) && (LCD_HEIGHT == 272)
+bubbles_emblem.320x240x16.bmp
+bubbles_background.480x272x16.bmp
 #elif (LCD_WIDTH >= 360) && (LCD_HEIGHT >= 400)
 bubbles_emblem.360x400x16.bmp
 bubbles_background.360x400x16.bmp
@@ -436,7 +439,9 @@ invadrox_shield.22x16x16.bmp
 invadrox_ufo.16x7x16.bmp
 invadrox_ufo_explode.21x8x16.bmp
 invadrox_numbers.50x7x16.bmp
-#if LCD_WIDTH == 480
+#if (LCD_WIDTH == 480) && (LCD_HEIGHT == 272)
+invadrox_background.480x272x16.bmp
+#elif LCD_WIDTH == 480
 invadrox_background.480x640x16.bmp
 #elif LCD_WIDTH == 360 && (LCD_HEIGHT == 400 || LCD_HEIGHT == 640)
 invadrox_background.360x400x16.bmp
@@ -515,6 +520,8 @@ jewels.320x240x16.bmp
 jewels.320x240x16.bmp
 #elif (LCD_WIDTH == 360) && ((LCD_HEIGHT == 400) || (LCD_HEIGHT == 640))
 jewels.360x400x16.bmp
+#elif (LCD_WIDTH == 480) && (LCD_HEIGHT == 272)
+jewels.320x240x16.bmp
 #elif   ((LCD_WIDTH >= 480) && (LCD_HEIGHT >= 640)) || \
         ((LCD_WIDTH >= 640) && (LCD_HEIGHT >= 480))
 jewels.640x480x16.bmp
@@ -603,6 +610,8 @@ puzzles_cursor.11x16x24.bmp
 #if LCD_DEPTH >= 16 /* colour versions*/
 #if   (LCD_WIDTH == 640) && (LCD_HEIGHT == 480)
 rockblox_background.640x480x16.bmp
+#elif   (LCD_WIDTH == 480) && (LCD_HEIGHT == 272)
+rockblox_background.480x272x16.bmp
 #elif   (LCD_WIDTH == 360) && (LCD_HEIGHT == 400)
 rockblox_background.360x400x16.bmp
 #elif   (LCD_WIDTH >= 320) && (LCD_HEIGHT >= 240)
@@ -914,6 +923,10 @@ sudoku_inverse.320x240x16.bmp
 sudoku_start.320x240x16.bmp
 sudoku_normal.320x240x16.bmp
 sudoku_inverse.320x240x16.bmp
+#elif (LCD_WIDTH == 480) && (LCD_HEIGHT == 272) && (LCD_DEPTH >= 16)
+sudoku_start.320x240x16.bmp
+sudoku_normal.320x240x16.bmp
+sudoku_inverse.320x240x16.bmp
 #elif (LCD_WIDTH == 640) && (LCD_HEIGHT == 480) && (LCD_DEPTH >= 16)
 sudoku_start.640x480x16.bmp
 sudoku_normal.640x480x16.bmp
@@ -945,7 +958,8 @@ superdom_boarditems.220x176x16.bmp
 superdom_boarditems.176x132x16.bmp
 #elif ((LCD_WIDTH == 240) && (LCD_HEIGHT == 240)) || \
       ((LCD_WIDTH == 320) && (LCD_HEIGHT == 240)) || \
-      ((LCD_WIDTH == 400) && (LCD_HEIGHT == 240))
+      ((LCD_WIDTH == 400) && (LCD_HEIGHT == 240)) || \
+      ((LCD_WIDTH == 480) && (LCD_HEIGHT == 272))
 superdom_boarditems.320x240x16.bmp
 #elif ((LCD_WIDTH == 240) && (LCD_HEIGHT == 320)) || \
       ((LCD_WIDTH == 240) && (LCD_HEIGHT == 400)) || \

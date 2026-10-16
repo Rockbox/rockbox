@@ -138,6 +138,23 @@ enum {
 #define XOFS          128
 #define MAX_FPS       40
 
+/* 22x22 bubbles (Sony PSP) */
+#elif (LCD_WIDTH == 480) && (LCD_HEIGHT == 272)
+#define XOFS          152
+#define YOFS          29
+#define MAX_FPS       60
+
+/* custom text positioning */
+#define LEVEL_TXT_X     38
+#define LEVEL_TXT_WIDTH 55
+#define LEVEL_TXT_Y     34
+#define SCORE_TXT_X     38
+#define SCORE_TXT_WIDTH 55
+#define SCORE_TXT_Y     104
+#define NEXT_BB_X       390
+#define NEXT_BB_WIDTH   35
+#define NEXT_BB_Y       116
+
 #elif (LCD_WIDTH == 360) && (LCD_HEIGHT == 640)
 #define XOFS            86
 #define YOFS            220

@@ -23,7 +23,8 @@ bubbles_bubble.220x176x1.bmp
       ((LCD_WIDTH == 400) && (LCD_HEIGHT == 240)) || \
       ((LCD_WIDTH == 240) && (LCD_HEIGHT >= 320)) || \
       ((LCD_WIDTH == 360) && (LCD_HEIGHT == 400)) || \
-      ((LCD_WIDTH == 360) && (LCD_HEIGHT == 640))
+      ((LCD_WIDTH == 360) && (LCD_HEIGHT == 640)) || \
+      ((LCD_WIDTH == 480) && (LCD_HEIGHT == 272))
 bubbles_bubble.320x240x1.bmp
 #elif   ((LCD_WIDTH == 640) && (LCD_HEIGHT == 480)) || \
         ((LCD_WIDTH == 480) && (LCD_HEIGHT >= 640))

@@ -428,6 +428,11 @@ sub buildzip {
         glob_copy("icon.icn", "$temp_dir/");
         glob_copy("rockbox.3dsx", "$temp_dir/");
     }
+    # add prx executable
+    if ($modelname =~ /psp/) {
+        glob_copy("rockbox.prx", "$temp_dir/");
+    }
+
 
     glob_mkdir("$temp_dir/langs");
     glob_mkdir("$temp_dir/rocks");
@@ -762,6 +767,15 @@ sub runone {
             print "$ziptool $output $ROOT/packaging/3ds/rockbox.xml $target >/dev/null\n" if $verbose;
             system("$ziptool -u $output 3ds/rockbox.cia $target >/dev/null");
             print "$ziptool $output rockbox.cia $target >/dev/null\n" if $verbose;
+        }
+
+        # EBOOT.PBP file to zip file
+        if ($modelname =~ /psp/) {
+            mkpath("PSP/GAME/rockbox");
+            copy("EBOOT.PBP", "PSP/GAME/rockbox");
+
+            system("$ziptool -u $output PSP/GAME/rockbox/EBOOT.PBP $target >/dev/null");
+            print "$ziptool $output EBOOT.PBP $target >/dev/null\n" if $verbose;
         }
 
         system("$ziptool $output $rbdir $target >/dev/null");

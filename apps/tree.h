@@ -127,8 +127,8 @@ void tree_unlock_cache(struct tree_context *t);
 #else
 #define getcwd_size_t size_t
 #endif
-#ifdef N3DS
-/* devkitarm already defines getcwd */
+#if defined(N3DS) || defined(SONY_PSP)
+/* devkitarm and pspsdk already defines getcwd */
 char *__wrap_getcwd(char *buf, getcwd_size_t size);
 #else
 char *getcwd(char *buf, getcwd_size_t size);

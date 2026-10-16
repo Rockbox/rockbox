@@ -32,6 +32,9 @@
 #define FS_PREFIX(_x_) console_ ## _x_
 
 void paths_init(void);
+const char * handle_special_dirs(const char *dir, unsigned flags,
+                                 char *buf, const size_t bufsize);
+
 #endif /* !OSFUNCTIONS_DECLARED */
 #endif /* _FILESYSTEM_CONSOLE_H_ */
 

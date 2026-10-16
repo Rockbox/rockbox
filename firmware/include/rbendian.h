@@ -27,7 +27,7 @@
 #endif
 
 #ifndef __MINGW32__
-#if defined(__APPLE__) || defined(N3DS)
+#if defined(__APPLE__) || defined(N3DS) || defined(SONY_PSP)
 #include <sys/types.h>
 #else
 #include <endian.h>

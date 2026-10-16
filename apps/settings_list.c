@@ -353,7 +353,7 @@ static const char graphic_numeric[] = "graphic,numeric";
   #define DEFAULT_FONT_HEIGHT 15
 #elif LCD_HEIGHT <= 320
   #define DEFAULT_FONT_HEIGHT 18
-#elif defined(SHANLING_Q1)
+#elif defined(SHANLING_Q1) || defined(SONY_PSP)
   /* 16pt font looks pretty aliased & ugly */
   #define DEFAULT_FONT_HEIGHT 18
 #elif LCD_HEIGHT <= 400
@@ -381,6 +381,10 @@ static const char graphic_numeric[] = "graphic,numeric";
   #elif DEFAULT_FONT_HEIGHT >= 23
     #define DEFAULT_ICONSET "tango_icons.24x24"
     #define DEFAULT_VIEWERS_ICONSET "tango_icons_viewers.24x24"
+  #elif defined(SONY_PSP)
+    /* 16pt icons looks too small on the PSP screen */
+    #define DEFAULT_ICONSET "tango_icons.18x18"
+    #define DEFAULT_VIEWERS_ICONSET "tango_icons_viewers.18x18"
   #elif DEFAULT_FONT_HEIGHT >= 15
     #define DEFAULT_ICONSET "tango_icons.16x16"
     #define DEFAULT_VIEWERS_ICONSET "tango_icons_viewers.16x16"

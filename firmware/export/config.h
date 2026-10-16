@@ -83,6 +83,7 @@
 #define X1000        1000
 #define STM32H743   32743
 #define N10480H     10480
+#define TACHYON     4000
 
 /* platforms
  * bit fields to allow PLATFORM_HOSTED to be OR'ed e.g. with a
@@ -158,6 +159,7 @@
 #define N3DS_PAD           78
 #define HIBY_R3PROII_PAD   79
 #define HIDIZS_AP80MAX_PAD 80
+#define PSP_PAD            81
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE   1
@@ -594,6 +596,8 @@ Lyre prototype 1 */
 #include "config/hibyr1.h"
 #elif defined(HIDIZS_AP80MAX)
 #include "config/hidizsap80max.h"
+#elif defined(SONY_PSP)
+#include "config/sonypsp.h"
 #else
 #error "unknown hardware platform!"
 #endif
@@ -1037,11 +1041,12 @@ Lyre prototype 1 */
 #if defined(ASSEMBLER_THREADS) \
     || defined(HAVE_WIN32_FIBER_THREADS) \
     || defined(HAVE_SIGALTSTACK_THREADS) \
-    || defined(N3DS)
+    || defined(N3DS) \
+    || defined(SONY_PSP)
 #define HAVE_PRIORITY_SCHEDULING
 #endif
 
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE) || defined(SONY_PSP)
 #define HAVE_PRIORITY_SCHEDULING
 #define HAVE_SCHEDULER_BOOSTCTRL
 #endif /* PLATFORM_NATIVE */

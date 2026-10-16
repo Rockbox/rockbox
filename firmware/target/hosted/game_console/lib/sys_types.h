@@ -36,5 +36,20 @@ typedef LightSemaphore sys_sem_type;
 typedef Handle         sys_handle_type;
 #endif
 
+#ifdef SONY_PSP
+#include <psptypes.h>
+#include <pspthreadman.h>
+#include <pspkerneltypes.h>
+#include <pspiofilemgr.h>
+#include <pspkerror.h>
+#include <psprtc.h>
+#include <stdbool.h>
+
+typedef SceUID             sys_thread_type;
+typedef SceLwMutexWorkarea sys_mutex_type;
+typedef SceUID             sys_sem_type;
+typedef SceUID             sys_handle_type;
+#endif
+
 #endif /* __SYSTYPES_H__ */
 

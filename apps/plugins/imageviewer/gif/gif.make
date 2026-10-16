@@ -9,8 +9,12 @@
 GIFSRCDIR := $(IMGVSRCDIR)/gif
 GIFBUILDDIR := $(IMGVBUILDDIR)/gif
 
+ifeq ($(APP_TYPE),psp-homebrew)
+IMGV_PLUGIN_CRT0 := $(ROOTDIR)/apps/plugins/imageviewer/plugin_crt0_psp.o
+endif
+
 GIF_SRC := $(call preprocess, $(GIFSRCDIR)/SOURCES)
-GIF_OBJ := $(call c2obj, $(GIF_SRC))
+GIF_OBJ := $(call c2obj, $(GIF_SRC)) $(IMGV_PLUGIN_CRT0)
 
 OTHER_SRC += $(GIF_SRC)
 

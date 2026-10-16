@@ -9,8 +9,12 @@
 JPEGSRCDIR := $(IMGVSRCDIR)/jpeg
 JPEGBUILDDIR := $(IMGVBUILDDIR)/jpeg
 
+ifeq ($(APP_TYPE),psp-homebrew)
+IMGV_PLUGIN_CRT0 := $(ROOTDIR)/apps/plugins/imageviewer/plugin_crt0_psp.o
+endif
+
 JPEG_SRC := $(call preprocess, $(JPEGSRCDIR)/SOURCES)
-JPEG_OBJ := $(call c2obj, $(JPEG_SRC))
+JPEG_OBJ := $(call c2obj, $(JPEG_SRC)) $(IMGV_PLUGIN_CRT0)
 
 OTHER_SRC += $(JPEG_SRC)
 

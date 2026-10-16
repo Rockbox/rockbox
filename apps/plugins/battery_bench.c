@@ -270,6 +270,12 @@ struct battery_tables_t {
 #define BATTERY_ON_TXT  "Start"
 #define BATTERY_OFF_TXT "Select"
 
+#elif CONFIG_KEYPAD == PSP_PAD
+#define BATTERY_ON      BUTTON_SELECT
+#define BATTERY_OFF     BUTTON_BACK
+#define BATTERY_ON_TXT  "Cross - start"
+#define BATTERY_OFF_TXT "Circle"
+
 #else
 #error "No keymap defined!"
 #endif

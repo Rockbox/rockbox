@@ -9,8 +9,12 @@
 PPMSRCDIR := $(IMGVSRCDIR)/ppm
 PPMBUILDDIR := $(IMGVBUILDDIR)/ppm
 
+ifeq ($(APP_TYPE),psp-homebrew)
+IMGV_PLUGIN_CRT0 := $(ROOTDIR)/apps/plugins/imageviewer/plugin_crt0_psp.o
+endif
+
 PPM_SRC := $(call preprocess, $(PPMSRCDIR)/SOURCES)
-PPM_OBJ := $(call c2obj, $(PPM_SRC))
+PPM_OBJ := $(call c2obj, $(PPM_SRC)) $(IMGV_PLUGIN_CRT0)
 
 OTHER_SRC += $(PPM_SRC)
 

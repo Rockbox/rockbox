@@ -490,6 +490,17 @@
 #define LABEL_MENU   "Start"
 #define LABEL_VOLUME "Up/Down"
 
+#elif CONFIG_KEYPAD == PSP_PAD
+#define VUMETER_QUIT BUTTON_BACK
+#define VUMETER_HELP BUTTON_USER
+#define VUMETER_MENU BUTTON_MENU
+#define VUMETER_UP   BUTTON_UP
+#define VUMETER_DOWN BUTTON_DOWN
+#define LABEL_HELP   "Square"
+#define LABEL_QUIT   "Cross"
+#define LABEL_MENU   "Triangle"
+#define LABEL_VOLUME "Up/Down"
+
 #else
 #error No keymap defined!
 #endif

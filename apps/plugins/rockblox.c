@@ -507,6 +507,18 @@
 #define ROCKBLOX_DROP          BUTTON_A
 #define ROCKBLOX_RESTART       BUTTON_START
 
+#elif CONFIG_KEYPAD == PSP_PAD
+
+#define ROCKBLOX_OFF           BUTTON_BACK
+#define ROCKBLOX_ROTATE_CCW    BUTTON_POWER
+#define ROCKBLOX_ROTATE_CW     BUTTON_MENU
+#define ROCKBLOX_ROTATE        BUTTON_UP
+#define ROCKBLOX_DOWN          BUTTON_DOWN
+#define ROCKBLOX_LEFT          BUTTON_LEFT
+#define ROCKBLOX_RIGHT         BUTTON_RIGHT
+#define ROCKBLOX_DROP          BUTTON_SELECT
+#define ROCKBLOX_RESTART       BUTTON_USER
+
 #else
 #error No keymap defined!
 #endif
@@ -575,6 +587,19 @@
 #define SCORE_Y 58
 #define LEVEL_Y 142
 #define LINES_Y 218
+
+#elif (LCD_WIDTH == 480) && (LCD_HEIGHT == 272)
+
+#define BLOCK_WIDTH 10
+#define BLOCK_HEIGHT 10
+#define BOARD_X 219
+#define BOARD_Y 13
+#define PREVIEW_X 154
+#define PREVIEW_Y 151
+#define LABEL_X 148
+#define SCORE_Y 43
+#define LEVEL_Y 78
+#define LINES_Y 106
 
 #elif (LCD_WIDTH == 360) && (LCD_HEIGHT == 640)
 

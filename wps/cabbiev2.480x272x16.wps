@@ -1,0 +1,79 @@
+# Cabbie v2.0
+# (C) 2007-2012 The Authors (see /rockbox/wps/AUTHORS)
+# Derived from "cabbie" (C) Yohann Misquitta
+#
+# Disable Status Bar
+%wd
+#
+# Load Backdrop
+%X(wpsbackdrop-480x272x16.bmp)
+#
+# Preload Images
+%xl(A,lock-480x272x16.bmp,0,0,2)
+%xl(B,battery-480x272x16.bmp,0,0,10)
+%xl(C,volume-480x272x16.bmp,0,0,10)
+%xl(D,shuffle-480x272x16.bmp,0,0)
+%xl(E,repeat-480x272x16.bmp,0,0,4)
+%xl(F,playmode-480x272x16.bmp,0,0,5)
+#
+# Album Art/Info Viewport Conditional
+%?C<%Vd(a)|%Vd(b)>
+#
+# Progress Bar
+%V(15,176,450,19,-)
+%pb(0,0,450,19,pb-480x272x16.bmp)
+#
+# Hold
+%V(176,232,38,28,-)
+%?mh<%xd(Aa)|%xd(Ab)>
+#
+# Battery
+%V(224,233,48,26,-)
+%?bp<%?bc<%xd(Ba)|%xd(Bb)>|%?bl<|%xd(Bc)|%xd(Bd)|%xd(Be)|%xd(Bf)|%xd(Bg)|%xd(Bh)|%xd(Bi)|%xd(Bj)>>
+#
+# Volume
+%V(277,234,49,24,-)
+%?pv<%xd(Ca)|%xd(Cb)|%xd(Cc)|%xd(Cd)|%xd(Ce)|%xd(Cf)|%xd(Cg)|%xd(Ch)|%xd(Ci)|%xd(Cj)>
+#
+# Shuffle
+%V(336,235,50,23,-)
+%?ps<%xd(D)>
+#
+# Repeat
+%V(396,226,30,40,-)
+%?mm<|%xd(Ea)|%xd(Eb)|%xd(Ec)|%xd(Ed)>
+#
+# Playmode
+%V(434,231,32,30,-)
+%?mp<%xd(Fa)|%xd(Fb)|%xd(Fc)|%xd(Fd)|%xd(Fe)>
+#
+# Time Elapsed/Remaining
+%V(17,202,446,21,1)
+%al%pc%ac%?Sr<%pe %Sx(of) %pp|%pp %Sx(of) %pe>%ar%pr
+#
+# Album Art
+%ax%Vl(a,26,39,128,128,-)
+%Cl(0,0,128,128,c,c)
+%Cd
+#
+# Track Info - Album Art
+%ax%Vl(a,170,39,284,128,1)
+%s%al%?id<%id|%?d(1)<%d(1)|%(root%)>>
+%s%al%?it<%it|%fn>
+%s%al%?ia<%ia|%?iA<%iA|%?d(2)<%d(2)|%(root%)>>>
+%s%al%?iy<%iy>
+
+%s%al%Sx(Next Track:)
+%s%al%?It<%It|%Fn>
+%s%al%?Ia<%Ia|%?IA<%IA>>
+#
+# Track Info - No Album Art
+%ax%Vl(b,0,39,-,128,1)
+%s%ac%?id<%id|%?d(1)<%d(1)|%(root%)>>
+%s%ac%?it<%it|%fn>
+%s%ac%?ia<%ia|%?iA<%iA|%?d(2)<%d(2)|%(root%)>>>
+%s%ac%?iy<%iy>
+
+%ac%Sx(Next Track:)
+%s%ac%?It<%It|%Fn>
+%s%ac%?Ia<%Ia|%?IA<%IA>>

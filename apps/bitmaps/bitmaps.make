@@ -51,9 +51,11 @@ $(BUILDDIR)/apps/bitmaps/remote_native/%.c: $(ROOTDIR)/apps/bitmaps/remote_nativ
 	$(call PRINTS,BMP2RB $(<F))$(BMP2RB_REMOTENATIVE) -b -h $(BMPINCDIR) $< > $@
 
 ifdef APP_TYPE
+ifeq (,$(findstring psp, $(MODELNAME)))
 # Bitmaps must be explicitly Position independent to avoid linker warnings
 $(BUILDDIR)/apps/bitmaps/native/%.o: CFLAGS += -fPIC
 $(BUILDDIR)/apps/bitmaps/mono/%.o: CFLAGS += -fPIC
 $(BUILDDIR)/apps/bitmaps/remote_mono/%.o: CFLAGS += -fPIC
 $(BUILDDIR)/apps/bitmaps/remote_native/%.o: CFLAGS += -fPIC
+endif
 endif

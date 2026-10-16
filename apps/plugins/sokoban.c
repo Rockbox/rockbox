@@ -746,6 +746,28 @@
 #define BUTTON_SAVE          BUTTON_A
 #define BUTTON_SAVE_NAME     "A"
 
+#elif CONFIG_KEYPAD == PSP_PAD
+#define SOKOBAN_LEFT       BUTTON_LEFT
+#define SOKOBAN_RIGHT      BUTTON_RIGHT
+#define SOKOBAN_UP         BUTTON_UP
+#define SOKOBAN_DOWN       BUTTON_DOWN
+#define SOKOBAN_MENU       BUTTON_MENU
+#define SOKOBAN_UNDO       BUTTON_BACK
+#define SOKOBAN_REDO       BUTTON_USER
+//#define SOKOBAN_LEVEL_DOWN (BUTTON_POWER|BUTTON_REL)
+//#define SOKOBAN_LEVEL_REPEAT (BUTTON_CENTER|BUTTON_REPEAT)
+//#define SOKOBAN_LEVEL_UP (BUTTON_MENU|BUTTON_REPEAT)
+#define SOKOBAN_PAUSE      BUTTON_SELECT
+#define BUTTON_SAVE        BUTTON_SELECT
+
+#define SOKOBAN_MENU_NAME     "Triangle"
+#define SOKOBAN_UNDO_NAME     "Circle"
+#define SOKOBAN_REDO_NAME     "Square"
+#define SOKOBAN_PAUSE_NAME    "Cross"
+#define SOKOBAN_LEVEL_REPEAT_NAME ""
+#define BUTTON_SAVE_NAME      "Cross"
+
+
 #else
 #error No keymap defined!
 #endif

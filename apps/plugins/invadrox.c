@@ -311,6 +311,13 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define RIGHT BUTTON_RIGHT
 #define FIRE  BUTTON_A
 
+#elif CONFIG_KEYPAD == PSP_PAD
+
+#define QUIT  BUTTON_POWER
+#define LEFT  BUTTON_LEFT
+#define RIGHT BUTTON_RIGHT
+#define FIRE  BUTTON_SELECT
+
 #else
     #error INVADROX: Unsupported keypad
 #endif
@@ -395,8 +402,52 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define LIVES_X 10
 #define MAX_Y 18
 
-/* iPod Video defines - and Samsung YP-CP3, 400x240: the same, centred */
-#elif ((LCD_WIDTH == 320) || (LCD_WIDTH == 400)) && (LCD_HEIGHT == 240)
+/* Sony PSP defines */
+#elif (LCD_WIDTH == 480) && (LCD_HEIGHT == 272)
+
+/* Original arcade game size 224x240, 1bpp with
+ * red overlay at top and green overlay at bottom.
+ *
+ * Sony PSP: 480x272x16
+ * ======================
+ * X: 48p padding at left/right gives 224p playfield in middle.
+ *    10p "border" gives 204p actual playfield. UFO use full 224p.
+ * Y: Use full 240p.
+ *
+ * MAX_X = (204 - 12) / 2 - 1 = 95
+ *
+ * Y: Score text 7       0
+ *    Space      10      7
+ *    Score      7       17
+ *    Space      8       24
+ * 3  Ufo        7       32
+ * 2  Space      Aliens start at 32 + 3 * 8 = 56
+ * 0  aliens     9*8     56  -
+ *    space     ~7*8     128  | 18.75 aliens space between
+ *    shield     2*8     182  | first alien and ship.
+ *    space      8       198  | MAX_Y = 18
+ *    ship       8       206 -
+ *    space      2*8     214
+ *    hline      1       230 - PLAYFIELD_Y
+ *    bottom border 10   240
+ *    Lives and Level goes inside bottom border
+ */
+
+#define ARCADISH_GRAPHICS
+#define PLAYFIELD_X 96
+#define SHIP_Y (PLAYFIELD_Y - 3 * SHIP_HEIGHT)
+#undef SCORE_Y
+#define SCORE_Y 48
+#define ALIEN_START_Y (UFO_Y + (ALIEN_HEIGHT + 8))
+#define SCORENUM_X (PLAYFIELD_X + NUMBERS_WIDTH) + 10
+#define SCORENUM_Y SCORE_Y + (2 * (FONT_HEIGHT + 1) + 1)
+#define HISCORENUM_X (LCD_WIDTH - PLAYFIELD_X - 1 - 6 * NUMBERS_WIDTH - 8 * NUM_SPACING)
+#define SHIELD_Y (PLAYFIELD_Y - 6 * SHIP_HEIGHT)
+#define LIVES_X 10
+#define MAX_Y 18
+
+/* iPod Video defines */
+#elif (LCD_WIDTH == 320) && (LCD_HEIGHT == 240)
 
 /* Original arcade game size 224x240, 1bpp with
  * red overlay at top and green overlay at bottom.

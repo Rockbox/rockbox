@@ -44,6 +44,12 @@ SDLFLAGS += -Wno-int-conversion -Wno-incompatible-pointer-types        \
 -Wno-implicit-function-declaration -Wno-implicit-int
 endif
 
+# PSPSDK also does need these to avoid compiler errors
+ifeq ($(APP_TYPE),psp-homebrew)
+SDLFLAGS += -Wno-int-conversion -Wno-incompatible-pointer-types        \
+-Wno-implicit-function-declaration -Wno-implicit-int
+endif
+
 ifndef APP_TYPE
     ### no target has a big enough plugin buffer
     ROCKS += $(SDL_OBJDIR)/duke3d.ovl

@@ -34,7 +34,7 @@ struct filestr_base {
     int             flags;            /* stream flags */
     char            path[MAX_PATH+1];
 
-    sysMutex    mtx;              /* serialization for this stream */
+    sysMutex        mtx;              /* serialization for this stream */
 };
 
 static inline void filestr_lock(struct filestr_base *stream)

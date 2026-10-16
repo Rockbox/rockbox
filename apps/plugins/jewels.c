@@ -409,6 +409,16 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define HK_SELECT "A"
 #define HK_CANCEL "POWER"
 
+#elif CONFIG_KEYPAD == PSP_PAD
+#define JEWELS_UP     BUTTON_UP
+#define JEWELS_DOWN   BUTTON_DOWN
+#define JEWELS_LEFT   BUTTON_LEFT
+#define JEWELS_RIGHT  BUTTON_RIGHT
+#define JEWELS_SELECT BUTTON_SELECT
+#define JEWELS_CANCEL BUTTON_BACK
+#define HK_SELECT "Cross"
+#define HK_CANCEL "Circle"
+
 #else
 #error No keymap defined!
 #endif

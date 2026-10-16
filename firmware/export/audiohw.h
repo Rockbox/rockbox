@@ -178,6 +178,8 @@ struct sound_settings_info
 #elif defined(HAVE_WM8711) || defined(HAVE_WM8721) || \
       defined(HAVE_WM8731)
 #include "wm8731.h"
+#elif defined(HAVE_WM8973G_CODEC)
+#include "wm8973g_codec.h"
 #elif defined(HAVE_TLV320)
 #include "tlv320.h"
 #elif defined(HAVE_AS3514)

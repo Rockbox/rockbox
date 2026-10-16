@@ -70,4 +70,21 @@ typedef struct {
 } PageReader;
 #endif
 
+#ifdef SONY_PSP
+typedef struct {
+    s64     start;
+    s64     end;
+    s64     size;
+    bool    isLastPage;
+
+    u8      *buffer;
+} Page;
+
+typedef struct {
+    SceUID  fd;
+    SceOff  last_offset;
+    Page    p;
+} PageReader;
+#endif
+
 #endif /* _BFILE_INTERNAL_H_ */

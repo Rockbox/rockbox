@@ -43,6 +43,9 @@ objcopy_plugin = $(objcopy)
 else ifneq (,$(findstring 3ds,$(MODELNAME)))  		# 3dsxtool requires symbols
 objcopy = cp $(1) $(1).tmp;mv -f $(1).tmp $(2)
 objcopy_plugin = $(objcopy)
+else ifneq (,$(findstring psp,$(MODELNAME)))  		# do not strip prx symbols
+objcopy = cp $(1) $(1).tmp;mv -f $(1).tmp $(2)
+objcopy_plugin = $(objcopy)
 else
   ifdef DEBUG
     objcopy = cp $(1) $(1).tmp;mv -f $(1).tmp $(2)	# objcopy hosted (DEBUG)
