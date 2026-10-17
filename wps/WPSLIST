@@ -76,6 +76,7 @@ FMS: yes
 WRS: yes
 RWPS: yes
 RWRS: yes
+RFMS: yes
 SBS: no
 RSBS: no
 
@@ -119,6 +120,8 @@ fms.400x240x(16|24|32):  cabbiev2-400x240x16.fms
 fms.160x128x2:   cabbiev2-160x128x2.fms
 fms.128x128x2:   cabbiev2-128x128x2.fms
 fms.138x110x2:   cabbiev2-138x110x2.fms
+fms.128x96x2:    cabbiev2-128x96x2.fms
+fms.128x64x1:    cabbiev2-128x64x1.fms
 fms.320x240x(16|24|32):    cabbiev2-320x240x16.fms
 fms.240x400x(16|24|32):    cabbiev2-240x400x16.fms
 fms.220x176x(16|24|32):    cabbiev2-220x176x16.fms
@@ -285,6 +288,8 @@ rwps.128x96x2: cabbiev2.128x96x2.wps
 rwps.128x64x1: cabbiev2.128x64x1.wps
 rwrs.128x96x2: cabbiev2-128x96x2.wrs
 rwrs.128x64x1: cabbiev2-128x64x1.wrs
+rfms.128x96x2: cabbiev2-128x96x2.fms
+rfms.128x64x1: cabbiev2-128x64x1.fms
 Font.128x64x1: 08-Rockfont.fnt
 statusbar: top
 ui viewport: -
