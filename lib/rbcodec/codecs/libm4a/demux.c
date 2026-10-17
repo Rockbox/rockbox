@@ -1112,7 +1112,8 @@ static bool build_seek_index(qtmovie_t *qtmovie)
 void m4a_lookup_refill(demux_res_t *res, stream_t *stream, uint32_t frame)
 {
     unsigned char scratch[1020];
-    qtmovie_t qtmovie = { .stream = stream, .res = res };
+    qtmovie_t movie = { .stream = stream, .res = res };
+    qtmovie_t *qtmovie = &movie;   /* for DEBUGF */
     const uint32_t nframes = res->num_sample_byte_sizes;
     const uint32_t nchunks = res->num_chunks;
     const uint32_t resume_at = stream->ci->curpos;
@@ -1136,7 +1137,7 @@ void m4a_lookup_refill(demux_res_t *res, stream_t *stream, uint32_t frame)
     first = place.chunk;
     at = place.frame;
     place.chunk = 0;                    /* the frame counts alone */
-    chunk_tables_init(&tables, &qtmovie, scratch, sizeof(scratch), &place);
+    chunk_tables_init(&tables, qtmovie, scratch, sizeof(scratch), &place);
     for (;; first++)
     {
         if (first > nchunks || at >= nframes ||
@@ -1167,7 +1168,7 @@ void m4a_lookup_refill(demux_res_t *res, stream_t *stream, uint32_t frame)
     }
 
     /* and the first frame of each */
-    chunk_tables_init(&tables, &qtmovie, scratch, sizeof(scratch), &place);
+    chunk_tables_init(&tables, qtmovie, scratch, sizeof(scratch), &place);
     for (i = 0, chunk = first; i < count && at < nframes; i++, chunk++)
     {
         if (!chunk_tables_next(&tables, chunk, &offset))
