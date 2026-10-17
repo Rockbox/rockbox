@@ -1054,6 +1054,7 @@ struct plugin_api {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
+    void (*settings_apply)(bool read_disk);
 };
 
 /* plugin header */
