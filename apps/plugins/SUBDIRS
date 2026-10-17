@@ -24,8 +24,7 @@ puzzles
     && (CONFIG_KEYPAD != HM60X_PAD) /* not enough buttons */ \
     && (LCD_PIXELFORMAT != HORIZONTAL_PACKING) /* TODO */ \
     && (LCD_PIXELFORMAT != VERTICAL_INTERLEAVED) /* TODO */ \
-    && (defined(HAVE_LCD_COLOR) || (LCD_HEIGHT == 64) && (LCD_DEPTH == 1) || \
-                                   (LCD_HEIGHT == 128) && (LCD_DEPTH == 2))
+    && (defined(HAVE_LCD_COLOR) || ((LCD_HEIGHT > 64) && (LCD_DEPTH >= 2)))
 #ifndef N3DS
 rockboy
 #endif
