@@ -446,8 +446,8 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define LIVES_X 10
 #define MAX_Y 18
 
-/* iPod Video defines */
-#elif (LCD_WIDTH == 320) && (LCD_HEIGHT == 240)
+/* iPod Video defines - and Samsung YP-CP3, 400x240: the same, centred */
+#elif ((LCD_WIDTH == 320) || (LCD_WIDTH == 400)) && (LCD_HEIGHT == 240)
 
 /* Original arcade game size 224x240, 1bpp with
  * red overlay at top and green overlay at bottom.

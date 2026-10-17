@@ -1761,37 +1761,38 @@ cat <<EOF
  142) YH-925               120) VX747
  144) YP-R0                122) VX747+           ==ROCKCHIP==
  145) YP-R1 (WIP)          121) VX767            180) rk27xx generic
-                           123) VX777
- ==HiFiMAN==                                     ==HiFi E.T.==
- 190) HM-60x               ==MPIO==              210) MA9
- 191) HM-801               170) HD200            211) MA9C
-                           171) HD300            212) MA8
- ==Sony==                                        213) MA8C
- 219) NWZ-E350 series      ==Application==
- 220) NWZ-E370/E380 series 200) SDL (Generic)    ==IHIFI==
- 221) NWZ-E360 series      201) Android (ARM)    230) 760
- 222) NWZ-E450 series      202) Android (MIPS)   231) 770
- 223) NWZ-E460 series      203) Android (x86)    232) 770C
- 224) NWZ-E470 series      209) Anbernic RG Nano 233) 800
- 225) NWZ-E580 series                            234) 960
- 226) NWZ-A10 series       ==AgpTek==
- 227) NW-A20 series        239) Rocker native    ==AIGO==
- 228) NWZ-A860 series      240) Rocker (hosted)  245) Eros Q / K (hosted)
- 229) NWZ-S750 series      ==iBasso==            247) Eros Q / K native
- 303) PSP (WIP)            250) DX50                   (hw1/hw2 bl, all hw rb)
-                           251) DX90             248) Eros Q / K native
-                                                       (hw3 bl only)
- ==FiiO==                  ==xDuoo==             249) Eros Q / K native
- 244) M3K Linux            241) X3                     (hw4 bl only)
- 246) M3K baremetal        242) X3II
-                           243) X20              ==HiBy==
- ==Shanling==                                    300) R3 Pro II
- 260) Q1                   ==Surfans==           301) R1
-                           280) F28 (WIP)
- ==Echo project==
+ 146) YP-CP3               123) VX777
+                                                 ==HiFi E.T.==
+ ==HiFiMAN==               ==MPIO==              210) MA9
+ 190) HM-60x               170) HD200            211) MA9C
+ 191) HM-801               171) HD300            212) MA8
+                                                 213) MA8C
+ ==Sony==                  ==Application==
+ 219) NWZ-E350 series      200) SDL (Generic)    ==IHIFI==
+ 220) NWZ-E370/E380 series 201) Android (ARM)    230) 760
+ 221) NWZ-E360 series      202) Android (MIPS)   231) 770
+ 222) NWZ-E450 series      203) Android (x86)    232) 770C
+ 223) NWZ-E460 series      209) Anbernic RG Nano 233) 800
+ 224) NWZ-E470 series                            234) 960
+ 225) NWZ-E580 series      ==AGPTek==
+ 226) NWZ-A10 series       239) Rocker (native)  ==AIGO==
+ 227) NW-A20 series        240) Rocker (hosted)  245) Eros Q / K (hosted)
+ 228) NWZ-A860 series                            247) Eros Q / K native
+ 229) NWZ-S750 series      ==iBasso==                  (hw1/hw2 bl, all hw rb)
+ 303) PSP (WIP)            250) DX50             248) Eros Q / K native
+                           251) DX90                   (hw3 bl only)
+                                                 249) Eros Q / K native
+ ==FiiO==                  ==xDuoo==                   (hw4 bl only)
+ 244) M3K Linux            241) X3
+ 246) M3K baremetal        242) X3II             ==HiBy==
+                           243) X20              300) R3 Pro II
+ ==Shanling==                                    301) R1
+ 260) Q1                   ==Surfans==
+                           280) F28 (WIP)        ==Hidizs==
+ ==Echo project==                                302) AP80 Pro Max (WIP)
  270) Echo R1 (WIP)
-                                                 ==Hidizs==
- ==Nintendo==                                    302) AP80 Pro Max (WIP)
+
+ ==Nintendo==
  290) Nintendo 3DS (WIP)
 
 EOF
