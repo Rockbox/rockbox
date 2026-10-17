@@ -26,7 +26,9 @@ puzzles
     && (LCD_PIXELFORMAT != VERTICAL_INTERLEAVED) /* TODO */ \
     && (defined(HAVE_LCD_COLOR) || (LCD_HEIGHT == 64) && (LCD_DEPTH == 1) || \
                                    (LCD_HEIGHT == 128) && (LCD_DEPTH == 2))
+#ifndef N3DS
 rockboy
+#endif
 #endif
 
 #if defined(HAVE_TAGCACHE)
