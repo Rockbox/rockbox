@@ -955,7 +955,7 @@ static void rec_skin_display(enum screen_type screen, bool enter)
     struct gui_wps *gwps;
 
     if (!rec_skinned[screen] || enter == shown[screen] ||
-        (enter && screen >= screen_update)) /* remote LCD off */
+        (enter && (int)screen >= screen_update)) /* remote LCD off */
         return;
     shown[screen] = enter;
     gwps = skin_get_gwps(RECORDING_SCREEN, screen);
