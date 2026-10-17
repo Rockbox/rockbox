@@ -1,0 +1,97 @@
+# Cabbie v2.0
+# (C) 2010-2026 The Authors (see /rockbox/wps/AUTHORS)
+# Derived from "Cabbie v2.0" (C) 2010-2012 The Authors
+#
+# The FM screen: the WPS backdrop, header, bar and status icons, the
+# station where the track info is, the signal strength where shuffle,
+# repeat and play mode are.
+#
+# Disable Status Bar
+%wd
+#
+# Load Backdrop
+%X(backdrop-132x80x16.bmp)
+#
+# Header font
+%Fl(2,10-Adobe-Helvetica-Bold.fnt)
+#
+# Preload Images
+%xl(lock,lock-132x80x16.bmp,0,0,2)
+%xl(battery,battery-132x80x16.bmp,0,0,10)
+%xl(volume,volume-132x80x16.bmp,0,0,10)
+#
+# Station Art/Info Viewport Conditional
+# Preset present conditional
+# RDS present conditional
+%?C<%Vd(art)>
+%?Ti<%?C<%Vd(art_preset)|%Vd(noart_preset)>>
+%?tx<%?Ti<%?C<%Vd(art_preset_rds)|%Vd(noart_preset_rds)>|%?C<%Vd(art_nopreset_rds)|%Vd(noart_nopreset_rds)>>|>
+# Frequency line conditional
+%?C<%Vd(art_freq)|%Vd(noart_freq)>
+#
+# Header
+%V(2,1,128,10,2)%Vf(0F0B00)
+%acFM RADIO
+#
+# Frequency Bar
+%V(2,58,127,6,-)
+%pb(0,0,127,6,pb-132x80x16.bmp)
+#
+# Hold
+%V(36,69,12,9,-)
+%xd(lock,%mh)
+#
+# Battery
+%V(51,69,16,9,-)
+%?bp<%?bc<%xd(battery,1)|%xd(battery,2)>|%?bl<|%xd(battery,3)|%xd(battery,4)|%xd(battery,5)|%xd(battery,6)|%xd(battery,7)|%xd(battery,8)|%xd(battery,9)|%xd(battery,10)>>
+#
+# Volume
+%V(69,69,13,9,-)
+%xd(volume,%pv)
+#
+# Signal strength, where the tuner reports it
+%V(85,67,44,11,1)
+%ar%?tr<%tr dBuV>
+#
+# Station Art
+%ax%Vl(art,3,14,40,40,-)
+%Cl(0,0,40,40,c,c)
+%Cd
+#
+# Station art
+# Preset present
+%ax%Vl(art_preset,48,10,-,11,1)
+%Vp(0,%s%al%?Ti<%Sx(Station:) |>%?Tn<%Tn|%Tf>)
+%ax%Vl(art_preset,48,21,-,11,1)
+%Vp(1,%s%al%?Ti<Next station: |>%?Tn<%Tn|%Tf>)
+#
+%ax%Vl(art_preset_rds,48,32,-,11,1)
+%s%al%ty
+#
+# Preset absent
+%ax%Vl(art_nopreset_rds,48,21,-,22,1)
+%s%al%ty
+%s%al%tz
+#
+# Frequency, on the last line: there's no room below the bar
+%ax%Vl(art_freq,48,43,-,11,1)
+%al%tf MHz %?ts<%Sx(Stereo)|%Sx(Mono)>
+#
+# No station art
+# Preset present
+%Vl(noart_preset,0,10,-,11,1)
+%Vp(0,%s%ac%?Ti<%Sx(Station:) |>%?Tn<%Tn|%Tf>)
+%Vl(noart_preset,0,21,-,11,1)
+%Vp(1,%s%ac%?Ti<Next station: |>%?Tn<%Tn|%Tf>)
+#
+%Vl(noart_preset_rds,0,32,-,11,1)
+%s%ac%ty
+#
+# Preset absent
+%Vl(noart_nopreset_rds,0,21,-,22,1)
+%s%ac%ty
+%s%ac%tz
+#
+# Frequency, on the last line: there's no room below the bar
+%Vl(noart_freq,0,43,-,11,1)
+%ac%tf MHz %?ts<%Sx(Stereo)|%Sx(Mono)>

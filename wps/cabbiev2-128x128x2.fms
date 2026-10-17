@@ -30,7 +30,7 @@
 #
 # Battery
 %V(26,115,17,9,-)
-%?bp<%?bc<%xd(battery,1)|%xd(battery,2)>|%xd(battery,%bl,2)>
+%?bp<%?bc<%xd(battery,1)|%xd(battery,2)>|%?bl<|%xd(battery,3)|%xd(battery,4)|%xd(battery,5)|%xd(battery,6)|%xd(battery,7)|%xd(battery,8)|%xd(battery,9)|%xd(battery,10)>>
 #
 # Volume
 %V(49,114,16,10,-)

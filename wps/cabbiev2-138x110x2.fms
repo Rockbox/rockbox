@@ -1,0 +1,90 @@
+# Cabbie v2.0
+# (C) 2010-2012 The Authors (see /rockbox/wps/AUTHORS)
+# Derived from "Cabbie v2.0" (C) 2010-2012 The Authors
+#
+# Disable Status Bar
+%wd
+#
+# Load Backdrop
+%X(backdrop-138x110x2.bmp)
+#
+# Preload Images
+%xl(lock,lock-160x128x2.bmp,0,0,2)
+%xl(battery,battery-160x128x2.bmp,0,0,10)
+%xl(volume,volume-160x128x2.bmp,0,0,10)
+#
+# Station Art/Info Viewport Conditional
+# Preset present conditional
+# RDS present conditional
+%?C<%Vd(art)>
+%?Ti<%?C<%Vd(art_preset)|%Vd(noart_preset)>>
+%?tx<%?Ti<%?C<%Vd(art_preset_rds)|%Vd(noart_preset_rds)>|%?C<%Vd(art_nopreset_rds)|%Vd(noart_nopreset_rds)>>|>
+#
+# Frequency Bar
+%V(2,75,134,6,-)
+%pb(0,0,134,6,pb-138x110x2.bmp)
+#
+# Hold
+%V(4,98,16,10,-)
+%xd(lock,%mh)
+#
+# Battery
+%V(28,99,17,9,-)
+%?bp<%?bc<%xd(battery,1)|%xd(battery,2)>|%?bl<|%xd(battery,3)|%xd(battery,4)|%xd(battery,5)|%xd(battery,6)|%xd(battery,7)|%xd(battery,8)|%xd(battery,9)|%xd(battery,10)>>
+#
+# Volume
+%V(53,98,16,10,-)
+%xd(volume,%pv)
+#
+# Signal strength
+%V(74,97,60,13,-)
+%ar%?tr<%tr dBuV>
+# Below frequency bar Scan/Preset frequency MHz Force Mono/Mono/Stereo
+%V(2,82,134,13,1)
+%al%?tm<%Sx(Scan)|%Sx(Preset)> %ac%tf MHz %ar%?St(force fm mono)<%Sx(Mono)|%?ts<%Sx(Stereo)|%Sx(Mono)>>
+#
+# Station Art
+%ax%Vl(art,5,15,55,55,-)
+%Cl(0,0,55,55,c,c)
+%Cd
+#
+# Station Art
+# Preset present
+%ax%Vl(art_preset,65,12,-,16,-)
+%Vp(0,%s%ac%?Ti<%Sx(Station:) |>%?Tn<%Tn|%Tf>)
+%ax%Vl(art_preset,65,28,-,16,-)
+%Vp(1,%s%ac%?Ti<Next station: |>%?Tn<%Tn|%Tf>)
+#
+%ax%Vl(art_preset_rds,65,44,-,30,-)
+%s%al%ty
+%s%al%tz
+#
+# Station Art
+# Preset absent
+%ax%Vl(art_nopreset_rds,65,28,-,30,-)
+%s%al%ty
+%s%al%tz
+#
+# No station art
+# Preset present
+%Vl(noart_preset,0,12,-,16,-)
+%Vp(0,%s%ac%?Ti<%Sx(Station:) |>%?Tn<%Tn|%Tf>)
+%Vl(noart_preset,0,28,-,16,-)
+%Vp(1,%s%ac%?Ti<Next station: |>%?Tn<%Tn|%Tf>)
+#
+%Vl(noart_preset_rds,0,44,-,30,-)
+%s%ac%ty
+%s%ac%tz
+#
+# No station art
+# Preset absent
+%Vl(noart_nopreset_rds,0,28,-,30,-)
+%s%ac%ty
+%s%ac%tz
+#
+# Header font
+%Fl(2,05-Cabbie-Bold.fnt)
+#
+# Header
+%V(3,4,132,5,2)%Vf(3)
+%acFM RADIO

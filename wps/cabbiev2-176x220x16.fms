@@ -1,0 +1,92 @@
+# Cabbie v2.0
+# (C) 2010-2026 The Authors (see /rockbox/wps/AUTHORS)
+# Derived from "Cabbie v2.0" (C) 2010-2012 The Authors
+#
+# The FM screen: the WPS backdrop, header, bar and status icons, the
+# station where the track info is, the signal strength where shuffle,
+# repeat and play mode are.
+#
+# Disable Status Bar
+%wd
+#
+# Load Backdrop
+%X(backdrop-176x220x16.bmp)
+#
+# Header font
+%Fl(2,10-Adobe-Helvetica-Bold.fnt)
+#
+# Preload Images
+%xl(lock,lock-176x220x16.bmp,0,0,2)
+%xl(battery,battery-176x220x16.bmp,0,2,10)
+%xl(volume,volume-176x220x16.bmp,0,2,10)
+#
+# Station Art/Info Viewport Conditional
+# Preset present conditional
+# RDS present conditional
+%?C<%Vd(art)>
+%?Ti<%?C<%Vd(art_preset)|%Vd(noart_preset)>>
+%?tx<%?Ti<%?C<%Vd(art_preset_rds)|%Vd(noart_preset_rds)>|%?C<%Vd(art_nopreset_rds)|%Vd(noart_nopreset_rds)>>|>
+#
+# Header
+%V(5,6,167,10,2)%Vf(0F0B00)
+%acFM RADIO
+#
+# Frequency Bar
+%V(5,182,166,8,-)
+%pb(0,0,166,8,pb-176x220x16.bmp)
+#
+# Hold
+%V(51,204,17,16,-)
+%xd(lock,%mh)
+#
+# Battery
+%V(73,204,20,16,-)
+%?bp<%?bc<%xd(battery,1)|%xd(battery,2)>|%?bl<|%xd(battery,3)|%xd(battery,4)|%xd(battery,5)|%xd(battery,6)|%xd(battery,7)|%xd(battery,8)|%xd(battery,9)|%xd(battery,10)>>
+#
+# Volume
+%V(97,204,16,16,-)
+%xd(volume,%pv)
+#
+# Signal strength, where the tuner reports it
+%V(119,206,54,12,1)
+%ar%?tr<%tr dBuV>
+#
+# Below frequency bar Scan/Preset frequency MHz Force Mono/Mono/Stereo
+%V(5,191,166,12,1)
+%al%tf MHz %ar%?ts<%Sx(Stereo)|%Sx(Mono)>
+#
+# Station Art
+%ax%Vl(art,29,21,120,120,-)
+%Cl(0,0,120,120,c,c)
+%Cd
+#
+# Station art
+# Preset present
+%ax%Vl(art_preset,0,142,-,12,1)
+%Vp(0,%s%al%?Ti<%Sx(Station:) |>%?Tn<%Tn|%Tf>)
+%ax%Vl(art_preset,0,154,-,12,1)
+%Vp(1,%s%al%?Ti<Next station: |>%?Tn<%Tn|%Tf>)
+#
+%ax%Vl(art_preset_rds,0,166,-,12,1)
+%s%al%ty
+#
+# Preset absent
+%ax%Vl(art_nopreset_rds,0,154,-,24,1)
+%s%al%ty
+%s%al%tz
+#
+# No station art
+# Preset present
+%Vl(noart_preset,0,50,-,12,1)
+%Vp(0,%s%ac%?Ti<%Sx(Station:) |>%?Tn<%Tn|%Tf>)
+%Vl(noart_preset,0,62,-,12,1)
+%Vp(1,%s%ac%?Ti<Next station: |>%?Tn<%Tn|%Tf>)
+#
+%Vl(noart_preset_rds,0,74,-,24,1)
+%s%ac%ty
+%s%ac%tz
+#
+# Preset absent
+%Vl(noart_nopreset_rds,0,62,-,24,1)
+%s%ac%ty
+%s%ac%tz
