@@ -1,0 +1,39 @@
+skinshots - before/after screenshots of the built-in theme on every screen size
+
+  utils/skinshots/skinshots.py --work DIR COMMIT1 COMMIT2 [...]
+
+Checks each commit out in a private worktree (DIR/tree-<sha>; your own
+checkout is never touched) and patches it with simhack.py (TEST ONLY hooks:
+screendump and exit a few seconds after boot, autoplay of a generated
+test.wav, fixed peak meter levels, frozen clock). Then, several targets at a
+time (-p), each target from targets.txt is configured and built once - only
+the binary and codecs, no plugins - and shot at every commit in turn: between
+commits the build's source symlink is repointed at the next worktree and make
+rebuilds only what differs (just "make install" when only themes changed).
+Each commit's screens - WPS, and recording and FM radio where the target has
+them, the remote LCD along with each - are shot at once, every simulator on
+its own copy of simdisk. The build is deleted as soon as its target is done,
+the worktrees at the end. Builds go through a short /tmp/ssXXXX symlink, as
+make's dependency step overflows the command line under long paths.
+
+Then draws one sheet per target: a column per commit, plus a diff column
+(changed pixels magenta over the last commit, dimmed), and prints a summary.
+
+  DIR/out/shots/<sha>/<target>/*.png   the screenshots
+  DIR/out/collage/<WxHxD>-<target>.png  the sheets; all.png all of them
+  DIR/out/index.html                    the sheets on one page
+  DIR/out/logs/<sha>/<target>/          configure, make, run logs
+
+Rerunning skips what's already shot, so after a fix only the missing or
+failed (--retry-failed) targets are built; --force reshoots all,
+--collage-only just redraws the sheets.
+
+  --only t1,t2        these targets instead of targets.txt
+  --targets FILE      another target list
+  -p N                targets built at once (default 3)
+  -j N                make jobs per build, capped by load (default: CPU count)
+  --delay N           seconds after boot to take the shots (default 4)
+  --min-free-gb N     stop before a build when less is free (default 5)
+  --min-width N       upscale sheets so the narrowest shot is N px wide
+
+Needs Python 3 with PIL, the host gcc and SDL2 dev files the simulators need.

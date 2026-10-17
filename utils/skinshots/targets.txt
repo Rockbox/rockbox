@@ -1,0 +1,30 @@
+# One simulator per CabbieV2 screen size: configure --target names.
+# Screens shot: WPS always, recording and FM radio where the target has
+# them, the remote LCD along with each where it has one.
+sansaclipzip        # 96x96x16
+sansaclip           # 128x64x1
+iaudiom3            # 128x96x2, remote 128x96x2
+samsungyh820        # 128x96x16
+mpiohd200           # 128x128x2
+iriverh10_5gb       # 128x128x16
+creativezenmozaic   # 128x160x16
+sansac200           # 132x80x16
+ipodmini2g          # 138x110x2
+mrobe100            # 160x128x1, remote
+iriverh100          # 160x128x2, remote 128x64x1
+iaudiox5            # 160x128x16, remote 128x96x2
+ipodnano1g          # 176x132x16
+sansae200           # 176x220x16
+iriverh300          # 220x176x16, remote 128x64x1
+fiiom3k             # 240x320x16
+creativezenxfi2     # 240x400x16
+ipodvideo           # 320x240x16
+shanlingq1          # 360x400x16
+hidizsap80max       # 360x640x16
+samsungypcp3        # 400x240x16
+hibyr3proii         # 480x720x16
+hibyr1              # 480x800x16
+# no simulator builds here for these:
+#rgnano             # 240x240x16
+#surfansf28         # 320x480x16
+# 800x480x16: no simulator target
