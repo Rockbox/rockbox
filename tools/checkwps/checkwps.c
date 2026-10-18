@@ -259,7 +259,7 @@ static int checkwps_loader(const char *path, const char *search, int mode, const
         goto done;
 
     /* See if file has an extension */
-    char *has_ext = strrchr(buf, '.');
+    const char *has_ext = strrchr(path, '.');
     /* if path starts with '.rockbox' we can get a false positive */
     if (has_ext == buf)
         has_ext = NULL;
@@ -296,7 +296,6 @@ static int checkwps_loader(const char *path, const char *search, int mode, const
     /* Ok, doesn't appear to exist in theme. Find basename. */
     strcpy(buf2, buf);
     char *basename = strrchr(buf2, '/');
-    int missing = 1;
 
     if (basename)
         basename++;
@@ -311,23 +310,21 @@ static int checkwps_loader(const char *path, const char *search, int mode, const
     {
         if (!strcmp(basename, themeassets[i]))
         {
-            missing = 0;
-            break;
+            goto done;
         }
     }
+
+    int missing = 1;
 
     if (mode == 0 || mode == 1) /* not found and it's a font */
     {
         /* Check if font is included in the bundle */
-        if (missing)
+        for (int i = 0 ; bundledfonts[i] != NULL ; i++)
         {
-            for (int i = 0 ; bundledfonts[i] != NULL ; i++)
+            if (!strcmp(basename, bundledfonts[i]))
             {
-                if (!strcmp(basename, bundledfonts[i]))
-                {
-                    missing = 2;
-                    break;
-                }
+                missing = 2;
+                break;
             }
         }
 
