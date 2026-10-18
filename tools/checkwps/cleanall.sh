@@ -5,8 +5,7 @@ outdir=$rootdir/output
 if [ -f Makefile ] ; then
   make clean # make clean the build dir first
 fi
-rm -f autoconf.h
-rm -f Makefile
+rm -f autoconf.h Makefile
 awk -f $rootdir/parse_configure.awk $rootdir/../configure | (
     while read target model
     do

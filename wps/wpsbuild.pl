@@ -10,8 +10,9 @@
 use strict;
 use Getopt::Long qw(:config pass_through);	# pass_through so not confused by -DTYPE_STUFF
 use IPC::Open2;
+use File::Basename;
 
-my $ROOT="..";
+my $ROOT=dirname($0) . "/..";
 my $wpsdir;
 my $verbose;
 my $rbdir=".rockbox";
@@ -147,6 +148,7 @@ STOP
 
 sub mkdirs
 {
+    mkdir "$tempdir", 0777;
     mkdir "$tempdir/wps", 0777;
     mkdir "$tempdir/themes", 0777;
     mkdir "$tempdir/icons", 0777;
