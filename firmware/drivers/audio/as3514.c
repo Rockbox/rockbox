@@ -32,6 +32,9 @@
 #include "audiohw.h"
 #include "i2s.h"
 #include "ascodec.h"
+#ifdef AUDIOHW_HAVE_LINEOUT
+#include "button.h"
+#endif
 
 #ifdef HAVE_AS3543
 /* Headphone volume goes from -81.0 ... +6dB */
@@ -79,6 +82,13 @@
 static uint8_t as3514_regs[AS3514_NUM_AUDIO_REGS]; /* 8-bit registers */
 /* Keep track of volume */
 static int current_vol_l, current_vol_r;
+
+#ifdef AUDIOHW_HAVE_LINEOUT
+/* Line out level: DAC mixer at 0dB and headphone volume 0x1c, the level the
+ * Sansa Fuze v2 OF uses for its dock */
+#define LINEOUT_VOLUME 5
+static bool lineout_active = false;
+#endif
 
 /*
  * little helper method to set register values.
@@ -260,14 +270,10 @@ void audiohw_postinit(void)
     audiohw_mute(false);
 }
 
-void audiohw_set_volume(int vol_l, int vol_r)
+static void as3514_set_volume(int vol_l, int vol_r)
 {
     unsigned int hph_r, hph_l;
     unsigned int mix_l, mix_r;
-
-    /* remember volume */
-    current_vol_l = vol_l;
-    current_vol_r = vol_r;
 
     vol_l = vol_tenthdb2hw(vol_l);
     vol_r = vol_tenthdb2hw(vol_r);
@@ -343,20 +349,55 @@ void audiohw_set_volume(int vol_l, int vol_r)
     audiohw_mute(false);
 }
 
-#if 0 /* unused */
+void audiohw_set_volume(int vol_l, int vol_r)
+{
+    /* remember volume */
+    current_vol_l = vol_l;
+    current_vol_r = vol_r;
+
+#ifdef AUDIOHW_HAVE_LINEOUT
+    /* applied externally by audiohw_set_lineout_volume() */
+    if (lineout_active)
+        return;
+#endif
+
+    as3514_set_volume(vol_l, vol_r);
+}
+
+#ifdef AUDIOHW_HAVE_LINEOUT
+/* Called after every volume change and when line out is (un)plugged. While
+ * line out is in use the headphone amp runs in line out mode at a fixed
+ * level and the target applies the user volume. */
 void audiohw_set_lineout_volume(int vol_l, int vol_r)
 {
-#ifdef HAVE_AS3543
-    /* line out volume is set in the same registers */
-    audiohw_set_volume(vol_l, vol_r);
-#else
-    vol_l = vol_tenthdb2hw(vol_l);
-    vol_r = vol_tenthdb2hw(vol_r);
-    as3514_write_masked(AS3514_LINE_OUT_R, vol_r, AS3514_VOL_MASK);
-    as3514_write_masked(AS3514_LINE_OUT_L, vol_l, AS3514_VOL_MASK);
-#endif
+    bool inserted = lineout_inserted();
+
+    (void)vol_l;
+    (void)vol_r;
+
+    if (inserted && !lineout_active)
+    {
+        /* same sequence as the Fuze v2 OF: silence everything, let the
+         * external amp settle, then switch the headphone amp over */
+        audiohw_mute(true);
+        as3543_lineout_volume(VOLUME_MIN, VOLUME_MIN);
+        sleep(HZ*3/10);
+        as3514_set(AS3514_HPH_OUT_R, HPH_OUT_R_LINEOUT);
+        lineout_active = true;
+        as3514_set_volume(LINEOUT_VOLUME, LINEOUT_VOLUME);
+    }
+    else if (!inserted && lineout_active)
+    {
+        audiohw_mute(true);
+        as3514_clear(AS3514_HPH_OUT_R, HPH_OUT_R_LINEOUT);
+        lineout_active = false;
+        as3514_set_volume(current_vol_l, current_vol_r);
+    }
+
+    if (lineout_active)
+        as3543_lineout_volume(current_vol_l, current_vol_r);
 }
-#endif
+#endif /* AUDIOHW_HAVE_LINEOUT */
 
 /* Nice shutdown of AS3514 audio codec */
 void audiohw_close(void)

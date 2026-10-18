@@ -23,11 +23,18 @@
 
 #include "config.h"
 
-#if 0
+#if defined(HAVE_AS3543) && defined(HAVE_LINEOUT_DETECTION)
+/* the headphone output doubles as line out */
 #define AUDIOHW_CAPS    (LINEOUT_CAP | LIN_GAIN_CAP | MIC_GAIN_CAP)
+#else
+#define AUDIOHW_CAPS    (LIN_GAIN_CAP | MIC_GAIN_CAP)
 #endif
 
-#define AUDIOHW_CAPS    (LIN_GAIN_CAP | MIC_GAIN_CAP)
+#if defined(HAVE_AS3543) && defined(HAVE_LINEOUT_DETECTION)
+/* Implemented by the target: apply the user volume externally (e.g. in a
+ * dock) while the headphone output is in line out mode */
+void as3543_lineout_volume(int vol_l, int vol_r);
+#endif
 
 /*different volume ranges for different AMS chips*/
 #ifdef HAVE_AS3543

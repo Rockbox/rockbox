@@ -1554,6 +1554,7 @@ target/arm/as3525/sansa-fuzev2/button-fuzev2.c
 target/arm/as3525/dbop-as3525.c
 #ifndef BOOTLOADER
 target/arm/as3525/sansa-fuzev2/powermgmt-fuzev2.c
+target/arm/as3525/sansa-fuzev2/dock-fuzev2.c
 target/arm/as3525/lcd-as-e200v2-fuze-fuzev2.S
 #endif /* !BOOTLOADER */
 #endif /* SANSA_FUZEV2 */

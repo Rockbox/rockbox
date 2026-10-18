@@ -1324,10 +1324,10 @@ Lyre prototype 1 */
 
 #endif /* NUM_CORES */
 
-#ifdef HAVE_HEADPHONE_DETECTION
-/* Timeout objects required if headphone detection is enabled */
+#if defined(HAVE_HEADPHONE_DETECTION) || defined(HAVE_LINEOUT_DETECTION)
+/* Timeout objects required if headphone or line out detection is enabled */
 #define INCLUDE_TIMEOUT_API
-#endif /* HAVE_HEADPHONE_DETECTION */
+#endif /* HAVE_HEADPHONE_DETECTION || HAVE_LINEOUT_DETECTION */
 
 #ifdef HAVE_TOUCHSCREEN
 /* Timeout objects required for kinetic list scrolling */

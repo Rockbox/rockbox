@@ -120,6 +120,11 @@
 #define HAVE_AS3514
 #define HAVE_AS3543
 
+#ifndef BOOTLOADER
+/* The dock switches the headphone output to line out */
+#define HAVE_LINEOUT_DETECTION
+#endif
+
 /* Define this if you have a software controlled poweroff */
 #define HAVE_SW_POWEROFF
 
