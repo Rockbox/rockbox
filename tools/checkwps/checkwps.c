@@ -273,33 +273,35 @@ static int checkwps_loader(const char *path, const char *search, int mode, const
             goto done;
     }
 
-    /* At this point, buf is guaranteed to have an extension */
+    /* At this point, buf is guaranteed to have an extension, so use it
+       instead of 'path' going forward */
+    char buf2[2048];
     if (!mode)
     {
         /* WPS paths are relative to ROCKBOX_DIR */
-        sprintf(buf, ".rockbox/%s", path);
-        fd = open(buf, O_RDONLY);
+        sprintf(buf2, ".rockbox/%s", buf);
+        fd = open(buf2, O_RDONLY);
         if (fd >= 0)
             goto done;
     }
     else if (!absolute && search)
     {
         /* Don't prepend a search path if we have an absolute path */
-        sprintf(buf, ".rockbox/%s/%s", search, path);
-        fd = open(buf, O_RDONLY);
+        sprintf(buf2, ".rockbox/%s/%s", search, buf);
+        fd = open(buf2, O_RDONLY);
         if (fd >= 0)
             goto done;
     }
 
     /* Ok, doesn't appear to exist in theme. Find basename. */
-    strcpy(buf, path);
-    char *basename = strrchr(buf, '/');
+    strcpy(buf2, buf);
+    char *basename = strrchr(buf2, '/');
     int missing = 1;
 
     if (basename)
         basename++;
     else
-        basename = buf;
+        basename = buf2;
 
     /* TODO put full paths in asset list, and perform the same
        search path logic as above? */
