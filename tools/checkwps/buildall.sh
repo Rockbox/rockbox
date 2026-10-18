@@ -1,7 +1,14 @@
 #!/bin/sh
 rootdir=`dirname $0`
-toolsdir=$rootdir/..
+
+now=`pwd`
+cd $rootdir
+rootdir=`pwd`
+cd $now
+
 outdir=$rootdir/output
+toolsdir=$rootdir/..
+
 jobs="1"
 err="0"
 
@@ -40,8 +47,11 @@ then
     exit
 fi
 
-echo > checkwps.failures
+builddir=`mktemp -d`
 
+echo > $rootdir/checkwps.failures
+
+pushd $builddir > /dev/null
 awk -f $rootdir/parse_configure.awk $rootdir/../configure | (
     while read target model blonly
     do
@@ -52,8 +62,10 @@ awk -f $rootdir/parse_configure.awk $rootdir/../configure | (
           if [ -f checkwps.$model ] ; then
               mv checkwps.$model $outdir
           else
-              echo "checkwps.$model" >> checkwps.failures
+              echo "checkwps.$model" >> $rootdir/checkwps.failures
           fi
 	fi
     done
 )
+popd > /dev/null
+rm -Rf $builddir
