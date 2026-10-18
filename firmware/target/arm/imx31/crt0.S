@@ -55,6 +55,54 @@ start:
 newstart:
     msr     cpsr_c, #0xd3 /* enter supervisor mode, disable IRQ/FIQ */
 
+#ifndef BOOTLOADER
+    /* Bootloaders built between May 2008 and February 2009 map VA
+     * 0x00100000 onwards to PA 0x80200000, skipping the megabyte at PA
+     * 0x80100000 that holds their framebuffer and page table, which they
+     * map at VA 0x03f00000. They load the firmware through that map, so
+     * any of the image past its first megabyte lands a megabyte too high
+     * for the flat map set up below, and the init code there is garbage.
+     * While their map is still in place, move it down to where it
+     * belongs. */
+    mrc     p15, 0, r0, c1, c0, 0
+    tst     r0, #(1 << 0)          /* MMU on? */
+    beq     2f
+    mrc     p15, 0, r0, c2, c0, 0  /* their page table is at 0x801fc000 */
+    mov     r0, r0, lsr #14
+    ldr     r1, =(0x801fc000 >> 14)
+    cmp     r0, r1
+    bne     2f
+    ldr     r0, =0x03ffc000        /* ...and mapped here, if it is theirs */
+    ldr     r1, [r0, #1*4]         /* section for VA 0x00100000 */
+    ldr     r2, [r0, #63*4]        /* section for VA 0x03f00000 */
+    mov     r1, r1, lsr #20
+    mov     r2, r2, lsr #20
+    ldr     r3, =(0x80200000 >> 20)
+    cmp     r1, r3
+    ldreq   r3, =(0x80100000 >> 20)
+    cmpeq   r2, r3
+    bne     2f
+    ldr     r0, =_initcopy         /* the image ends with the init code */
+    ldr     r1, =_initstart
+    ldr     r2, =_initend
+    sub     r2, r2, r1
+    add     r0, r0, r2
+    subs    r3, r0, #0x00100000    /* bytes past the first megabyte */
+    bls     2f
+    cmp     r3, #0x000fc000        /* not as far as their page table */
+    bhs     2f
+    mov     r1, #0x00100000        /* where they put it */
+    mov     r2, #0x03f00000        /* PA 0x80100000, uncached */
+1:
+    ldr     r4, [r1], #4
+    str     r4, [r2], #4
+    subs    r3, r3, #4
+    bhi     1b
+    mov     r0, #0
+    mcr     p15, 0, r0, c7, c10, 4 /* drain the write buffer */
+2:
+#endif /* BOOTLOADER */
+
     adr     r2, remap_start    /* Load PC-relative labels (relocatable) */
     adr     r3, remap_end
     ldr     r5, =TTB_BASE_ADDR /* TTB pointer */
