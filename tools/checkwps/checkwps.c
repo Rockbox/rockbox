@@ -103,17 +103,21 @@ unsigned int htole32(unsigned int x)
 
 int recalc_dimension(struct dim *dst, struct dim *src)
 {
+    (void) dst;
+    (void) src;
     return 0;
 }
 
 #ifdef HAVE_ALBUMART
 int playback_claim_aa_slot(struct dim *dim)
 {
+    (void) dim;
     return 0;
 }
 
 void playback_release_aa_slot(int slot)
 {
+    (void) slot;
     return;
 }
 #endif
@@ -126,6 +130,16 @@ int resize_on_load(struct bitmap *bm, bool dither,
                    struct img_part* (*store_part)(void *args),
                    void *args)
 {
+    (void) bm;
+    (void) dither;
+    (void) src;
+    (void) tmp_row;
+    (void) buf;
+    (void) len;
+    (void) cformat;
+    IF_PIX_FMT((void) format_index);
+    (void) store_part;
+    (void) args;
     return 0;
 }
 
@@ -144,6 +158,7 @@ void* plugin_get_buffer(size_t *buffer_size)
 
 static struct viewport* init_viewport(struct viewport* vp)
 {
+    (void) vp;
     return NULL;
 }
 
@@ -241,8 +256,6 @@ static struct font _font;
 */
 static int checkwps_loader(const char *path, const char *search, int mode, const char *def_ext)
 {
-    char buf[2048];
-
     if (!path)
         return -1;
     if (!path[0])
@@ -262,8 +275,10 @@ static int checkwps_loader(const char *path, const char *search, int mode, const
     /* See if file has an extension */
     const char *has_ext = strrchr(path, '.');
     /* if path starts with '.rockbox' we can get a false positive */
-    if (has_ext == buf)
+    if (has_ext == path)
         has_ext = NULL;
+
+    char buf[2048];
 
     /* Next, try to append the default extension */
     if (!has_ext && def_ext)
@@ -272,15 +287,17 @@ static int checkwps_loader(const char *path, const char *search, int mode, const
         fd = open(buf, O_RDONLY);
         if (fd >= 0)
             goto done;
+    } else {
+        strcpy(buf, path);
     }
 
     /* At this point, buf is guaranteed to have an extension, so use it
        instead of 'path' going forward */
-    char buf2[2048];
+    char buf2[2500];
     if (!mode)
     {
         /* WPS paths are relative to ROCKBOX_DIR */
-        sprintf(buf2, ".rockbox/%s", buf);
+        snprintf(buf2, sizeof(buf2), ".rockbox/%s", buf);
         fd = open(buf2, O_RDONLY);
         if (fd >= 0)
             goto done;
@@ -288,7 +305,7 @@ static int checkwps_loader(const char *path, const char *search, int mode, const
     else if (!absolute && search)
     {
         /* Don't prepend a search path if we have an absolute path */
-        sprintf(buf2, ".rockbox/%s/%s", search, buf);
+        snprintf(buf2, sizeof(buf2), ".rockbox/%s/%s", search, buf);
         fd = open(buf2, O_RDONLY);
         if (fd >= 0)
             goto done;
@@ -371,6 +388,7 @@ void font_unload(int font_id)
 
 struct font* font_get(int font)
 {
+    (void)font;
     return &_font;
 }
 
@@ -655,6 +673,7 @@ int main(int argc, char **argv)
         else if (valid > 0)
             continue; /* skip (unsupported by this target but not an error) */
 
+        loaded_fonts = 0;
         res = skin_data_load(skin, screen, &wps, name, true, &stats);
 
         if (!res) {
@@ -669,7 +688,6 @@ int main(int argc, char **argv)
             skin_debug_tree(SKINOFFSETTOPTR(skin_buffer, wps.tree));
     }
 
-done:
     if (skin_buffer)
         free(skin_buffer);
     return ret;
