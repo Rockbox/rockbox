@@ -58,7 +58,19 @@ $(BUILDDIR)/themeassets.h: $(ROOTDIR)/wps/WPSLIST
 	$(SILENT)echo "};" >> $@
 	$(SILENT)rm -Rf $(BUILDDIR)/.rockbox
 
-#### Everything below is hacked in from apps.make and lang.make
+#### Everything below is hacked in from firmware.make, apps.make and lang.make
+
+SVNVERSION:=$(shell VERSION='$(VERSION)' $(TOOLSDIR)/version.sh $(ROOTDIR))
+OLDSVNVERSION:=$(shell grep 'RBVERSION' $(BUILDDIR)/rbversion.h 2>/dev/null|cut -d '"' -f 2 || echo "NOREVISION")
+
+CORE_LIBS:=$(FIRMLIB)
+
+ifneq ($(SVNVERSION),$(OLDSVNVERSION))
+.PHONY: $(BUILDDIR)/rbversion.h
+endif
+
+$(BUILDDIR)/rbversion.h:
+	$(call PRINTS,GEN $(@F))$(TOOLSDIR)/genversion.sh $(BUILDDIR) $(SVNVERSION)
 
 $(BUILDDIR)/apps/features: $(ROOTDIR)/apps/features.txt
 	$(SILENT)mkdir -p $(BUILDDIR)/apps

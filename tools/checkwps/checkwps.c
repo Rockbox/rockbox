@@ -34,6 +34,7 @@
 #include "file.h"
 #include "font.h"
 #include "misc.h"
+#include "rbversion.h"
 
 bool debug_wps = false;
 int wps_verbose_level = 0;
@@ -586,7 +587,7 @@ int main(int argc, char **argv)
         strcmp(argv[1],"-h") == 0 ||
         strcmp(argv[1],"--help") == 0 )
     {
-        printf("Usage: checkwps [OPTIONS] [filename1] [filename2] ...\n");
+        printf("Usage: checkwps.%s [OPTIONS] [filename1] [filename2] ...\n", TARGET_NAME);
         printf("  supported file types: wps, sbs, fms, wrs, cfg, "
                "rwps, rsbs, rfms, rwrs\n");
         printf("\nOPTIONS:\n");
@@ -614,6 +615,8 @@ int main(int argc, char **argv)
     }
 
     skin_buffer_init(skin_buffer, SKIN_BUFFER_SIZE);
+
+    printf(">>checkwps.%s revision %s\n", TARGET_NAME, RBVERSION);
 
     /* Go through every skin that was thrown at us.
        Don't error out until we have checked everything */
