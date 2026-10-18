@@ -615,9 +615,10 @@ int main(int argc, char **argv)
 
     skin_buffer_init(skin_buffer, SKIN_BUFFER_SIZE);
 
-    /* Go through every skin that was thrown at us, error out at the first
-     * flawed wps */
-    while (argv[filearg]) {
+    /* Go through every skin that was thrown at us.
+       Don't error out until we have checked everything */
+    while (argv[filearg])
+    {
         const char* name = argv[filearg++];
         const char *ext = strrchr(name, '.');
         struct skin_stats stats;
@@ -626,7 +627,7 @@ int main(int argc, char **argv)
         {
             printf("Invalid extension\n");
             ret = 2;
-            goto done;
+            continue;
         }
         ext++;
 
@@ -635,7 +636,7 @@ int main(int argc, char **argv)
         {
             printf("Invalid extension\n");
             ret = 2;
-            goto done;
+            continue;
         }
         else if (valid == 2)
         {
@@ -643,7 +644,7 @@ int main(int argc, char **argv)
             {
                 printf("Bad configuration\n");
                 ret = 3;
-                goto done;
+                continue;
             }
             printf("%s parsed OK\n\n", ext);
             continue;
@@ -657,7 +658,7 @@ int main(int argc, char **argv)
             printf("%s parsing failure\n", ext);
             skin_error_format_message();
             ret = 4;
-            goto done;
+            continue;
         }
 
         printf("%s parsed OK\n\n", ext);
