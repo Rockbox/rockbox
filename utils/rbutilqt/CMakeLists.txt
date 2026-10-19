@@ -184,6 +184,8 @@ add_library(rbbase
     ${CMAKE_CURRENT_LIST_DIR}/base/bootloaderinstallmi4.h
     ${CMAKE_CURRENT_LIST_DIR}/base/bootloaderinstallmpio.cpp
     ${CMAKE_CURRENT_LIST_DIR}/base/bootloaderinstallmpio.h
+    ${CMAKE_CURRENT_LIST_DIR}/base/bootloaderinstallnk.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/base/bootloaderinstallnk.h
     ${CMAKE_CURRENT_LIST_DIR}/base/bootloaderinstalls5l.cpp
     ${CMAKE_CURRENT_LIST_DIR}/base/bootloaderinstalls5l.h
     ${CMAKE_CURRENT_LIST_DIR}/base/bootloaderinstallsansa.cpp
@@ -273,7 +275,7 @@ endif()
 target_link_libraries(rbbase
     cutelogger ${QUAZIP_LIBRARY} mspack bspatch rbspeex
     voicefont sansapatcher ipodpatcher chinachippatcher
-    mkamsboot mkimxboot mkmpioboot mktccboot mks5lboot
+    mkamsboot mkimxboot mkmpioboot mktccboot mks5lboot mknkboot
     Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Network)
 target_include_directories(rbbase PUBLIC ${CMAKE_CURRENT_LIST_DIR}/base)
 target_include_directories(rbbase PRIVATE ${CMAKE_CURRENT_LIST_DIR})
@@ -281,9 +283,14 @@ target_include_directories(rbbase PUBLIC ${CMAKE_CURRENT_LIST_DIR}/../../tools)
 target_compile_definitions(rbbase PUBLIC RBUTIL _LARGEFILE64_SOURCE UNICODE)
 target_compile_definitions(rbbase PRIVATE QT_DEPRECATED_WARNINGS)
 if(WIN32)
-    target_link_libraries(rbbase setupapi ws2_32 netapi32 crypt32 iphlpapi)
+    target_link_libraries(rbbase setupapi ws2_32 netapi32 crypt32 iphlpapi
+        portabledeviceguids ole32 uuid)
 elseif("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
     target_link_libraries(rbbase PkgConfig::libusb)
+    if(${libmtp_FOUND})
+        target_link_libraries(rbbase PkgConfig::libmtp)
+        target_compile_definitions(rbbase PRIVATE HAVE_LIBMTP)
+    endif()
 elseif("${CMAKE_SYSTEM_NAME}" STREQUAL "Darwin")
     target_link_libraries(rbbase ${FRAMEWORK_IOKIT} ${FRAMEWORK_COREFOUNDATION}
         ${FRAMEWORK_CARBON} ${FRAMEWORK_SYSTEMCONFIGURATION} ${FRAMEWORK_CORESERVICES})

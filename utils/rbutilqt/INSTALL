@@ -32,6 +32,7 @@ Requirements:
   o utils/
   o tools/
 - libusb (Linux only)
+- libmtp (Linux only, optional: installs the Gigabeat S bootloader)
 
 Building:
 =========

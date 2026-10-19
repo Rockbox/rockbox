@@ -33,6 +33,7 @@
 #include "bootloaderinstallimx.h"
 #include "bootloaderinstalls5l.h"
 #include "bootloaderinstallbspatch.h"
+#include "bootloaderinstallnk.h"
 
 BootloaderInstallBase* BootloaderInstallHelper::createBootloaderInstaller(QObject* parent, QString type)
 {
@@ -71,6 +72,9 @@ BootloaderInstallBase* BootloaderInstallHelper::createBootloaderInstaller(QObjec
     }
     else if(type == "bspatch") {
         return new BootloaderInstallBSPatch(parent);
+    }
+    else if(type == "nk") {
+        return new BootloaderInstallNk(parent);
     }
     else {
         return nullptr;
@@ -137,7 +141,7 @@ QString BootloaderInstallHelper::postinstallHints(QString model)
             "following steps manually:");
 
     msg += "<ol>";
-    if(model != "sansafuzeplus") {
+    if(model != "sansafuzeplus" && model != "gigabeats") {
         msg += QObject::tr("<li>Safely remove your player.</li>");
     }
     if(model == "iriverh100" || model == "iriverh120" || model == "iriverh300"
@@ -170,6 +174,14 @@ QString BootloaderInstallHelper::postinstallHints(QString model)
         hint = true;
         msg += QObject::tr("<li>Turn the player off</li>"
                 "<li>Insert the charger</li>");
+    }
+    if(model == "gigabeats") {
+        hint = true;
+        msg += QObject::tr("<li>If the player is still on, unplug USB and "
+                "plug it in again. If it turned itself off, turn it on with "
+                "USB connected.</li>"
+                "<li>The player starts the Rockbox bootloader in USB mode "
+                "and shows up as a drive. Install Rockbox to that drive.</li>");
     }
     if(model == "gigabeatf") {
         hint = true;

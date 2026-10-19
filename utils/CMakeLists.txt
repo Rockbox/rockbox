@@ -75,6 +75,12 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
     add_compile_definitions(USE_LIBUSBAPI)
 
     # optional system libs.
+    pkg_check_modules(libmtp QUIET IMPORTED_TARGET libmtp)
+    if (${libmtp_FOUND})
+        message("-- Found libmtp: ${libmtp_LINK_LIBRARIES}")
+    else()
+        message("-- Could not find libmtp, Gigabeat S bootloader install disabled.")
+    endif()
     pkg_check_modules(speex QUIET IMPORTED_TARGET speex speexdsp)
     if (${speex_FOUND})
         message("-- Found speex: ${speex_LINK_LIBRARIES}")
