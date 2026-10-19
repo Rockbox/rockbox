@@ -649,9 +649,17 @@ bool ata_dma_finish(void)
 
 static int ata_wait_status(unsigned status, unsigned mask, int timeout)
 {
-    long busy_timeout = usec_timer() + 2;
+    long busy_timeout;
     long end_tick = current_tick + timeout;
-    
+
+    /* A drive may take up to 400 ns after a command to set BSY.  At 528
+       MHz the status was read sooner: after each wake-up from standby,
+       IDENTIFY found neither BSY nor DRQ set and was taken to have
+       failed.  Wait at least a microsecond by the timer, whatever the
+       core's clock. */
+    udelay(2);
+    busy_timeout = usec_timer() + 2;
+
     while (1)
     {
         if ((ATA_DRIVE_STATUS & mask) == status)
