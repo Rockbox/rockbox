@@ -1163,7 +1163,9 @@
 #define L2_CACHE_INV_LINE_REG           0x770
 #define L2_CACHE_INV_WAY_REG            0x77C
 #define L2_CACHE_CLEAN_LINE_REG         0x7B0
+#define L2_CACHE_CLEAN_WAY_REG          0x7BC
 #define L2_CACHE_CLEAN_INV_LINE_REG     0x7F0
+#define L2_CACHE_CLEAN_INV_WAY_REG      0x7FC
 
 #define L2CC_CACHE_SYNC                 (*(REG32_PTR_T)(L2CC_BASE_ADDR+L2_CACHE_SYNC_REG))
 

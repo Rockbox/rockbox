@@ -122,6 +122,68 @@ enable_mmu:
 
 /** Cache coherency **/
 
+#if CONFIG_CPU == IMX31L
+/* The i.MX31 has an L210 L2 cache behind the L1. It caches DRAM through
+ * the cached map only, so the uncached alias never meets it. The L210
+ * signals completion of each maintenance operation in its register, and
+ * a new one must not be issued while another is in progress, so each is
+ * issued and waited for with interrupts off.
+ *
+ * The line operations take a physical address. Cached DRAM is mapped at
+ * VA = PA - CSD0_BASE_ADDR, so setting those bits gives the PA; for
+ * anything else the address is not cached in L2 and the operation finds
+ * nothing. */
+#define HAVE_L2_CACHE
+
+/* Perform op on each line from first up to end (both PAs, line
+ * aligned). Clobbers r0, r1, r12 and first. */
+.macro l2_lines op, first, end
+    mov     r0, #L2CC_BASE_ADDR     @
+    mrs     r1, cpsr                @
+7:
+    cmp     \first, \end            @
+    bhs     9f                      @
+    cpsid   if                      @
+    str     \first, [r0, #\op]      @
+8:
+    ldr     r12, [r0, #\op]         @ Wait for the line
+    tst     r12, #1                 @
+    bne     8b                      @
+    msr     cpsr_c, r1              @
+    add     \first, \first, #32     @
+    b       7b                      @
+9:
+.endm
+
+/* Perform op on all eight ways. Clobbers r0, r1, r12. */
+.macro l2_ways op
+    mov     r0, #L2CC_BASE_ADDR     @
+    mrs     r1, cpsr                @
+    cpsid   if                      @
+    mov     r12, #0xff              @
+    str     r12, [r0, #\op]         @
+8:
+    ldr     r12, [r0, #\op]         @ Wait for every way
+    cmp     r12, #0                 @
+    bne     8b                      @
+    msr     cpsr_c, r1              @
+.endm
+
+/* Wait until L2's write-backs reach memory. Clobbers r0, r1, r12. */
+.macro l2_sync
+    mov     r0, #L2CC_BASE_ADDR     @
+    mrs     r1, cpsr                @
+    cpsid   if                      @
+    mov     r12, #0                 @
+    str     r12, [r0, #L2_CACHE_SYNC_REG]
+8:
+    ldr     r12, [r0, #L2_CACHE_SYNC_REG]
+    tst     r12, #1                 @
+    bne     8b                      @
+    msr     cpsr_c, r1              @
+.endm
+#endif /* CONFIG_CPU == IMX31L */
+
 #if 0 /* unused */
 
 /*
@@ -160,10 +222,20 @@ commit_discard_dcache_range:
 commit_dcache_range:
     add     r1, r0, r1              @ size -> end
     cmp     r1, r0                  @ end <= start?
-    subhi   r1, r1, #1              @ round it down
-    movhi   r2, #0                  @
-    mcrrhi  p15, 0, r1, r0, c12     @ Clean DCache range
-    mcrhi   p15, 0, r2, c7, c10, 4  @ Data synchronization barrier
+    bxls    lr                      @
+    sub     r2, r1, #1              @ round it down
+    mcrr    p15, 0, r2, r0, c12     @ Clean DCache range
+    mov     r2, #0                  @
+    mcr     p15, 0, r2, c7, c10, 4  @ Data synchronization barrier
+#ifdef HAVE_L2_CACHE
+    bic     r2, r0, #31             @ First line
+    orr     r2, r2, #CSD0_BASE_ADDR @ VA -> PA
+    add     r3, r1, #31             @ Line after the last
+    bic     r3, r3, #31             @
+    orr     r3, r3, #CSD0_BASE_ADDR @ VA -> PA
+    l2_lines L2_CACHE_CLEAN_LINE_REG, r2, r3
+    l2_sync
+#endif
     bx      lr                      @
     .size   commit_dcache_range, .-commit_dcache_range
 
@@ -182,6 +254,10 @@ discard_dcache_range:
     add     r1, r0, r1              @ size -> end
     cmp     r1, r0                  @ end <= start?
     bxls    lr                      @
+#ifdef HAVE_L2_CACHE
+    mov     r2, r0                  @ Keep start and end for L2
+    mov     r3, r1                  @
+#endif
     tst     r0, #31                 @ Check first line for bits set
     bicne   r0, r0, #31             @ Clear low five bits (down)
     mcrne   p15, 0, r0, c7, c14, 1  @ Clean and invalidate line by MVA
@@ -197,7 +273,31 @@ discard_dcache_range:
     mcrrhs  p15, 0, r1, r0, c6      @ Invalidate DCache range
     mov     r0, #0                  @
     mcr     p15, 0, r0, c7, c10, 4  @ Data synchronization barrier
+#ifdef HAVE_L2_CACHE
+    @ The same in L2: clean and invalidate the partial lines at either
+    @ end, which the L1 just wrote back to it, and invalidate the rest.
+    stmfd   sp!, {r4, lr}           @
+    orr     r2, r2, #CSD0_BASE_ADDR @ VA -> PA
+    orr     r3, r3, #CSD0_BASE_ADDR @
+    tst     r2, #31                 @ First line partial?
+    bic     r2, r2, #31             @
+    beq     1f                      @
+    add     r4, r2, #32             @
+    l2_lines L2_CACHE_CLEAN_INV_LINE_REG, r2, r4
+1:
+    tst     r3, #31                 @ Last line partial?
+    bic     r3, r3, #31             @
+    beq     2f                      @
+    mov     r4, r3                  @
+    add     lr, r3, #32             @
+    l2_lines L2_CACHE_CLEAN_INV_LINE_REG, r4, lr
+2:
+    l2_lines L2_CACHE_INV_LINE_REG, r2, r3
+    l2_sync
+    ldmfd   sp!, {r4, pc}           @
+#else
     bx      lr                      @
+#endif
     .size   discard_dcache_range, .-discard_dcache_range
 
 
@@ -214,6 +314,10 @@ commit_dcache:
     mov     r0, #0                  @
     mcr     p15, 0, r0, c7, c10, 0  @ Clean entire DCache
     mcr     p15, 0, r0, c7, c10, 4  @ Data synchronization barrier
+#ifdef HAVE_L2_CACHE
+    l2_ways L2_CACHE_CLEAN_WAY_REG  @ Clean entire L2
+    l2_sync
+#endif
     bx      lr                      @
     .size   commit_dcache, .-commit_dcache
 
@@ -230,6 +334,10 @@ commit_discard_dcache:
     mov     r0, #0                  @
     mcr     p15, 0, r0, c7, c14, 0  @ Clean and invalidate entire DCache
     mcr     p15, 0, r0, c7, c10, 4  @ Data synchronization barrier
+#ifdef HAVE_L2_CACHE
+    l2_ways L2_CACHE_CLEAN_INV_WAY_REG @ Clean and invalidate entire L2
+    l2_sync
+#endif
     bx      lr                      @
     .size   commit_discard_dcache, .-commit_discard_dcache
 
@@ -246,6 +354,12 @@ commit_discard_dcache:
 commit_discard_idcache:
     mov     r0, #0                  @
     mcr     p15, 0, r0, c7, c14, 0  @ Clean and invalidate entire DCache
+#ifdef HAVE_L2_CACHE
+    mcr     p15, 0, r0, c7, c10, 4  @ Data synchronization barrier
+    l2_ways L2_CACHE_CLEAN_INV_WAY_REG @ Clean and invalidate entire L2
+    l2_sync
+    mov     r0, #0                  @
+#endif
     @ ARM1136/1156/1176 erratum 411920: Invalidate entire ICache can leave
     @ lines valid. Issue it four times with interrupts off, then 11 NOPs.
     mrs     r1, cpsr                @

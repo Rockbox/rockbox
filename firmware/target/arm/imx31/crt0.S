@@ -267,6 +267,14 @@ L_post_remap:
     .word remap_end
 remap_end:
 
+#ifndef BOOTLOADER
+    /* Enable the L2 cache, invalidated above. The bootloader leaves it
+     * off, and so must ROLO before it starts a firmware. */
+    mov     r0, #L2CC_BASE_ADDR
+    mov     r1, #1
+    str     r1, [r0, #L2_CACHE_CTL_REG]
+#endif /* BOOTLOADER */
+
 #ifdef BOOTLOADER
     /* Copy bootloader exception handler code to address 0 */
     ldr     r2, =_vectorsstart

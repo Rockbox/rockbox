@@ -57,6 +57,24 @@ restart_copy_start:
     @ Clean and invalidate all caches
     mov     r0, #0
     mcr     p15, 0, r0, c7, c14, 0
+    mcr     p15, 0, r0, c7, c10, 4
+
+    @ Write the L2 back and turn it off: the new firmware's startup
+    @ invalidates it without writing it back.
+    mov     r3, #L2CC_BASE_ADDR
+    mov     r4, #0xff
+    str     r4, [r3, #L2_CACHE_CLEAN_INV_WAY_REG]
+2:
+    ldr     r4, [r3, #L2_CACHE_CLEAN_INV_WAY_REG]
+    cmp     r4, #0
+    bne     2b
+    str     r0, [r3, #L2_CACHE_SYNC_REG]
+3:
+    ldr     r4, [r3, #L2_CACHE_SYNC_REG]
+    tst     r4, #1
+    bne     3b
+    str     r0, [r3, #L2_CACHE_CTL_REG]
+
     mcr     p15, 0, r0, c7, c5, 0
     mcr     p15, 0, r0, c7, c10, 4
     mcr     p15, 0, r0, c7, c5, 4
