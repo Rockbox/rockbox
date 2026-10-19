@@ -113,6 +113,8 @@ static const struct nand_chip_info nand_chip_table[] =
     { 0xA555D5AD, 4,  8, 8192, 128, 2048, 7744, true  },
     /* Micronas */
     { 0xB614D5EC, 2,  8, 4096, 128, 4096, 3872, true  },
+    /* Toshiba */
+    { 0xBA94D598, 2, 12, 4096, 128, 4096, 3872, true  },
     /* Intel */
     { 0x3E94D589, 2,  3, 4096, 128, 4096, 3872, true  },
 #ifdef NAND_CHECK
@@ -134,7 +136,6 @@ static const struct nand_chip_info nand_chip_table[] =
     /* Toshiba */
     { 0xA585D598, 2, 13, 8320, 128, 2048, 7744, false },
     { 0xA585D598, 4, 13, 8320, 128, 2048, 7744, false },
-    { 0xBA94D598, 2, 12, 4096, 128, 4096, 3872, false },
     { 0xBA94D598, 4,  1, 4096, 128, 4096, 3872, false },
     /* Intel */
     { 0x3ED5D789, 2,  2, 8192, 128, 4096, 7744, false },
