@@ -113,7 +113,7 @@ static const struct nand_chip_info nand_chip_table[] =
     { 0xA555D5AD, 4,  8, 8192, 128, 2048, 7744, true  },
     /* Micronas */
     { 0xB614D5EC, 2,  8, 4096, 128, 4096, 3872, true  },
-    /* Toshiba */
+    /* Intel */
     { 0x3E94D589, 2,  3, 4096, 128, 4096, 3872, true  },
 #ifdef NAND_CHECK
     /* The rest of the chips the original firmware knows. They are here for
