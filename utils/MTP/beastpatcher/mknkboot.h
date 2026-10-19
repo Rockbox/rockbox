@@ -37,6 +37,12 @@
 #ifndef MKNKBOOT_H
 #define MKNKBOOT_H
 
+#include <sys/types.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct filebuf {
     off_t len;
     unsigned char* buf;
@@ -45,5 +51,10 @@ struct filebuf {
 int verifyfirm(const struct filebuf* firmdata);
 int mknkboot(const struct filebuf *indata, const struct filebuf *bootdata,
              struct filebuf *outdata);
+int mknkboot_single(const struct filebuf *bootdata, struct filebuf *outdata);
+
+#ifdef __cplusplus
+}
+#endif
 #endif
 

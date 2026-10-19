@@ -376,6 +376,15 @@ if(WIN32)
 target_link_libraries(mks5lboot PRIVATE setupapi)
 endif()
 
+add_library(mknkboot
+    MTP/beastpatcher/md5.c
+    MTP/beastpatcher/md5.h
+    MTP/beastpatcher/mknkboot.c
+    MTP/beastpatcher/mknkboot.h
+    )
+target_include_directories(mknkboot PUBLIC ${CMAKE_CURRENT_LIST_DIR}/MTP/beastpatcher)
+target_compile_definitions(mknkboot PRIVATE MKNKBOOT_LIBRARY)
+
 add_library(bspatch
     bspatch/bspatch.c
     bspatch/bspatch.h

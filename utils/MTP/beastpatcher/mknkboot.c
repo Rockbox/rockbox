@@ -109,8 +109,10 @@ struct firmentry
 // firmware table
 static const struct firmentry firmtable[] =
 {
-    {0x0102, "\xdc\xd8\xe9\x04\x2c\x4d\x14\x84\x85\xbe\xef\x9c\xa5\xe6\x7b\x90"},
-    {0x0103, "\x19\x9f\x97\x5b\x5e\xef\x66\xf8\x91\x2c\x34\xf2\x11\x4c\xb1\xb4"},
+    {0x0102, {0xdc, 0xd8, 0xe9, 0x04, 0x2c, 0x4d, 0x14, 0x84,
+              0x85, 0xbe, 0xef, 0x9c, 0xa5, 0xe6, 0x7b, 0x90}},
+    {0x0103, {0x19, 0x9f, 0x97, 0x5b, 0x5e, 0xef, 0x66, 0xf8,
+              0x91, 0x2c, 0x34, 0xf2, 0x11, 0x4c, 0xb1, 0xb4}},
     {},
 };
 
@@ -142,7 +144,65 @@ static void put_uint32le(uint32_t x, unsigned char* p)
     p[3] = (unsigned char)((x >> 24) & 0xff);
 }
 
-#if !defined(BEASTPATCHER)
+static uint32_t calc_csum(const unsigned char* pb, int cb)
+{
+    uint32_t l = 0;
+    while (cb--)
+        l += *pb++;
+    return l;
+}
+
+/* Create a single-boot nk.bin that runs only the Rockbox bootloader.
+   Based on tools/gigabeats.c by Will Robertson. */
+int mknkboot_single(const struct filebuf *bootdata, struct filebuf *outdata)
+{
+    unsigned char* buf;
+    int bootlen = bootdata->len;
+
+    /* 15 bytes for header, 16 for signature bypass,
+     * 12 for record header, size of bootloader, 12 for footer */
+    outdata->len = 15 + 16 + 12 + bootlen + 12;
+    outdata->buf = malloc(outdata->len);
+
+    if (outdata->buf == NULL) {
+        fprintf(stderr, "[ERR]  Could not allocate memory, aborting\n");
+        outdata->len = 0;
+        return -1;
+    }
+
+    buf = outdata->buf;
+
+    /* Step 1: Copy bootloader image. */
+    memcpy(buf + 43, bootdata->buf, bootlen);
+
+    /* Step 2: Create the file header */
+    memcpy(buf, "B000FF\n", 7);
+    put_uint32le(NK_ENTRY_POINT, buf+7);
+
+    /* If the value below is too small, the update will attempt to flash.
+     * Be careful when changing this (leaving it as is won't cause issues) */
+    put_uint32le(0xCC0CD8, buf+11);
+
+    /* Step 3: Add the signature bypass record */
+    put_uint32le(DISABLE_ADDR, buf+15);
+    put_uint32le(4, buf+19);
+    put_uint32le(DISABLE_INSN, buf+27);
+    put_uint32le(calc_csum(buf+27, 4), buf+23);
+
+    /* Step 4: Create a record for the actual code */
+    put_uint32le(BL_ENTRY_POINT, buf+31);
+    put_uint32le(bootlen, buf+35);
+    put_uint32le(calc_csum(buf + 43, bootlen), buf+39);
+
+    /* Step 5: Write the footer */
+    put_uint32le(0, buf+outdata->len-12);
+    put_uint32le(BL_ENTRY_POINT, buf+outdata->len-8);
+    put_uint32le(0, buf+outdata->len-4);
+
+    return 0;
+}
+
+#if !defined(BEASTPATCHER) && !defined(MKNKBOOT_LIBRARY)
 static off_t filesize(int fd) {
     struct stat buf;
 
@@ -254,7 +314,7 @@ int mknkboot(const struct filebuf *indata, const struct filebuf *bootdata,
     return 0;
 }
 
-#if !defined(BEASTPATCHER)
+#if !defined(BEASTPATCHER) && !defined(MKNKBOOT_LIBRARY)
 static void usage(void)
 {
     fprintf(stderr, "Usage: mknkboot <firmware file> <boot file> <output file>\n");

@@ -55,78 +55,6 @@
 #include "bootimg.h"
 #include "mknkboot.h"
 
-/* Code to create a single-boot bootloader.
-   Based on tools/gigabeats.c by Will Robertson.
-*/
-
-/* Entry point (and load address) for the main Rockbox bootloader */
-#define BL_ENTRY_POINT 0x8a000000
-
-static void put_uint32le(uint32_t x, unsigned char* p)
-{
-    p[0] = (unsigned char)(x & 0xff);
-    p[1] = (unsigned char)((x >> 8) & 0xff);
-    p[2] = (unsigned char)((x >> 16) & 0xff);
-    p[3] = (unsigned char)((x >> 24) & 0xff);
-}
-
-static uint32_t calc_csum(const unsigned char* pb, int cb)
-{
-    uint32_t l = 0;
-    while (cb--)
-        l += *pb++;
-    return l;
-}
-
-static void create_single_boot(unsigned char* boot, int bootlen,
-                               unsigned char** fwbuf, off_t* fwsize)
-{
-    unsigned char* buf;
-
-    /* 15 bytes for header, 16 for signature bypass,
-     * 12 for record header, size of bootloader, 12 for footer */
-    *fwsize = 15 + 16 + 12 + bootlen + 12;
-    *fwbuf = malloc(*fwsize);
-
-    if(fwbuf == NULL) {
-        fprintf(stderr, "[ERR]  Cannot allocate memory.\n" );
-        *fwbuf = NULL;
-        *fwsize = 0;
-        return;
-    }
-
-    buf = *fwbuf;
-
-    /* Copy bootloader image. */
-    memcpy(buf + 43, boot, bootlen);
-
-    /* Step 2: Create the file header */
-    sprintf((char *)buf, "B000FF\n");
-    put_uint32le(0x88200000, buf+7);
-
-    /* If the value below is too small, the update will attempt to flash.
-     * Be careful when changing this (leaving it as is won't cause issues) */
-    put_uint32le(0xCC0CD8, buf+11);
-
-    /* Step 3: Add the signature bypass record */
-    put_uint32le(0x88065A10, buf+15);
-    put_uint32le(4, buf+19);
-    put_uint32le(0xE3A00001, buf+27);
-    put_uint32le(calc_csum(buf+27,4), buf+23);
-
-    /* Step 4: Create a record for the actual code */
-    put_uint32le(BL_ENTRY_POINT, buf+31);
-    put_uint32le(bootlen, buf+35);
-    put_uint32le(calc_csum(buf + 43, bootlen), buf+39);
-
-    /* Step 5: Write the footer */
-    put_uint32le(0, buf+*fwsize-12);
-    put_uint32le(BL_ENTRY_POINT, buf+*fwsize-8);
-    put_uint32le(0, buf+*fwsize-4);
-
-    return;
-}
-
 static int readfile(const char* filename, struct filebuf *buf)
 {
     int res;
@@ -220,7 +148,8 @@ int beastpatcher(const char* bootfile, const char* firmfile, int interactive)
         }
         else {
             /* Create a single-boot bootloader from the embedded bootloader */
-            create_single_boot(bootloader.buf, bootloader.len, &fw.buf, &fw.len);
+            if (mknkboot_single(&bootloader, &fw) != 0)
+                fw.buf = NULL;
         }
 
         if (fw.buf == NULL)
