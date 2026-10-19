@@ -76,7 +76,8 @@ local R = {
     PWR_CTRL4 = 0x103, PWR_CTRL6 = 0x110, PWR_CTRL7 = 0x112,
     GRAM_H_ADDR = 0x200, GRAM_V_ADDR = 0x201, GRAM_WRITE = 0x202,
     WINDOW_H_START = 0x210, WINDOW_H_END = 0x211,
-    WINDOW_V_START = 0x212, WINDOW_V_END = 0x213, VCOM_HV2 = 0x282,
+    WINDOW_V_START = 0x212, WINDOW_V_END = 0x213,
+    VCOM_HV1 = 0x281, VCOM_HV2 = 0x282,
     BASE_IMG_SIZE = 0x400, BASE_IMG_CTRL = 0x401, VSCROLL_CTRL = 0x404,
     PART1_POS = 0x500, PART1_START = 0x501, PART1_END = 0x502,
     PART2_POS = 0x503, PART2_START = 0x504, PART2_END = 0x505,
@@ -110,8 +111,32 @@ local function bypass()
     setb(LCDC_CTRL, RGB24B)
 end
 
--- lcd_sleep()
-local function panel_sleep(sleep)
+-- lcd_display_init()'s power on
+local function power_on()
+    reg(R.DISPLAY_CTRL1, 0x0001)
+    reg(R.PWR_CTRL6,     0x0001)
+    reg(R.PWR_CTRL7,     0x0060); udelay(500)
+    reg(R.PWR_CTRL1,     0x16B0); udelay(100)
+    reg(R.PWR_CTRL2,     0x0147); udelay(100)
+    reg(R.PWR_CTRL3,     0x0117); udelay(100)
+    reg(R.PWR_CTRL4,     0x2F00); udelay(500)
+    reg(R.VCOM_HV2,      0x0000); udelay(100)
+    reg(R.VCOM_HV1,      0x000A)
+    reg(R.PWR_CTRL3,     0x01BE); udelay(100)
+end
+
+-- ...and its display on, in steps
+local function display_on()
+    reg(R.DISPLAY_CTRL1, 0x0021); udelay(400)
+    reg(R.DISPLAY_CTRL1, 0x0061); udelay(1000)
+    reg(R.DISPLAY_CTRL1, 0x0173); udelay(3000)
+end
+
+-- lcd_sleep(). Waking, opt (wake_test()'s) may change what the firmware
+-- does: settle_ms after leaving sleep (10), power = true to run the whole
+-- power on again first
+local function panel_sleep(sleep, opt)
+    opt = opt or {}
     if sleep then
         reg(R.DISPLAY_CTRL1, 0x0170)
         udelay(50)
@@ -119,9 +144,10 @@ local function panel_sleep(sleep)
         udelay(50)
         reg(R.PWR_CTRL1,     0x14B4)
     else
+        if opt.power then power_on() end
         reg(R.PWR_CTRL1,     0x14B0)
-        udelay(50)
-        reg(R.DISPLAY_CTRL1, 0x0173)
+        hwstub.mdelay(opt.settle_ms or 10)
+        display_on()
     end
     cmd(R.GRAM_WRITE)
 end
@@ -176,22 +202,8 @@ function YPLCD.init()
                     0x0501, 0x0700 }
     for i, v in ipairs(gamma) do reg(0x300 + i - 1, v) end
 
-    -- power on
-    reg(R.DISPLAY_CTRL1, 0x0001)
-    reg(R.PWR_CTRL6,     0x0001)
-    reg(R.PWR_CTRL7,     0x0060); udelay(500)
-    reg(R.PWR_CTRL1,     0x16B0); udelay(100)
-    reg(R.PWR_CTRL2,     0x0147); udelay(100)
-    reg(R.PWR_CTRL3,     0x0117); udelay(100)
-    reg(R.PWR_CTRL4,     0x2F00); udelay(500)
-    reg(R.VCOM_HV2,      0x0000); udelay(100)
-    reg(R.PWR_CTRL3,     0x01BE); udelay(100)
-
-    -- display on
-    reg(R.DISPLAY_CTRL1, 0x0021); udelay(400)
-    reg(R.DISPLAY_CTRL1, 0x0061); udelay(1000)
-    reg(R.DISPLAY_CTRL1, 0x0173); udelay(3000)
-
+    power_on()
+    display_on()
     panel_sleep(false)
 end
 
@@ -251,13 +263,13 @@ end
 
 -- lcd_enable(): the panel to sleep, then the LCDC's bus clock off - or
 -- the clock on, VERT_PERIOD again, and the panel awake
-function YPLCD.enable(on)
+function YPLCD.enable(on, opt)
     if on then
         clrb(CLKCFG, CLK_HLCDC)
         wr(VERT_PERIOD, LCD_TIMING)
     end
     bypass()
-    panel_sleep(not on)
+    panel_sleep(not on, opt)
     clrb(LCDC_CTRL, RGB24B)
     if not on then
         wait_idle()
@@ -290,4 +302,71 @@ function YPLCD.test(opt)
 
     YPLCD.pattern_b()
     print("  look: checkerboard under the squares, edges straight")
+end
+
+-- ---- experiments ----
+
+-- backlight_hw_off(): the PWM0 pin a GPIO, pulled low, the timer stopped
+function YPLCD.backlight_off()
+    clrb(IOMUXB, bit32.lshift(1, 11))
+    clrb(PWMT0_CTRL, bit32.bor(bit32.lshift(1, 3), 1))
+end
+
+-- The white flash on wake, as in Rockbox: backlight and panel off, then
+-- the panel woken, wait_ms, and the backlight on. Watch the moment it
+-- lights. Pattern A must be on the screen (YPLCD.test() leaves it).
+--   YPLCD.wake_test()                        -- what the firmware does now
+--   YPLCD.wake_test{ settle_ms = 50 }
+--   YPLCD.wake_test{ wait_ms = 200 }
+--   YPLCD.wake_test{ power = true }          -- the whole power on again
+--   YPLCD.wake_test{ n = 5 }                 -- five times, 2 s apart
+function YPLCD.wake_test(opt)
+    opt = opt or {}
+    local wait_ms = opt.wait_ms or 40
+    for i = 1, opt.n or 1 do
+        print(string.format("wake %d: settle %d ms, %s, backlight %d ms after",
+            i, opt.settle_ms or 10, opt.power and "power on again" or "sleep bit only",
+            wait_ms))
+        YPLCD.backlight_off()
+        YPLCD.enable(false)
+        hwstub.mdelay(1000)
+        YPLCD.enable(true, opt)
+        hwstub.mdelay(wait_ms)
+        YPLCD.backlight()
+        hwstub.mdelay(2000)
+    end
+end
+
+-- A grey ramp across the screen, h rows from y: for the stripes, which
+-- show on smooth gradients. Slow: 400 pixels a row.
+function YPLCD.gradient(y, h)
+    y = y or 200
+    h = h or 32
+    print(string.format("grey ramp, rows %d-%d", y, y + h - 1))
+    bypass()
+    rect(0, y, 400, h, function(i)
+        local g = math.floor(i * 64 / 400)          -- 6-bit green
+        local rb = bit32.rshift(g, 1)               -- 5-bit red and blue
+        return bit32.bor(bit32.lshift(rb, 11), bit32.lshift(g, 5), rb)
+    end)
+end
+
+-- A panel register, for trying values by hand (the panel's are 16-bit)
+function YPLCD.reg(r, v)
+    bypass()
+    reg(r, v)
+    cmd(R.GRAM_WRITE)
+end
+
+-- Steps panel register r from v0 to v1, ms apart, printing each value:
+-- watch the ramp's stripes come and go. E.g. VCOM_HV1, the VCOMH level
+-- (stripes at the reset value; none from 0x07 to 0x0C, init sets 0x0A):
+--   YPLCD.sweep(0x281, 0x00, 0x3F, 1, 1500)
+-- r is left at the last value; put it back with YPLCD.reg(), or init.
+function YPLCD.sweep(r, v0, v1, step, ms)
+    for v = v0, v1, step or 1 do
+        print(string.format("  reg %03x = %04x", r, v))
+        YPLCD.reg(r, v)
+        hwstub.mdelay(ms or 1500)
+    end
 end
