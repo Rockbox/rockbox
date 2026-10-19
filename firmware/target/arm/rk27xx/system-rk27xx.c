@@ -111,6 +111,26 @@ void fiq_dummy(void)
 }
 
 
+/* The DWDMA's clock is on while one of its users holds it: lcdif-rk27xx.c,
+ * for dwdma_init() and each LCD update. */
+static int dwdma_users = 0;
+
+void rk27xx_dwdma_clock(bool on)
+{
+    int old = disable_irq_save();
+
+    if (on)
+    {
+        if (dwdma_users++ == 0)
+            SCU_CLKCFG &= ~CLKCFG_DWDMA;
+    }
+    else if (--dwdma_users == 0)
+    {
+        SCU_CLKCFG |= CLKCFG_DWDMA;
+    }
+    restore_irq(old);
+}
+
 void system_init(void)
 {
     /* disable WDT just in case nand loader activated it */

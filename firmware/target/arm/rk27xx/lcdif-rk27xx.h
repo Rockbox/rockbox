@@ -17,4 +17,7 @@ void lcd_set_gram_area(int x_start, int y_start, int x_end, int y_end);
 /* LCD bus timing for the bus clock: set before it rises, after it falls */
 void lcdif_set_bus_timing(bool boosted);
 
+/* the LCDC's bus clock, off while the display is (lcd_enable()) */
+void lcdif_clock(bool on);
+
 #endif /* _LCDIF_RK27XX_H */

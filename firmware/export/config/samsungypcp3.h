@@ -89,6 +89,9 @@
 #define LCD_DEPTH  16   /* pseudo 262.144 colors */
 #define LCD_PIXELFORMAT RGB565 /* rgb565 */
 
+/* Define this if your LCD can be enabled/disabled */
+#define HAVE_LCD_ENABLE
+
 /* Define this if your LCD can be put to sleep. HAVE_LCD_ENABLE
    should be defined as well. */
 #ifndef BOOTLOADER

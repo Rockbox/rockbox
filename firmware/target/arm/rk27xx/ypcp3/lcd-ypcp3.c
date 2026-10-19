@@ -34,6 +34,8 @@
 #include "spfd5420a.h"
 #include "lcdif-rk27xx.h"
 
+static bool display_on = false;
+
 static void lcd_sleep(bool sleep)
 {
     if (sleep)
@@ -153,6 +155,36 @@ void lcd_display_init(void)
     }
 
     lcd_sleep(false);
+    display_on = true;
+}
+
+/* Called with the backlight (backlight-rk27xx.c). The panel is put to
+ * sleep, and the LCDC's bus clock turned off; on the way back the panel
+ * wakes with its GRAM kept, and is redrawn. */
+void lcd_enable(bool on)
+{
+    if (on == display_on)
+        return;
+
+    if (on)
+        lcdif_clock(true);
+
+    lcdctrl_bypass(1);
+    LCDC_CTRL |= RGB24B;
+    lcd_sleep(!on);
+    LCDC_CTRL &= ~RGB24B;
+
+    display_on = on;
+
+    if (on)
+        send_event(LCD_EVENT_ACTIVATION, NULL);
+    else
+        lcdif_clock(false);
+}
+
+bool lcd_active(void)
+{
+    return display_on;
 }
 
 void lcd_set_gram_area(int x_start, int y_start, int x_end, int y_end)

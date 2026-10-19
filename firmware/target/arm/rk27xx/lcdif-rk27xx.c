@@ -103,9 +103,36 @@ static void lcdctrl_buff_setup(int width, int height)
 #define LCD_TIMING_50MHZ    ((1<<7) | (4<<3) | 1)
 #define LCD_TIMING_100MHZ   ((2<<7) | (8<<3) | 2)
 
+/* The LCDC's HCLK goes off with the display (lcdif_clock()), and the CPU
+ * clock may change meanwhile: the timing is kept, and set when the clock
+ * comes back. */
+static bool lcdif_clocked = true;
+static uint32_t lcdif_bus_timing = LCD_TIMING_50MHZ;
+
 void lcdif_set_bus_timing(bool boosted)
 {
-    VERT_PERIOD = boosted ? LCD_TIMING_100MHZ : LCD_TIMING_50MHZ;
+    lcdif_bus_timing = boosted ? LCD_TIMING_100MHZ : LCD_TIMING_50MHZ;
+    if (lcdif_clocked)
+        VERT_PERIOD = lcdif_bus_timing;
+}
+
+/* The LCDC's HCLK, for a display that is turned off (lcd_enable()). While
+ * it is off lcd_update_rect() does nothing: the display is redrawn as it
+ * comes back on (LCD_EVENT_ACTIVATION). */
+void lcdif_clock(bool on)
+{
+    if (on)
+    {
+        SCU_CLKCFG &= ~CLKCFG_HCLK_LCDC;
+        VERT_PERIOD = lcdif_bus_timing;
+    }
+    else
+    {
+        /* the last write out to the panel first */
+        while (!(LCDC_STA & LCDC_MCU_IDLE));
+        SCU_CLKCFG |= CLKCFG_HCLK_LCDC;
+    }
+    lcdif_clocked = on;
 }
 
 static void lcdctrl_init(void)
@@ -155,11 +182,18 @@ static void iomux_lcd(void)
     SCU_IOMUXB_CON |= IOMUX_LCD_D815;
 }
 
+/* The DWDMA is clocked only while lcd_update_rect() runs, unless another
+ * user holds it (rk27xx_dwdma_clock()). dwdma_start() sets up the channel
+ * each time. */
+#define dwdma_clock rk27xx_dwdma_clock
+
 static void dwdma_init(void)
 {
+    dwdma_clock(true);
     DWDMA_DMA_CHEN = 0xf00;
     DWDMA_CLEAR_BLOCK = 0x0f;
     DWDMA_DMA_CFG = 1;        /* global enable */
+    dwdma_clock(false);
 }
 
 static void llp_setup(void *src, void *dst, struct llp_t *llp, uint32_t size)
@@ -264,6 +298,7 @@ void lcd_write_reg(unsigned int reg, unsigned int val)
 /* rockbox API functions */
 void lcd_init_device(void)
 {
+    lcdif_clock(true); /* a bootloader may have left it off */
     iomux_lcd();       /* setup pins for lcd interface */
     dwdma_init();      /* init dwdma module */
     lcdctrl_init();    /* basic lcdc module configuration */
@@ -272,6 +307,9 @@ void lcd_init_device(void)
 void lcd_update_rect(int x, int y, int width, int height)
 {
     int x_end, y_end, x_align, y_align;
+
+    if (!lcdif_clocked)
+        return;
 
     /* Clip to the screen, as other targets do. A rect reaching past it
      * set a GRAM window off the panel - nothing showed - and built more
@@ -314,6 +352,7 @@ void lcd_update_rect(int x, int y, int width, int height)
     while (!(LCDC_STA & LCDC_MCU_IDLE));
 
     lcdctrl_buff_setup(width, height);
+    dwdma_clock(true);
     dwdma_start(0, scr_llp, 6);
     udelay(10);
 
@@ -325,6 +364,7 @@ void lcd_update_rect(int x, int y, int width, int height)
      * it clears as soon as the last block is loaded, while that block
      * still runs. */
     while (DWDMA_DMA_CHEN & (1<<0));
+    dwdma_clock(false);
 }
 
 void lcd_update()
