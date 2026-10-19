@@ -35,6 +35,7 @@
 #include "encttscfggui.h"
 #include "rbsettings.h"
 #include "playerbuildinfo.h"
+#include "bootloaderinstallhelper.h"
 #include "utils.h"
 #include "comboboxviewdelegate.h"
 #if defined(Q_OS_WIN32)
@@ -168,8 +169,19 @@ void Config::accept()
         updateMountpoint(ui.mountPoint->currentIndex());
     }
 
+    // A player whose bootloader installs without its drive (over MTP, for
+    // example) has no drive to select until that bootloader runs.
+    bool mountpointOptional = ui.treeDevices->selectedItems().size() != 0
+        && BootloaderInstallHelper::mountpointOptional(
+            ui.treeDevices->selectedItems().at(0)->data(0, Qt::UserRole)
+                .toString());
+
     // mountpoint
-    if(mountpoint.isEmpty()) {
+    if(mountpointOptional
+       && (mountpoint.isEmpty() || !QFileInfo::exists(mountpoint))) {
+        RbSettings::setValue(RbSettings::Mountpoint, QString());
+    }
+    else if(mountpoint.isEmpty()) {
         errormsg += "<li>" + tr("No mountpoint given") + "</li>";
         error = true;
     }

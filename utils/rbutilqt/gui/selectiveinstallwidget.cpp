@@ -50,6 +50,7 @@ SelectiveInstallWidget::SelectiveInstallWidget(QWidget* parent) : QWidget(parent
     ui.bootloaderCheckbox->setChecked(!info.success());
 
     m_logger = nullptr;
+    m_bootloaderOnly = false;
     m_zipinstaller = nullptr;
     m_themesinstaller = new ThemesInstallWindow(this);
     connect(m_themesinstaller, &ThemesInstallWindow::selected,
@@ -234,10 +235,18 @@ void SelectiveInstallWidget::startInstall(void)
     }
 
     m_logger->show();
+    m_bootloaderOnly = false;
     if(!QFileInfo(m_mountpoint).isDir()) {
-        m_logger->addItem(tr("Mountpoint is wrong"), LOGERROR);
-        m_logger->setFinished();
-        return;
+        if(!ui.bootloaderCheckbox->isChecked()
+           || !BootloaderInstallHelper::mountpointOptional()) {
+            m_logger->addItem(tr("Mountpoint is wrong"), LOGERROR);
+            m_logger->setFinished();
+            return;
+        }
+        // The bootloader installs without the player's drive; everything
+        // else needs the drive that appears once the bootloader runs.
+        LOG_INFO() << "no mountpoint, installing the bootloader only";
+        m_bootloaderOnly = true;
     }
     // start installation. No errors until now.
     continueInstall(false);
@@ -254,6 +263,8 @@ void SelectiveInstallWidget::continueInstall(bool error)
         m_installStage = 9;
     }
     m_installStage++;
+    if(m_bootloaderOnly && m_installStage > 1 && m_installStage < 8)
+        m_installStage = 8;
     switch(m_installStage) {
         case 0: LOG_ERROR() << "Something wrong!"; break;
         case 1: installBootloader(); break;
@@ -269,6 +280,17 @@ void SelectiveInstallWidget::continueInstall(bool error)
 
     if(m_installStage > 8) {
         LOG_INFO() << "All install stages done.";
+        if(m_bootloaderOnly && !error
+           && (ui.rockboxCheckbox->isChecked() || ui.fontsCheckbox->isChecked()
+               || ui.themesCheckbox->isChecked()
+               || ui.pluginDataCheckbox->isChecked()
+               || ui.voiceCheckbox->isChecked()
+               || ui.manualCheckbox->isChecked())) {
+            m_logger->addItem(tr("Only the bootloader was installed. Once the "
+                        "player shows up as a drive, select it in the "
+                        "configuration and install again for the rest."),
+                    LOGWARNING);
+        }
         m_logger->setFinished();
         if(m_blmethod != "none") {
             // check if Rockbox is installed by looking after rockbox-info.txt.

@@ -483,5 +483,5 @@ BootloaderInstallBase::BootloaderType BootloaderInstallNk::installed(void)
 
 BootloaderInstallBase::Capabilities BootloaderInstallNk::capabilities(void)
 {
-    return (Install);
+    return (Install | NoMountpoint);
 }

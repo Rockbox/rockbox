@@ -43,7 +43,8 @@ class RbUtilQt : public QMainWindow
     public:
         RbUtilQt(QWidget *parent = nullptr);
         static QList<QTranslator*> translators;
-        static bool chkConfig(QWidget *parent = nullptr);
+        static bool chkConfig(QWidget *parent = nullptr,
+                              bool needMountpoint = true);
 
     private:
         InfoWidget *info;

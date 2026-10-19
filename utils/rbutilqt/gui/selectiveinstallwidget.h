@@ -66,6 +66,7 @@ class SelectiveInstallWidget : public QWidget
         QString m_suffix;
         ProgressLoggerGui *m_logger;
         int m_installStage;
+        bool m_bootloaderOnly;
         ZipInstaller *m_zipinstaller;
         ThemesInstallWindow *m_themesinstaller;
         PlayerBuildInfo::BuildType m_buildtype;

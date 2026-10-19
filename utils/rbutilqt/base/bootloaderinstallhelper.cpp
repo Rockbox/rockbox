@@ -21,6 +21,7 @@
 #include <QtCore>
 
 #include "bootloaderinstallhelper.h"
+#include "playerbuildinfo.h"
 #include "bootloaderinstallmi4.h"
 #include "bootloaderinstallhex.h"
 #include "bootloaderinstallipod.h"
@@ -100,6 +101,18 @@ BootloaderInstallBase::Capabilities
 
     return caps;
 }
+
+//! @brief Check if the bootloader installs without the player's drive.
+//! @param target player, or the selected one if empty
+//! @return true if no mountpoint is needed to install the bootloader.
+bool BootloaderInstallHelper::mountpointOptional(QString target)
+{
+    QString type = PlayerBuildInfo::instance()->value(
+            PlayerBuildInfo::BootloaderMethod, target).toString();
+    return bootloaderInstallerCapabilities(nullptr, type)
+        & BootloaderInstallBase::NoMountpoint;
+}
+
 
 //! @brief Return pre install hints string.
 //! @param model model string
