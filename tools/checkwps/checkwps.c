@@ -275,7 +275,7 @@ static int checkwps_loader(const char *path, const char *search, int mode, const
     /* See if file has an extension */
     const char *has_ext = strrchr(path, '.');
     /* if path starts with '.rockbox' we can get a false positive */
-    if (has_ext == path)
+    if (has_ext && (has_ext == path || !strncmp(has_ext, ROCKBOX_DIR, sizeof(ROCKBOX_DIR))))
         has_ext = NULL;
 
     char buf[2048];
@@ -297,7 +297,7 @@ static int checkwps_loader(const char *path, const char *search, int mode, const
     if (!mode)
     {
         /* WPS paths are relative to ROCKBOX_DIR */
-        snprintf(buf2, sizeof(buf2), ".rockbox/%s", buf);
+        snprintf(buf2, sizeof(buf2), ROCKBOX_DIR "/%s", buf);
         fd = open(buf2, O_RDONLY);
         if (fd >= 0)
             goto done;
@@ -305,7 +305,7 @@ static int checkwps_loader(const char *path, const char *search, int mode, const
     else if (!absolute && search)
     {
         /* Don't prepend a search path if we have an absolute path */
-        snprintf(buf2, sizeof(buf2), ".rockbox/%s/%s", search, buf);
+        snprintf(buf2, sizeof(buf2), ROCKBOX_DIR "/%s/%s", search, buf);
         fd = open(buf2, O_RDONLY);
         if (fd >= 0)
             goto done;

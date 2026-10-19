@@ -596,6 +596,9 @@ static int parse_listitemviewport(struct skin_element *element,
         cfg->tile = true;
     token->value.data = PTRTOSKINOFFSET(skin_buffer, (void*)cfg);
 #endif
+    (void)element;
+    (void)token;
+    (void)wps_data;
     return 0;
 }
 
@@ -978,7 +981,9 @@ static int parse_progressbar_tag(struct skin_element* element,
     struct viewport *vp = &curr_vp->vp;
     struct skin_tag_parameter *param = get_param(element, 0);
     int curr_param = 0;
+#ifndef __PCTOOL__
     int setting_offset = 0;
+#endif
     char *image_filename = NULL;
 #ifdef HAVE_TOUCHSCREEN
     bool suppress_touchregion = false;
@@ -1207,7 +1212,9 @@ static int parse_progressbar_tag(struct skin_element* element,
             {
                 curr_param++;
                 param++;
+#ifndef __PCTOOL__
                 setting_offset = param->data.number;
+#endif
             }
         }
         else if (token->type == SKIN_TOKEN_SETTING && pb_op == eSETTING)

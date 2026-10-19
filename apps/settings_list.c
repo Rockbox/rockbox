@@ -2468,7 +2468,7 @@ const struct settings_list settings[] = {
                    &list_kinetic_scroll_press_default, "kinetic scroll press",
                    list_kinetic_load_from_cfg, list_kinetic_write_to_cfg,
                    list_kinetic_is_default, list_kinetic_set_default),
-#endif
+#endif /* TOUCHSCREEN */
     OFFON_SETTING(0, prevent_skip, LANG_PREVENT_SKIPPING, false, "prevent track skip", NULL),
     OFFON_SETTING(0, rewind_across_tracks, LANG_REWIND_ACROSS_TRACKS, false, "rewind across tracks", NULL),
 #ifdef HAVE_PITCHCONTROL
