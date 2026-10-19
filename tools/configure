@@ -992,7 +992,6 @@ pspsdkcc () {
     ARG_PREFIX=""
 
     extradefines="-D__PSP__"
-    rbdir="/.rockbox"
 }
 
 
