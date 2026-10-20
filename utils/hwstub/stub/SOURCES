@@ -36,4 +36,8 @@ atj213x/usb_drv_atj213x.c
 jz4760b/crt0.S
 jz4760b/target.c
 jz4760b/usb_drv_jz4760b.c
+#elif defined(CONFIG_X1000)
+x1000/crt0.S
+x1000/target.c
+x1000/usb_drv_x1000.c
 #endif

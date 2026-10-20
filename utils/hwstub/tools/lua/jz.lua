@@ -18,7 +18,12 @@ end
 
 -- init
 function JZ.init()
-    local desc = string.format("jz%04x%c", hwstub.dev.jz.chipid, hwstub.dev.jz.rev)
+    local desc
+    if hwstub.dev.jz.chipid == 0x1000 then
+        desc = "x1000"
+    else
+        desc = string.format("jz%04x%c", hwstub.dev.jz.chipid, hwstub.dev.jz.rev)
+    end
     desc = desc:lower()
     if not hwstub.soc:select(desc) then
         print("Looking for soc " .. desc .. ": not found. Please load a soc by hand.")
@@ -28,3 +33,6 @@ end
 require "jz/gpio"
 require "jz/lcd"
 require "jz/nand"
+require "jz/x1000clk"
+require "jz/x1000vcore"
+require "jz/x1000mem"
