@@ -157,8 +157,12 @@ void eint_register(struct eic_handler *h)
             EIC_INTSTAT(group) = (1 << index); /* clear */
             EIC_INTEN(group) |= (1 << index); /* enable */
 
+#if CONFIG_CPU == S5L8720
+            VICINTENABLE(EIC_IRQ(group) >> 5) = 1 << (EIC_IRQ(group) & 0x1f);
+#else
             /* XXX: valid only for gpio_n = 0..127 (IRQ_EXT0..IRQ_EXT3) */
             VIC0INTENABLE = 1 << (IRQ_EXT0 + (h->gpio_n >> 5));
+#endif
 
             l_handlers[i] = h;
             break;
@@ -184,7 +188,12 @@ void eint_unregister(struct eic_handler *h)
 
             /* XXX: valid only for gpio_n = 0..127 (IRQ_EXT0..IRQ_EXT3) */
             if (EIC_INTEN(group) == 0)
+#if CONFIG_CPU == S5L8720
+                VICINTENCLEAR(EIC_IRQ(group) >> 5) =
+                    1 << (EIC_IRQ(group) & 0x1f);
+#else
                 VIC0INTENCLEAR = 1 << (IRQ_EXT0 + (h->gpio_n >> 5));
+#endif
 
             l_handlers[i] = NULL;
             break;
@@ -245,6 +254,18 @@ void ICODE_ATTR INT_EXT3(void)
     eint_handler(3);
 }
 
+#if CONFIG_CPU == S5L8720
+void ICODE_ATTR INT_EXT4(void)
+{
+    eint_handler(2);
+}
+
+void ICODE_ATTR INT_EXT5(void)
+{
+    eint_handler(1);
+}
+
+#endif
 void ICODE_ATTR INT_EXT6(void)
 {
     eint_handler(0);

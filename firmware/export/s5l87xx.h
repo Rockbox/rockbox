@@ -2076,11 +2076,20 @@ Information for them was gathered solely by reverse-engineering Apple's firmware
  *
  * EIC_GROUP0..6 are connected to EINT6..0 of the VIC.
  */
+#if CONFIG_CPU == S5L8720
+/* 5 groups: GPIO 0..7 = group 0 bits 2..9, then 32 GPIOs per group in
+ * order; groups 0..4 raise VIC sources 33, 32, 31, 3 and 2 */
+#define EIC_N_GROUPS    5
+#define EIC_GROUP(n)    ((n) < 8 ? 0 : 1 + (((n) - 8) >> 5))
+#define EIC_INDEX(n)    ((n) < 8 ? (n) + 2 : ((n) - 8) & 0x1f)
+#define EIC_IRQ(g)      ((g) < 3 ? IRQ_EXT6 - (g) : IRQ_EXT3 + 3 - (g))
+#else
 #define EIC_N_GROUPS    7
 
 /* get EIC group and bit for a given GPIO port */
 #define EIC_GROUP(n)    (6 - ((n) >> 5))
 #define EIC_INDEX(n)    ((0x18 - ((n) & 0x18)) | ((n) & 0x7))
+#endif
 
 /* SoC EINTs uses these 'gpio' numbers */
 #define GPIO_EINT_USB       0xd8
