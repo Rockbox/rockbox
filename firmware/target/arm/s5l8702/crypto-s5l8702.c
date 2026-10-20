@@ -40,7 +40,11 @@ void hwkeyaes(enum hwkeyaes_direction direction, uint32_t keyidx, void* data, ui
     AESTYPE = keyidx;
     AESTYPE2 = ~AESTYPE;
     AESUNKREG2 = 0;
+#if CONFIG_CPU == S5L8720
+    AESKEYLEN = direction == HWKEYAES_ENCRYPT ? 0xf : 0xe;
+#else
     AESKEYLEN = direction == HWKEYAES_ENCRYPT ? 9 : 8;
+#endif
     AESOUTSIZE = size;
     AESOUTADDR = data;
     AESINSIZE = size;
