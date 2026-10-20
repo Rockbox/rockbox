@@ -459,6 +459,9 @@ bool headphones_inserted(void)
 #ifdef IPOD_NANO3G
     /* GPIO 7.0, high with headphones in (measured) */
     return (PDAT(7) & (1 << 0)) != 0;
+#elif defined(IPOD_NANO4G)
+    /* GPIO 5.0, an input after boot, high with headphones in */
+    return (PDAT(5) & (1 << 0)) != 0;
 #else
     return ((PDAT10 & (1 << 6)) != 0);
 #endif
