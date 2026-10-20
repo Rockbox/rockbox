@@ -124,6 +124,11 @@ static void dma_play_callback(void *cb_data)
         return; /* dblbuf callback entered, nothing to do */
 
     const void *dataptr = cb_data;
+    /* Report STARTED only for a buffer fetched here. The first buffer
+     * comes from sink_dma_start(), whose caller has already prepared the
+     * next one; a STARTED for it makes the mixer refill the buffer that
+     * was just queued. */
+    bool fetched = !pcm_remaining;
 
     if (!pcm_remaining)
         if (!pcm_play_dma_complete_callback(
@@ -150,7 +155,8 @@ static void dma_play_callback(void *cb_data)
     play_queue_dma(dblbuf[active_dblbuf], lastsize, NULL);
     active_dblbuf ^= 1;
 
-    pcm_play_dma_status_callback(PCM_DMAST_STARTED);
+    if (fetched)
+        pcm_play_dma_status_callback(PCM_DMAST_STARTED);
 }
 
 static void sink_dma_stop(void)
