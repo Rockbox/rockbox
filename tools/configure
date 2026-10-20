@@ -589,7 +589,8 @@ arm1136jfscc () {
 
 arm1176jzscc () {
  findarmgcc
- GCCOPTS="$CCOPTS -mcpu=arm1176jz-s"
+ # Rockbox runs with SCTLR.U clear, so no unaligned accesses (as arm1176jzlinuxcc)
+ GCCOPTS="$CCOPTS -mcpu=arm1176jz-s -mno-unaligned-access"
  GCCOPTIMIZE="-fomit-frame-pointer"
  endian="little"
 }
