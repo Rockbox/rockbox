@@ -95,13 +95,30 @@ reloc_dcache_loop:
     addiu   t0, t0, DCACHE_LINE_SIZE /* bytes per cache line */
     bne     t0, t1, reloc_dcache_loop
     nop
+    sync                     /* the write back must reach memory before fetching */
     la      t0, 0x80000000   /* an idx op should use an unmappable address */
     ori     t1, t0, ICACHE_SIZE   /* cache size */
+#if defined(CONFIG_JZ4760B) || defined(CONFIG_X1000)
+    /* XBurst: invalidate by storing a zero tag, as Rockbox does */
+    mtc0    zero, C0_TAGLO
+    mtc0    zero, C0_TAGHI
+reloc_icache_loop:
+    cache   ICIndexStTag, 0(t0)
+#else
 reloc_icache_loop:
     cache   ICIndexInv, 0(t0) /* invalidate icache index */
+#endif
     addiu   t0, t0, ICACHE_LINE_SIZE  /* bytes per cache line */
     bne     t0, t1, reloc_icache_loop
     nop
+#if defined(CONFIG_JZ4760B) || defined(CONFIG_X1000)
+    /* XBurst: invalidate the branch target buffer */
+    mfc0    t0, C0_CONFIG, 7
+    nop
+    ori     t0, t0, 2
+    mtc0    t0, C0_CONFIG, 7
+    nop
+#endif
     jr      ra
     nop
 #endif
