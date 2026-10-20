@@ -87,9 +87,21 @@ static struct dmac_ch_cfg dma_play_ch_cfg = {
 #ifdef IPOD_NANO3G
 #define I2STXCON_SETUP  0x0b100001
 #define I2STXCOM_START  0x6
+#elif CONFIG_CPU == S5L8720
+/* The values Apple's firmware writes for the Nano 4G's CS42L58; it
+ * stops the transmitter with TXCOM 0 */
+#define I2STXCON_SETUP  0x03100081
+#define I2STXCOM_START  0x6
+#define I2STXCOM_STOP   0
 #else
 #define I2STXCON_SETUP  0xb100019
 #define I2STXCOM_START  0xe
+#endif
+
+#define I2SRXCON_SETUP  0x1000
+
+#ifndef I2STXCOM_STOP
+#define I2STXCOM_STOP   0xa
 #endif
 
 static volatile int locked = 0;
@@ -162,7 +174,7 @@ static void dma_play_callback(void *cb_data)
 static void sink_dma_stop(void)
 {
     dmac_ch_stop(&dma_play_ch);
-    I2STXCOM = 0xa;
+    I2STXCOM = I2STXCOM_STOP;
 }
 
 static void sink_dma_start(const void* addr, size_t size)
@@ -170,16 +182,24 @@ static void sink_dma_start(const void* addr, size_t size)
     sink_dma_stop();
 
     pcm_remaining = size;
-    I2STXCOM = I2STXCOM_START;
+    /* Queue the data before starting the transmitter, as Apple does */
     dma_play_callback((void*)addr);
+    I2STXCOM = I2STXCOM_START;
 }
 
+#if CONFIG_CPU == S5L8720
+/* MCLK = OSC0 / 4 = 6 MHz. The CS42L58 driver programs it and restarts
+ * it on every rate change, in the order Apple's firmware uses. */
+#define MCLK_FREQ     6000000
+#else
 /* MCLK = 12MHz (MCLKDIV2=1), [CS42L55 DS, s4.8] */
 #define MCLK_FREQ     12000000
+#endif
 
 /* set the configured PCM frequency */
 static void sink_set_freq(uint16_t freq)
 {
+#if CONFIG_CPU != S5L8720
 #ifdef HAVE_CS42L55
     static uint16_t last_clkcon3l = 0;
 #else
@@ -211,10 +231,11 @@ static void sink_set_freq(uint16_t freq)
         CLKCON3 &= ~0x8000;  /* CLKCON3L on */
         last_clkcon3l = clkcon3l;
     }
+#endif /* CONFIG_CPU != S5L8720 */
 
     /* configure I2S clock ratio */
     I2SCLKDIV = MCLK_FREQ / hw_freq_sampr[freq];
-    /* select CS42L55 sample rate */
+    /* select codec sample rate */
     audiohw_set_frequency(freq);
 }
 
@@ -224,8 +245,11 @@ static void sink_dma_init(void)
 
     dmac_ch_init(&dma_play_ch, &dma_play_ch_cfg);
 
-    I2STXCON = I2STXCON_SETUP;
+    /* Apple's order: interface clock, TX mode, divider, RX mode */
     I2SCLKCON = 1;
+    I2STXCON = I2STXCON_SETUP;
+    I2SCLKDIV = MCLK_FREQ / hw_freq_sampr[HW_FREQ_DEFAULT];
+    I2SRXCON = I2SRXCON_SETUP;
 
     audiohw_preinit();
     sink_set_freq(HW_FREQ_DEFAULT);
@@ -424,7 +448,7 @@ void pcm_rec_dma_init(void)
     if (rec_locked)
         dmac_ch_lock_int(&dma_rec_ch);
 
-    I2SRXCON = 0x1000;
+    I2SRXCON = I2SRXCON_SETUP;
     I2SCLKCON = 1;
 
     pcm_rec_initialized = true;

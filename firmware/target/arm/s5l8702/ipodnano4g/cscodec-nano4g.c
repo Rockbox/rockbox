@@ -25,12 +25,11 @@
 #include "i2c-s5l8702.h"
 #include "s5l87xx.h"
 #include "cscodec.h"
+#include "pmu-target.h"
 
 void audiohw_init(void)
 {
-#ifdef HAVE_CS42L55
     audiohw_preinit();
-#endif
 }
 
 unsigned char cscodec_read(int reg)
@@ -49,20 +48,39 @@ void cscodec_write(int reg, unsigned char data)
 
 void cscodec_power(bool state)
 {
-    (void)state; //TODO: Figure out which LDO this is
+    unsigned char control;
+
+    /* The codec runs from a D1759 LDO set to 1.8 V (register 0x21 = 6),
+     * enabled by bit 2 of register 0x11. Apple's firmware leaves it on
+     * when the codec is stopped, so only switch it on here. */
+    if (!state)
+        return;
+    if (pmu_write(0x21, 6) == 0 &&
+        pmu_read_multiple(0x11, 1, &control) == 0)
+        pmu_write(0x11, control | 0x04);
 }
 
 void cscodec_reset(bool state)
 {
-    (void)state;
-    // TODO: not tested
-    // if (state) PDAT(3) &= ~8;
-    // else PDAT(3) |= 8;
+    /* The codec reset line is GPIO 4.6, active low. */
+    if (state)
+        PDAT(4) &= ~(1 << 6);
+    else
+        PDAT(4) |= 1 << 6;
+    PCON(4) |= 0x0f000000;
 }
 
 void cscodec_clock(bool state)
 {
-    // TODO: not tested
-    if (state) CLKCON3 &= ~0xffff;
-    else CLKCON3 |= 0x8000;
+    /* MCLK is OSC0 (24 MHz) / 4 = 6 MHz, as Apple's firmware sets it:
+     * select the divider with the gate (bit 15) left as it is, then
+     * ungate 100 us later. */
+    if (state)
+    {
+        CLKCON3 = (CLKCON3 & 0xffff8000) | 3;
+        udelay(100);
+        CLKCON3 &= ~0x8000;
+    }
+    else
+        CLKCON3 |= 0x8000;
 }

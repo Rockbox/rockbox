@@ -587,6 +587,8 @@ drivers/audio/ak4376.c
 drivers/audio/uda1341.c
 #elif defined(HAVE_CS42L55)
 drivers/audio/cs42l55.c
+#elif defined(HAVE_CS42L58)
+drivers/audio/cs42l58.c
 #elif defined (HAVE_RK27XX_CODEC)
 drivers/audio/rk27xx_codec.c
 #elif defined(HAVE_AIC3X)
