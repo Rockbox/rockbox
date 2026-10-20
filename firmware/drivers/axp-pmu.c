@@ -175,7 +175,7 @@ int axp_supply_get_voltage(int supply)
         } else
 #endif
         {
-            if(r & (1 << info->en_bit) == 0)
+            if((r & (1 << info->en_bit)) == 0)
                 return AXP_SUPPLY_DISABLED;
         }
     }
