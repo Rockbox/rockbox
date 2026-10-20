@@ -84,9 +84,9 @@ unsigned int power_input_status(void)
 
 bool charging_state(void)
 {
-    /* Bit 7 is the flag preinit preserves. No input means not charging. */
+    /* No input means not charging. 0x05 bits 1..2: charger running */
     if (power_input_status() == POWER_INPUT_NONE)
         return false;
-    return (pmu_read(D1759_REG_CHCTL) & D1759_CHCTL_ACTIVE) != 0;
+    return (pmu_read(D1759_REG_STATUSB) & 0x06) != 0;
 }
 #endif /* CONFIG_CHARGING */
