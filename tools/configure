@@ -2690,7 +2690,6 @@ fi
    81|ipodnano4g)
     target_id=118
     modelname="ipodnano4g"
-    bootloader_only="1"
     target="IPOD_NANO4G"
     memory=32 # always
     arm1176jzscc
