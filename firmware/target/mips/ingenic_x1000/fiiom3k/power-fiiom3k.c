@@ -64,6 +64,13 @@ void power_init(void)
         (1 << ADC_INTERNAL_TEMP) |
         (1 << ADC_APS_VOLTAGE));
 
+    /*
+     * Drop VCORE voltage to the standard 1200mV, for some reason the
+     * default is 1400mV which is unnecessarily high and outside the
+     * recommended operating range.
+     */
+    axp_supply_set_voltage(AXP_SUPPLY_DCDC2, 1200);
+
     /* Turn on all power outputs */
     i2c_reg_modify1(AXP_PMU_BUS, AXP_PMU_ADDR,
                     AXP_REG_PWROUTPUTCTRL2, 0, 0x5f, NULL);
