@@ -68,7 +68,7 @@ void audiohw_init(void)
     aic_enable_i2s_bit_clock(true);
 
     /* Power up and configure the codec */
-    i2c_x1000_set_freq(CS42L51_BUS, I2C_FREQ_400K);
+    i2c_ingenic_set_freq(CS42L51_BUS, I2C_FREQ_400K);
     codec_power(true);
     if(cs42l51_open())
         logf("audiohw: codec not found");
