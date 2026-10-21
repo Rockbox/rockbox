@@ -101,9 +101,11 @@ void pmu_set_wake_condition(unsigned char condition)
 
 void pmu_enter_standby(void)
 {
-    /* Keep the 0x70 preinit wrote. Bit 0 is the standby request. */
-    pmu_write(D1759_REG_SYSCTRL,
-              pmu_read(D1759_REG_SYSCTRL) | D1759_SYSCTRL_STBY);
+    /* Apple's firmware powers off with two exact writes: backlight off,
+     * then 0x0a = 1 on its own. OR-ing the request into the other bits of
+     * 0x0a leaves the unit on until the hold switch is toggled. */
+    pmu_write(D1759_REG_LEDCTL, 0x02);
+    pmu_write(D1759_REG_SYSCTRL, D1759_SYSCTRL_STBY);
 }
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ

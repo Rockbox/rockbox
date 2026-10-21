@@ -39,13 +39,6 @@ void power_init(void)
 
 void power_off(void)
 {
-#ifndef BOOTLOADER
-    /* Standby may wake straight into the Apple OS, so show it first */
-    lcd_putsf(0, LCD_HEIGHT / 8 - 3, "power_off from %08lx",
-              (unsigned long)__builtin_return_address(0));
-    lcd_update();
-    udelay(5000000);
-#endif
 //     /* USB inserted or EXTON1 */
 //     pmu_set_wake_condition(/*TODO*/);
     pmu_enter_standby();
