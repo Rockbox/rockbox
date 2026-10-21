@@ -181,7 +181,6 @@ unsigned short pmu_read_adc(const struct pmu_adc_channel *ch)
 
 static long pmu_thread_stack[DEFAULT_STACK_SIZE/2/sizeof(long)];
 static struct event_queue pmu_queue;
-static unsigned char ints_msk[3];
 
 static void pmu_eint_isr(struct eic_handler*);
 
@@ -321,21 +320,31 @@ void pmu_init(void)
             pmu_thread_stack, sizeof(pmu_thread_stack), 0,
             "PMU" IF_PRIO(, PRIORITY_SYSTEM) IF_COP(, CPU));
 
-    /* configure PMU interrutps */
-    ints_msk[0] = 0xff;
-    ints_msk[1] = 0xff;
-    ints_msk[2] = 0xff;
+    /* Copy the running-state setup performed at OF PMU thread startup:
+     * osos routines at 0x0828d306 (0x0c/0x0e) and 0x0828d2b8 (0x22).
+     * The functions of these three registers and their bits are unknown;
+     * these are observed whole-register values. */
+    pmu_write(D1759_REG_UNK0C, 0x05); /* bits 0 and 2 */
+    pmu_write(D1759_REG_UNK0E, 0xd0); /* bits 4, 6 and 7 */
+    pmu_write(D1759_REG_UNK22, 0x05); /* bits 0 and 2 */
 
-    ints_msk[0] &= ~D1759_IRQMASKA_VBUS;      /* USB */
-#ifdef IPOD_ACCESSORY_PROTOCOL
-    ints_msk[0] &= ~D1759_IRQMASKA_INPUT1;    /* Accessory */
-#endif
-    ints_msk[1] &= ~D1759_IRQMASKB_INPUT2;    /* Holdswitch */
-#if CONFIG_CHARGING
-    ints_msk[2] &= ~D1759_IRQMASKC_VADAPTOR;  /* FireWire */
-#endif
-
-    pmu_write_multiple(D1759_REG_IRQMASKA, 3, ints_msk);
+    /* OF interrupt masks from 0x0828d2b8 (1 = masked): 10 fe 2b.
+     * A: unmask USB, accessory and unidentified events 0, 1, 2, 6, 7.
+     * B: unmask Hold only; WARMBOOT stays masked.
+     * C: unmask unidentified events 2, 4, 6, 7; FireWire stays masked.
+     * With the old USB/accessory/Hold/FireWire-only setup, only Hold woke
+     * the unit after power_off(). This complete OF setup also allowed
+     * button wake; the individual bit responsible has not been isolated. */
+    static unsigned char ints_msk[] = {
+        0xff & ~(D1759_IRQMASKA_VBUS | D1759_IRQMASKA_INPUT1 |
+                 D1759_IRQMASKA_UNK0 | D1759_IRQMASKA_UNK1 |
+                 D1759_IRQMASKA_UNK2 | D1759_IRQMASKA_UNK6 |
+                 D1759_IRQMASKA_UNK7),
+        0xff & ~D1759_IRQMASKB_INPUT2,
+        0xff & ~(D1759_IRQMASKC_UNK2 | D1759_IRQMASKC_UNK4 |
+                 D1759_IRQMASKC_UNK6 | D1759_IRQMASKC_UNK7),
+    };
+    pmu_write_multiple(D1759_REG_IRQMASKA, sizeof(ints_msk), ints_msk);
 
     /* clear all interrupts */
     pmu_write_multiple(D1759_REG_EVENTA, 3, "\xFF\xFF\xFF");

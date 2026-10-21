@@ -38,8 +38,11 @@ enum d1759_regs {
     D1759_REG_IRQMASKB      = 0x08,
     D1759_REG_IRQMASKC      = 0x09,
     D1759_REG_SYSCTRL       = 0x0a, /* preinit writes 0x70 */
+    D1759_REG_UNK0C         = 0x0c, /* OF PMU thread writes 0x05 */
     D1759_REG_WAKE          = 0x0d, /* preinit gates bit 5 from PMU 0x7f */
+    D1759_REG_UNK0E         = 0x0e, /* OF PMU thread writes 0xd0 */
     D1759_REG_VCORE         = 0x14, /* active core buck, code = (mV - 725) / 25 */
+    D1759_REG_UNK22         = 0x22, /* OF PMU thread writes 0x05 */
     D1759_REG_LEDOUT        = 0x30,
     D1759_REG_LEDCTL        = 0x31,
     D1759_REG_ILIM          = 0x33, /* preinit keeps bits 0..1, sets 0x50 */
@@ -77,15 +80,26 @@ enum d1759_reg_statusc {
 };
 
 enum d1759_reg_irqmaska {
+    /* UNK bits are unmasked by the OF; their event sources are unknown. */
+    D1759_IRQMASKA_UNK0     = 0x01,
+    D1759_IRQMASKA_UNK1     = 0x02,
+    D1759_IRQMASKA_UNK2     = 0x04,
     D1759_IRQMASKA_VBUS     = 0x08,
     D1759_IRQMASKA_INPUT1   = 0x20,
+    D1759_IRQMASKA_UNK6     = 0x40,
+    D1759_IRQMASKA_UNK7     = 0x80,
 };
 enum d1759_reg_irqmaskb {
     D1759_IRQMASKB_INPUT2   = 0x01,
     D1759_IRQMASKB_WARMBOOT = 0x80,
 };
 enum d1759_reg_irqmaskc {
+    /* UNK bits are unmasked by the OF; their event sources are unknown. */
+    D1759_IRQMASKC_UNK2     = 0x04,
     D1759_IRQMASKC_VADAPTOR = 0x08,
+    D1759_IRQMASKC_UNK4     = 0x10,
+    D1759_IRQMASKC_UNK6     = 0x40,
+    D1759_IRQMASKC_UNK7     = 0x80,
 };
 #else // TODO?
 /* PMU interrupts */
