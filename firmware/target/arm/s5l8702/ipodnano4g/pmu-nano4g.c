@@ -476,10 +476,6 @@ void pmu_preinit(void)
     pmu_wr_multiple(D1759_REG_IRQMASKA, 3, "\x50\xFE\x2B");
     pmu_wr_multiple(D1759_REG_EVENTA, 3, "\xFF\xFF\xFF");
 
-    pmu_wr(D1759_REG_LEDOUT, 0x64); /* set backlight brightness to 40% */
-    pmu_wr(D1759_REG_LEDCTL,
-            pmu_rd(D1759_REG_LEDCTL) | D1759_LEDCTL_ENABLE); /* backlight on */
-
     pmu_wr(0xa, 0x70);
     pmu_wr(0x13, 0x02);
 }
