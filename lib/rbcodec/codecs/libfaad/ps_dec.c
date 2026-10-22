@@ -994,6 +994,7 @@ static void ps_decorrelate(ps_info *ps,
     static real_t P[32][34];
     static real_t G_TransientRatio[32][34];
     complex_t inputLeft;
+    uint8_t processed = 0;
 
     memset(&G_TransientRatio, 0, sizeof(G_TransientRatio));
 
@@ -1151,176 +1152,201 @@ static void ps_decorrelate(ps_info *ps,
             }
 
 
-            /* set delay indices */
-            temp_delay = ps->saved_delay;
-            for (n = 0; n < NO_ALLPASS_LINKS; n++)
-                temp_delay_ser[n] = ps->delay_buf_index_ser[n];
-
-            for (n = ps->border_position[0]; n < ps->border_position[ps->num_env]; n++)
+            /* the band's buffers, all with rows of "stride" complex
+             * values: one value per time slot n */
             {
-                complex_t tmp, tmp0, R0;
+                const uint8_t hybrid = (gr < ps->num_hybrid_groups);
+                const int stride = hybrid ? 32 : 64;
+                const uint8_t n0 = ps->border_position[0];
+                const uint8_t n1 = ps->border_position[ps->num_env];
+                const complex_t *in;
+                complex_t *out;
+                const real_t *G;
 
-                if (gr < ps->num_hybrid_groups)
+                if (hybrid)
                 {
-                    /* hybrid filterbank input */
-                    RE(inputLeft) = QMF_RE(X_hybrid_left[n][sb]);
-                    IM(inputLeft) = QMF_IM(X_hybrid_left[n][sb]);
+                    in = &X_hybrid_left[n0][sb];
+                    out = &X_hybrid_right[n0][sb];
                 } else {
-                    /* QMF filterbank input */
-                    RE(inputLeft) = QMF_RE(X_left[n][sb]);
-                    IM(inputLeft) = QMF_IM(X_left[n][sb]);
+                    in = &X_left[n0][sb];
+                    out = &X_right[n0][sb];
                 }
+                /* select b(k) for reading the transient ratio */
+                bk = (~NEGATE_IPD_MASK) & ps->map_group2bk[gr];
+                G = &G_TransientRatio[n0][bk];
 
-                if (sb > ps->nr_allpass_bands && gr >= ps->num_hybrid_groups)
+                if (sb > ps->nr_allpass_bands && !hybrid)
                 {
-                    /* delay */
+                    /* delay: never hybrid subbands here, always QMF */
+                    complex_t *dly = &ps->delay_Qmf[0][sb];
+                    uint8_t di = ps->delay_buf_index_delay[sb];
+                    const uint8_t dD = ps->delay_D[sb];
 
-                    /* never hybrid subbands here, always QMF subbands */
-                    RE(tmp) = RE(ps->delay_Qmf[ps->delay_buf_index_delay[sb]][sb]);
-                    IM(tmp) = IM(ps->delay_Qmf[ps->delay_buf_index_delay[sb]][sb]);
-                    RE(R0) = RE(tmp);
-                    IM(R0) = IM(tmp);
-                    RE(ps->delay_Qmf[ps->delay_buf_index_delay[sb]][sb]) = RE(inputLeft);
-                    IM(ps->delay_Qmf[ps->delay_buf_index_delay[sb]][sb]) = IM(inputLeft);
+                    for (n = n0; n < n1; n++)
+                    {
+                        complex_t *d = dly + di * 64;
+                        real_t re = RE(d[0]), im = IM(d[0]);
+
+                        RE(d[0]) = RE(in[0]);
+                        IM(d[0]) = IM(in[0]);
+
+                        /* duck if a past transient is found */
+                        RE(out[0]) = MUL_R(*G, re);
+                        IM(out[0]) = MUL_R(*G, im);
+
+                        /* delay_D depends on the samplerate, it can hold
+                         * the values 14 and 1 */
+                        if (++di >= dD)
+                            di = 0;
+
+                        in += stride;
+                        out += stride;
+                        G += 34;
+                    }
+                    ps->delay_buf_index_delay[sb] = di;
                 } else {
                     /* allpass filter */
-                    uint8_t m;
-                    complex_t Phi_Fract;
+                    complex_t *dly, *ser[NO_ALLPASS_LINKS];
+                    complex_t Phi_Fract, Q_Fract_allpass[NO_ALLPASS_LINKS];
+                    uint8_t td = ps->saved_delay;
+                    uint8_t ts[NO_ALLPASS_LINKS];
 
-                    /* fetch parameters */
-                    if (gr < ps->num_hybrid_groups)
+                    if (hybrid)
                     {
                         /* select data from the hybrid subbands */
-                        RE(tmp0) = RE(ps->delay_SubQmf[temp_delay][sb]);
-                        IM(tmp0) = IM(ps->delay_SubQmf[temp_delay][sb]);
-
-                        RE(ps->delay_SubQmf[temp_delay][sb]) = RE(inputLeft);
-                        IM(ps->delay_SubQmf[temp_delay][sb]) = IM(inputLeft);
-
+                        dly = &ps->delay_SubQmf[0][sb];
                         RE(Phi_Fract) = RE(Phi_Fract_SubQmf[sb]);
                         IM(Phi_Fract) = IM(Phi_Fract_SubQmf[sb]);
                     } else {
                         /* select data from the QMF subbands */
-                        RE(tmp0) = RE(ps->delay_Qmf[temp_delay][sb]);
-                        IM(tmp0) = IM(ps->delay_Qmf[temp_delay][sb]);
-
-                        RE(ps->delay_Qmf[temp_delay][sb]) = RE(inputLeft);
-                        IM(ps->delay_Qmf[temp_delay][sb]) = IM(inputLeft);
-
+                        dly = &ps->delay_Qmf[0][sb];
                         RE(Phi_Fract) = RE(Phi_Fract_Qmf[sb]);
                         IM(Phi_Fract) = IM(Phi_Fract_Qmf[sb]);
                     }
-
-                    /* z^(-2) * Phi_Fract[k] */
-                    ComplexMult(&RE(tmp), &IM(tmp), RE(tmp0), IM(tmp0), RE(Phi_Fract), IM(Phi_Fract));
-
-                    RE(R0) = RE(tmp);
-                    IM(R0) = IM(tmp);
                     for (m = 0; m < NO_ALLPASS_LINKS; m++)
                     {
-                        complex_t Q_Fract_allpass, tmp2;
+                        const complex_t *q;
 
-                        /* fetch parameters */
-                        if (gr < ps->num_hybrid_groups)
+                        if (!hybrid)
                         {
-                            /* select data from the hybrid subbands */
-                            RE(tmp0) = RE(ps->delay_SubQmf_ser[m][temp_delay_ser[m]][sb]);
-                            IM(tmp0) = IM(ps->delay_SubQmf_ser[m][temp_delay_ser[m]][sb]);
-
+                            ser[m] = &ps->delay_Qmf_ser[m][0][sb];
+                            q = &Q_Fract_allpass_Qmf[sb][m];
+                        } else {
+                            ser[m] = &ps->delay_SubQmf_ser[m][0][sb];
                             if (ps->use34hybrid_bands)
-                            {
-                                RE(Q_Fract_allpass) = RE(Q_Fract_allpass_SubQmf34[sb][m]);
-                                IM(Q_Fract_allpass) = IM(Q_Fract_allpass_SubQmf34[sb][m]);
-                            } else {
-                                RE(Q_Fract_allpass) = RE(Q_Fract_allpass_SubQmf20[sb][m]);
-                                IM(Q_Fract_allpass) = IM(Q_Fract_allpass_SubQmf20[sb][m]);
-                            }
-                        } else {
-                            /* select data from the QMF subbands */
-                            RE(tmp0) = RE(ps->delay_Qmf_ser[m][temp_delay_ser[m]][sb]);
-                            IM(tmp0) = IM(ps->delay_Qmf_ser[m][temp_delay_ser[m]][sb]);
-
-                            RE(Q_Fract_allpass) = RE(Q_Fract_allpass_Qmf[sb][m]);
-                            IM(Q_Fract_allpass) = IM(Q_Fract_allpass_Qmf[sb][m]);
+                                q = &Q_Fract_allpass_SubQmf34[sb][m];
+                            else
+                                q = &Q_Fract_allpass_SubQmf20[sb][m];
                         }
+                        RE(Q_Fract_allpass[m]) = RE(q[0]);
+                        IM(Q_Fract_allpass[m]) = IM(q[0]);
+                        ts[m] = ps->delay_buf_index_ser[m];
+                    }
 
-                        /* delay by a fraction */
-                        /* z^(-d(m)) * Q_Fract_allpass[k,m] */
-                        ComplexMult(&RE(tmp), &IM(tmp), RE(tmp0), IM(tmp0), RE(Q_Fract_allpass), IM(Q_Fract_allpass));
+                    {
+                        /* the band's samples between the stages of the
+                         * filter: each stage only touches its own delay
+                         * line, so it can run over all slots in turn */
+                        complex_t R[32]; /* as G_TransientRatio */
+                        const uint8_t N = n1 - n0;
+                        uint8_t k;
 
-                        /* -a(m) * g_DecaySlope[k] */
-                        RE(tmp) += -MUL_F(g_DecaySlope_filt[m], RE(R0));
-                        IM(tmp) += -MUL_F(g_DecaySlope_filt[m], IM(R0));
-
-                        /* -a(m) * g_DecaySlope[k] * Q_Fract_allpass[k,m] * z^(-d(m)) */
-                        RE(tmp2) = RE(R0) + MUL_F(g_DecaySlope_filt[m], RE(tmp));
-                        IM(tmp2) = IM(R0) + MUL_F(g_DecaySlope_filt[m], IM(tmp));
-
-                        /* store sample */
-                        if (gr < ps->num_hybrid_groups)
+                        for (k = 0; k < N; k++)
                         {
-                            RE(ps->delay_SubQmf_ser[m][temp_delay_ser[m]][sb]) = RE(tmp2);
-                            IM(ps->delay_SubQmf_ser[m][temp_delay_ser[m]][sb]) = IM(tmp2);
-                        } else {
-                            RE(ps->delay_Qmf_ser[m][temp_delay_ser[m]][sb]) = RE(tmp2);
-                            IM(ps->delay_Qmf_ser[m][temp_delay_ser[m]][sb]) = IM(tmp2);
+                            complex_t *d = dly + td * stride;
+                            real_t re = RE(d[0]), im = IM(d[0]);
+
+                            RE(d[0]) = RE(in[0]);
+                            IM(d[0]) = IM(in[0]);
+
+                            /* z^(-2) * Phi_Fract[k] */
+                            ComplexMult(&RE(R[k]), &IM(R[k]), re, im,
+                                        RE(Phi_Fract), IM(Phi_Fract));
+
+                            /* Update delay buffer index */
+                            if (++td >= 2)
+                                td = 0;
+                            in += stride;
                         }
 
-                        /* store for next iteration (or as output value if last iteration) */
-                        RE(R0) = RE(tmp);
-                        IM(R0) = IM(tmp);
-                    }
-                }
+                        for (m = 0; m < NO_ALLPASS_LINKS; m++)
+                        {
+                            complex_t *base = ser[m];
+                            complex_t *sp = base + ts[m] * stride;
+                            complex_t *end = base +
+                                ps->num_sample_delay_ser[m] * stride;
+                            const real_t q_re = RE(Q_Fract_allpass[m]);
+                            const real_t q_im = IM(Q_Fract_allpass[m]);
+                            const real_t g = g_DecaySlope_filt[m];
 
-                /* select b(k) for reading the transient ratio */
-                bk = (~NEGATE_IPD_MASK) & ps->map_group2bk[gr];
+                            for (k = 0; k < N; k++)
+                            {
+                                real_t r_re = RE(R[k]), r_im = IM(R[k]);
+                                real_t t_re, t_im;
 
-                /* duck if a past transient is found */
-                RE(R0) = MUL_R(G_TransientRatio[n][bk], RE(R0));
-                IM(R0) = MUL_R(G_TransientRatio[n][bk], IM(R0));
+                                /* delay by a fraction */
+                                /* z^(-d(m)) * Q_Fract_allpass[k,m] */
+                                ComplexMult(&t_re, &t_im, RE(sp[0]), IM(sp[0]),
+                                            q_re, q_im);
 
-                if (gr < ps->num_hybrid_groups)
-                {
-                    /* hybrid */
-                    QMF_RE(X_hybrid_right[n][sb]) = RE(R0);
-                    QMF_IM(X_hybrid_right[n][sb]) = IM(R0);
-                } else {
-                    /* QMF */
-                    QMF_RE(X_right[n][sb]) = RE(R0);
-                    QMF_IM(X_right[n][sb]) = IM(R0);
-                }
+                                /* -a(m) * g_DecaySlope[k] */
+                                t_re += -MUL_F(g, r_re);
+                                t_im += -MUL_F(g, r_im);
 
-                /* Update delay buffer index */
-                if (++temp_delay >= 2)
-                {
-                    temp_delay = 0;
-                }
+                                /* -a(m) * g_DecaySlope[k] *
+                                 * Q_Fract_allpass[k,m] * z^(-d(m)) */
+                                RE(sp[0]) = r_re + MUL_F(g, t_re);
+                                IM(sp[0]) = r_im + MUL_F(g, t_im);
 
-                /* update delay indices */
-                if (sb > ps->nr_allpass_bands && gr >= ps->num_hybrid_groups)
-                {
-                    /* delay_D depends on the samplerate, it can hold the values 14 and 1 */
-                    if (++ps->delay_buf_index_delay[sb] >= ps->delay_D[sb])
-                    {
-                        ps->delay_buf_index_delay[sb] = 0;
-                    }
-                }
+                                /* input of the next stage, or the output */
+                                RE(R[k]) = t_re;
+                                IM(R[k]) = t_im;
 
-                for (m = 0; m < NO_ALLPASS_LINKS; m++)
-                {
-                    if (++temp_delay_ser[m] >= ps->num_sample_delay_ser[m])
-                    {
-                        temp_delay_ser[m] = 0;
+                                sp += stride;
+                                if (sp >= end)
+                                    sp = base;
+                            }
+                        }
+
+                        /* duck if a past transient is found */
+                        for (k = 0; k < N; k++)
+                        {
+                            RE(out[0]) = MUL_R(G[0], RE(R[k]));
+                            IM(out[0]) = MUL_R(G[0], IM(R[k]));
+                            out += stride;
+                            G += 34;
+                        }
                     }
                 }
             }
+            processed = 1;
         }
     }
 
-    /* update delay indices */
-    ps->saved_delay = temp_delay;
-    for (m = 0; m < NO_ALLPASS_LINKS; m++)
-        ps->delay_buf_index_ser[m] = temp_delay_ser[m];
+    /* update delay indices: every band started from the saved ones and
+     * stepped once per time slot */
+    if (processed)
+    {
+        temp_delay = ps->saved_delay;
+        for (m = 0; m < NO_ALLPASS_LINKS; m++)
+            temp_delay_ser[m] = ps->delay_buf_index_ser[m];
+        for (n = ps->border_position[0];
+             n < ps->border_position[ps->num_env]; n++)
+        {
+            if (++temp_delay >= 2)
+                temp_delay = 0;
+            for (m = 0; m < NO_ALLPASS_LINKS; m++)
+            {
+                if (++temp_delay_ser[m] >= ps->num_sample_delay_ser[m])
+                    temp_delay_ser[m] = 0;
+            }
+        }
+        ps->saved_delay = temp_delay;
+        for (m = 0; m < NO_ALLPASS_LINKS; m++)
+            ps->delay_buf_index_ser[m] = temp_delay_ser[m];
+    } else {
+        ps->saved_delay = 0;
+    }
 }
 
 #ifdef FIXED_POINT
@@ -1387,7 +1413,7 @@ static void ps_mix_phase(ps_info *ps,
     uint8_t n;
     uint8_t gr;
     uint8_t bk = 0;
-    uint8_t sb, maxsb;
+    uint8_t maxsb;
     uint8_t env;
     uint8_t nr_ipdopd_par;
     complex_t h11 = {0,0}, h12 = {0,0}, h21 = {0,0}, h22 = {0,0};
@@ -1717,70 +1743,106 @@ static void ps_mix_phase(ps_info *ps,
                 IM(ps->h22_prev[gr]) = IM(h22);
             }
 
-            /* apply H_xy to the current envelope band of the decorrelated subband */
-            for (n = ps->border_position[env]; n < ps->border_position[env + 1]; n++)
+            /* apply H_xy to the current envelope band of the decorrelated
+             * subband */
             {
-                /* addition finalises the interpolation over every n */
-                RE(H11) += RE(deltaH11);
-                RE(H12) += RE(deltaH12);
-                RE(H21) += RE(deltaH21);
-                RE(H22) += RE(deltaH22);
-                if ((ps->enable_ipdopd) && (bk < nr_ipdopd_par))
+                const uint8_t hybrid = (gr < ps->num_hybrid_groups);
+                const uint8_t use_im = ps->enable_ipdopd &&
+                                       (bk < nr_ipdopd_par);
+                const int stride = hybrid ? 32 : 64;
+                const uint8_t sb0 = ps->group_border[gr];
+                complex_t *rowL, *rowR;
+
+                n = ps->border_position[env];
+                if (hybrid)
                 {
-                    IM(H11) += IM(deltaH11);
-                    IM(H12) += IM(deltaH12);
-                    IM(H21) += IM(deltaH21);
-                    IM(H22) += IM(deltaH22);
+                    rowL = X_hybrid_left[n];
+                    rowR = X_hybrid_right[n];
+                } else {
+                    rowL = X_left[n];
+                    rowR = X_right[n];
                 }
 
-                /* channel is an alias to the subband */
-                for (sb = ps->group_border[gr]; sb < maxsb; sb++)
+                for (; n < ps->border_position[env + 1]; n++)
                 {
-                    complex_t inLeft, inRight;
+                    complex_t *pL = rowL + sb0, *pR = rowR + sb0;
+                    complex_t *endL = rowL + maxsb;
 
-                    /* load decorrelated samples */
-                    if (gr < ps->num_hybrid_groups)
+                    /* addition finalises the interpolation over every n */
+                    RE(H11) += RE(deltaH11);
+                    RE(H12) += RE(deltaH12);
+                    RE(H21) += RE(deltaH21);
+                    RE(H22) += RE(deltaH22);
+                    if (use_im)
                     {
-                        RE(inLeft) =  RE(X_hybrid_left[n][sb]);
-                        IM(inLeft) =  IM(X_hybrid_left[n][sb]);
-                        RE(inRight) = RE(X_hybrid_right[n][sb]);
-                        IM(inRight) = IM(X_hybrid_right[n][sb]);
+                        IM(H11) += IM(deltaH11);
+                        IM(H12) += IM(deltaH12);
+                        IM(H21) += IM(deltaH21);
+                        IM(H22) += IM(deltaH22);
+
+                        /* channel is an alias to the subband */
+                        for (; pL < endL; pL++, pR++)
+                        {
+                            complex_t inLeft, inRight;
+
+                            /* load decorrelated samples */
+                            RE(inLeft) =  RE(pL[0]);
+                            IM(inLeft) =  IM(pL[0]);
+                            RE(inRight) = RE(pR[0]);
+                            IM(inRight) = IM(pR[0]);
+
+                            /* apply mixing */
+                            RE(tempLeft) =  MUL_C(RE(H11), RE(inLeft)) +
+                                            MUL_C(RE(H21), RE(inRight));
+                            IM(tempLeft) =  MUL_C(RE(H11), IM(inLeft)) +
+                                            MUL_C(RE(H21), IM(inRight));
+                            RE(tempRight) = MUL_C(RE(H12), RE(inLeft)) +
+                                            MUL_C(RE(H22), RE(inRight));
+                            IM(tempRight) = MUL_C(RE(H12), IM(inLeft)) +
+                                            MUL_C(RE(H22), IM(inRight));
+
+                            /* apply rotation */
+                            RE(tempLeft)  -= MUL_C(IM(H11), IM(inLeft)) +
+                                             MUL_C(IM(H21), IM(inRight));
+                            IM(tempLeft)  += MUL_C(IM(H11), RE(inLeft)) +
+                                             MUL_C(IM(H21), RE(inRight));
+                            RE(tempRight) -= MUL_C(IM(H12), IM(inLeft)) +
+                                             MUL_C(IM(H22), IM(inRight));
+                            IM(tempRight) += MUL_C(IM(H12), RE(inLeft)) +
+                                             MUL_C(IM(H22), RE(inRight));
+
+                            /* store final samples */
+                            RE(pL[0]) = RE(tempLeft);
+                            IM(pL[0]) = IM(tempLeft);
+                            RE(pR[0]) = RE(tempRight);
+                            IM(pR[0]) = IM(tempRight);
+                        }
                     } else {
-                        RE(inLeft) =  RE(X_left[n][sb]);
-                        IM(inLeft) =  IM(X_left[n][sb]);
-                        RE(inRight) = RE(X_right[n][sb]);
-                        IM(inRight) = IM(X_right[n][sb]);
+                        /* channel is an alias to the subband */
+                        for (; pL < endL; pL++, pR++)
+                        {
+                            complex_t inLeft, inRight;
+
+                            /* load decorrelated samples */
+                            RE(inLeft) =  RE(pL[0]);
+                            IM(inLeft) =  IM(pL[0]);
+                            RE(inRight) = RE(pR[0]);
+                            IM(inRight) = IM(pR[0]);
+
+                            /* apply mixing */
+                            RE(pL[0]) = MUL_C(RE(H11), RE(inLeft)) +
+                                        MUL_C(RE(H21), RE(inRight));
+                            IM(pL[0]) = MUL_C(RE(H11), IM(inLeft)) +
+                                        MUL_C(RE(H21), IM(inRight));
+                            RE(pR[0]) = MUL_C(RE(H12), RE(inLeft)) +
+                                        MUL_C(RE(H22), RE(inRight));
+                            IM(pR[0]) = MUL_C(RE(H12), IM(inLeft)) +
+                                        MUL_C(RE(H22), IM(inRight));
+                        }
                     }
 
-                    /* apply mixing */
-                    RE(tempLeft) =  MUL_C(RE(H11), RE(inLeft)) + MUL_C(RE(H21), RE(inRight));
-                    IM(tempLeft) =  MUL_C(RE(H11), IM(inLeft)) + MUL_C(RE(H21), IM(inRight));
-                    RE(tempRight) = MUL_C(RE(H12), RE(inLeft)) + MUL_C(RE(H22), RE(inRight));
-                    IM(tempRight) = MUL_C(RE(H12), IM(inLeft)) + MUL_C(RE(H22), IM(inRight));
-
-                    /* only perform imaginary operations when needed */
-                    if ((ps->enable_ipdopd) && (bk < nr_ipdopd_par))
-                    {
-                        /* apply rotation */
-                        RE(tempLeft)  -= MUL_C(IM(H11), IM(inLeft)) + MUL_C(IM(H21), IM(inRight));
-                        IM(tempLeft)  += MUL_C(IM(H11), RE(inLeft)) + MUL_C(IM(H21), RE(inRight));
-                        RE(tempRight) -= MUL_C(IM(H12), IM(inLeft)) + MUL_C(IM(H22), IM(inRight));
-                        IM(tempRight) += MUL_C(IM(H12), RE(inLeft)) + MUL_C(IM(H22), RE(inRight));
-                    }
-
-                    /* store final samples */
-                    if (gr < ps->num_hybrid_groups)
-                    {
-                        RE(X_hybrid_left[n][sb])  = RE(tempLeft);
-                        IM(X_hybrid_left[n][sb])  = IM(tempLeft);
-                        RE(X_hybrid_right[n][sb]) = RE(tempRight);
-                        IM(X_hybrid_right[n][sb]) = IM(tempRight);
-                    } else {
-                        RE(X_left[n][sb])  = RE(tempLeft);
-                        IM(X_left[n][sb])  = IM(tempLeft);
-                        RE(X_right[n][sb]) = RE(tempRight);
-                        IM(X_right[n][sb]) = IM(tempRight);
-                    }
+                    rowL += stride;
+                    rowR += stride;
                 }
             }
 

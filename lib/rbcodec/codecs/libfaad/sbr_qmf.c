@@ -37,6 +37,13 @@
 #include "sbr_qmf_c.h"
 #include "sbr_syntax.h"
 
+#ifdef CPU_ARM_CLASSIC
+/* sbr_qmf_arm.S: 64 output samples from the history ring v, whose newest
+ * slot starts at v[v_index] */
+void sbr_qmf_window_arm(real_t *out, const real_t *v, int v_index,
+                        const real_t *c);
+#endif
+
 #ifdef FIXED_POINT
     #define FAAD_SYNTHESIS_SCALE(X) ((X)>>1)
     #define FAAD_ANALYSIS_SCALE1(X) ((X)>>4)
@@ -240,12 +247,14 @@ void sbr_qmf_synthesis_32(sbr_info *sbr, qmfs_info *qmfs, qmf_t X[MAX_NTSR][64],
 }
 
 void sbr_qmf_synthesis_64(sbr_info *sbr, qmfs_info *qmfs, qmf_t X[MAX_NTSR][64],
-                          real_t *output)
+                          const uint8_t *nb, real_t *output)
 {
     real_t x[64] MEM_ALIGN_ATTR;
     real_t y[64] MEM_ALIGN_ATTR;
     int16_t n, k, out = 0;
     uint8_t l;
+
+    (void)nb;
 
 
     /* qmf subsample l */
@@ -413,14 +422,17 @@ void sbr_qmf_synthesis_32(sbr_info *sbr, qmfs_info *qmfs, qmf_t X[MAX_NTSR][64],
 }
 
 void sbr_qmf_synthesis_64(sbr_info *sbr, qmfs_info *qmfs, qmf_t X[MAX_NTSR][64],
-                          real_t *output)
+                          const uint8_t *nb, real_t *output)
 {
     real_t real1[32] MEM_ALIGN_ATTR; 
     real_t imag1[32] MEM_ALIGN_ATTR;
     real_t real2[32] MEM_ALIGN_ATTR; 
     real_t imag2[32] MEM_ALIGN_ATTR;
     qmf_t *pX;
-    real_t *p_buf_1, *p_buf_3;
+    real_t *p_buf_1;
+#if QMFS_V_SIZE != 1280
+    real_t *p_buf_3;
+#endif
     int32_t n, k, idx0, idx1, out = 0;
     uint32_t l;
     
@@ -432,12 +444,25 @@ void sbr_qmf_synthesis_64(sbr_info *sbr, qmfs_info *qmfs, qmf_t X[MAX_NTSR][64],
         //memmove(qmfs->v + 128, qmfs->v, (1280-128)*sizeof(real_t));
 
         /* calculate 128 samples */
+        /* bands from nb[l] up are zero */
         pX = X[l];
-        for (k = 0; k < 32; k++)
+        n = nb ? nb[l] : 64;
+        for (k = 0; k < n/2; k++)
         {
             idx0 = 2*k; idx1 = idx0+1;
             real1[   k] = QMF_RE(pX[idx0]); imag2[   k] = QMF_IM(pX[idx0]);
-            imag1[31-k] = QMF_RE(pX[idx1]); real2[31-k] = QMF_IM(pX[idx1]);    
+            imag1[31-k] = QMF_RE(pX[idx1]); real2[31-k] = QMF_IM(pX[idx1]);
+        }
+        if (n & 1)
+        {
+            real1[   k] = QMF_RE(pX[2*k]); imag2[   k] = QMF_IM(pX[2*k]);
+            imag1[31-k] = 0;               real2[31-k] = 0;
+            k++;
+        }
+        for (; k < 32; k++)
+        {
+            real1[   k] = 0; imag2[   k] = 0;
+            imag1[31-k] = 0; real2[31-k] = 0;
         }
         
         // dct4_kernel is DCT_IV without reordering which is done before and after FFT
@@ -445,6 +470,16 @@ void sbr_qmf_synthesis_64(sbr_info *sbr, qmfs_info *qmfs, qmf_t X[MAX_NTSR][64],
         dct4_kernel(real2, imag2);
 
         p_buf_1 = qmfs->v + qmfs->v_index;
+#if QMFS_V_SIZE == 1280
+        idx0 = 0; idx1 = 127;
+        for (n = 0; n < 32; n++)
+        {
+            p_buf_1[idx0] = real2[   n] - real1[   n]; idx0++;
+            p_buf_1[idx1] = real2[   n] + real1[   n]; idx1--;
+            p_buf_1[idx0] = imag2[31-n] + imag1[31-n]; idx0++;
+            p_buf_1[idx1] = imag2[31-n] - imag1[31-n]; idx1--;
+        }
+#else
         p_buf_3 = p_buf_1 + 1280;
 
         idx0 = 0; idx1 = 127;
@@ -455,12 +490,14 @@ void sbr_qmf_synthesis_64(sbr_info *sbr, qmfs_info *qmfs, qmf_t X[MAX_NTSR][64],
             p_buf_1[idx0] = p_buf_3[idx0] = imag2[31-n] + imag1[31-n]; idx0++;
             p_buf_1[idx1] = p_buf_3[idx1] = imag2[31-n] - imag1[31-n]; idx1--;
         }
-
-        p_buf_1 = qmfs->v + qmfs->v_index;
+#endif
 
         /* calculate 64 output samples and window */
         /* note: GCC 4.9 complains about the inline asm on Cortex-M targets */
-#if defined(CPU_ARM_CLASSIC) || (defined(CPU_ARM_MICRO) && __GNUC__ > 4)
+#if defined(CPU_ARM_CLASSIC)
+        sbr_qmf_window_arm(&output[out], qmfs->v, qmfs->v_index, qmf_c);
+        out += 64;
+#elif defined(CPU_ARM_MICRO) && __GNUC__ > 4
         const real_t *qtab = qmf_c;
         real_t *pbuf = p_buf_1;
         for (k = 0; k < 64; k++, pbuf++)

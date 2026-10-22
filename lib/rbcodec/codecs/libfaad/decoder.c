@@ -55,7 +55,26 @@ uint16_t dbg_count;
 /* static variables */
 static NeAACDecStruct s_AACDec;
 static real_t s_fb_intermed  [MAX_CHANNELS][1*FRAME_LEN] IBSS_ATTR_FAAD_LARGE_IRAM MEM_ALIGN_ATTR;
+#ifdef SBR_DEC
+/* A stream has SBR (sbr_alloced, output in s_time_buf_2048) or puts its
+ * output in s_time_buf_1024, never both.  Where the SBR synthesis history
+ * is stored once, it shares memory with s_time_buf_1024. */
+#if QMFS_V_SIZE == 1280
+static union {
+    real_t time_buf[MAX_CHANNELS][1*FRAME_LEN];
+    real_t qmfs_v[MAX_CHANNELS][QMFS_V_SIZE];
+} s_shared IBSS_ATTR_FAAD_LARGE_IRAM MEM_ALIGN_ATTR;
+#define s_time_buf_1024 s_shared.time_buf
+#define s_qmfs_v        s_shared.qmfs_v
+#else
+static real_t s_time_buf_1024[MAX_CHANNELS][1*FRAME_LEN]
+    IBSS_ATTR_FAAD_LARGE_IRAM MEM_ALIGN_ATTR;
+static real_t s_qmfs_v[MAX_CHANNELS][QMFS_V_SIZE] MEM_ALIGN_ATTR;
+#endif
+real_t *const faad_qmfs_v[2] = { s_qmfs_v[0], s_qmfs_v[1] };
+#else
 static real_t s_time_buf_1024[MAX_CHANNELS][1*FRAME_LEN] IBSS_ATTR_FAAD_LARGE_IRAM MEM_ALIGN_ATTR;
+#endif
 #ifdef SBR_DEC
 #ifdef FAAD_STATIC_ALLOC
 static real_t s_time_buf_2048[MAX_CHANNELS][2*FRAME_LEN] MEM_ALIGN_ATTR;

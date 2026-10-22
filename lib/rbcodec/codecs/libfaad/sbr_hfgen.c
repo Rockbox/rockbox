@@ -60,6 +60,11 @@ void hf_generation(sbr_info *sbr,
     uint8_t l, i, x;
     complex_t alpha_0[64] MEM_ALIGN_ATTR;
     complex_t alpha_1[64] MEM_ALIGN_ATTR;
+#ifndef SBR_LOW_POWER
+    /* source bands whose prediction coefficients are already known:
+     * patches often copy from the same band */
+    uint32_t alpha_done[2] = { 0, 0 };
+#endif
 #ifdef SBR_LOW_POWER
     real_t rxx[64];
 #endif
@@ -119,7 +124,11 @@ void hf_generation(sbr_info *sbr,
                 real_t temp1_r, temp2_r, temp3_r;
 #ifndef SBR_LOW_POWER
                 real_t temp1_i, temp2_i, temp3_i;
-                calc_prediction_coef(sbr, Xlow, alpha_0, alpha_1, p);
+                if (!(alpha_done[p >> 5] & (1u << (p & 31))))
+                {
+                    calc_prediction_coef(sbr, Xlow, alpha_0, alpha_1, p);
+                    alpha_done[p >> 5] |= 1u << (p & 31);
+                }
 #endif
 
                 a0_r = MUL_C(RE(alpha_0[p]), bw);

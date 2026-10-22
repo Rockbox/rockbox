@@ -160,6 +160,10 @@ sbr_info *sbrDecodeInit(uint16_t framelength, uint8_t id_aac, uint8_t id_ele,
 
     memset(sbr->qmfa, 0, 2*sizeof(qmfa_info));
     memset(sbr->qmfs, 0, 2*sizeof(qmfs_info));
+    sbr->qmfs[0].v = faad_qmfs_v[0];
+    sbr->qmfs[1].v = faad_qmfs_v[1];
+    memset(faad_qmfs_v[0], 0, QMFS_V_SIZE*sizeof(real_t));
+    memset(faad_qmfs_v[1], 0, QMFS_V_SIZE*sizeof(real_t));
 
     memset(sbr->Xsbr[0], 0, (sbr->numTimeSlotsRate+sbr->tHFGen)*64 * sizeof(qmf_t));
     memset(sbr->Xsbr[1], 0, (sbr->numTimeSlotsRate+sbr->tHFGen)*64 * sizeof(qmf_t));
@@ -211,14 +215,25 @@ static void sbr_save_matrix(sbr_info *sbr, uint8_t ch)
     {
         memmove(sbr->Xsbr[ch][i], sbr->Xsbr[ch][i+sbr->numTimeSlotsRate], 64 * sizeof(qmf_t));
     }
-    for (i = sbr->tHFGen; i < MAX_NTSRHFG; i++)
+    /* bands 0-31 of the next numTimeSlotsRate slots are written by the
+     * next frame's analysis before anything reads them */
+    for (i = sbr->tHFGen; i < sbr->tHFGen + sbr->numTimeSlotsRate; i++)
+    {
+        memset(sbr->Xsbr[ch][i] + 32, 0, 32 * sizeof(qmf_t));
+    }
+    for (; i < MAX_NTSRHFG; i++)
     {
         memset(sbr->Xsbr[ch][i], 0, 64 * sizeof(qmf_t));
     }
 }
 
+/* Analysis, HF generation and adjustment for one channel.  The slots'
+ * subbands for synthesis are left in sbr->Xsbr[ch] from row tHFAdj, with
+ * nb[l] (if nb is not NULL) the number of bands of slot l synthesis is to
+ * take, the rest being zero.  If X is not NULL they are also copied there,
+ * with the bands above nb[l] cleared. */
 static void sbr_process_channel(sbr_info *sbr, real_t *channel_buf, qmf_t X[MAX_NTSR][64],
-                                uint8_t ch, uint8_t dont_process,
+                                uint8_t *nb, uint8_t ch, uint8_t dont_process,
                                 const uint8_t downSampledSBR)
 {
     int16_t k, l;
@@ -286,6 +301,27 @@ static void sbr_process_channel(sbr_info *sbr, real_t *channel_buf, qmf_t X[MAX_
 #endif
     }
 
+#ifndef SBR_LOW_POWER
+    for (l = 0; l < sbr->numTimeSlotsRate; l++)
+    {
+        if ((sbr->just_seeked != 0) || dont_process)
+            k = 32;
+        else if (l < sbr->t_E[ch][0])
+            k = sbr->kx_prev + max(sbr->bsco_prev, sbr->M_prev);
+        else
+            k = sbr->kx + max(sbr->bsco, sbr->M);
+        if (k > 64)
+            k = 64;
+        if (nb)
+            nb[l] = k;
+        if (X)
+        {
+            memcpy(X[l], sbr->Xsbr[ch][l + sbr->tHFAdj], k * sizeof(qmf_t));
+            memset(X[l] + k, 0, (64 - k) * sizeof(qmf_t));
+        }
+    }
+#else
+    (void)nb;
     if ((sbr->just_seeked != 0) || dont_process)
     {
         for (l = 0; l < sbr->numTimeSlotsRate; l++)
@@ -293,16 +329,10 @@ static void sbr_process_channel(sbr_info *sbr, real_t *channel_buf, qmf_t X[MAX_
             for (k = 0; k < 32; k++)
             {
                 QMF_RE(X[l][k]) = QMF_RE(sbr->Xsbr[ch][l + sbr->tHFAdj][k]);
-#ifndef SBR_LOW_POWER
-                QMF_IM(X[l][k]) = QMF_IM(sbr->Xsbr[ch][l + sbr->tHFAdj][k]);
-#endif
             }
             for (k = 32; k < 64; k++)
             {
                 QMF_RE(X[l][k]) = 0;
-#ifndef SBR_LOW_POWER
-                QMF_IM(X[l][k]) = 0;
-#endif
             }
         }
     } else {
@@ -321,23 +351,6 @@ static void sbr_process_channel(sbr_info *sbr, real_t *channel_buf, qmf_t X[MAX_
                 bsco_band = sbr->bsco;
             }
 
-#ifndef SBR_LOW_POWER
-            for (k = 0; k < kx_band + bsco_band; k++)
-            {
-                QMF_RE(X[l][k]) = QMF_RE(sbr->Xsbr[ch][l + sbr->tHFAdj][k]);
-                QMF_IM(X[l][k]) = QMF_IM(sbr->Xsbr[ch][l + sbr->tHFAdj][k]);
-            }
-            for (k = kx_band + bsco_band; k < kx_band + M_band; k++)
-            {
-                QMF_RE(X[l][k]) = QMF_RE(sbr->Xsbr[ch][l + sbr->tHFAdj][k]);
-                QMF_IM(X[l][k]) = QMF_IM(sbr->Xsbr[ch][l + sbr->tHFAdj][k]);
-            }
-            for (k = max(kx_band + bsco_band, kx_band + M_band); k < 64; k++)
-            {
-                QMF_RE(X[l][k]) = 0;
-                QMF_IM(X[l][k]) = 0;
-            }
-#else
             for (k = 0; k < kx_band + bsco_band; k++)
             {
                 QMF_RE(X[l][k]) = QMF_RE(sbr->Xsbr[ch][l + sbr->tHFAdj][k]);
@@ -352,9 +365,37 @@ static void sbr_process_channel(sbr_info *sbr, real_t *channel_buf, qmf_t X[MAX_
             }
             QMF_RE(X[l][kx_band - 1 + bsco_band]) +=
                 QMF_RE(sbr->Xsbr[ch][l + sbr->tHFAdj][kx_band - 1 + bsco_band]);
-#endif
         }
     }
+#endif
+}
+
+/* One channel's SBR, from analysis to synthesis.  The full-rate
+ * synthesis reads the subbands from sbr->Xsbr itself; otherwise they are
+ * copied to X first. */
+static void sbr_process_and_synthesise(sbr_info *sbr, real_t *channel_buf,
+                                       qmf_t X[MAX_NTSR][64], uint8_t ch,
+                                       uint8_t dont_process,
+                                       const uint8_t downSampledSBR)
+{
+#ifndef SBR_LOW_POWER
+    if (!downSampledSBR)
+    {
+        uint8_t nb[MAX_NTSR];
+
+        sbr_process_channel(sbr, channel_buf, NULL, nb, ch, dont_process,
+                            downSampledSBR);
+        sbr_qmf_synthesis_64(sbr, &sbr->qmfs[ch],
+                             sbr->Xsbr[ch] + sbr->tHFAdj, nb, channel_buf);
+        return;
+    }
+#endif
+    sbr_process_channel(sbr, channel_buf, X, NULL, ch, dont_process,
+                        downSampledSBR);
+    if (downSampledSBR)
+        sbr_qmf_synthesis_32(sbr, &sbr->qmfs[ch], X, channel_buf);
+    else
+        sbr_qmf_synthesis_64(sbr, &sbr->qmfs[ch], X, NULL, channel_buf);
 }
 
 uint8_t sbrDecodeCoupleFrame(sbr_info *sbr, real_t *left_chan, real_t *right_chan,
@@ -387,23 +428,10 @@ uint8_t sbrDecodeCoupleFrame(sbr_info *sbr, real_t *left_chan, real_t *right_cha
         sbr->just_seeked = 0;
     }
 
-    sbr_process_channel(sbr, left_chan, p_XLR->X_L, 0, dont_process, downSampledSBR);
-    /* subband synthesis */
-    if (downSampledSBR)
-    {
-        sbr_qmf_synthesis_32(sbr, &sbr->qmfs[0], p_XLR->X_L, left_chan);
-    } else {
-        sbr_qmf_synthesis_64(sbr, &sbr->qmfs[0], p_XLR->X_L, left_chan);
-    }
-
-    sbr_process_channel(sbr, right_chan, p_XLR->X_R, 1, dont_process, downSampledSBR);
-    /* subband synthesis */
-    if (downSampledSBR)
-    {
-        sbr_qmf_synthesis_32(sbr, &sbr->qmfs[1], p_XLR->X_R, right_chan);
-    } else {
-        sbr_qmf_synthesis_64(sbr, &sbr->qmfs[1], p_XLR->X_R, right_chan);
-    }
+    sbr_process_and_synthesise(sbr, left_chan, p_XLR->X_L, 0, dont_process,
+                               downSampledSBR);
+    sbr_process_and_synthesise(sbr, right_chan, p_XLR->X_R, 1, dont_process,
+                               downSampledSBR);
 
     if (sbr->bs_header_flag)
         sbr->just_seeked = 0;
@@ -469,14 +497,8 @@ uint8_t sbrDecodeSingleFrame(sbr_info *sbr, real_t *channel,
         sbr->just_seeked = 0;
     }
 
-    sbr_process_channel(sbr, channel, p_XLR->X_L, 0, dont_process, downSampledSBR);
-    /* subband synthesis */
-    if (downSampledSBR)
-    {
-        sbr_qmf_synthesis_32(sbr, &sbr->qmfs[0], p_XLR->X_L, channel);
-    } else {
-        sbr_qmf_synthesis_64(sbr, &sbr->qmfs[0], p_XLR->X_L, channel);
-    }
+    sbr_process_and_synthesise(sbr, channel, p_XLR->X_L, 0, dont_process,
+                               downSampledSBR);
 
     if (sbr->bs_header_flag)
         sbr->just_seeked = 0;
@@ -540,7 +562,8 @@ uint8_t sbrDecodeSingleFramePS(sbr_info *sbr, real_t *left_channel, real_t *righ
         sbr->just_seeked = 0;
     }
 
-    sbr_process_channel(sbr, left_channel, p_XLR->X_L, 0, dont_process, downSampledSBR);
+    sbr_process_channel(sbr, left_channel, p_XLR->X_L, NULL, 0, dont_process,
+                        downSampledSBR);
 
     /* copy some extra data for PS */
     for (l = 32; l < 38; l++)
@@ -572,8 +595,10 @@ uint8_t sbrDecodeSingleFramePS(sbr_info *sbr, real_t *left_channel, real_t *righ
         sbr_qmf_synthesis_32(sbr, &sbr->qmfs[0], p_XLR->X_L, left_channel);
         sbr_qmf_synthesis_32(sbr, &sbr->qmfs[1], p_XLR->X_R, right_channel);
     } else {
-        sbr_qmf_synthesis_64(sbr, &sbr->qmfs[0], p_XLR->X_L, left_channel);
-        sbr_qmf_synthesis_64(sbr, &sbr->qmfs[1], p_XLR->X_R, right_channel);
+        sbr_qmf_synthesis_64(sbr, &sbr->qmfs[0], p_XLR->X_L, NULL,
+                             left_channel);
+        sbr_qmf_synthesis_64(sbr, &sbr->qmfs[1], p_XLR->X_R, NULL,
+                             right_channel);
     }
 
     if (sbr->bs_header_flag)

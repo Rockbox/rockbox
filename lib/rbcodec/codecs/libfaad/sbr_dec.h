@@ -51,10 +51,21 @@ typedef struct {
     int16_t x_index;
 } qmfa_info;
 
+/* The synthesis history is 1280 values.  On ARM the window handles the
+ * wrap of the ring (sbr_qmf_arm.S); elsewhere it is stored twice so that
+ * the window never wraps.  The storage is faad_qmfs_v in decoder.c. */
+#ifdef CPU_ARM_CLASSIC
+#define QMFS_V_SIZE 1280
+#else
+#define QMFS_V_SIZE 2560
+#endif
+
 typedef struct {
-    real_t  v[2*64*20]; /* Size was "(downSampledSBR)?32:64". We use 64 now. */
+    real_t  *v;
     int16_t v_index;
 } qmfs_info;
+
+extern real_t *const faad_qmfs_v[2];
 
 typedef struct
 {

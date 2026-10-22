@@ -36,7 +36,7 @@ void sbr_qmf_analysis_32(sbr_info *sbr, qmfa_info *qmfa, const real_t *input,
 void sbr_qmf_synthesis_32(sbr_info *sbr, qmfs_info *qmfs, qmf_t X[MAX_NTSR][64],
                           real_t *output);
 void sbr_qmf_synthesis_64(sbr_info *sbr, qmfs_info *qmfs, qmf_t X[MAX_NTSR][64],
-                          real_t *output);
+                          const uint8_t *nb, real_t *output);
 
 
 #ifdef __cplusplus

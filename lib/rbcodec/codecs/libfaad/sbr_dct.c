@@ -1532,10 +1532,28 @@ static const uint32_t dct4_revtab[32] ICONST_ATTR MEM_ALIGN_ATTR = {
 #define BUTTERFLY_DCT4(out1, out2, real_part, imag_part, tab, tabidx) \
     x_re = real_part; \
     x_im = imag_part; \
-    tmp  = MUL_C(x_re + x_im, tab[tabidx++]); \
-    out1 = MUL_C(x_re       , tab[tabidx++]) + tmp; \
-    out2 = MUL_C(x_im       , tab[tabidx++]) + tmp;
+    tmp  = MUL_C_RS(tab[tabidx], x_re + x_im); \
+    out1 = MUL_C_RS(tab[tabidx + 1], x_re) + tmp; \
+    out2 = MUL_C_RS(tab[tabidx + 2], x_im) + tmp; \
+    tabidx += 3;
 
+#if defined(CPU_ARM_CLASSIC) && defined(FIXED_POINT)
+/* sbr_dct_arm.S */
+void dct4_pre_arm(const real_t *real, const real_t *imag, FFTComplex *xc,
+                  const real_t *tab, const uint32_t *revtab);
+void dct4_post_arm(real_t *real, real_t *imag, const FFTComplex *xc,
+                   const real_t *tab);
+
+/* size 64 only! */
+void dct4_kernel(real_t *real, real_t *imag)
+{
+    FFTComplex xc[32]; /* used for calling codeclib's fft implementation */
+
+    dct4_pre_arm(real, imag, xc, dct4_pre_tab, dct4_revtab);
+    ff_fft_calc_c(5, xc);
+    dct4_post_arm(real, imag, xc, dct4_post_tab);
+}
+#else
 /* size 64 only! */
 void dct4_kernel(real_t *real, real_t *imag)
 {
@@ -1568,14 +1586,15 @@ void dct4_kernel(real_t *real, real_t *imag)
     // i = 16, idx = 16 = reorder_tab[16];
     x_re  = xc[16].re;
     x_im  = xc[16].im;
-    imag[16] = MUL_C(x_im - x_re, COEF_CONST(0.707106769084930));
-    real[16] = MUL_C(x_re + x_im, COEF_CONST(0.707106769084930));
+    imag[16] = MUL_C_RS(COEF_CONST(0.707106769084930), x_im - x_re);
+    real[16] = MUL_C_RS(COEF_CONST(0.707106769084930), x_re + x_im);
     for (i = 17, tabidx = 3*17; i < 32; i++)
     {
         idx = 32-i;
         BUTTERFLY_DCT4(imag[i], real[i], xc[idx].re, xc[idx].im, dct4_post_tab, tabidx);
     }
 }
+#endif /* CPU_ARM_CLASSIC && FIXED_POINT */
 
 void DST4_32(real_t *y, real_t *x)
 {

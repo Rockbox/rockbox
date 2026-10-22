@@ -123,6 +123,8 @@ static INLINE void ComplexMult(real_t *y1, real_t *y2,
     );
 }
 
+#define MUL_C_RS(A,B) MUL_C(A,B)
+
   /* the following see little or no use, so just ignore them for now */
   #define MUL_Q2(A,B) (real_t)(((int64_t)(A)*(int64_t)(B)+(1 << (Q2_BITS-1))) >> Q2_BITS)
 
@@ -157,6 +159,22 @@ static INLINE real_t MUL_C(real_t A, real_t B)
 static INLINE real_t MUL_Q2(real_t A, real_t B)
 {
     return arm_mul(A, B, Q2_BITS);
+}
+
+/* MUL_C with B as the multiplier's Rs operand.  ARM7TDMI's multiply
+ * finishes early when Rs is small, so B should be the operand that is
+ * usually the narrower: the data rather than a full-width coefficient.
+ * The result is the same as MUL_C's. */
+static INLINE real_t MUL_C_RS(real_t A, real_t B)
+{
+    uint32_t lo, hi, res;
+    asm("smull  %0, %1, %3, %4\n\t"
+        "movs   %0, %0, lsr %5\n\t"
+        "adc    %2, %0, %1, lsl %6"
+        : "=&r" (lo), "=&r" (hi), "=r" (res)
+        : "r" (A), "r" (B), "M" (COEF_BITS), "M" (32 - COEF_BITS)
+        : "cc");
+    return res;
 }
 
 static INLINE real_t _MulHigh(real_t x, real_t y)
@@ -210,6 +228,7 @@ static INLINE void ComplexMult(real_t *y1, real_t *y2,
   #define MUL_F(A,B) (real_t)(((int64_t)(A)*(int64_t)(B)+(1 << (FRAC_BITS-1))) >> FRAC_BITS)
 #endif
   #define MUL_Q2(A,B) (real_t)(((int64_t)(A)*(int64_t)(B)+(1 << (Q2_BITS-1))) >> Q2_BITS)
+  #define MUL_C_RS(A,B) MUL_C(A,B)
 
 /* Complex multiplication */
 static INLINE void ComplexMult(real_t *y1, real_t *y2,

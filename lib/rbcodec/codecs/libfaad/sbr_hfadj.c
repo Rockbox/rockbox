@@ -1464,6 +1464,13 @@ static void hf_assembly(sbr_info *sbr, sbr_hfadj_info *adj,
     real_t G_filt, Q_filt;
 
     uint8_t h_SL;
+#ifndef SBR_LOW_POWER
+    /* smoothed gains of the current time slot */
+    real_t G_smooth[MAX_M], Q_smooth[MAX_M];
+    const real_t *G_f, *Q_f;
+    /* slots of this envelope in the smoothing ring buffer, up to 5 */
+    uint8_t same;
+#endif
 
     if (sbr->Reset == 1)
     {
@@ -1486,6 +1493,9 @@ static void hf_assembly(sbr_info *sbr, sbr_hfadj_info *adj,
         h_SL = (no_noise ? 0 : h_SL);
 #endif
 
+#ifndef SBR_LOW_POWER
+        same = 0;
+#endif
         if (assembly_reset)
         {
             for (n = 0; n < 4; n++)
@@ -1496,6 +1506,9 @@ static void hf_assembly(sbr_info *sbr, sbr_hfadj_info *adj,
             /* reset ringbuffer index */
             sbr->GQ_ringbuf_index[ch] = 4;
             assembly_reset = 0;
+#ifndef SBR_LOW_POWER
+            same = 4;
+#endif
         }
 
         for (i = sbr->t_E[ch][l]; i < sbr->t_E[ch][l+1]; i++)
@@ -1506,35 +1519,105 @@ static void hf_assembly(sbr_info *sbr, sbr_hfadj_info *adj,
 #endif
 
             /* load new values into ringbuffer */
+#ifndef SBR_LOW_POWER
+            /* once all five rows hold this envelope's gains, the row
+             * written and the smoothed gains no longer change */
+            if (same < 5)
+            {
+                same++;
+#endif
             memcpy(sbr->G_temp_prev[ch][sbr->GQ_ringbuf_index[ch]], adj->G_lim_boost[l], sbr->M*sizeof(real_t));
             memcpy(sbr->Q_temp_prev[ch][sbr->GQ_ringbuf_index[ch]], adj->Q_M_lim_boost[l], sbr->M*sizeof(real_t));
+#ifndef SBR_LOW_POWER
+                if (h_SL != 0)
+                {
+                    const real_t *g[5], *q[5];
+                    uint8_t ri = sbr->GQ_ringbuf_index[ch];
+                    for (n = 0; n <= 4; n++)
+                    {
+                        ri++;
+                        if (ri >= 5)
+                            ri -= 5;
+                        g[n] = sbr->G_temp_prev[ch][ri];
+                        q[n] = sbr->Q_temp_prev[ch][ri];
+                    }
+                    for (m = 0; m < sbr->M; m++)
+                    {
+                        G_smooth[m] = MUL_F(g[0][m], h_smooth[0]) +
+                                      MUL_F(g[1][m], h_smooth[1]) +
+                                      MUL_F(g[2][m], h_smooth[2]) +
+                                      MUL_F(g[3][m], h_smooth[3]) +
+                                      MUL_F(g[4][m], h_smooth[4]);
+                        Q_smooth[m] = MUL_F(q[0][m], h_smooth[0]) +
+                                      MUL_F(q[1][m], h_smooth[1]) +
+                                      MUL_F(q[2][m], h_smooth[2]) +
+                                      MUL_F(q[3][m], h_smooth[3]) +
+                                      MUL_F(q[4][m], h_smooth[4]);
+                    }
+                }
+            }
+            if (h_SL != 0)
+            {
+                G_f = G_smooth;
+                Q_f = Q_smooth;
+            } else {
+                G_f = adj->G_lim_boost[l];
+                Q_f = adj->Q_M_lim_boost[l];
+            }
+#endif
 
+#ifndef SBR_LOW_POWER
+            {
+                /* locals, as stores to Xsbr would otherwise make the
+                 * compiler reload them for every band */
+                qmf_t *row = Xsbr[i + sbr->tHFAdj] + sbr->kx;
+                const real_t *S = adj->S_M_boost[l];
+                const uint8_t M = sbr->M;
+                const uint8_t easter = (sbr->bs_extension_id == 3 &&
+                                        sbr->bs_extension_data == 42);
+                const int8_t ph_re = phi_re[fIndexSine];
+                const int8_t ph_im = phi_im[fIndexSine];
+                int8_t rev = (sbr->kx & 1) ? -1 : 1;
+
+                for (m = 0; m < M; m++)
+                {
+                    real_t re, im, S_m = S[m];
+
+                    G_filt = G_f[m];
+                    Q_filt = (S_m != 0 || no_noise) ? 0 : Q_f[m];
+
+                    /* add noise to the output */
+                    fIndexNoise = (fIndexNoise + 1) & 511;
+
+                    /* the smoothed gain values are applied to Xsbr */
+                    /* V is defined, not calculated */
+                    re = MUL_R(G_filt, QMF_RE(row[m]))
+                        + MUL_F(Q_filt, RE(V[fIndexNoise]));
+                    if (easter)
+                        re = 16428320;
+                    im = MUL_R(G_filt, QMF_IM(row[m]))
+                        + MUL_F(Q_filt, IM(V[fIndexNoise]));
+
+                    /* psi */
+                    re += REAL_UPSCALE(S_m * ph_re);
+                    im += REAL_UPSCALE(rev * S_m * ph_im);
+
+                    QMF_RE(row[m]) = re;
+                    QMF_IM(row[m]) = im;
+                    rev = -rev;
+                }
+            }
+#else
             for (m = 0; m < sbr->M; m++)
             {
                 qmf_t psi;
 
-                G_filt = 0;
-                Q_filt = 0;
-
 #ifndef SBR_LOW_POWER
-                if (h_SL != 0)
-                {
-                    uint8_t ri = sbr->GQ_ringbuf_index[ch];
-                    for (n = 0; n <= 4; n++)
-                    {
-                        real_t curr_h_smooth = h_smooth[n];
-                        ri++;
-                        if (ri >= 5)
-                            ri -= 5;
-                        G_filt += MUL_F(sbr->G_temp_prev[ch][ri][m], curr_h_smooth);
-                        Q_filt += MUL_F(sbr->Q_temp_prev[ch][ri][m], curr_h_smooth);
-                    }
-               } else {
-#endif
-                    G_filt = sbr->G_temp_prev[ch][sbr->GQ_ringbuf_index[ch]][m];
-                    Q_filt = sbr->Q_temp_prev[ch][sbr->GQ_ringbuf_index[ch]][m];
-#ifndef SBR_LOW_POWER
-                }
+                G_filt = G_f[m];
+                Q_filt = Q_f[m];
+#else
+                G_filt = sbr->G_temp_prev[ch][sbr->GQ_ringbuf_index[ch]][m];
+                Q_filt = sbr->Q_temp_prev[ch][sbr->GQ_ringbuf_index[ch]][m];
 #endif
 
                 Q_filt = (adj->S_M_boost[l][m] != 0 || no_noise) ? 0 : Q_filt;
@@ -1613,6 +1696,8 @@ static void hf_assembly(sbr_info *sbr, sbr_hfadj_info *adj,
 #endif
                 }
             }
+
+#endif
 
             fIndexSine = (fIndexSine + 1) & 3;
 
