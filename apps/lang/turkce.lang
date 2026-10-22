@@ -16829,11 +16829,11 @@
   </source>
   <dest>
     *: none
-    usbdac: "USB-DAC"
+    usbdac: "~USB-DAC"
   </dest>
   <voice>
     *: none
-    usbdac: "USB-DAC"
+    usbdac: "~USB-DAC"
   </voice>
 </phrase>
 <phrase>
@@ -17160,5 +17160,73 @@
   <voice>
     *: none
     touchscreen: "Ekran Kaydırma Kısayolları"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_SCREEN
+  desc: in the theme menu: browse recording screen skins
+  user: core
+  <source>
+    *: none
+    recording: "Recording Screen"
+  </source>
+  <dest>
+    *: none
+    recording: "Kayıt Ekranı"
+  </dest>
+  <voice>
+    *: none
+    recording: "Kayıt Ekranı"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_WRS
+  desc: spoken only, for file extension
+  user: core
+  <source>
+    *: none
+    recording: ""
+  </source>
+  <dest>
+    *: none
+    recording: ""
+  </dest>
+  <voice>
+    *: none
+    recording: "kayıt ekranı teması"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_RECORDING_SCREEN
+  desc: in the theme menu: browse remote recording screen skins
+  user: core
+  <source>
+    *: none
+    recording_remote: "Remote Recording Screen"
+  </source>
+  <dest>
+    *: none
+    recording_remote: "Uzaktan Kayıt Ekranı"
+  </dest>
+  <voice>
+    *: none
+    recording_remote: "Uzaktan Kayıt Ekranı"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_RWRS
+  desc: spoken only, for file extension
+  user: core
+  <source>
+    *: none
+    recording_remote: ""
+  </source>
+  <dest>
+    *: none
+    recording_remote: ""
+  </dest>
+  <voice>
+    *: none
+    recording_remote: "uzaktan kayıt ekranı teması"
   </voice>
 </phrase>
