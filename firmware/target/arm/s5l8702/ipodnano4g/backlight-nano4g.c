@@ -33,16 +33,9 @@
 static unsigned char led_out = DEFAULT_BRIGHTNESS_SETTING << 2;
 static bool led_on;
 
-/* As Apple's DxeD1759 does it: SYSCTRL bits 4..6 (pmu_preinit sets them)
- * are cleared while LEDOUT and LEDCTL are written, then restored. */
 static void led_update(void)
 {
-    unsigned char sysctrl = pmu_read(D1759_REG_SYSCTRL);
-
-    pmu_write(D1759_REG_SYSCTRL, sysctrl & 0x8f);
-    pmu_write(D1759_REG_LEDOUT, led_out);
-    pmu_write(D1759_REG_LEDCTL, led_on ? D1759_LEDCTL_ENABLE : 0);
-    pmu_write(D1759_REG_SYSCTRL, sysctrl);
+    pmu_set_backlight(led_out, led_on);
 }
 
 void backlight_hw_brightness(int brightness)

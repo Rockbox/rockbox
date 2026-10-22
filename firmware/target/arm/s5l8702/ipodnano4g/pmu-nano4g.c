@@ -99,13 +99,36 @@ void pmu_set_wake_condition(unsigned char condition)
     pmu_write(D1759_REG_WAKE, pmu_read(D1759_REG_WAKE) | condition);
 }
 
+static struct mutex pmu_sysctrl_mutex;
+static bool standby_requested;
+
+void pmu_set_backlight(unsigned char output, bool on)
+{
+    mutex_lock(&pmu_sysctrl_mutex);
+    if (!standby_requested)
+    {
+        /* Clear SYSCTRL bits 4..6 around the LED writes, then restore. */
+        unsigned char sysctrl = pmu_read(D1759_REG_SYSCTRL);
+        pmu_write(D1759_REG_SYSCTRL, sysctrl & 0x8f);
+        pmu_write(D1759_REG_LEDOUT, output);
+        pmu_write(D1759_REG_LEDCTL, on ? D1759_LEDCTL_ENABLE : 0);
+        pmu_write(D1759_REG_SYSCTRL, sysctrl);
+    }
+    mutex_unlock(&pmu_sysctrl_mutex);
+}
+
 void pmu_enter_standby(void)
 {
+    /* A backlight update must not restore an old SYSCTRL value over the
+     * standby request, or turn the LEDs back on during power-down. */
+    mutex_lock(&pmu_sysctrl_mutex);
+    standby_requested = true;
     /* Apple's firmware powers off with two exact writes: backlight off,
      * then 0x0a = 1 on its own. OR-ing the request into the other bits of
      * 0x0a leaves the unit on until the hold switch is toggled. */
     pmu_write(D1759_REG_LEDCTL, 0x02);
     pmu_write(D1759_REG_SYSCTRL, D1759_SYSCTRL_STBY);
+    mutex_unlock(&pmu_sysctrl_mutex);
 }
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
@@ -317,6 +340,7 @@ static void NORETURN_ATTR pmu_thread(void)
 /* main init */
 void pmu_init(void)
 {
+    mutex_init(&pmu_sysctrl_mutex);
     mutex_init(&pmu_adc_mutex);
     queue_init(&pmu_queue, false);
 

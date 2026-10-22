@@ -182,6 +182,7 @@ extern unsigned char pmu_chctl_boot;
 // void pmu_ldo_power_off(unsigned int ldo);
 void pmu_set_wake_condition(unsigned char condition);
 void pmu_enter_standby(void);
+void pmu_set_backlight(unsigned char output, bool on);
 // void pmu_nand_power(bool on);
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
 void pmu_set_cpu_voltage(unsigned mv);
