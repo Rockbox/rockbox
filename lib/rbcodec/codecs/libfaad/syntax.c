@@ -32,6 +32,7 @@
 #include "structs.h"
 
 #include <stdlib.h>
+#include <stddef.h>
 #include <string.h>
 
 #include "decoder.h"
@@ -555,6 +556,32 @@ void raw_data_block(NeAACDecHandle hDecoder, NeAACDecFrameInfo *hInfo,
     return;
 }
 
+/* An element is 20 KB, so it is not cleared for each frame.  Everything
+ * in it that is read is written first while parsing the frame, except
+ * what is reset here. */
+static void reset_ics(ic_stream *ics)
+{
+    ics->noise_used = 0;
+    ics->ms_mask_present = 0;
+}
+
+/* The second channel of a common-window pair takes the first's window and
+ * band layout: what ics_info() and window_grouping_info() set. */
+static void copy_ics_info(ic_stream *dst, const ic_stream *src)
+{
+    uint8_t g;
+
+    memcpy(dst, src, offsetof(ic_stream, sect_sfb_offset));
+    for (g = 0; g < src->num_window_groups; g++)
+    {
+        memcpy(dst->sect_sfb_offset[g], src->sect_sfb_offset[g],
+               (src->num_swb + 1) * sizeof(uint16_t));
+    }
+    memcpy(dst->swb_offset, src->swb_offset,
+           (src->num_swb + 1) * sizeof(uint16_t));
+    dst->predictor_data_present = src->predictor_data_present;
+}
+
 /* Table 4.4.4 and */
 /* Table 4.4.9 */
 static int16_t spec_data[FRAME_LEN] MEM_ALIGN_ATTR = {0};
@@ -566,7 +593,7 @@ static uint8_t single_lfe_channel_element(NeAACDecHandle hDecoder, bitfile *ld,
     ic_stream *ics = &(sce.ics1);
 
     memset(spec_data,0,sizeof(spec_data));
-    memset(&sce,0,sizeof(sce));
+    reset_ics(&sce.ics1);
     sce.element_instance_tag = (uint8_t)faad_getbits(ld, LEN_TAG
         DEBUGVAR(1,38,"single_lfe_channel_element(): element_instance_tag"));
 
@@ -615,7 +642,8 @@ static uint8_t channel_pair_element(NeAACDecHandle hDecoder, bitfile *ld,
 
     memset(spec_data1,0,sizeof(spec_data1));
     memset(spec_data2,0,sizeof(spec_data2));
-    memset(&cpe,0,sizeof(cpe));
+    reset_ics(ics1);
+    reset_ics(ics2);
     cpe.channel        = channels;
     cpe.paired_channel = channels+1;
 
@@ -644,6 +672,12 @@ static uint8_t channel_pair_element(NeAACDecHandle hDecoder, bitfile *ld,
                 }
             }
         }
+        else if (ics1->ms_mask_present == 3)
+        {
+            /* reserved: ms_decode() reads ms_used, which was all zeros
+             * when the element was cleared for each frame */
+            memset(ics1->ms_used, 0, sizeof(ics1->ms_used));
+        }
 
 #ifdef ERROR_RESILIENCE
         if ((hDecoder->object_type >= ER_OBJECT_START) && (ics1->predictor_data_present))
@@ -666,7 +700,7 @@ static uint8_t channel_pair_element(NeAACDecHandle hDecoder, bitfile *ld,
         }
 #endif
 
-        memcpy(ics2, ics1, sizeof(ic_stream));
+        copy_ics_info(ics2, ics1);
     } else {
         ics1->ms_mask_present = 0;
     }
@@ -1686,6 +1720,10 @@ static uint8_t section_data(NeAACDecHandle hDecoder, ic_stream *ics, bitfile *ld
 #endif
 
             if (k + sect_len >= 8*15)
+                return 15;
+            /* a section past max_sfb would read offsets this frame did
+             * not set */
+            if (k + sect_len > ics->max_sfb)
                 return 15;
             if (i >= 8*15)
                 return 15;
