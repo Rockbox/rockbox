@@ -111,6 +111,8 @@ void fiq_dummy(void)
 }
 
 
+static void core_sleep_init(void);
+
 /* The DWDMA's clock is on while one of its users holds it: lcdif-rk27xx.c,
  * for dwdma_init() and each LCD update. */
 static int dwdma_users = 0;
@@ -135,6 +137,8 @@ void system_init(void)
 {
     /* disable WDT just in case nand loader activated it */
     WDTCON &= ~(1<<3);
+
+    core_sleep_init();
 
 #ifndef BOOTLOADER
     /* turn off clock for unused modules - not the NAND controller's: the
@@ -179,6 +183,81 @@ void system_exception_wait(void)
     while(button_read_device());
     /* then wait until next button press */
     while(!button_read_device());
+}
+
+/* Idle: SCU_CPUPD = 0xdeedbabe gates the core clock, the peripherals keep
+ * running. The SCU restarts the clock only when the INTC's IRQ output
+ * *rises* while the core is stopped: written while an enabled interrupt is
+ * pending - one that came in after the scheduler found nothing to do - the
+ * core never wakes again. The core cannot avoid that window itself: it
+ * stops a few cycles after the write, before it could unmask anything it
+ * masked first. So the INTC is masked, and the A2A DMA unmasks it a few
+ * microseconds later, after the core has stopped: anything pending then
+ * raises the line and wakes the core. Interrupts that arrive meanwhile are
+ * delayed by those microseconds. (Tested with hwstub: 2.4 million sleeps
+ * under 25 kHz of interrupts without a hang; without the DMA, a hang within
+ * 60000.) The zeros the DMA writes first are the delay: the core must stop
+ * before the first unmask lands. Measured in Rockbox during playback, the
+ * DMA has written at most 1 word when the core writes SCU_CPUPD, normal or
+ * boosted, and every sleep with an interrupt pending was woken by the
+ * first unmask after 7 zeros; with 3 zeros, and a write to SDRAM between
+ * starting the DMA and SCU_CPUPD, it sometimes took the next one, and with
+ * a single unmask playback hung within seconds. The DMA still unmasks
+ * twice, masking again in between, as a margin: each unmask is a new edge
+ * if anything is pending.
+ *
+ * A2A channel 0 is used for nothing else (the SD driver uses channel 1),
+ * so it is set up once, by core_sleep_init(). The DWDMA cannot reach the
+ * INTC; borrowing the HDMA channel playback did not use hung the player as
+ * soon as playback started. */
+#define A2A_CON_UNMASK      ((1<<5) | /* fixed destination address */ \
+                             (1<<3) | /* DMA start */ \
+                             (2<<1) | /* word transfer size */ \
+                             (1<<0))  /* software mode */
+
+/* written to INTC_IMR one after the other (~1.6 us per word at 50 MHz
+ * HCLK): 7 zeros, the mask, zero, the mask */
+static unsigned long core_sleep_imr[10] __attribute__((aligned(16)));
+
+static void core_sleep_init(void)
+{
+    SCU_CLKCFG &= ~CLKCFG_A2A;
+    A2A_DOMAIN = 0;                 /* both channels on AHB0 */
+    A2A_ISRC0 = (unsigned long)core_sleep_imr;
+    A2A_IDST0 = (unsigned long)&INTC_IMR;
+    A2A_ICNT0 = sizeof(core_sleep_imr);
+    A2A_LCNT0 = 1;
+}
+
+void rk27xx_core_sleep(void)
+{
+    unsigned long imr = INTC_IMR;
+
+    if (imr != 0)                   /* else nothing could wake the core */
+    {
+        core_sleep_imr[7] = imr;
+        core_sleep_imr[9] = imr;
+        /* the buffer must be in memory before the DMA reads it */
+        asm volatile ("" : : : "memory");
+
+        /* nothing between starting the DMA and SCU_CPUPD: it eats into
+         * the delay */
+        INTC_IMR = 0;
+        A2A_CON0 = A2A_CON_UNMASK;
+
+        /* reading the register back makes sure the write has reached the
+         * SCU (ARMv5 has no barrier instruction); the core stops a few
+         * cycles later, before it gets past the next instructions */
+        SCU_CPUPD = 0xdeedbabe;
+        (void)SCU_CPUPD;
+
+        /* the INTC must be unmasked again before IRQs are. The channel
+         * reads as idle once it has read its last word; the write of that
+         * word to INTC_IMR may still be on its way. */
+        while (A2A_DMA_STS & 1);
+        for (int n = 1000; INTC_IMR != imr && n > 0; n--);
+    }
+    enable_irq();
 }
 
 /* usecs may be at most 2^32/200 (~21 seconds) for 200MHz max cpu freq */
