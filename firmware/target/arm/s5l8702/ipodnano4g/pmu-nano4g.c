@@ -137,6 +137,10 @@ void pmu_set_usblimit(bool fast_charge)
 
     val |= fast_charge ? D1759_ILIM_500MA : D1759_ILIM_100MA;
     pmu_write(D1759_REG_ILIM, val);
+    /* Apple's running firmware follows the input-limit write with 0x04
+     * while enabled, or 0x00 while disabled. Do not retain preinit's
+     * 0x54 setting when USB takes over the power budget. */
+    pmu_write(D1759_REG_CHCTL, (val & ~D1759_ILIM_MASK) ? 0x04 : 0x00);
 }
 
 /*
