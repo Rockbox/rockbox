@@ -3608,7 +3608,9 @@ void audio_playback_handler(struct queue_event *ev)
         case Q_AUDIO_STOP:
             LOGFQUEUE("playback < Q_AUDIO_STOP");
             audio_stop_playback();
-            if (ev->data != 0)
+            /* Unplug can queue the disconnect while playback stops.
+             * Leave it for usb_wait_for_disconnect() to consume. */
+            if (ev->data != 0 && ev->id != SYS_USB_CONNECTED)
                 queue_clear(&audio_queue);
             return; /* no more playback */
 
