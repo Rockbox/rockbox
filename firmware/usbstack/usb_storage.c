@@ -556,9 +556,14 @@ static void usb_storage_transfer_complete(int ep,int dir,int status,int length)
             }
             logf("scsi write %llu %d", cur_cmd.sector, cur_cmd.count);
             if(status==0) {
-                if((unsigned int)length!=(cur_cmd.block_size* cur_cmd.count)
-                  && (unsigned int)length!=WRITE_BUFFER_SIZE) {
-                    logf("unexpected length :%d",length);
+                unsigned int expected = MIN(WRITE_BUFFER_SIZE,
+                                    cur_cmd.block_size * cur_cmd.count);
+                if((unsigned int)length != expected) {
+                    logf("unexpected length: %d != %u", length, expected);
+                    cur_sense_data.sense_key = SENSE_MEDIUM_ERROR;
+                    cur_sense_data.asc = ASC_WRITE_ERROR;
+                    cur_sense_data.ascq = 0;
+                    send_csw(UMS_STATUS_FAIL);
                     break;
                 }
 
