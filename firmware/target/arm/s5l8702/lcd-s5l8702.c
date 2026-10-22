@@ -557,6 +557,14 @@ static void lcd_powersave(void)
 {
     mutex_lock(&lcd_mutex);
 
+    /* Shutdown can follow automatic LCD sleep. Its clock is already
+     * gated, so do not poll the controller or send another sleep sequence. */
+    if (!lcd_ispowered)
+    {
+        mutex_unlock(&lcd_mutex);
+        return;
+    }
+
     displaylcd_wait_dma();
                                    // XXX: Do not change modes while data is being sent
     s5l_lcd_set_command_mode();
