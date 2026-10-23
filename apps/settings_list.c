@@ -1374,7 +1374,7 @@ const struct settings_list settings[] = {
     CHOICE_SETTING(0, timeformat, LANG_TIMEFORMAT, 0,
         "time format", "24hour,12hour", NULL, 2,
         ID2P(LANG_24_HOUR_CLOCK), ID2P(LANG_12_HOUR_CLOCK)),
-    OFFON_SETTING(0,show_icons, LANG_SHOW_ICONS ,true,"show icons", NULL),
+    OFFON_SETTING(F_THEMESETTING,show_icons, LANG_SHOW_ICONS ,true,"show icons", NULL),
     /* system */
     INT_SETTING(F_TIME_SETTING, poweroff, LANG_POWEROFF_IDLE, 10,
                 "idle poweroff", UNIT_MIN, 0,60,1,
