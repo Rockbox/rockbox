@@ -146,13 +146,13 @@ target/hosted/sonynwz/nwzlinux-codec.c
 #endif
 
 #if !defined(BOOTLOADER)
-#if ((defined(HIBY_LINUX) || defined(FIIO_M3K_LINUX) || defined(SAMSUNG_YPR0) || defined(SAMSUNG_YPR1) || defined(SONY_NWZ_LINUX)) && !defined(SIMULATOR))
+#if ((defined(HIBY_LINUX) || defined(SAMSUNG_YPR0) || defined(SAMSUNG_YPR1) || defined(SONY_NWZ_LINUX)) && !defined(SIMULATOR))
 target/hosted/pcm-alsa.c
 target/hosted/alsa-controls.c
 #endif
 #endif
 
-#if ((defined(HIBY_LINUX) || defined(FIIO_M3K_LINUX)) && !defined(SIMULATOR))
+#if defined(HIBY_LINUX) && !defined(SIMULATOR)
 drivers/lcd-memframe.c
 target/hosted/backtrace-glibc.c
 target/hosted/filesystem-unix.c
@@ -235,18 +235,6 @@ target/hosted/button-devinput.c
 
 #if defined(HIBY_LINUX) && !defined(HIBY_R3PROII) && !defined(HIBY_R1) && !defined(HIDIZS_AP80MAX) && !defined(SIMULATOR)
 target/hosted/usb-hiby.c
-#endif
-
-#if defined(FIIO_M3K_LINUX) && !defined(SIMULATOR)
-target/hosted/fiio/buttonlight-fiio.c
-target/hosted/fiio/button-fiio.c
-target/hosted/fiio/debug-fiio.c
-target/hosted/fiio/powermgmt-fiio.c
-target/hosted/fiio/system-fiio.c
-target/hosted/fiio/usb-fiio.c
-#if !defined(BOOTLOADER)
-target/hosted/fiio/fiiolinux_codec.c
-#endif
 #endif
 
 #if defined(EROS_Q) && !defined(SIMULATOR)

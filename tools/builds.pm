@@ -439,10 +439,6 @@ $releasenotes="/wiki/ReleaseNotes400";
         manualok => 0,     # Remove when manual is written
         status => 3,
     },
-    'fiiom3klinux' => {
-        name => 'FiiO M3K (Linux)',
-        status => 1,
-    },
     'fiiom3k' => {
         name => 'FiiO M3K',
         status => 3,

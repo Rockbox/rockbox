@@ -29,9 +29,6 @@
 #include "sysfs.h"
 
 #include "tick.h"
-#ifdef FIIO_M3K_LINUX
-#include "usb.h"
-#endif
 
 #ifdef BATTERY_DEV_NAME
 # define BATTERY_SYSFS_PATH     "/sys/class/power_supply/" BATTERY_DEV_NAME
@@ -133,10 +130,6 @@ unsigned int power_input_status(void)
 {
     int present = 0;
     sysfs_get_int(POWER_STATUS_PATH, &present);
-
-#ifdef FIIO_M3K_LINUX
-    usb_enable(present ? true : false);
-#endif
 
     return present ? POWER_INPUT_USB_CHARGER : POWER_INPUT_NONE;
 }

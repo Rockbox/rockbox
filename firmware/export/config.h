@@ -150,8 +150,8 @@
 #define IHIFI_800_PAD      68
 #define XDUOO_X3II_PAD     69
 #define XDUOO_X20_PAD      70
-#define FIIO_M3K_LINUX_PAD 71
 #define EROSQ_PAD          72
+// 71 can be reused
 #define FIIO_M3K_PAD       73
 #define SHANLING_Q1_PAD    74
 #define ECHO_R1_PAD        75
@@ -572,8 +572,6 @@ Lyre prototype 1 */
 #include "config/xduoox3ii.h"
 #elif defined(XDUOO_X20)
 #include "config/xduoox20.h"
-#elif defined(FIIO_M3K_LINUX)
-#include "config/fiiom3klinux.h"
 #elif defined(FIIO_M3K)
 #include "config/fiiom3k.h"
 #elif defined(EROS_Q)

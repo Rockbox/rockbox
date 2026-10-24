@@ -76,15 +76,6 @@
 #define BUTTON_DOWN   BUTTON_HOME
 #define BUTTON_SELECT BUTTON_PLAY
 #include "bitmaps/hibyicon.h"
-#elif defined(FIIO_M3K_LINUX)
-#define ICON_WIDTH  130
-#define ICON_HEIGHT 130
-#define ICON_NAME bm_fiioicon
-#define BUTTON_LEFT    BUTTON_PREV
-#define BUTTON_RIGHT   BUTTON_NEXT
-#define BUTTON_SELECT BUTTON_PLAY
-#define OF_NAME "FIIO PLAYER"
-#include "bitmaps/fiioicon.h"
 #elif defined(EROS_Q)
 #define ICON_WIDTH  130
 #define ICON_HEIGHT 130
@@ -529,12 +520,6 @@ void run_script_menu(void)
 
 static void adb(int start)
 {
-#if defined(FIIO_M3K_LINUX)
-    lcd_set_foreground(LCD_RGBPACK(255, 0, 0));
-    lcd_putsf(0, 1, "ADB not supported!");
-    sleep(2*HZ);
-    (void)start;
-#else
     pid_t pid = fork();
     if(pid == 0)
     {
@@ -559,7 +544,6 @@ static void adb(int start)
         lcd_set_foreground(LCD_RGBPACK(255, 0, 0));
         lcd_putsf(0, 1, "an error occured: %x", status);
     }
-#endif
 #endif
 }
 
@@ -692,11 +676,7 @@ int main(int argc, char **argv)
 #endif
             mount_storage(false);
             /* boot OF */
-#if defined(FIIO_M3K_LINUX)
-            execvp("/usr/project/bin/player_daemon", argv);
-#else
             execvp("/usr/bin/hiby_player", argv);
-#endif
             error_screen("Cannot boot OF");
             sleep(5 * HZ);
         }

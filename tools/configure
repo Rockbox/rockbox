@@ -1760,17 +1760,15 @@ cat <<EOF
  229) NWZ-S750 series      251) DX90                  (hw1/hw2 bl, all hw rb)
  303) PSP (WIP)                                  248) Eros Q / K native
                            ==xDuoo==                  (hw3 bl only)
-                           241) X3               249) Eros Q / K native
- ==FiiO==                  242) X3II                  (hw4 bl only)
- 244) M3K Linux            243) X20
- 246) M3K baremetal                              ==HiBy==
-                           ==Surfans==           300) R3 Pro II
- ==Shanling==              280) F28 (WIP)        301) R1
- 260) Q1
-                           ==Nintendo==          ==Hidizs==
- ==Echo project==          290) 3DS (WIP)        302) AP80 Pro Max (WIP)
- 270) Echo R1 (WIP)
-
+ ==FiiO==                  241) X3               249) Eros Q / K native
+ 246) M3K                  242) X3II                  (hw4 bl only)
+                           243) X20
+ ==Shanling==                                    ==HiBy==
+ 260) Q1                   ==Surfans==           300) R3 Pro II
+                           280) F28 (WIP)        301) R1
+ ==Echo project==
+ 270) Echo R1 (WIP)       ==Nintendo==          ==Hidizs==
+                          290) 3DS (WIP)        302) AP80 Pro Max (WIP)
 EOF
 
   buildfor=`input`;
@@ -3871,29 +3869,6 @@ fi
     t_cpu="hosted"
     t_manufacturer="xduoo"
     t_model="xduoo_x20"
-    sysfontbl="16-Terminus"
-    ;;
-
-   244|fiiom3klinux)
-    application="yes"
-    app_type="fiio"
-    target_id=112
-    modelname="fiiom3klinux"
-    target="FIIO_M3K_LINUX"
-    memory=16 # XXX Can probably go over 32?
-    tool="cp "
-    boottool="cp "
-    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
-    output="rockbox.m3k"
-    bootoutput="bootloader.m3k"
-    appextra=""
-    plugins="yes"
-    # architecture, manufacturer and model for the target-tree build
-    t_cpu="hosted"
-    t_manufacturer="fiio"
-    t_model="m3k"
-    mipsellinuxcc
     sysfontbl="16-Terminus"
     ;;
 
