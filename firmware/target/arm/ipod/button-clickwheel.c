@@ -261,6 +261,9 @@ static inline int ipod_4g_button_read(void)
             }
 
         }
+#ifdef CPU_PP
+        /* Recovery uses PortalPlayer registers; other targets drop
+         * unknown packets without accessing them. */
         else if ((status & 0x800000ff) != 0x8000003a &&
                  status != 0xFFFFFFFF)
         {
@@ -269,6 +272,7 @@ static inline int ipod_4g_button_read(void)
             outl(inl(0x7000c104) | 0x04000000, 0x7000c104);
             outl(inl(0x7000c100) | 0x60000000, 0x7000c100);
         }
+#endif
 #if CONFIG_CPU==S5L8701 || CONFIG_CPU==S5L8702 || CONFIG_CPU==S5L8720
         else if ((status & 0x8000FFFF) == 0x8000023A)
         {
