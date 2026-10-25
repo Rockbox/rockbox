@@ -64,12 +64,6 @@
 
 #define NAND_STATUS_READY       (1 << 6)
 
-#define NAND_ERR_RESET_CMD      (-1)
-#define NAND_ERR_IDENTIFY       (-2)
-#define NAND_ERR_READY_CMD      (-3)
-#define NAND_ERR_UNKNOWN        (-5)
-#define NAND_ERR_FTL            (-100)
-
 #define NAND_CHUNK_SIZE         512
 #define NAND_CHUNKS_PER_PAGE    (NAND_PAGE_SIZE / NAND_CHUNK_SIZE)
 #define NAND_MAX_BANKS          4
@@ -994,18 +988,22 @@ int nand_init(void)
         logf("nand: identify failed");
         return NAND_ERR_IDENTIFY;
     }
-    if (nand_decode(id, &nand_chip_decoded))
-    {
-        logf("nand: unknown chip %08lx", (unsigned long)id);
-        return NAND_ERR_UNKNOWN;
-    }
-    nand_chip = &nand_chip_decoded;
+    /* Keep the ID even for an unknown chip, so the storage error on screen
+     * can show which chip it is. */
     nand_id = id;
+    if (!nand_decode(id, &nand_chip_decoded))
+        nand_chip = &nand_chip_decoded;
 
     for (bank = 1; bank < NAND_MAX_BANKS; bank++)
-        if (nand_reset(bank) || nand_identify(&id) || id != nand_chip->id)
+        if (nand_reset(bank) || nand_identify(&id) || id != nand_id)
             break;
     nand_banks = bank;
+    if (!nand_chip)
+    {
+        logf("nand: unknown chip %08lx x %u", (unsigned long)nand_id,
+             nand_banks);
+        return NAND_ERR_UNKNOWN;
+    }
     /* Apple's populations for this model: two or four chips of one part on
      * the first chip enables, the others empty */
     for (; bank < NAND_MAX_BANKS; bank++)

@@ -34,6 +34,15 @@
  * still moves a page as 512-byte ECC chunks, eight of them. */
 #define NAND_PAGE_SIZE      4096
 
+/* Return values of nand_init(). When the FTL fails to mount, nand_init()
+ * returns NAND_ERR_FTL plus the ftl_init() code, so "Storage error: -103"
+ * means ftl_init() returned -3. */
+#define NAND_ERR_RESET_CMD      (-1)
+#define NAND_ERR_IDENTIFY       (-2)
+#define NAND_ERR_READY_CMD      (-3)
+#define NAND_ERR_UNKNOWN        (-5)
+#define NAND_ERR_FTL            (-100)
+
 #define NAND_ECC_CLEAN      0
 #define NAND_ECC_CORRECTED  1
 #define NAND_ECC_FAILED     3

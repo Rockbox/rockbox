@@ -1112,6 +1112,14 @@ void main(void)
 #endif
         if (rc != 0) {
             printf("Storage error: %d", rc);
+#ifdef IPOD_NANO4G
+            printf("NAND %08lx x %u", (unsigned long)nand_chip_id(),
+                   nand_get_bank_count());
+            if (rc == NAND_ERR_UNKNOWN)
+                printf("unknown NAND chip");
+            else if (rc <= NAND_ERR_FTL)
+                printf("FTL mount error: %d", rc - NAND_ERR_FTL);
+#endif
             fatal_error(ERR_STORAGE);
         }
 
