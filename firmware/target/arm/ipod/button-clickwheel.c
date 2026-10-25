@@ -261,6 +261,33 @@ static inline int ipod_4g_button_read(void)
             }
 
         }
+#ifdef IPOD_NANO4G
+        else if ((status & 0x800000ff) == 0x8000005a)
+        {
+            /* Two fingers on the wheel: buttons in bits 24..28, the finger
+             * positions in bits 8..15 and 16..23 (0x7f = no finger). Only
+             * the buttons are reported; scrolling restarts from the next
+             * single-finger packet without a jump. */
+            if (status & 0x01000000)
+                btn |= BUTTON_SELECT;
+            if (status & 0x02000000)
+                btn |= BUTTON_RIGHT;
+            if (status & 0x04000000)
+                btn |= BUTTON_LEFT;
+            if (status & 0x08000000)
+                btn |= BUTTON_PLAY;
+            if (status & 0x10000000)
+                btn |= BUTTON_MENU;
+            wheel_is_touched = ((status >> 8) & 0xff) != 0x7f ||
+                               ((status >> 16) & 0xff) != 0x7f;
+            if (wheel_is_touched)
+            {
+                backlight_on();
+                reset_poweroff_timer();
+            }
+            old_wheel_value = -1;
+        }
+#endif
 #ifdef CPU_PP
         /* Recovery uses PortalPlayer registers; other targets drop
          * unknown packets without accessing them. */
