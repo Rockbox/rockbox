@@ -115,6 +115,7 @@ enum variables {
     var_include,
     var_rootmenu,
     var_format,
+    var_hide_special,
     menu_byfirstletter,
     menu_next,
     menu_load,
@@ -193,6 +194,7 @@ struct menu_entry {
         int format_id[MAX_TAGS];
         int clause_count[MAX_TAGS];
         int result_seek[MAX_TAGS];
+        bool hide_special; /* no [All tracks], [Random] or [By album] rows */
     } si;
     int link;
 };
@@ -406,6 +408,7 @@ static int get_tag(int *tag)
         TAG_MATCH("lastelapsed", tag_lastelapsed) \
         TAG_MATCH("%menu_start", var_menu_start) \
         TAG_MATCH("%byfirstletter", menu_byfirstletter) \
+        TAG_MATCH("%hide_special", var_hide_special) \
         TAG_MATCH("canonicalartist", tag_virt_canonicalartist) \
     /* END OF TAG_TABLE MACRO */
 
@@ -765,6 +768,15 @@ static int get_condition(struct search_instruction *inst)
         case '-':
         case '\0':
             return 0;
+        case '%':
+        {
+            /* item option, e.g. "Albums" -> album -> title %hide_special */
+            int var;
+            if (get_tag(&var) <= 0 || var != var_hide_special)
+                return -1;
+            inst->hide_special = true;
+            return 1;
+        }
     }
 
     clause_count = inst->clause_count[inst->tagorder_count];
@@ -1750,7 +1762,7 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
     tree_lock_cache(c);
     struct tagentry *dptr = core_get_data(c->cache.entries_handle);
 
-    if (tag != tag_title && tag != tag_filename)
+    if (tag != tag_title && tag != tag_filename && !csi->hide_special)
     {
         bool show_album_sorted = (tag == tag_album);
         int show_album_sorted_offset = (show_album_sorted ? 1 : 0);
