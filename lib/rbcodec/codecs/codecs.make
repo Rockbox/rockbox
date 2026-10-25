@@ -23,7 +23,7 @@ CODEC_LIBS := $(CODECLIB) $(FIXEDPOINTLIB) $(ARMSUPPORTLIB)
 
 # compile flags for codecs
 CODECFLAGS := $(CFLAGS) $(RBCODEC_CFLAGS) -fstrict-aliasing \
-			 -I$(RBCODECLIB_DIR)/codecs -I$(RBCODECLIB_DIR)/codecs/lib -DCODEC
+            -I$(RBCODECLIB_DIR)/codecs -I$(RBCODECLIB_DIR)/codecs/lib -DCODEC
 
 ifdef APP_TYPE
  CODECLDFLAGS = $(SHARED_LDFLAGS)
@@ -43,7 +43,6 @@ ifdef USE_LTO
  CODECFLAGS += -fno-builtin -ffreestanding
  CODECLDFLAGS += -e __header
 endif
-
 
 # the codec libraries
 include $(RBCODECLIB_DIR)/codecs/demac/libdemac.make
@@ -86,84 +85,33 @@ $(MUSEPACKLIB): CODECFLAGS += -Wno-shift-negative-value
 $(WMALIB): CODECFLAGS += -Wno-shift-negative-value
 endif
 
-ifndef DEBUG
 # set CODECFLAGS per codec lib, since gcc takes the last -Ox and the last
 # in a -ffoo -fno-foo pair, there is no need to filter them out
-$(CODECLIB) : CODECFLAGS += -O1
-$(A52LIB) : CODECFLAGS += -O1
-$(ALACLIB) : CODECFLAGS += -O1
-$(ASAPLIB) : CODECFLAGS += -O1
-$(ASFLIB) : CODECFLAGS += -O2
-$(ATRACLIB) : CODECFLAGS += -O1
-$(AYLIB) : CODECFLAGS += -O2
-$(AYUMILIB) : CODECFLAGS += -O3
-$(COOKLIB): CODECFLAGS += -O1
-$(DEMACLIB) : CODECFLAGS += -O3
-$(FAADLIB) : CODECFLAGS += -O2
-$(FFMPEGFLACLIB) : CODECFLAGS += -O2
-$(GBSLIB) : CODECFLAGS +=  -O2
-$(HESLIB) : CODECFLAGS +=  -O2
-$(KSSLIB) : CODECFLAGS +=  -O2
-$(M4ALIB) : CODECFLAGS += -O3
-$(MADLIB) : CODECFLAGS += -O2
-$(MUSEPACKLIB) : CODECFLAGS += -O1
-$(NSFLIB) : CODECFLAGS +=  -O2
-$(OPUSLIB) : CODECFLAGS +=  -O2
-$(PCMSLIB) : CODECFLAGS += -O1
-$(RMLIB) : CODECFLAGS += -O3
-$(SGCLIB) : CODECFLAGS +=  -O2
-$(SPCLIB) : CODECFLAGS +=  -O1
-$(SPEEXLIB) : CODECFLAGS += -O2
-$(TREMORLIB) : CODECFLAGS += -O2
-$(TTALIB) : CODECFLAGS += -O2
-$(VGMLIB) : CODECFLAGS +=  -O2
-$(EMU2413LIB) : CODECFLAGS +=  -O3
-$(WAVPACKLIB) : CODECFLAGS += -O1
-$(WMALIB) : CODECFLAGS += -O2
-$(WMAPROLIB) : CODECFLAGS += -O1
-$(WMAVOICELIB) : CODECFLAGS += -O1
-$(CRSID) : CODECFLAGS += -O3
+
+# Use -O2 as the baseline for everything under codecs!
+CODECFLAGS += -O2
 
 # fine-tuning of CODECFLAGS per cpu arch
 ifeq ($(ARCH),arch_arm)
-  # redo per arm generation
-  $(ALACLIB) : CODECFLAGS += -O2
-  $(AYLIB) : CODECFLAGS +=  -O1
-  $(EMU2413LIB) : CODECFLAGS +=  -O3
-  $(GBSLIB) : CODECFLAGS +=  -O1
-  $(HESLIB) : CODECFLAGS +=  -O1
-  $(KSSLIB) : CODECFLAGS +=  -O1
-  $(MADLIB) : CODECFLAGS += -O1
-  $(NSFLIB) : CODECFLAGS +=  -O1
-  $(SPEEXLIB) : CODECFLAGS += -O2
-  $(SGCLIB) : CODECFLAGS +=  -O1
-  $(VGMLIB) : CODECFLAGS +=  -O1
+  # All ARM targets
+  $(MADLIB) : CODECFLAGS += -O3
+  $(ALACLIB) : CODECFLAGS += -O3
   $(WAVPACKLIB) : CODECFLAGS += -O3
-  ifneq (,$(findstring 3ds, $(MODELNAME)))
-    # segfault with -O1
-    $(SPCLIB) : CODECFLAGS += -O2
-  endif
+#  $(TREMORLIB) : CODECFLAGS += -O3
+ifeq ($(ARCH_VERSION),4)
+  $(MUSEPACKLIB) : CODECFLAGS += -O1
+  $(ATRACLIB) : CODECFLAGS += -O1
+else # armv5+
+  # defaults for everything else for now
+endif # [ARM] ARCH_VERSION
+
 else ifeq ($(ARCH),arch_m68k)
-  $(CODECLIB) : CODECFLAGS += -O2
-  $(A52LIB) : CODECFLAGS += -O2
-  $(ASFLIB) : CODECFLAGS += -O3
-  $(ATRACLIB) : CODECFLAGS += -O2
-  $(COOKLIB): CODECFLAGS += -O2
-  $(DEMACLIB) : CODECFLAGS += -O2
-  $(FFMPEGFLACLIB) : CODECFLAGS += -Os
-  $(SPCLIB) : CODECFLAGS +=  -O3
-  $(WMAPROLIB) : CODECFLAGS += -O3
-  $(WMAVOICELIB) : CODECFLAGS += -O2
+  # defaults for everything for now
+  # ASFLIB, SPCLIB, WMAPROLIB get -O3 ?
 else ifeq ($(ARCH),arch_mips)
+  # defaults for everything for now
   $(OPUSLIB) : CODECFLAGS += -fno-strict-aliasing
 endif
-
-ifeq ($(MEMORYSIZE),2)
-  $(CODECLIB) : CODECFLAGS += -Os
-  $(ASFLIB) : CODECFLAGS += -Os
-  $(WMALIB) : CODECFLAGS += -Os
-endif
-endif #ifndef DEBUG
 
 ifndef APP_TYPE
   CONFIGFILE := $(FIRMDIR)/export/config/$(MODELNAME).h
