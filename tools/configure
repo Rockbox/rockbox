@@ -1260,7 +1260,7 @@ voiceconfig () {
         DEFAULT_TTS_OPTS=$GTTS_OPTS
         DEFAULT_CHOICE="g"
     fi
-    if [ -n "`findtool piper`" ]; then
+    if python3 -m piper -h > /dev/null ; then
         PIPER="(p)iper "
         PIPER_OPTS=""
         DEFAULT_TTS="piper"
@@ -1366,6 +1366,7 @@ voiceconfig () {
 	fi
 	models=`(cd $PIPER_MODEL_DIR ; ls -1 *onnx)`
 	for model in $models; do
+	    model=`basename "$model" .onnx`
 	    PIPER_MODEL="$model"  # Default
 	    break;
         done
@@ -1374,6 +1375,7 @@ voiceconfig () {
         else
 	    i=1
 	    for model in $models; do
+		model=`basename "$model" .onnx`
 		printf "%3d. %s\n" "$i" "$model"
                 i=`expr $i + 1`
             done
@@ -1382,6 +1384,7 @@ voiceconfig () {
 	fi
         i=1
         for model in $models; do
+	    model=`basename "$model" .onnx`
             if [ "$i" = "$CHOICE" -o "$model" = "$CHOICE" ]; then
                 PIPER_MODEL="$model"
 		break;
@@ -1389,7 +1392,7 @@ voiceconfig () {
             i=`expr $i + 1`
         done
 
-	TTS_OPTS="$TTS_OPTS --model $PIPER_MODEL_DIR/$PIPER_MODEL"
+	TTS_OPTS="$TTS_OPTS -m $PIPER_MODEL"
         advopts="$advopts --voice=$PIPER_MODEL"
         echo "Piper model set to $PIPER_MODEL"
     elif [ "$TTS_ENGINE" = "mimic" ]; then
@@ -1452,7 +1455,7 @@ voiceconfig () {
 picklang() {
     # figure out which languages that are around
     for file in $rootdir/apps/lang/*.lang; do
-        clean=`basename $file .lang`
+        clean=`basename "$file" .lang`
         langs="$langs $clean"
     done
 

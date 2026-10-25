@@ -62,7 +62,7 @@ sub buildit {
     system($c);
 
     print "Run 'make voice'\n" if($verbose);
-    `make voice`;
+    `make V=1 voice > build.log`;
 }
 
 `git checkout $tag`;
