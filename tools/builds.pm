@@ -67,6 +67,7 @@ $releasenotes="/wiki/ReleaseNotes400";
     },
     'gigabeats' => {
         name => 'Toshiba Gigabeat S',
+        manualok => 1, # Remove when promoted to stable
         status => 2,
     },
     'gogearhdd1630' => {
