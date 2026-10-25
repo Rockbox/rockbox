@@ -247,6 +247,7 @@ enum { E_COMMENT, E_RAW, E_BROWSE, E_SHUFFLE, E_LINK, E_RELOAD, E_EDIT };
 struct tn_entry {
     struct tn_entry *next;
     unsigned char kind;
+    bool hide_special;         /* %hide_special: no [All tracks]/[Random] rows */
     char *name;
     char *text;                /* raw line, comment, or link target id */
     struct tn_screen *screens;
@@ -474,7 +475,7 @@ static struct tn_clause *new_clause(int fld, int op, const char *value)
 }
 
 /* clauses after "?": tag op "value", joined by & or |; also "= fmt" */
-static bool read_conds(struct tn_screen *sc)
+static bool read_conds(struct tn_screen *sc, struct tn_entry *e)
 {
     struct tn_clause **tail = &sc->clauses;
     while (*tail)
@@ -503,6 +504,12 @@ static bool read_conds(struct tn_screen *sc)
             tpos++;
             if (!(sc->fmt = need_str()))
                 return false;
+            continue;
+        }
+        if (word_is(t, "%hide_special"))
+        {
+            tpos++;
+            e->hide_special = true;
             continue;
         }
         int fld = field_of(t);
@@ -572,7 +579,7 @@ static struct tn_entry *parse_entry(const char *line)
         if (!sc)
             return NULL;
         sc->fld = fld;
-        if (!read_conds(sc))
+        if (!read_conds(sc, e))
             return NULL;
         *tail = sc;
         tail = &sc->next;
@@ -813,6 +820,8 @@ static void out_entry(const struct tn_entry *e)
                 if (sc->next)
                     out(" -> ");
             }
+            if (e->hide_special)
+                out(" %hide_special");
             break;
     }
     out("\n");
@@ -2135,7 +2144,7 @@ static void edit_items(struct tn_stmt *m, bool is_root);
 static void edit_az(struct tn_stmt *m);
 
 /* item screen ids */
-enum { R_NAME = 1, R_KIND, R_FILTERS, R_SCREEN, R_ADD_SCREEN, R_DELETE,
+enum { R_NAME = 1, R_KIND, R_SPECIAL, R_FILTERS, R_SCREEN, R_ADD_SCREEN, R_DELETE,
        R_ENTRY, R_ADD_ITEM, R_SAVE, R_MORE, R_FILTER, R_ADD_FILTER, R_FORMAT,
        R_MOVE_FILTERS, R_FIELD, R_TEST, R_VALUE, R_REMOVE, R_FROM, R_TO,
        R_DECADE, R_ALL_MENUS, R_TOP, R_DISCARD, R_RESTORE, R_MENU, R_INDEX };
@@ -2608,6 +2617,15 @@ static void edit_entry(struct tn_stmt *m, struct tn_entry *e)
         rows_reset();
         add_row(R_NAME, Icon_Menu_setting, NULL, "%s: %s", LSTR(LANG_NAME), e->name);
         add_row(R_KIND, Icon_Menu_setting, NULL, "Opens as: %s", e->kind == E_SHUFFLE ? LSTR(LANG_SHUFFLE) : "List");
+        /* the [All tracks] and [Random] rows only appear on lists that aren't tracks */
+        bool lists = false;
+        for (struct tn_screen *sc = e->screens; sc; sc = sc->next)
+            if (!IS_TRACKS(sc->fld))
+                lists = true;
+        if (e->kind == E_BROWSE && lists)
+            add_row(R_SPECIAL, Icon_Menu_setting, NULL, "%s & %s: %s",
+                    LSTR(LANG_TAGNAVI_ALL_TRACKS), LSTR(LANG_TAGNAVI_RANDOM),
+                    LSTR(e->hide_special ? LANG_OFF : LANG_ON));
         if (never)
             add_row(R_FILTERS, Icon_Menu_setting, NULL, "Filters: never match!");
         else if (nf)
@@ -2695,6 +2713,10 @@ static void edit_entry(struct tn_stmt *m, struct tn_entry *e)
             }
             case R_KIND:
                 e->kind = e->kind == E_SHUFFLE ? E_BROWSE : E_SHUFFLE;
+                changed();
+                break;
+            case R_SPECIAL:
+                e->hide_special = !e->hide_special;
                 changed();
                 break;
             case R_FILTERS:
