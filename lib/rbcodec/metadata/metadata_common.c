@@ -293,7 +293,7 @@ long parse_tag(const char* name, char* value, struct mp3entry* id3,
         eYEAR, eDATE, eTITLE, eARTIST, eALBUM, eGENRE,
         eCOMPOSER, eCOMMENT, eALBUMARTIST, eALBUM_ARTIST,
         eENSEMBLE, eGROUPING, eCONTENTGROUP, eCONTENT_GROUP,
-        eMUSICBRAINZ1, eMUSICBRAINZ2, e_COUNT_TAG_COUNT
+        eMUSICBRAINZ1, eMUSICBRAINZ2, eDESCRIPTION, e_COUNT_TAG_COUNT
     };
 
     static const char *tagops[e_COUNT_TAG_COUNT + 1] =
@@ -307,6 +307,7 @@ long parse_tag(const char* name, char* value, struct mp3entry* id3,
       [eCONTENTGROUP] = "contentgroup", [eCONTENT_GROUP] = "content group",
       [eMUSICBRAINZ1] = "musicbrainz_trackid",
       [eMUSICBRAINZ2] = "http://musicbrainz.org",
+      [eDESCRIPTION] = "description",
       [e_COUNT_TAG_COUNT] = NULL
     };
 
@@ -363,8 +364,10 @@ long parse_tag(const char* name, char* value, struct mp3entry* id3,
     {
         p = &(id3->composer);
     }
-    else if (item == eCOMMENT)
+    else if (item == eCOMMENT
+        || (item == eDESCRIPTION && type == TAGTYPE_VORBIS))
     {
+        /* DESCRIPTION is the Vorbis comment spec's name for it */
         p = &(id3->comment);
     }
     else if (item == eALBUMARTIST || item == eALBUM_ARTIST || item == eENSEMBLE)
