@@ -66,9 +66,9 @@ bool read_ape_tags(int fd, struct mp3entry* id3)
     if (IS_BIG_ENDIAN)
     {
         header.version = swap32(header.version);
-        header.length = swap32(header.version);
-        header.item_count = swap32(header.version);
-        header.flags = swap32(header.version);
+        header.length = swap32(header.length);
+        header.item_count = swap32(header.item_count);
+        header.flags = swap32(header.flags);
     }
 
     if ((header.version == 2000) && (header.item_count > 0)
