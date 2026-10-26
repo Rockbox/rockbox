@@ -230,6 +230,7 @@ static int asf_parse_header(int fd, struct mp3entry* id3,
     int i;
     int fileprop = 0;
     uint64_t play_duration;
+    uint64_t preroll;
     uint16_t flags;
     uint32_t subobjects;
     uint8_t utf8buf[512];
@@ -288,13 +289,21 @@ static int asf_parse_header(int fd, struct mp3entry* id3,
                     read_uint64le(fd, &wfx->numpackets);
                     /*DEBUGF("read packets:  %llx %lld\n", wfx->numpackets, wfx->numpackets);*/
 
-                    /* Now get the play duration - uint64_t at offset 40 */
+                    /* Now get the play duration - uint64_t at offset 40,
+                     * in 100 ns units */
                     read_uint64le(fd, &play_duration);
-                    id3->length = play_duration / 10000;
+
+                    /* The preroll (ms) - uint64_t at offset 56.  The play
+                     * duration includes it, the packet times don't */
+                    lseek(fd, 8, SEEK_CUR);
+                    read_uint64le(fd, &preroll);
+                    play_duration /= 10000;
+                    id3->length = play_duration > preroll ?
+                                  play_duration - preroll : play_duration;
                     /*DEBUGF("****** length = %lums\n", id3->length);*/
 
                     /* Read the packet size - uint32_t at offset 68 */
-                    lseek(fd, 20, SEEK_CUR);
+                    lseek(fd, 4, SEEK_CUR);
                     read_uint32le(fd, &wfx->packet_size);
 
                     /* Skip bytes remaining in object */
