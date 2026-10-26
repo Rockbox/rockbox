@@ -146,11 +146,18 @@ bool read_ape_tags(int fd, struct mp3entry* id3)
 #ifdef HAVE_ALBUMART
                 if (strcasecmp(name, "cover art (front)") == 0)
                 {
-                    /* Skip any file name. */
-                    r = read_string(fd, value, sizeof(value), 0, -1);
-                    r += read_string(fd, value, sizeof(value), -1, 4);
+                    /* where the item's value starts */
+                    off_t start = lseek(fd, 0, SEEK_CUR);
 
+                    /* Skip any file name, then read the magic number. */
+                    r = read_string(fd, value, sizeof(value), 0,
+                                    item.length);
                     if (r < 0)
+                    {
+                        return false;
+                    }
+                    value[0] = '\0';
+                    if (item.length - r >= 4 && read(fd, value, 4) != 4)
                     {
                         return false;
                     }
@@ -173,13 +180,13 @@ bool read_ape_tags(int fd, struct mp3entry* id3)
                     /* Set the album art size and position. */
                     if (id3->albumart.type != AA_TYPE_UNKNOWN)
                     {
-                        id3->albumart.pos  = lseek(fd, - 4, SEEK_CUR);
-                        id3->albumart.size = item.length - r - 4;
+                        id3->albumart.pos  = start + r;
+                        id3->albumart.size = item.length - r;
                         id3->has_embedded_albumart = true;
                     }
-                    
+
                     /* Seek back to this APE items begin. */
-                    if (lseek(fd, -r, SEEK_CUR) < 0)
+                    if (lseek(fd, start, SEEK_SET) < 0)
                     {
                         return false;
                     }
