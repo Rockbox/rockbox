@@ -44,17 +44,19 @@ bool parse_flac_album_art(unsigned char *buf, int bytes_read, enum mp3_aa_type *
 
     mime_length = get_long_be(&buf[(*picframe_pos)]);
 
-    char *mime = buf + *picframe_pos + 4;
-    *picframe_pos +=  4 + mime_length;
-
-    if (bytes_read < *picframe_pos)
+    /* the MIME type and the description length after it must be in buf */
+    if (mime_length < 0 ||
+        mime_length > bytes_read - (*picframe_pos + 4) - 4)
     {
         logf("flac picture length invalid!");
         return false;
     }
 
+    char *mime = buf + *picframe_pos + 4;
+    *picframe_pos +=  4 + mime_length;
+
     *type = AA_TYPE_UNKNOWN;
-    if (memcmp(mime, "image/", 6) == 0)
+    if (mime_length >= 6 && memcmp(mime, "image/", 6) == 0)
     {
         mime += 6;
         if (strcmp(mime, "jpeg") == 0 || strcmp(mime, "jpg") == 0){
