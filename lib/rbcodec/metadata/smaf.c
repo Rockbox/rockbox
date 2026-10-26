@@ -113,27 +113,20 @@ static void set_length(struct mp3entry *id3, unsigned int ch, unsigned int baseb
 static void decode2utf8(const unsigned char *src, unsigned char **dst,
                         int srcsize, int *dstsize, int codepage)
 {
-    unsigned char tmpbuf[srcsize * 3 + 1];
     unsigned char *p;
-    int utf8size;
 
+    if (*dstsize <= 0)
+        return;
+
+    /* decode into the store, leaving room for the nil */
     if (codepage < NUM_CODEPAGES)
-        p = iso_decode(src, tmpbuf, codepage, srcsize);
-    else /* codepage == UCS2 */
-        p = utf16BEdecode(src, tmpbuf, srcsize);
+        p = iso_decode_ex(src, *dst, codepage, srcsize, *dstsize - 1);
+    else /* codepage == UCS2: srcsize bytes, half as many characters */
+        p = utf16decode(src, *dst, srcsize / 2, *dstsize - 1, false);
 
-    *p = '\0';
-
-    strlcpy(*dst, tmpbuf, *dstsize);
-    utf8size = (p - tmpbuf) + 1;
-    if (utf8size > *dstsize)
-    {
-        DEBUGF("metadata warning: data length: %d > contents store buffer size: %d\n",
-                    utf8size, *dstsize);
-        utf8size = *dstsize;
-    }
-    *dst     += utf8size;
-    *dstsize -= utf8size;
+    *p++ = '\0';
+    *dstsize -= p - *dst;
+    *dst      = p;
 }
 
 static int read_audio_track_contents(int fd, int codepage, unsigned char **dst,
@@ -143,12 +136,14 @@ static int read_audio_track_contents(int fd, int codepage, unsigned char **dst,
     unsigned char buf[256];
     unsigned char *p = buf;
     unsigned char *q = buf;
+    unsigned char *end;
 
     int datasize = read(fd, buf, 256);
     if (datasize <= 0)
         return  0;
+    end = buf + datasize;
 
-    while (p - buf < datasize && *p != ',')
+    while (p < end && *p != ',')
     {
         /* skip yen mark */
         if (codepage != UCS2)
@@ -156,14 +151,14 @@ static int read_audio_track_contents(int fd, int codepage, unsigned char **dst,
             if (*p == '\\')
                 p++;
         }
-        else if (*p == '\0' && *(p+1) == '\\')
+        else if (p + 1 < end && *p == '\0' && *(p+1) == '\\')
             p += 2;
 
-        if (*p > 0x7f)
+        if (p < end && *p > 0x7f)
         {
             if (codepage == UTF_8)
             {
-                while ((*p & MASK) != COMP)
+                while (p < end && (*p & MASK) != COMP)
                     *q++ = *p++;
             }
             else if (codepage == SJIS)
@@ -173,13 +168,20 @@ static int read_audio_track_contents(int fd, int codepage, unsigned char **dst,
             }
         }
 
+        if (p >= end)
+            break;
         *q++ = *p++;
         if (codepage == UCS2)
+        {
+            if (p >= end)
+                break;
             *q++ = *p++;
+        }
     }
 
-    datasize =  p - buf + 1;
-    lseek(fd, datasize - 256, SEEK_CUR);
+    /* to just after the ',' */
+    lseek(fd, (p - buf + 1) - datasize, SEEK_CUR);
+    datasize = p - buf + 1;
 
     if (dst != NULL)
         decode2utf8(buf, dst, q - buf, dstsize, codepage);
@@ -190,10 +192,15 @@ static int read_audio_track_contents(int fd, int codepage, unsigned char **dst,
 static void read_score_track_contents(int fd, int codepage, int datasize,
                                      unsigned char **dst, int *dstsize)
 {
-    unsigned char buf[datasize];
-    if (read(fd, buf, datasize) != datasize)
-        memset(buf, 0, datasize);
-    decode2utf8(buf, dst, datasize, dstsize, codepage);
+    /* keep the first 256 bytes, as for audio track contents */
+    unsigned char buf[256];
+    int size = MIN(datasize, (int)sizeof(buf));
+
+    if (read(fd, buf, size) != size)
+        size = 0;
+    else if (datasize > size)
+        lseek(fd, datasize - size, SEEK_CUR);
+    decode2utf8(buf, dst, size, dstsize, codepage);
 }
 
 /* traverse chunk functions */
