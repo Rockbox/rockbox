@@ -44,9 +44,11 @@ bool get_aiff_metadata(int fd, struct mp3entry* id3)
     unsigned long numChannels = 0;
     unsigned long numSampleFrames = 0;
     unsigned long numbytes = 0;
-    unsigned long offset = 0;
     bool is_aifc = false;
     char *p=id3->id3v2buf;
+    size_t buf_left = sizeof(id3->id3v2buf);
+    off_t id3_pos = -1;
+    size_t id3_size = 0;
 
 
     if ((lseek(fd, 0, SEEK_SET) < 0) || (read(fd, &buf[0], 12) < 12) ||
@@ -60,62 +62,33 @@ bool get_aiff_metadata(int fd, struct mp3entry* id3)
     while (read(fd, &buf[0], 8) == 8)
     {
         size_t size = get_long_be(&buf[4]); /* chunkSize */
+        /* odd chunk sizes must be padded */
+        off_t next = lseek(fd, 0, SEEK_CUR) + size + (size & 1);
+        char **field = NULL;
 
         if (memcmp(&buf[0], "SSND", 4) == 0)
         {
             numbytes = size - 8;
-
-            /* check for ID3 tag */
-            offset=lseek(fd, 0, SEEK_CUR);
-            lseek(fd, size, SEEK_CUR);
-            if ((read(fd, &buf[0], 8) == 8) &&  (memcmp(&buf[0], "ID3", 3) == 0))
-            {
-                id3->id3v2len = get_long_be(&buf[4]);
-                read_id3_tags(fd, id3);
-            }
-            else
-                DEBUGF("ID3 tag not present immediately after sound data");
-            lseek(fd, offset, SEEK_SET);
-            break;  /* assume COMM was already read */
         }
-
-        /* odd chunk sizes must be padded */
-        size += size & 1;
-
-        if (size > sizeof(buf))
+        else if (memcmp(&buf[0], "NAME", 4) == 0)
         {
-            DEBUGF("AIFF \"%4.4s\" chunk too large (%zd > %zd)",
-                    (char*) &buf[0], size, sizeof(buf));
+            field = &id3->title;
         }
-
-
-        if (memcmp(&buf[0], "NAME", 4) == 0)
-        {
-            read_string(fd, p, 512, 0, size);
-            id3->title=p;
-            p+=size;
-        }
-
         else if (memcmp(&buf[0], "AUTH", 4) == 0)
         {
-            read_string(fd, p, 512, 0, size);
-            id3->artist=p;
-            p+=size;
+            field = &id3->artist;
         }
-
         else if (memcmp(&buf[0], "ANNO", 4) == 0)
         {
-            read_string(fd, p, 512, 0, size);
-            id3->comment=p;
-            p+=size;
+            field = &id3->comment;
         }
-
-        else if (memcmp(&buf[0], "ID3", 3) == 0)
+        else if ((memcmp(&buf[0], "ID3 ", 4) == 0
+                  || memcmp(&buf[0], "id3 ", 4) == 0) && id3_pos < 0)
         {
-            read_id3_tags(fd, id3);
+            /* read after the walk: it uses the whole buffer */
+            id3_pos = next - size - (size & 1);
+            id3_size = size;
         }
-
-
         else if (memcmp(&buf[0], "COMM", 4) == 0)
         {
             if (size > sizeof(buf) || read(fd, &buf[0], size) != (ssize_t)size)
@@ -144,12 +117,30 @@ bool get_aiff_metadata(int fd, struct mp3entry* id3)
             id3->vbr = false;   /* AIFF files are CBR */
             id3->filesize = ffilesize(fd);
         }
-        else
+
+        if (field && *field == NULL && buf_left > 1)
         {
-            /* skip chunk */
-            if (lseek(fd, size, SEEK_CUR) < 0)
-                return false;
+            if (read_string(fd, p, buf_left, 0, size) > 0 && *p)
+            {
+                size_t len = strlen(p) + 1;
+                *field = p;
+                p += len;
+                buf_left -= len;
+            }
         }
+
+        /* to the next chunk; a truncated last chunk ends the walk */
+        if (lseek(fd, next, SEEK_SET) != next)
+            break;
+    }
+
+    if (id3_pos >= 0 && lseek(fd, id3_pos, SEEK_SET) == id3_pos)
+    {
+        /* the ID3 tag replaces the text chunks, whose strings it
+         * overwrites */
+        id3->title = id3->artist = id3->comment = NULL;
+        id3->id3v2len = id3_size;
+        read_id3_tags(fd, id3);
     }
 
     return numbytes && numChannels;
