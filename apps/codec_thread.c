@@ -281,6 +281,10 @@ static bool codec_advance_buffer_counters(size_t amount)
 /* copy up-to size bytes into ptr and return the actual size copied */
 static size_t codec_filebuf_callback(void *ptr, size_t size)
 {
+    /* bufread() takes a size of 0 as "the rest of the file" */
+    if (size == 0)
+        return 0;
+
     ssize_t copy_n = bufread(ci.audio_hid, size, ptr);
 
     /* Nothing requested OR nothing left */
