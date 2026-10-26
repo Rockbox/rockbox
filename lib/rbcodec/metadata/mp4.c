@@ -635,8 +635,24 @@ static bool read_mp4_container(int fd, struct mp3entry* id3,
             break;
 
         case MP4_meta:
-            lseek(fd, 4, SEEK_CUR);  /* Skip version */
-            size -= 4;
+            {
+                /* ISO meta starts with 4 bytes of version and flags;
+                   QuickTime's has none, so its hdlr atom comes first */
+                uint32_t first_size, first_type = 0;
+
+                if (size >= 8)
+                {
+                    read_uint32be(fd, &first_size);
+                    read_uint32be(fd, &first_type);
+                    lseek(fd, -8, SEEK_CUR);
+                }
+
+                if (first_type != MP4_hdlr)
+                {
+                    lseek(fd, 4, SEEK_CUR);  /* Skip version */
+                    size -= 4;
+                }
+            }
             /* Fall through */
 
         case MP4_moov:
