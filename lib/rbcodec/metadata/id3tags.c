@@ -347,12 +347,36 @@ static int parsealbumart( struct mp3entry* entry, char* tag, int bufferpos )
         tag += 3;
     }
 
+    /* what was read of the frame ends with a nil, at end */
+    char *end = entry->id3v2buf + bufferpos - 1;
+
     if (entry->albumart.type != AA_TYPE_UNKNOWN)
     {
         /* skip picture type */
         tag += 1;
-        /* skip description */
-        tag = strchr(tag, '\0') + 1;
+        /* skip description: in UTF-16 (encodings 1 and 2) it ends with
+         * two nils at an even offset, otherwise with one */
+        if (*start == 0x01 || *start == 0x02)
+        {
+            while (tag + 1 < end && (tag[0] != '\0' || tag[1] != '\0'))
+                tag += 2;
+            tag += 2;
+        }
+        else if (tag < end)
+        {
+            tag = strchr(tag, '\0') + 1;
+        }
+        else
+        {
+            tag = end + 1;
+        }
+        /* no end found before the end of what was read */
+        if (tag > end)
+            entry->albumart.type = AA_TYPE_UNKNOWN;
+    }
+
+    if (entry->albumart.type != AA_TYPE_UNKNOWN)
+    {
         /* fixup offset&size for image data */
         entry->albumart.pos  += tag - start;
         entry->albumart.size -= tag - start;
