@@ -728,6 +728,12 @@ static bool read_mp4_container(int fd, struct mp3entry* id3,
                 read_uint32be(fd, &entries);
                 id3->samples = 0;
 
+                /* 8 bytes each, after version, flags and count */
+                if (size < 8)
+                    entries = 0;
+                else if (entries > (size - 8) / 8)
+                    entries = (size - 8) / 8;
+
                 for (i = 0; i < entries; i++)
                 {
                     uint32_t n;
