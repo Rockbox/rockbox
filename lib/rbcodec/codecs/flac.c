@@ -154,7 +154,11 @@ static bool flac_init(FLACContext* fc, int first_frame_offset)
 
         if ((buf[0] & 0x7f) == 0)       /* 0 is the STREAMINFO block */
         {
-            if (ci->read_filebuf(buf, blocklength) < blocklength) return false;
+            /* only one, and it must fit in buf */
+            if (found_streaminfo || blocklength < 18 ||
+                blocklength > sizeof(buf) ||
+                ci->read_filebuf(buf, blocklength) < blocklength)
+                return false;
 
             fc->filesize = ci->filesize;
             fc->min_blocksize = (buf[0] << 8) | buf[1];
@@ -170,6 +174,8 @@ static bool flac_init(FLACContext* fc, int first_frame_offset)
             fc->max_framesize = (buf[7] << 16) | (buf[8] << 8) | buf[9];
             fc->samplerate = (buf[10] << 12) | (buf[11] << 4)
                              | ((buf[12] & 0xf0) >> 4);
+            if (fc->samplerate == 0)
+                return false;
             fc->channels = ((buf[12]&0x0e)>>1) + 1;
             fc->bps = (((buf[12]&0x01) << 4) | ((buf[13]&0xf0)>>4) ) + 1;
 
