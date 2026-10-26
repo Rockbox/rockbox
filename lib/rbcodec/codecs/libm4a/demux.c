@@ -1532,10 +1532,19 @@ int qtmovie_read(stream_t *file, demux_res_t *demux_res)
 
         if (chunk_len == 1)
         {
-            //DEBUGF("need 64bit support\n");
-            return 0;
+            /* 64-bit size: only one that fits in 32 bits can be in a
+               file on FAT32.  The header is 16 bytes, so take 8 off to
+               leave the size as if it had the usual 8-byte one. */
+            chunk_id = stream_read_uint32(qtmovie.stream);
+            if (stream_read_uint32(qtmovie.stream) != 0)
+                return 0;
+            chunk_len = stream_read_uint32(qtmovie.stream);
+            if (chunk_len < 16)
+                return 0;
+            chunk_len -= 8;
         }
-        chunk_id = stream_read_uint32(qtmovie.stream);
+        else
+            chunk_id = stream_read_uint32(qtmovie.stream);
 
         //DEBUGF("Found a chunk %c%c%c%c, length=%d\n",SPLITFOURCC(chunk_id),chunk_len);
         switch (chunk_id)
