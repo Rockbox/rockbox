@@ -1,0 +1,130 @@
+% Button names
+\newcommand{\ButtonPower}{\btnfnt{Power}}
+\newcommand{\ButtonHold}{\btnfnt{Hold}}
+
+\newcommand{\ButtonUp}{\btnfnt{Up}}
+\newcommand{\ButtonDown}{\btnfnt{Down}}
+\newcommand{\ButtonLeft}{\btnfnt{Left}}
+\newcommand{\ButtonRight}{\btnfnt{Right}}
+\newcommand{\ButtonSelect}{\btnfnt{Select}}
+
+\newcommand{\ButtonPlay}{\btnfnt{Play}}
+\newcommand{\ButtonMenu}{\btnfnt{Menu}}
+\newcommand{\ButtonBack}{\btnfnt{Back}}
+\newcommand{\ButtonShortcut}{\btnfnt{Shortcut}}
+
+%Button actions, standard context
+\newcommand{\ActionStdPrev}{\ButtonUp}
+\newcommand{\ActionStdPrevRepeat}{Long \ButtonUp}
+\newcommand{\ActionStdNext}{\ButtonDown}
+\newcommand{\ActionStdNextRepeat}{Long \ButtonDown}
+
+\newcommand{\ActionStdOk}{\ButtonSelect{} or \ButtonRight}
+\newcommand{\ActionStdCancel}{\ButtonBack{} or \ButtonLeft}
+\newcommand{\ActionStdContext}{\ButtonMenu{} or Long \ButtonRight}
+\newcommand{\ActionStdMenu}{\fixme{tbd}}
+\newcommand{\ActionStdQuickScreen}{Long \ButtonBack}
+\newcommand{\ActionQuickScreenExit}{\ButtonBack{} or \ButtonSelect{} or \ButtonPlay}
+\newcommand{\ActionStdUsbCharge}{\fixme{tbd}}
+
+%Button actions, wps context
+\newcommand{\ActionWpsPlay}{\ButtonPlay}
+\newcommand{\ActionWpsStop}{Long \ButtonPlay}
+\newcommand{\ActionWpsMenu}{\ButtonBack}
+\newcommand{\ActionWpsVolUp}{\ButtonUp}
+\newcommand{\ActionWpsVolDown}{\ButtonDown}
+\newcommand{\ActionWpsSkipPrev}{\ButtonLeft}
+\newcommand{\ActionWpsSkipNext}{\ButtonRight}
+\newcommand{\ActionWpsSeekBack}{Long \ButtonLeft}
+\newcommand{\ActionWpsSeekFwd}{Long \ButtonRight}
+
+\newcommand{\ActionWpsBrowse}{\ButtonSelect}
+\newcommand{\ActionWpsContext}{\ButtonMenu{} or Long \ButtonSelect}
+\newcommand{\ActionWpsQuickScreen}{Long \ButtonBack}
+\newcommand{\ActionWpsHotkey}{Long \ButtonMenu}
+
+%Button actions, tree context
+\newcommand{\ActionTreeWps}{\ButtonPlay}
+\newcommand{\ActionTreeStop}{Long \ButtonPlay}
+\newcommand{\ActionTreeParentDirectory}{\ButtonBack{} or \ButtonLeft}
+\newcommand{\ActionTreeHotkey}{Long \ButtonMenu}
+\newcommand{\ActionTreeEnter}{\ButtonSelect{} or \ButtonRight}
+
+%Button actions, YesNo context
+\newcommand{\ActionYesNoAccept}{\ButtonSelect}
+
+%Button actions, Setting context
+\newcommand{\ActionSettingInc}{\ButtonRight}
+\newcommand{\ActionSettingDec}{\ButtonLeft}
+
+%Button actions, Recording screen context
+\newcommand{\ActionRecPause}{\ButtonPlay}
+\newcommand{\ActionRecExit}{\ButtonBack}
+\newcommand{\ActionRecNewfile}{\fixme{tbd}}
+\newcommand{\ActionRecMenu}{\fixme{tbd}}
+\newcommand{\ActionRecSettingsInc}{\ButtonRight}
+\newcommand{\ActionRecSettingsDec}{\ButtonLeft}
+\newcommand{\ActionRecPrev}{\ButtonUp}
+\newcommand{\ActionRecNext}{\ButtonDown}
+
+%Button actions, FM radio context
+\newcommand{\ActionFMMenu}{\ButtonMenu}
+
+\newcommand{\ActionFMPreset}{\fixme{tbd}}
+\newcommand{\ActionFMPlay}{\ButtonPlay}
+\newcommand{\ActionFMStop}{Long \ButtonPlay}
+\newcommand{\ActionFMMode}{\fixme{tbd}}
+\newcommand{\ActionFMExit}{\ButtonBack}
+\newcommand{\ActionFMPrevPreset}{\fixme{tbd}}
+\newcommand{\ActionFMNextPreset}{\fixme{tbd}}
+\newcommand{\ActionFMSettingsInc}{\ButtonUp}
+\newcommand{\ActionFMSettingsDec}{\ButtonDown}
+\newcommand{\ActionFMPrev}{\ButtonLeft}
+\newcommand{\ActionFMNext}{\ButtonRight}
+
+%Button actions, Virtual Keyboard Context
+\newcommand{\ActionKbdSelect}{\ButtonPlay}
+\newcommand{\ActionKbdUp}{\ButtonUp}
+\newcommand{\ActionKbdDown}{\ButtonDown}
+\newcommand{\ActionKbdLeft}{\ButtonLeft}
+\newcommand{\ActionKbdRight}{\ButtonRight}
+\newcommand{\ActionKbdDone}{Long \ButtonSelect}
+\newcommand{\ActionKbdAbort}{\ButtonPower}
+\newcommand{\ActionKbdPageFlip}{\fixme{tbd}}
+\newcommand{\ActionKbdMorseSelect}{\fixme{tbd}}
+
+%Button actions, Pitch Screen context
+\newcommand{\ActionPsToggleMode}{\ButtonMenu}
+\newcommand{\ActionPsIncSmall}{\ButtonUp}
+\newcommand{\ActionPsDecSmall}{\ButtonDown}
+\newcommand{\ActionPsIncBig}{Long \ButtonUp}
+\newcommand{\ActionPsDecBig}{Long \ButtonDown}
+\newcommand{\ActionPsNudgeLeft}{\ButtonLeft}
+\newcommand{\ActionPsNudgeRight}{\ButtonRight}
+\newcommand{\ActionPsReset}{\ButtonSelect}
+\newcommand{\ActionPsExit}{\ButtonBack}
+\newcommand{\ActionPsFaster}{Long \ButtonRight}
+\newcommand{\ActionPsSlower}{Long \ButtonLeft}
+
+%Button actions, Bookmark screen context
+\newcommand{\ActionBmDelete}{Long \ButtonSelect}
+
+%Button actions, Alarm screen
+\newcommand{\ActionAlarmSet}{\ButtonPlay}
+\newcommand{\ActionAlarmCancel}{\ButtonCancel}
+\newcommand{\ActionAlarmHoursInc}{\fixme{tbd}}
+\newcommand{\ActionAlarmHoursDec}{\fixme{tbd}}
+
+%Plugin lib actions
+\newcommand{\PluginUp}{\ButtonUp}
+\newcommand{\PluginDown}{\ButtonDown}
+\newcommand{\PluginLeft}{\ButtonLeft}
+\newcommand{\PluginRight}{\ButtonRight}
+\newcommand{\PluginUpRepeat}{Long \ButtonUp}
+\newcommand{\PluginDownRepeat}{Long \ButtonDown}
+\newcommand{\PluginLeftRepeat}{Long \ButtonLeft}
+\newcommand{\PluginRightRepeat}{Long \ButtonRight}
+\newcommand{\PluginSelect}{\ButtonSelect}
+\newcommand{\PluginSelectRepeat}{Long \ButtonSelect}
+\newcommand{\PluginCancel}{\ButtonBack}
+\newcommand{\PluginExit}{\ButtonPower}

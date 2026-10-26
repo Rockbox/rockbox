@@ -1,0 +1,26 @@
+\def\UseOption{creativezen}
+\edef\UseOption{\UseOption,CREATIVE_ZEN_PAD}
+\edef\UseOption{\UseOption,HAVE_BACKLIGHT}
+\edef\UseOption{\UseOption,HAVE_RB_BL_IN_FLASH}
+
+\newcommand{\playerman}{Creative}
+\newcommand{\playertype}{ZEN}
+\newcommand{\playerlongtype}{\playertype}
+\newcommand{\dapdisplaywidth}{320}
+\newcommand{\dapdisplayheight}{240}
+\newcommand{\dapdisplaydepth}{24}
+% override standard img name to reuse screenshots from 320x240x16 targets
+\newcommand{\genericimg}{\dapdisplaywidth x\dapdisplayheight x16}
+
+\newcommand{\specimg}{zen}
+%Used to name the player, e.g. ...to the \dap
+\newcommand{\dap}{player}
+%For use when referring to the player. E.g. the \daps\ capacity ...
+\newcommand{\daps}{player's}
+\newcommand{\firmwarefilename}{\fname{rockbox.creative}}
+\newcommand{\firmwareextension}{\fname{creative}}
+\newcommand{\screenshotsize}{8cm}
+\newcommand{\disk}{flash storage}
+
+% link external keymap file
+\input{platform/keymap-creativezen.tex}

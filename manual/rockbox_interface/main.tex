@@ -549,6 +549,28 @@ detail in the following paragraph.
 
   On the bottom edge of the device is, from left to right, the headphone jack, the USB port, and the line-out jack.
   }
+  %
+  \opt{creativezen}{
+  Hold the \dap{} with the buttons on the right and the screen on the left.
+  On the right side of the unit, there is a series of four connected buttons
+  that form a square. The four sides of the square are the \ButtonUp{},
+  \ButtonDown{}, \ButtonLeft{} and \ButtonRight{} buttons, respectively.
+  Inside the square formed by these four buttons is the \ButtonSelect{} button.
+
+  Above the square are two connected buttons that act as \ButtonBack{} on
+  the left side and \ButtonMenu{} on the right. The connected buttons below
+  the square act as \ButtonShortcut{} and \ButtonPlay{} (from left to right).
+
+  On the right hand panel is a two way switch. Pressing this switch down acts
+  as \ButtonPower{}, and clicking it up until it locks acts as the \ButtonHold{}
+  switch. When the \ButtonHold{} switch is on, none of the other buttons have
+  any effect.
+
+  Immediately above you can find the headphone socket, below is a mini-USB
+  port to connect the \dap{} to a computer. On the top edge of the device is
+  the SD slot, on the bottom panel is the reset hole, if you need to perform
+  a hardware reset.
+  }
 }
 
 \subsection{Turning the \dap{} on and off}
@@ -556,7 +578,7 @@ detail in the following paragraph.
   the default.\\}
 To turn on and off your Rockbox enabled \dap{} use the following keys:
     \begin{btnmap}
-      \opt{RG_NANO_PAD}{Long \ButtonPower}%
+      \opt{RG_NANO_PAD,CREATIVE_ZEN_PAD}{Long \ButtonPower}%
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}%
       \opt{MPIO_HD200_PAD,MPIO_HD300_PAD,SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}%
           {Long \ButtonPlay}%
@@ -585,10 +607,11 @@ To turn on and off your Rockbox enabled \dap{} use the following keys:
       \opt{IPOD_4G_PAD,IPOD_3G_PAD}{Long \ButtonPlay}%
       \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD,SANSA_E200_PAD,SANSA_C200_PAD%
           ,GIGABEAT_PAD,MROBE100_PAD,GIGABEAT_S_PAD,sansaAMS,COWON_D2_PAD%
-          ,PBELL_VIBE500_PAD,ONDA_VX777_PAD,SANSA_FUZEPLUS_PAD,XDUOO_X3_PAD,AIGO_EROSQ_PAD%
+          ,PBELL_VIBE500_PAD,ONDA_VX777_PAD,SANSA_FUZEPLUS_PAD,XDUOO_X3_PAD%
+          ,AIGO_EROSQ_PAD,CREATIVE_ZEN_PAD%
           }{Long \ButtonPower}%
       \opt{RG_NANO_PAD}{\ButtonPower}%
-      \opt{AGPTEK_ROCKER_PAD}{Long \ButtonPower{}}%
+      \opt{AGPTEK_ROCKER_PAD}{Long \ButtonPower}%
           &
       \opt{HAVEREMOTEKEYMAP}{
           \opt{IRIVER_RC_H100_PAD}{Long \ButtonRCStop}%
@@ -621,7 +644,7 @@ To turn on and off your Rockbox enabled \dap{} use the following keys:
 }%
 \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_M3_PAD,IRIVER_H10_PAD,MROBE100_PAD
     ,PBELL_VIBE500_PAD,MPIO_HD200_PAD,MPIO_HD300_PAD,SAMSUNG_YH92X_PAD%
-    ,SAMSUNG_YH820_PAD,XDUOO_X3_PAD}{%
+    ,SAMSUNG_YH820_PAD,XDUOO_X3_PAD,CREATIVE_ZEN_PAD}{%
   In the unlikely event of a software failure, a hardware reset can be
   performed by inserting a paperclip gently into the Reset hole.
 }%
@@ -787,6 +810,17 @@ To turn on and off your Rockbox enabled \dap{} use the following keys:
     \ActionBootRecoveryMenu{} while powering on the player. This menu can be
     used to connect your \dap{} over USB to transfer files, update the Rockbox
     bootloader, or revert to a bootloader you've previously backed up.
+    }
+
+  \opt{creativezen}
+    {
+    Rockbox has a dual-boot feature. To boot into the original firmware,
+    press and hold the \ButtonBack{} button while turning on the player.
+
+    \note{The \playerman{} firmware does not shut down properly when you turn
+    it off, it only goes to sleep. To get back into Rockbox when exiting from
+    the \playerman{} firmware, you will need to reset the player by
+    inserting a pin in the reset hole.}
     }
 
   }

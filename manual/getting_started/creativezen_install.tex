@@ -1,0 +1,102 @@
+
+\note{There are currently no precompiled versions of the necessary tools
+  (see below) available. To use them you must compile them yourself
+  from the Rockbox source. See \wikilink{HowToCompile} for more information.
+}
+
+In order to install the bootloader, you will need to download the following
+files:
+
+\begin{itemize}
+  \item An original firmware (OF) from \playerman's website:
+    \opt{creativezen}{
+      \url{https://support.creative.com/downloads/download.aspx?nDownloadId=10890}
+      % FIXME: This link downloads the european variant of the firmware,
+      % ZEN_PCFW_L22_1_21_03e.exe. I couldn't find a download link for the
+      % US variant ZEN_PCFW_L22_1_21_03.exe
+    }
+
+  \item The bootloader:
+    \opt{creativezen}{\download{bootloader/creative/zen/bootloader-zen.creative}}
+
+  \item The version of mkzenboot for your operating system from Rockbox's server:
+    \download{bootloader/...}\fixme{Not yet available}
+\end{itemize}
+
+\subsubsection{Build the Firmware Boot File}
+
+\begin{enumerate}
+
+\item Create a folder called \fname{rbinstall} on your desktop or in your home
+  directory, and then extract the OF, the bootloader and mkzenboot into it.
+
+\item Open a new command prompt, and navigate to the ``rbinstall'' folder.
+
+\item Run \fname{mkzenboot}, passing according to the following syntax the name
+  of the OF and bootloader files that you downloaded, in addition to a name for
+  the output file and the option argument for dualboot.
+  You should replace \fname{ZEN\_PCFW\_L22\_1\_21\_03e.exe} by the path to the
+  firmware you downloaded from Creative.
+
+  From Windows, enter the following command:
+  % The following arguments to the code environment select the correct line out
+  % of the code block. This is necessary as using \opt{} in the code block would
+  % create unwanted empty lines.
+  \begin{code}[firstline=\opt{creativezen}{1},%
+              lastline=\opt{creativezen}{1}]
+    mkzenboot.exe -i ZEN_PCFW_L22_1_21_03e.exe -b bootloader-zen.creative -o firmware.nk -t dualboot
+  \end{code}
+  From Linux and Mac OS X enter:%
+  \begin{code}[firstline=\opt{creativezen}{1},%
+              lastline=\opt{creativezen}{1}]
+    ./mkzenboot -i ZEN_PCFW_L22_1_21_03e.exe -b bootloader-zen.creative -o firmware.nk -t dualboot
+  \end{code}
+
+\end{enumerate}
+
+\subsubsection{Transfer the Boot File to the \dap}
+
+The last step is to install the bootloader on the \dap{}.
+To do this, you need the sendfirm tool in \fname{utils/MTP}. It works both
+under Windows and Linux. To build it, change to \fname{utils/MTP} and run
+\fname{make} for Linux or \fname{make sendfirm.exe} for Windows. It will produce
+a \fname{sendfirm} or \fname{sendfirm.exe} executable. Note that the Windows
+version requires \fname{MTP\_DLL.dll} which can be found in \fname{utils/MTP}
+(you can also build it from \fname{utils/MTP/MTP\_DLL/}).
+\fixme{TODO: provide prebuilt versions and link to it}
+
+\begin{enumerate}
+  \item Turn off your \dap{}. You have to use the Reset Button, since Creative OS
+    doesn't actually shut down the \dap{} when you ``power off'', but only
+    puts it into a low power state and wakes up when you power up again.
+
+  \item Boot into recovery mode by holding the \ButtonPlay{} button on boot.
+    It will show a menu in which you should select ``Reload firmware''
+    and confirm. After having erased the firmware, you can proceed below.
+
+  \item Run ``sendfirm''. Replace \fname{firmware.nk} by the path to the
+    bootloader built in the previous section.
+    From Windows:%
+    % See above for the code environment arguments explanation.
+    \begin{code}[firstline=\opt{creativezen}{1},%
+                 lastline=\opt{creativezen}{1}]
+      sendfirm.exe firmware.nk
+    \end{code}
+  From Linux and Max OS X:\
+    \begin{code}[firstline=\opt{creativezen}{1},%
+                 lastline=\opt{creativezen}{1}]
+      ./sendfirm firmware.nk
+    \end{code}
+
+\end{enumerate}
+
+Note that after sending the whole file (i.e. progress show 100\%), the tool
+will probably display the following error after a timeout:%
+\begin{code}[firstline=\opt{creativezen}{1},%
+             lastline=\opt{creativezen}{1}]
+  Error 2: PTP Layer error 2002: get\_suggested\_storage\_id(): could not get storage id from parent id.
+\end{code}
+This is expected and you can safely ignore it. Your device should display
+``Upgrading firmware'' and perform the upgrade.
+
+Please now go to \reference{ref:finish_install} to complete the installation procedure.

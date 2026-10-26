@@ -155,7 +155,12 @@
 
 
 \newcommand{\dapdisplaysize}{\dapdisplaywidth$\times$\dapdisplayheight$\times$\dapdisplaydepth}
-\newcommand{\genericimg}{\dapdisplaywidth x\dapdisplayheight x\dapdisplaydepth}
+% define your own \genericimg (in platform/targetname.tex)
+% if you want to (re-)use non-native screenshots.
+\ifdefined\genericimg
+\else
+    \newcommand{\genericimg}{\dapdisplaywidth x\dapdisplayheight x\dapdisplaydepth}}
+\fi
 
 % add screenshot image.
 % Usage: \screenshot{filename}{caption}{label}

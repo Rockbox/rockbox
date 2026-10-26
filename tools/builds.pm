@@ -407,6 +407,7 @@ $releasenotes="/wiki/ReleaseNotes400";
     'creativezen' => {
         name => 'Creative Zen',
         status => 2,
+        manualok => 1 # Remove once status moves to 3,
     },
     'creativezenv' => {
         name => 'Creative Zen V',

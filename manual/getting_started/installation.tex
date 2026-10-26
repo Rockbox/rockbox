@@ -88,6 +88,17 @@ follow the instructions at
     \end{itemize}
 \end{description}
 }
+\opt{creativezen}{
+\begin{description}
+  \item[Current limitations.] The \daps{} original firmware (OF) and Rockbox use
+    incompatible file systems for the internal storage. As a consequence, if
+    you format the internal flash for the OF, Rockbox can't use it and if you
+    format for Rockbox, OF can't boot. That means that installing Rockbox will
+    require you to reformat your entire disk and you will loose all its content.
+    The SD card will stay untouched. You can install Rockbox entirely on the
+    SD card if you wish to dual-boot.
+\end{description}
+}
 \opt{ondavx777}{
 \begin{description}
   \item[Current limitations.] Most Rockbox functions are usable on the
@@ -113,7 +124,7 @@ follow the instructions at
 \end{description}
 }
 
-\opt{sansaAMS,fuzeplus}{
+\opt{sansaAMS,fuzeplus,creativezen}{
 \begin{description}
   \item[DRM capability.] It is possible that installation of the bootloader
   may lead to you \emph{permanently} losing the ability to playback files
@@ -280,7 +291,7 @@ of before installing.
 }
 
 \nopt{rgnano}{
-  \subsection{Storage/Capacity Limits}
+  \subsection{Storage/Capacity Limits}\label{sec:storage_limits}
 }
 
 \opt{disk_storage}{
@@ -359,7 +370,7 @@ It is also worth noting that data transfer rates are not likely to be improved w
   \end{itemize}
 }
 
-\opt{gigabeats,fiiom3k,shanlingq1,ipodnano3g}{
+\opt{gigabeats,fiiom3k,shanlingq1,ipodnano3g,creativezen}{
   \note{The automated install is not yet available for the
   \playerlongtype{}. For now you can use the manual method to install Rockbox.
   Please still read the section on the automatic install as it explains
@@ -432,7 +443,7 @@ in installing.
 
 \subsection{Automated Installation}
 
-\opt{gigabeats,ondavx777,fiiom3k,shanlingq1,erosqnative}{
+\opt{gigabeats,ondavx777,fiiom3k,shanlingq1,erosqnative,creativezen}{
 \note{Rockbox Utility does not currently support the \playertype{} and you will
 therefore need to follow the manual install instructions.}}
 \nopt{erosqnative}{
@@ -652,6 +663,16 @@ data partition.}}
     to boot into the original firmware, and then plugging in the USB cable.
   }
 
+\opt{creativezen}{
+\item If you want to use the internal storage from Rockbox, you first must
+  format the internal storage to FAT32, because the \playerman{} firmware
+  use an incompatible file system. This means that \textbf{you will loose
+  all your data} on the \dap{}.
+  Alternatively you can install Rockbox entirely on the external SD card.
+  Make sure the card is formatted as FAT32 (not exFAT, see
+  \reference{sec:storage_limits}), or Rockbox will not be able to use it.
+}
+
 \item Take the \fname{.zip} file that you downloaded and use
  the ``Extract all'' command of your unzip program to extract
  the files onto %
@@ -704,6 +725,7 @@ by Rockbox, in the main directory of your \daps{} drive.
         \opt{xduoox3}{\input{getting_started/xduoox3_install.tex}}
         \opt{xduoox3ii,xduoox20,agptekrocker,aigoerosq}{\input{getting_started/hibyos_install.tex}}
         \opt{fiiom3k,shanlingq1}{\input{getting_started/jztool_install.tex}}
+        \opt{creativezen}{\input{getting_started/creativezen_install.tex}}
     }
 }
 
@@ -735,7 +757,8 @@ by Rockbox, in the main directory of your \daps{} drive.
   \end{itemize}
 }
 
-\opt{iriverh10,iriverh10_5gb,ipod,mrobe100,sansa,cowond2,vibe500,ondavx777,samsungyh}{
+\opt{iriverh10,iriverh10_5gb,ipod,mrobe100,sansa,cowond2,vibe500,ondavx777,
+     samsungyh,creativezen}{
   Safely eject / unmount the USB drive, unplug the cable and restart.
 }
 
@@ -906,13 +929,14 @@ need to be updated.\\
 
 \section{Uninstalling Rockbox}\index{Installation!uninstall}
 
-\nopt{gigabeatf,iaudiom3,iaudiom5,iaudiox5,mrobe100,gigabeats,fuzeplus,erosqnative,rgnano}{
+\nopt{gigabeatf,iaudiom3,iaudiom5,iaudiox5,mrobe100,gigabeats,fuzeplus,
+      erosqnative,rgnano,creativezen}{
   \note{The Rockbox bootloader allows you to choose between Rockbox and
   the original firmware. (See \reference{ref:Dualboot} for more information.)}
 }
 
 \subsection{Automatic Uninstallation}
-\opt{gigabeats,erosqnative,rgnano}{\note{Rockbox can only be uninstalled manually from the \playername{} for now.}}
+\opt{gigabeats,erosqnative,rgnano,creativezen}{\note{Rockbox can only be uninstalled manually from the \playername{} for now.}}
 
 \nopt{erosqnative,rgnano}{
   You can uninstall Rockbox automatically by using Rockbox Utility. If you
@@ -920,7 +944,8 @@ need to be updated.\\
   but will not be able to do this selectively.
 }
 
-\opt{iriverh100,iriverh300,fuzeplus}{\note{Rockbox Utility cannot uninstall the bootloader due to
+\opt{iriverh100,iriverh300,fuzeplus,creativezen}
+{\note{Rockbox Utility cannot uninstall the bootloader due to
 the fact that it requires a flashing procedure. To uninstall the bootloader
 completely follow the manual uninstallation instructions below.}}
 
@@ -1018,6 +1043,18 @@ completely follow the manual uninstallation instructions below.}}
       \item Boot into the Rockbox bootloader menu: With the player off, hold \ButtonVolUp{} + \ButtonPower{}
       \item Select ``Aigo Recovery''
     \end{enumerate}
+}
+
+\opt{creativezen}{
+    If you would like to go back to using the original \playername{} software,
+    download the original \playertype{} firmware from the \playerman{} website.
+    Restart your \dap{} in recovery mode (pressing \ButtonBack), select
+    ``Upgrade firmware'' in the recovery menu and connect the \dap{} to your
+    computer.
+    Under Windows, start the \fname{ZEN\_PCFW\_L22\_1\_21\_03e.exe} file
+    you downloaded earlier, and follow the instructions given by the update
+    tool.
+    \fixme{Recovery instructions for Linux missing.}
 }
 
 \nopt{gigabeats,rgnano}{
