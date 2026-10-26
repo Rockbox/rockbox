@@ -115,6 +115,7 @@ typedef struct
     int32_t sample_byte_sizes_offset;
     uint32_t num_chunks;
     int32_t chunk_offset_offset;
+    bool chunk_offsets_wide;    /* co64: 8 bytes each, not 4 */
 
     uint32_t codecdata_len;
     uint8_t codecdata[MAX_CODECDATA_SIZE];

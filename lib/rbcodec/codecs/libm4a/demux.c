@@ -473,7 +473,8 @@ static bool read_chunk_range(qtmovie_t *qtmovie, size_t size_remaining,
     return true;
 }
 
-static bool read_chunk_stco(qtmovie_t *qtmovie, size_t chunk_len)
+/* An stco, or a co64 if wide. */
+static bool read_chunk_stco(qtmovie_t *qtmovie, size_t chunk_len, bool wide)
 {
     size_t size_remaining = chunk_len - 8;
     uint32_t first = 0, last = 0;
@@ -487,13 +488,14 @@ static bool read_chunk_stco(qtmovie_t *qtmovie, size_t chunk_len)
 
     /* The offsets are not kept either: see build_seek_index(). */
     qtmovie->res->chunk_offset_offset = stream_tell(qtmovie->stream);
+    qtmovie->res->chunk_offsets_wide = wide;
 
     /* The last audio track is the one played: an earlier one is now one
      * of the others. */
     if (qtmovie->have_audio)
         add_other_track(qtmovie, qtmovie->audio_first, qtmovie->audio_last);
     qtmovie->have_audio = read_chunk_range(qtmovie, size_remaining,
-                                           qtmovie->res->num_chunks, false,
+                                           qtmovie->res->num_chunks, wide,
                                            &first, &last);
     qtmovie->audio_first = first;
     qtmovie->audio_last = last;
@@ -614,6 +616,51 @@ static size_t index_load(stream_t *stream, uint32_t pos, unsigned char *dst,
             got = want;
         memcpy(dst + done, p, got);
         done += got;
+    }
+    return done;
+}
+
+/* n chunk offsets, from that of chunk (numbered from 1), to dst, 4 bytes
+ * each.  A co64's 8-byte entries are made 4 bytes as they are read: an
+ * offset past 4 GB, which no audio can have here, becomes 0xffffffff, as
+ * in read_chunk_range().  Returns how many were read. */
+static uint32_t chunk_offsets_load(stream_t *stream, const demux_res_t *res,
+                                   uint32_t chunk, unsigned char *dst,
+                                   uint32_t n)
+{
+    uint32_t done = 0;
+
+    if (!res->chunk_offsets_wide)
+        return index_load(stream, res->chunk_offset_offset + 4 * (chunk - 1),
+                          dst, 4 * n) / 4;
+
+    while (done < n)
+    {
+        uint32_t pos = res->chunk_offset_offset + 8 * (chunk - 1 + done);
+        size_t want = (n - done) > 2048 ? 16384 : 8 * (n - done);
+        size_t got, i;
+        unsigned char one[8];
+        const unsigned char *p = index_peek(stream, pos, want, &got);
+
+        if (p && got > want)
+            got = want;
+        if (!p || got < 8)
+        {
+            /* the buffer ends inside this entry */
+            if (index_load(stream, pos, one, 8) != 8)
+                break;
+            p = one;
+            got = 8;
+        }
+        for (i = 0; i + 8 <= got; i += 8, done++)
+        {
+            uint32_t v = BE32(p + i) ? 0xffffffff : BE32(p + i + 4);
+            unsigned char *d = dst + 4 * done;
+            d[0] = v >> 24;
+            d[1] = v >> 16;
+            d[2] = v >> 8;
+            d[3] = v;
+        }
     }
     return done;
 }
@@ -784,9 +831,7 @@ static inline bool chunk_tables_next(struct chunk_tables *t, uint32_t chunk,
         uint32_t n = res->num_chunks - (chunk - 1);
         if (n > t->co_room)
             n = t->co_room;
-        t->co_n = index_load(t->stream,
-                             res->chunk_offset_offset + 4 * (chunk - 1),
-                             t->co, 4 * n) / 4;
+        t->co_n = chunk_offsets_load(t->stream, res, chunk, t->co, n);
         if (!t->co_n)
             return false;
         t->co_i = 0;
@@ -1159,8 +1204,7 @@ void m4a_lookup_refill(demux_res_t *res, stream_t *stream, uint32_t frame)
     if (count > res->lookup_room)
         count = res->lookup_room;
     raw = (unsigned char *)table + 4 * count;
-    count = index_load(stream, res->chunk_offset_offset + 4 * (first - 1),
-                       raw, 4 * count) / 4;
+    count = chunk_offsets_load(stream, res, first, raw, count);
     if (!count)
     {
         stream->ci->seek_buffer(resume_at);
@@ -1244,7 +1288,9 @@ static bool read_chunk_stbl(qtmovie_t *qtmovie, size_t chunk_len)
             }
             break;
         case MAKEFOURCC('s','t','c','o'):
-            if (!read_chunk_stco(qtmovie, sub_chunk_len))
+        case MAKEFOURCC('c','o','6','4'):
+            if (!read_chunk_stco(qtmovie, sub_chunk_len,
+                                 sub_chunk_id == MAKEFOURCC('c','o','6','4')))
             {
                return false;
             }
