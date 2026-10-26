@@ -22,6 +22,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <inttypes.h>
+#include <limits.h>
 #include "platform.h"
 
 #include "metadata.h"
@@ -55,19 +56,25 @@ bool parse_flac_album_art(unsigned char *buf, int bytes_read, enum mp3_aa_type *
     char *mime = buf + *picframe_pos + 4;
     *picframe_pos +=  4 + mime_length;
 
+    /* the MIME type is not NUL-terminated */
     *type = AA_TYPE_UNKNOWN;
-    if (mime_length >= 6 && memcmp(mime, "image/", 6) == 0)
-    {
-        mime += 6;
-        if (strcmp(mime, "jpeg") == 0 || strcmp(mime, "jpg") == 0){
-            *type = AA_TYPE_JPG;
-        }else if (strcmp(mime, "png") == 0)
-            *type = AA_TYPE_PNG;
-    }
+    if ((mime_length == 10 && memcmp(mime, "image/jpeg", 10) == 0) ||
+        (mime_length == 9 && memcmp(mime, "image/jpg", 9) == 0))
+        *type = AA_TYPE_JPG;
+    else if (mime_length == 9 && memcmp(mime, "image/png", 9) == 0)
+        *type = AA_TYPE_PNG;
 
     description_length  = get_long_be(&buf[(*picframe_pos)]);
 
-    /* 16 = skip picture width,height,color-depth,color-used */
+    /* 16 = skip picture width,height,color-depth,color-used; the picture
+       data length that follows must still have an int offset */
+    if (description_length < 0 ||
+        description_length > INT_MAX - (*picframe_pos + 4 + 16 + 4))
+    {
+        logf("flac picture length invalid!");
+        return false;
+    }
+
     *picframe_pos += 4 + description_length + 16;
     return true;
 }
@@ -160,27 +167,55 @@ bool get_flac_metadata(int fd, struct mp3entry* id3)
 #ifdef HAVE_ALBUMART
         else if (type == 6) /* 6 is the PICTURE block */
         {
-            if(!id3->has_embedded_albumart) /* only use the first PICTURE */
+            /* only use the first PICTURE; a bad one is skipped */
+            if (!id3->has_embedded_albumart && i > 0)
             {
                 unsigned int buf_size = MIN(sizeof(id3->path), i);
-
-                id3->albumart.pos = lseek(fd, 0, SEEK_CUR);
+                unsigned long block_size = i;
+                off_t block_pos = lseek(fd, 0, SEEK_CUR);
+                enum mp3_aa_type aa_type;
+                int picframe_pos;
+                uint32_t aa_size = 0;
 
                 int bytes_read = read(fd, buf, buf_size);
-                buf[buf_size-1] = '\0';
+                if (bytes_read <= 0)
+                {
+                    return rc;
+                }
                 i -= bytes_read;
 
-                int picframe_pos;
-                if (!parse_flac_album_art(buf, bytes_read, &id3->albumart.type, &picframe_pos))
-                    return false;
-
-                /* if we support the format and image length is in the buffer */
-                if(id3->albumart.type != AA_TYPE_UNKNOWN
-                   && (picframe_pos + 4) - buf_size > 0)
+                /* the picture data length must be in the block */
+                if (parse_flac_album_art(buf, bytes_read, &aa_type,
+                                         &picframe_pos)
+                    && aa_type != AA_TYPE_UNKNOWN
+                    && (unsigned long)picframe_pos + 4 <= block_size)
                 {
-                    id3->has_embedded_albumart = true;
-                    id3->albumart.size = get_long_be(&buf[picframe_pos]);
-                    id3->albumart.pos += picframe_pos + 4;
+                    if (picframe_pos + 4 <= bytes_read)
+                    {
+                        aa_size = get_long_be(&buf[picframe_pos]);
+                    }
+                    else
+                    {
+                        /* after a long description: read it from the file */
+                        unsigned char size_buf[4];
+                        if (lseek(fd, block_pos + picframe_pos, SEEK_SET) < 0
+                            || read(fd, size_buf, 4) != 4
+                            || lseek(fd, block_pos + bytes_read, SEEK_SET) < 0)
+                        {
+                            return rc;
+                        }
+                        aa_size = get_long_be(size_buf);
+                    }
+
+                    /* and the picture data too */
+                    if (aa_size > 0 &&
+                        aa_size <= block_size - (picframe_pos + 4))
+                    {
+                        id3->has_embedded_albumart = true;
+                        id3->albumart.type = aa_type;
+                        id3->albumart.size = aa_size;
+                        id3->albumart.pos = block_pos + picframe_pos + 4;
+                    }
                 }
             }
 

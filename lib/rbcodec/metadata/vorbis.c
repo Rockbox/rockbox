@@ -431,15 +431,19 @@ long read_vorbis_tags(int fd, struct mp3entry *id3,
             size_t outlen = base64_decode(buf, MIN(read_len, (int32_t) sizeof(id3->path) - 1), buf);
 
             int picframe_pos;
-            parse_flac_album_art(buf, outlen, &id3->albumart.type, &picframe_pos);
-            if(id3->albumart.type != AA_TYPE_UNKNOWN)
+            enum mp3_aa_type aa_type;
+            if (parse_flac_album_art(buf, outlen, &aa_type, &picframe_pos)
+                && aa_type != AA_TYPE_UNKNOWN
+                /* the picture must start inside the comment */
+                && base64_encoded_size(picframe_pos + 4) <
+                   (size_t)(after_block_pos - before_block_pos))
             {
                 //NOTE: This is not exact location due to padding in base64 (up to 3 chars)!!
                 // But it's OK with our jpeg decoder if we add or miss few bytes in jpeg header
                 const int picframe_pos_b64 = base64_encoded_size(picframe_pos + 4);
 
                 id3->has_embedded_albumart = true;
-                id3->albumart.type |= AA_FLAG_VORBIS_BASE64;
+                id3->albumart.type = aa_type | AA_FLAG_VORBIS_BASE64;
                 id3->albumart.pos = picframe_pos_b64 + before_block_pos;
                 id3->albumart.size = after_block_pos - id3->albumart.pos;
             }
