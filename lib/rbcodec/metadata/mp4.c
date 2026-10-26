@@ -146,40 +146,51 @@ static unsigned int read_mp4_tag_string(int fd, int size_left, char** buffer,
     return length;
 }
 
+/* Read an atom header.  Sets *size to the size of the atom's contents,
+ * clamped to its parent, of which size_left bytes were left, and returns
+ * what is left of the parent after the atom.  An atom too small for its
+ * own header ends the parent: *type 0, *size 0, 0 left. */
 static unsigned int read_mp4_atom(int fd, uint32_t* size,
                                   uint32_t* type, uint32_t size_left)
 {
+    uint32_t header = 8;
+
     read_uint32be(fd, size);
     read_uint32be(fd, type);
 
     if (*size == 1)
     {
-        /* FAT32 doesn't support files this big, so something seems to
-         * be wrong. (64-bit sizes should only be used when required.)
-         */
-        errno = EFBIG;
+        /* 64-bit size.  FAT32 doesn't support files over 4 GB, so only
+         * the low 32 bits can be non-zero. */
+        uint32_t high;
+
+        read_uint32be(fd, &high);
+        read_uint32be(fd, size);
+        header = 16;
+
+        if (high != 0)
+        {
+            errno = EFBIG;
+            *type = 0;
+            return 0;
+        }
+    }
+
+    /* 0 means up to the end of the parent */
+    if (*size == 0 || *size > size_left)
+    {
+        *size = size_left;
+    }
+
+    if (*size < header)
+    {
         *type = 0;
+        *size = 0;
         return 0;
     }
 
-    if (*size > 0)
-    {
-        if (*size > size_left)
-        {
-            size_left = 0;
-        }
-        else
-        {
-            size_left -= *size;
-        }
-
-        *size -= 8;
-    }
-    else
-    {
-        *size = size_left;
-        size_left = 0;
-    }
+    size_left -= *size;
+    *size -= header;
 
     return size_left;
 }
@@ -399,7 +410,10 @@ static bool read_mp4_tags(int fd, struct mp3entry* id3,
 
     do
     {
+        off_t end;
+
         size_left = read_mp4_atom(fd, &size, &type, size_left);
+        end = lseek(fd, 0, SEEK_CUR) + size;
 
         /* DEBUGF("Tag atom: '%c%c%c%c' (%d bytes left)\n", type >> 24 & 0xff,
             type >> 16 & 0xff, type >> 8 & 0xff, type & 0xff, size); */
@@ -595,9 +609,12 @@ static bool read_mp4_tags(int fd, struct mp3entry* id3,
             break;
 
         default:
-            lseek(fd, size, SEEK_CUR);
             break;
         }
+
+        /* the next atom starts where this one ends, however much of it
+           was read */
+        lseek(fd, end, SEEK_SET);
     }
     while ((size_left > 0) && (errno == 0));
 
@@ -615,7 +632,10 @@ static bool read_mp4_container(int fd, struct mp3entry* id3,
 
     do
     {
+        off_t end;
+
         size_left = read_mp4_atom(fd, &size, &type, size_left);
+        end = lseek(fd, 0, SEEK_CUR) + size;
 
         /* DEBUGF("Atom: '%c%c%c%c' (0x%08lx, %lu bytes left)\n",
             (int) ((type >> 24) & 0xff), (int) ((type >> 16) & 0xff),
@@ -823,10 +843,11 @@ static bool read_mp4_container(int fd, struct mp3entry* id3,
             break;
         }
 
-        /* Skip final seek. */
+        /* The next atom starts where this one ends, however much of it
+           was read.  Skip the seek after the mdat that ends the walk. */
         if (!done)
         {
-            lseek(fd, size, SEEK_CUR);
+            lseek(fd, end, SEEK_SET);
         }
     } while (rc && (size_left > 0) && (errno == 0) && !done);
 
