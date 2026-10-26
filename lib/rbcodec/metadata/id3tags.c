@@ -695,15 +695,20 @@ bool setid3v1title(int fd, struct mp3entry *entry)
                 break;
 
             case 3:
+            {
+                /* the comment is 30 characters in v1.0, 28 in v1.1,
+                 * where a nil at 125 says the track number follows */
+                int len = buffer[125] ? 30 : 28;
                 /* kill trailing space in strings */
-                for (j=27; j && (ptr[j]==0 || ptr[j]==' '); j--)
+                for (j=len-1; j && (ptr[j]==0 || ptr[j]==' '); j--)
                     ptr[j] = 0;
                 /* convert string to utf8 */
                 utf8 = (unsigned char *)entry->id3v1buf[3];
-                utf8 = iso_decode(ptr, utf8, -1, 28);
+                utf8 = iso_decode(ptr, utf8, -1, len);
                 /* make sure string is terminated */
                 *utf8 = 0;
                 break;
+            }
 
             case 4:
                 ptr[4] = 0;
