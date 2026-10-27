@@ -404,7 +404,10 @@ static void iap_thread(void)
             case SYS_POWEROFF:
             case SYS_REBOOT:
             {
-                iap_shutdown = true;
+                /* iap_periodic() only runs once IAP is running, so do
+                 * not leave the flag for a later accessory */
+                if (iap_running)
+                    iap_shutdown = true;
                 break;
             }
 
@@ -825,18 +828,26 @@ void iap_periodic(void)
         iap_btnrepeat = false;
     }
 
-    /* Handle power down messages. */
-    if (iap_shutdown && device.do_power_notify)
+    /* Handle power down messages. This is a one-shot event: a shutdown
+     * can be cancelled, and a latched flag would then tell the next
+     * accessory to identify that we are going down.
+     */
+    if (iap_shutdown)
     {
-        /* NotifyiPodStateChange */
-        IAP_TX_INIT(0x00, 0x23);
-        IAP_TX_PUT(0x01);
+        iap_shutdown = false;
 
-        iap_send_tx();
+        if (device.do_power_notify)
+        {
+            /* NotifyiPodStateChange */
+            IAP_TX_INIT(0x00, 0x23);
+            IAP_TX_PUT(0x01);
 
-        /* No further actions, we're going down */
-        iap_reset_device(&device);
-        return;
+            iap_send_tx();
+
+            /* No further actions, we're going down */
+            iap_reset_device(&device);
+            return;
+        }
     }
 
     /* Handle GetAccessoryInfo messages */
