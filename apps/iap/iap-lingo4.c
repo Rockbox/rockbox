@@ -3241,6 +3241,7 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
                     break;
                 }
             }
+            break;
         }
         default:
         {
