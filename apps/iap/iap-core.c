@@ -438,47 +438,54 @@ static void iap_track_changed(unsigned short id, void *ignored)
     }
 }
 
-/* Do general setup of the needed infrastructure.
- *
- * Please note that a lot of additional work is done by iap_start()
+/* Set up the needed infrastructure: the message queue and message
+ * handler thread. This runs at boot, in thread context. The buffers and
+ * the notification timer are set up later by iap_malloc(), on the iAP
+ * thread, after the first sync byte.
  */
 void iap_setup(const int ratenum)
 {
     iap_bitrate_set(ratenum);
     iap_remotebtn = BUTTON_NONE;
-    iap_setupflag = true;
-    iap_started = false;
     iap_running = false;
+
+    if (!iap_started)
+    {
+        unsigned int tid;
+
+        iap_reset_device(&device);
+        queue_init(&iap_queue, true);
+        tid = create_thread(iap_thread, thread_stack, sizeof(thread_stack),
+                0, "iap"
+                IF_PRIO(, PRIORITY_SYSTEM)
+                IF_COP(, CPU));
+        if (!tid)
+            panicf("Could not create iap thread");
+        add_event(PLAYBACK_EVENT_TRACK_CHANGE, iap_track_changed);
+        iap_started = true;
+    }
+
+    /* Only now let the UART interrupt post to the queue */
+    iap_setupflag = true;
 }
 
-/* Actually bring up the message queue, message handler thread and
- * notification timer
+/* Start up on the first received sync byte.
  *
- * NOTE: This is running in interrupt context
+ * NOTE: This is running in interrupt context. Creating threads and
+ * allocating memory are not allowed here, so post a message to our own
+ * queue and let the iAP thread allocate the buffers.
  */
 static void iap_start(void)
 {
-    unsigned int tid;
+    static bool malloc_posted = false;
 
-    if (iap_started)
+    /* Every sync byte calls this until iap_malloc() has run, so post
+     * only once instead of filling the queue */
+    if (malloc_posted)
         return;
 
-    iap_reset_device(&device);
-    queue_init(&iap_queue, true);
-    tid = create_thread(iap_thread, thread_stack, sizeof(thread_stack),
-            0, "iap"
-            IF_PRIO(, PRIORITY_SYSTEM)
-            IF_COP(, CPU));
-    if (!tid)
-        panicf("Could not create iap thread");
-    timeout_register(&iap_task_tmo, iap_task, MS_TO_TICKS(100), (intptr_t)NULL);
-    add_event(PLAYBACK_EVENT_TRACK_CHANGE, iap_track_changed);
-
-    /* Since we cannot allocate memory while in interrupt context
-     * post a message to our own queue to get that done
-     */
+    malloc_posted = true;
     queue_post(&iap_queue, IAP_EV_MALLOC, 0);
-    iap_started = true;
 }
 
 static void iap_malloc(void)
@@ -501,6 +508,10 @@ static void iap_malloc(void)
 
     iap_reset_buffers();
     iap_running = true;
+
+    /* Only tick the iAP thread once an accessory has sent a sync byte */
+    timeout_register(&iap_task_tmo, iap_task, MS_TO_TICKS(100),
+                     (intptr_t)NULL);
 }
 
 void iap_bitrate_set(const int ratenum)
