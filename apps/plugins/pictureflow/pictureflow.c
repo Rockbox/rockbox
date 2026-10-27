@@ -2865,7 +2865,7 @@ bool load_new_slide(void)
             pf_sldcache.cache[ind_].index - 1 == pf_sldcache.cache[next_].index);
 
         pf_sldcache.right_idx = _SEEK_RIGHT_WHILE(pf_sldcache.right_idx,
-            pf_sldcache.cache[ind_].index - 1 == pf_sldcache.cache[next_].index);
+            pf_sldcache.cache[ind_].index + 1 == pf_sldcache.cache[next_].index);
         if (pf_sldcache.right_idx == -1 || pf_sldcache.left_idx == -1)
             goto fatal_fail;
 
