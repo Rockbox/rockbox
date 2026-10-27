@@ -4475,7 +4475,7 @@ static void draw_album_text(void)
     int c;
     /* Draw album text */
     if ( pf_state == pf_scrolling ) {
-        c = ((slide_frame & 0xffff )/ 255);
+        c = fade;
         if (step < 0) c = 255-c;
         if (c > 128 ) { /* half way to next slide .. still not perfect! */
             albumtxt_index = center_index+step;
