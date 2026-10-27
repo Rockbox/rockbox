@@ -1747,6 +1747,17 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
             cmd_ack(cmd, IAP_ACK_BAD_PARAM);
             break;
         }
+        /* 0x0021 and 0x0023 are replies sent by the iPod. They are
+         * refused here, because 0x0020, 0x0022 and 0x0024 below share one
+         * body and a body between them would divert 0x0020 and 0x0022.
+         */
+        case 0x0021: /* ReturnIndexedPlayingTrackTitle */
+        case 0x0023: /* ReturnIndexedPlayingTrackArtistName */
+        {
+            /* We should NEVER receive this command so ERROR if we do */
+            cmd_ack(cmd, IAP_ACK_BAD_PARAM);
+            break;
+        }
         case 0x0020: /* GetIndexedPlayingTrackTitle. See 0x0024 below */
             /* The following is the description for the Apple Firmware
              *
@@ -1773,7 +1784,7 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
              * 10   0xNN  Telegram payload checksum byte
              *
              */
-        case 0x0021: /* ReturnIndexedPlayingTrackTitle. See 0x0024 Below */
+        /* 0x0021 ReturnIndexedPlayingTrackTitle is refused above */
             /* The following is the description for the Apple Firmware
              *
              * Returns the title of the indexed playing track in response to
@@ -1822,7 +1833,7 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
              * 10   0xNN  Telegram payload checksum byte
              *
              */
-        case 0x0023: /* ReturnIndexedPlayingTrackArtistName. See 0x0024 Below */
+        /* 0x0023 ReturnIndexedPlayingTrackArtistName is refused above */
             /* The following is the description for the Apple Firmware
              *
              * Returns the artist name of the indexed playing track in response
