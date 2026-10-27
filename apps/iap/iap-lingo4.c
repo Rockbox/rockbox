@@ -1475,15 +1475,49 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
             uint32_t trackcount;
             trackcount = playlist_amount();
 
-            if ((buf[3] == 0x05) && ((start_index + read_count ) > trackcount))
+            /* Bound the request by the same record counts that
+             * GetNumberCategorizedDBRecords reports. Categories without a
+             * bound used to run the loop below with the count as
+             * received, so the spec's way of asking for every record,
+             * count = -1, re-sent one packet 4.3 billion times and wedged
+             * the iAP thread. Clamp by subtraction so start + count
+             * cannot wrap.
+             */
             {
-                cmd_ack(cmd, IAP_ACK_BAD_PARAM);
-                break;
-            }
-            if ((buf[3] == 0x01) && ((start_index + read_count) > (number_of_playlists + 1)))
-            {
-                cmd_ack(cmd, IAP_ACK_BAD_PARAM);
-                break;
+                uint32_t total;
+
+                switch(buf[3])
+                {
+                    case 0x01: /* Playlists, plus the On-The-Go playlist */
+                        total = number_of_playlists + 1;
+                        break;
+                    case 0x02: /* Artists */
+                    case 0x03: /* Albums  */
+                    case 0x05: /* Tracks  */
+                        total = trackcount;
+                        break;
+                    case 0x04: /* Genres     */
+                    case 0x06: /* Composers  */
+                    case 0x07: /* Audiobooks */
+                    case 0x08: /* Podcasts   */
+                        total = 0;
+                        break;
+                    default:
+                        total = 0xFFFFFFFF;
+                        break;
+                }
+                if (total == 0xFFFFFFFF)
+                {
+                    cmd_ack(cmd, IAP_ACK_UNKNOWN_DB);
+                    break;
+                }
+                if (start_index >= total)
+                {
+                    cmd_ack(cmd, IAP_ACK_BAD_PARAM);
+                    break;
+                }
+                if (read_count > total - start_index)
+                    read_count = total - start_index;
             }
             for (counter=0;counter<read_count;counter++)
             {
