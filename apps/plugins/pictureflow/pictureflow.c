@@ -4464,6 +4464,7 @@ static void draw_album_text(void)
         return;
 
     static int prev_albumtxt_index = -1;
+    static int prev_artisttxt_index = -1;
     static bool prev_show_year = false;
     int albumtxt_index;
     int char_height;
@@ -4531,7 +4532,10 @@ static void draw_album_text(void)
             mylcd_putsxy(albumtxt_x, albumtxt_y, album_and_year);
 
         artisttxt = get_album_artist(albumtxt_index);
-        set_scroll_line(artisttxt, PF_SCROLL_ARTIST);
+        if (albumtxt_index != prev_artisttxt_index) {
+            set_scroll_line(artisttxt, PF_SCROLL_ARTIST);
+            prev_artisttxt_index = albumtxt_index;
+        }
         artisttxt_x = get_scroll_line_offset(PF_SCROLL_ARTIST);
         int y_offset = char_height + char_height/2;
         mylcd_putsxy(artisttxt_x, albumtxt_y + y_offset, artisttxt);
