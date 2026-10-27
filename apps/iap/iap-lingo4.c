@@ -2064,6 +2064,11 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
          * 11   0xNN  Telegram payload checksum byte
          *
          */
+        {
+            /* We should NEVER receive this command so ERROR if we do */
+            cmd_ack(cmd, IAP_ACK_BAD_PARAM);
+            break;
+        }
         case 0x0028: /* PlayCurrentSelection */
             /* The following is the description for the Apple Firmware
              *
