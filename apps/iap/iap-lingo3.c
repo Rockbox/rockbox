@@ -542,8 +542,8 @@ void iap_handlepkt_mode3(const unsigned int len, const unsigned char *buf)
                 {
                     tm = get_time();
 
-                    /* Year */
-                    IAP_TX_PUT_U16(tm->tm_year);
+                    /* Year, tm_year counts from 1900 */
+                    IAP_TX_PUT_U16(tm->tm_year + 1900);
 
                     /* Month */
                     IAP_TX_PUT(tm->tm_mon+1);

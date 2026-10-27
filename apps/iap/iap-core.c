@@ -1198,11 +1198,18 @@ void iap_periodic(void)
 
         tm = get_time();
 
-        if (memcmp(tm, &(device.datetime), sizeof(struct tm)))
+        /* Only the fields that are sent: the seconds change every
+         * second */
+        if ((tm->tm_year != device.datetime.tm_year) ||
+            (tm->tm_mon != device.datetime.tm_mon) ||
+            (tm->tm_mday != device.datetime.tm_mday) ||
+            (tm->tm_hour != device.datetime.tm_hour) ||
+            (tm->tm_min != device.datetime.tm_min))
         {
             IAP_TX_INIT(0x03, 0x09);
             IAP_TX_PUT(0x09);
-            IAP_TX_PUT_U16(tm->tm_year);
+            /* tm_year counts from 1900, iAP wants the full year */
+            IAP_TX_PUT_U16(tm->tm_year + 1900);
 
             /* Month */
             IAP_TX_PUT(tm->tm_mon+1);
