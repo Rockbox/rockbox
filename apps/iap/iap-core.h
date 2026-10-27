@@ -250,6 +250,7 @@ void iap_repeat_next(void);
 void iap_fill_power_state(void);
 
 void iap_send_tx(void);
+int iap_byte_to_volume(unsigned char level);
 void iap_set_remote_volume(void);
 
 extern enum interface_state interface_state;

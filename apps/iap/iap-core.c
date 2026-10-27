@@ -389,12 +389,58 @@ static int iap_task(struct timeout *tmo)
 }
 
 
+/* Map a volume within lo..hi onto 0..255 */
+static unsigned char iap_scale_volume(int volume, int lo, int hi)
+{
+    if (hi <= lo || volume <= lo)
+        return 0;
+    if (volume >= hi)
+        return 255;
+
+    return ((volume - lo) * 255 + (hi - lo) / 2) / (hi - lo);
+}
+
+/* The upper end of the UI volume scale: the volume limit, which never
+ * exceeds the codec's maximum */
+static int iap_ui_volume_max(void)
+{
+    return MIN(global_settings.volume_limit, sound_max(SOUND_VOLUME));
+}
+
+/* The absolute volume byte, 0..255 over the codec's whole range */
+unsigned char iap_volume_to_byte(int volume)
+{
+    return iap_scale_volume(volume, sound_min(SOUND_VOLUME),
+                            sound_max(SOUND_VOLUME));
+}
+
+/* The UI volume byte, which the spec normalises to the volume limit:
+ * 255 is the loudest the user lets the player go */
+unsigned char iap_volume_to_ui_byte(int volume)
+{
+    return iap_scale_volume(volume, sound_min(SOUND_VOLUME),
+                            iap_ui_volume_max());
+}
+
+/* The inverse of iap_volume_to_ui_byte(), for volumes set by an
+ * accessory */
+int iap_byte_to_volume(unsigned char level)
+{
+    int lo = sound_min(SOUND_VOLUME);
+    int hi = iap_ui_volume_max();
+
+    if (hi <= lo)
+        return lo;
+
+    return lo + (level * (hi - lo) + 127) / 255;
+}
+
 void iap_set_remote_volume(void)
 {
     IAP_TX_INIT(0x03, 0x0D);
     IAP_TX_PUT(0x04);
     IAP_TX_PUT(0x00);
-    IAP_TX_PUT(0xFF & (int)((global_status.volume + 90) * 2.65625));
+    IAP_TX_PUT(iap_volume_to_ui_byte(global_status.volume));
     iap_send_tx();
 }
 
@@ -1022,7 +1068,7 @@ void iap_periodic(void)
         IAP_TX_INIT(0x03, 0x09);
         IAP_TX_PUT(0x04);
         IAP_TX_PUT(0x00);
-        IAP_TX_PUT(0xFF &(int)((global_status.volume + 90) * 2.65625));
+        IAP_TX_PUT(iap_volume_to_ui_byte(global_status.volume));
         device.changed_notifications |= BIT_N(4);
         iap_send_tx();
     }

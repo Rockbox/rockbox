@@ -42,13 +42,12 @@
 #include "ipod_remote_tuner.h"
 #endif
 
-/* Apply the accessory's volume byte, which maps onto -90..+6 dB.
- * sound_set_volume() keeps it within the codec's range and the volume
- * limit, and stores it in global_status.volume.
+/* Apply the accessory's UI volume byte. sound_set_volume() keeps the
+ * result within the volume limit and stores it in global_status.volume.
  */
 static void set_remote_volume(const unsigned char raw)
 {
-    sound_set_volume((int) (raw/2.65625)-90);
+    sound_set_volume(iap_byte_to_volume(raw));
 }
 
 /*
@@ -447,7 +446,7 @@ void iap_handlepkt_mode3(const unsigned int len, const unsigned char *buf)
                         /* Mute status False*/
                         IAP_TX_PUT(0x00);
                         /* Volume */
-                        IAP_TX_PUT(0xFF & (int)((global_status.volume + 90) * 2.65625));
+                        IAP_TX_PUT(iap_volume_to_ui_byte(global_status.volume));
 
                     } else {
                         /* Mute status True*/
@@ -643,9 +642,9 @@ void iap_handlepkt_mode3(const unsigned int len, const unsigned char *buf)
                     if (device.mute == false) {
                         /* Mute status False*/
                         IAP_TX_PUT(0x00);
-                        /* Volume */
-                        IAP_TX_PUT(0xFF & (int)((global_status.volume + 90) * 2.65625));
-                        IAP_TX_PUT(0xFF & (int)((global_status.volume + 90) * 2.65625));
+                        /* UI and absolute volume */
+                        IAP_TX_PUT(iap_volume_to_ui_byte(global_status.volume));
+                        IAP_TX_PUT(iap_volume_to_byte(global_status.volume));
 
                     } else {
                         /* Mute status True*/

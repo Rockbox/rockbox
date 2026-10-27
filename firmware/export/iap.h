@@ -40,6 +40,10 @@ extern void iap_bitrate_set(int ratenum);
 extern void iap_periodic(void);
 extern void iap_handlepkt(void);
 extern void iap_send_pkt(const unsigned char * data, int len);
+/* Volume to the protocol's 0..255 scales: absolute over the codec's
+ * whole range, and UI normalised to the volume limit */
+unsigned char iap_volume_to_byte(int volume);
+unsigned char iap_volume_to_ui_byte(int volume);
 const unsigned char *iap_get_serbuf(void);
 #ifdef HAVE_LINE_REC
 extern bool iap_record(bool onoff);

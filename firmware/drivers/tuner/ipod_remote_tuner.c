@@ -119,7 +119,7 @@ static void rmt_tuner_sleep(int state)
         iap_send_pkt(data4, sizeof(data4));
         /* set volume */
         unsigned char data2[] = {0x03, 0x09, 0x04, 0x00, 0x00 };
-        data2[4] = (char)((global_status.volume+58) * 4);
+        data2[4] = iap_volume_to_ui_byte(global_status.volume);
         iap_send_pkt(data2, sizeof(data2));
     }
     else
