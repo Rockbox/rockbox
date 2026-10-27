@@ -1542,16 +1542,16 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
                         switch(buf[3])
                         {
                             case 0x05:
-                                strmemccpy((char *)&data[7],
-                                           id3.title ? id3.title : "", 64);
+                                copy_utf8(&data[7],
+                                          id3.title ? id3.title : "", 63);
                                 break;
                             case 0x02:
-                                strmemccpy((char *)&data[7],
-                                           id3.artist ? id3.artist : "", 64);
+                                copy_utf8(&data[7],
+                                          id3.artist ? id3.artist : "", 63);
                                 break;
                             case 0x03:
-                                strmemccpy((char *)&data[7],
-                                           id3.album ? id3.album : "", 64);
+                                copy_utf8(&data[7],
+                                          id3.album ? id3.album : "", 63);
                                 break;
                             case 0x04:
                             case 0x06:
@@ -1561,7 +1561,15 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
                         break;
                 }
                 put_u32(&data[3], start_index+counter);
-                iap_send_pkt(data, 7 + strlen(data+7) + 1);
+                {
+                    /* get_playlist_name() may fill the name up to
+                     * MAX_PATH, but the packet has to fit TX_BUFLEN or
+                     * iap_send_pkt() overruns the TX buffer. Truncate to
+                     * the same 63 bytes as the other string replies.
+                     */
+                    size_t nlen = copy_utf8(&data[7], (char *)&data[7], 63);
+                    iap_send_pkt(data, 7 + nlen + 1);
+                }
                 yield();
             }
             break;
