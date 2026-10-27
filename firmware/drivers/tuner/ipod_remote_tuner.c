@@ -339,17 +339,23 @@ int ipod_rmt_tuner_set(int setting, int value)
             /* scan through frequencies */
             if (radio_tuned)
             {
+                /* Take the direction before a re-tune moves
+                   tuner_frequency to value */
+                int dir = (value < tuner_frequency) ? -1 : 1;
+
+                /* at or past either end of the band */
                 if ((tuner_frequency <= fmr->freq_min)
-                    && (tuner_frequency >= fmr->freq_max))
+                    || (tuner_frequency >= fmr->freq_max))
                 {
                     tuner_set(RADIO_FREQUENCY,value);
+                    /* A step that wrapped around the band lands on the
+                       other end: seek inwards from there */
+                    if (value <= fmr->freq_min)
+                        dir = 1;
+                    else if (value >= fmr->freq_max)
+                        dir = -1;
                 }
-                /* scan down */
-                if(value < tuner_frequency)
-                    rmt_tuner_scan(-1);
-                /* scan up */
-                else
-                    rmt_tuner_scan(1);
+                rmt_tuner_scan(dir);
 
                 sleep(HZ/10);
                 if (reply_timeout())
