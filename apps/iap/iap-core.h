@@ -132,7 +132,8 @@ struct device_t {
     uint32_t chapter_index;         /* if they change */
     unsigned char play_status;
     bool mute;
-    unsigned char volume;
+    bool mute_notified;
+    unsigned char volume;           /* UI volume byte */
     unsigned char power_state;
     unsigned char battery_level;
     uint32_t equalizer_index;

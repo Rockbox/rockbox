@@ -1060,17 +1060,42 @@ void iap_periodic(void)
     if (!device.do_notify) return;
     if (device.notifications == 0) return;
 
-    /* Volume change notifications are sent every 100ms */
-    if (device.notifications & (BIT_N(4) | BIT_N(16))) {
-        /* Currently we do not track volume changes for BIT_N(16),
-         *
-         */
-        IAP_TX_INIT(0x03, 0x09);
-        IAP_TX_PUT(0x04);
-        IAP_TX_PUT(0x00);
-        IAP_TX_PUT(iap_volume_to_ui_byte(global_status.volume));
-        device.changed_notifications |= BIT_N(4);
-        iap_send_tx();
+    /* Volume changes are checked every 100ms */
+    if (device.notifications & (BIT_N(4) | BIT_N(16)))
+    {
+        unsigned char volume = iap_volume_to_ui_byte(global_status.volume);
+
+        if ((device.volume != volume) || (device.mute_notified != device.mute))
+        {
+            /* Mute/UI volume */
+            if (device.notifications & BIT_N(4))
+            {
+                IAP_TX_INIT(0x03, 0x09);
+                IAP_TX_PUT(0x04);
+                IAP_TX_PUT(device.mute ? 0x01 : 0x00);
+                IAP_TX_PUT(device.mute ? 0x00 : volume);
+                device.changed_notifications |= BIT_N(4);
+
+                iap_send_tx();
+            }
+
+            /* Mute/UI/Absolute volume */
+            if (device.notifications & BIT_N(16))
+            {
+                IAP_TX_INIT(0x03, 0x09);
+                IAP_TX_PUT(0x10);
+                IAP_TX_PUT(device.mute ? 0x01 : 0x00);
+                IAP_TX_PUT(device.mute ? 0x00 : volume);
+                IAP_TX_PUT(device.mute ? 0x00 :
+                           iap_volume_to_byte(global_status.volume));
+                device.changed_notifications |= BIT_N(16);
+
+                iap_send_tx();
+            }
+
+            device.volume = volume;
+            device.mute_notified = device.mute;
+        }
     }
 
     /* All other events are sent every 500ms */
