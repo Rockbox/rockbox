@@ -353,6 +353,7 @@ void iap_reset_device(struct device_t* device)
     device->notifications = 0;
     device->changed_notifications = 0;
     device->do_notify = false;
+    device->pb_notifications = 0;
     device->do_power_notify = false;
     device->accinfo = ACCST_NONE;
     device->capabilities = 0;
@@ -460,7 +461,8 @@ static void iap_track_changed(unsigned short id, void *ignored)
 {
     (void)id;
     (void)ignored;
-    if ((interface_state == IST_EXTENDED) && device.do_notify) {
+    if ((interface_state == IST_EXTENDED) &&
+        (device.pb_notifications & BIT_N(2))) {
         long playlist_pos = playlist_next(0);
         playlist_pos -= playlist_get_first_index(NULL);
         if(playlist_pos < 0)
@@ -818,6 +820,7 @@ uint32_t iap_get_trackindex(void)
 void iap_periodic(void)
 {
     static int count;
+    static int pb_count;
 
     if(!iap_setupflag) return;
 
@@ -975,8 +978,27 @@ void iap_periodic(void)
         }
     }
 
+    /* Extended Interface PlayStatusChangeNotification. The track index
+     * change is sent by iap_track_changed().
+     */
+    if ((interface_state == IST_EXTENDED) &&
+        (device.pb_notifications & BIT_N(3)))
+    {
+        /* Track position, every 500ms */
+        if (++pb_count >= 5)
+        {
+            pb_count = 0;
+
+            IAP_TX_INIT4(0x04, 0x0027);
+            IAP_TX_PUT(0x04);
+            IAP_TX_PUT_U32(iap_get_trackpos());
+
+            iap_send_tx();
+        }
+    }
+
     if (!device.do_notify) return;
-    if ((device.notifications == 0) && (interface_state != IST_EXTENDED)) return;
+    if (device.notifications == 0) return;
 
     /* Volume change notifications are sent every 100ms */
     if (device.notifications & (BIT_N(4) | BIT_N(16))) {
@@ -998,19 +1020,6 @@ void iap_periodic(void)
     count = 0;
 
     /* RemoteEventNotification */
-
-    /* Mode 04 PlayStatusChangeNotification */
-    /* Are we in Extended Mode */
-    if (interface_state == IST_EXTENDED) {
-        /* Return Track Position */
-        struct mp3entry *id3 = audio_current_track();
-        unsigned long time_elapsed = id3->elapsed;
-        IAP_TX_INIT4(0x04, 0x0027);
-        IAP_TX_PUT(0x04);
-        IAP_TX_PUT_U32(time_elapsed);
-
-        iap_send_tx();
-    }
 
     /* Track position (ms)  or Track position (s) */
     if (device.notifications & (BIT_N(0) | BIT_N(15)))

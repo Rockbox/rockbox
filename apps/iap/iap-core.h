@@ -112,6 +112,10 @@ struct device_t {
                                      * call to SetRemoteEventNotification or GetRemoteEventStatus
                                      */
     bool do_notify;                 /* Notifications enabled */
+    uint32_t pb_notifications;      /* Extended Interface play status change
+                                     * notifications requested with
+                                     * SetPlayStatusChangeNotification
+                                     */
     bool do_power_notify;           /* Whether to send power change notifications.
                                      * These are sent automatically to all devices
                                      * that used IdentifyDeviceLingoes to identify

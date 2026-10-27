@@ -1984,9 +1984,30 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
              *              0x01 = Enable all change notification
              *              0x02 - 0xFF = Reserved
              *  7     0xNN   Telegram payload checksum byte
+             *
+             * Protocol version 1.08 and later also have a four byte form,
+             * carrying a bitmask of the notifications to enable. Bits
+             * 31:13 are reserved, so its first byte is always 0x00.
              */
         {
-            device.do_notify = buf[3] ? true : false;
+            CHECKLEN(4);
+
+            if (len >= 7)
+            {
+                device.pb_notifications = get_u32(&buf[3]);
+            }
+            else if (buf[3] != 0x00)
+            {
+                /* Any non-zero value enables basic play state, track
+                 * index, track time offset (ms) and chapter index
+                 * changes */
+                device.pb_notifications =
+                    BIT_N(0) | BIT_N(2) | BIT_N(3) | BIT_N(5);
+            }
+            else
+            {
+                device.pb_notifications = 0;
+            }
             /* respond with cmd ok packet */
             cmd_ok(cmd);
             break;
