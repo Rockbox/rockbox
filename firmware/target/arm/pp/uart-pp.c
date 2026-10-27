@@ -48,11 +48,19 @@ static volatile struct ppuart *SERn = &SER0;
 static void set_bitrate(volatile struct ppuart *port, unsigned int rate)
 {
     unsigned int divisor;
+    int level;
 
     divisor = 24000000L / rate / 16;
+    /* While the divisor latch is enabled, reading RBR returns DLL and
+     * does not pop the Rx FIFO, so an Rx interrupt in this window would
+     * spin in SERIAL_ISR() forever. The ISR calls this itself, which is
+     * fine since the previous level is restored.
+     */
+    level = disable_irq_save();
     *port->LCR = 0x80; /* Divisor latch enable */
     *port->RBR_THR_DLL = (divisor >> 0) & 0xFF;
     *port->LCR = 0x03; /* Divisor latch disable, 8-N-1 */
+    restore_irq(level);
 }
 
 void serial_setup (void)
