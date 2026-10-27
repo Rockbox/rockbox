@@ -51,8 +51,20 @@ void rmt_tuner_freq(unsigned int len, const unsigned char *buf)
     /* length currently unused */
     (void)len;
 
-    unsigned int khz = (buf[2] << 24) | (buf[3] << 16) |
-                       (buf[4] << 8) | buf[5];
+    /* Widen before shifting, a top byte of 0x80 or more overflows an
+     * int */
+    unsigned int khz = ((unsigned int)buf[2] << 24) |
+                       ((unsigned int)buf[3] << 16) |
+                       ((unsigned int)buf[4] << 8) | buf[5];
+
+    /* A seek that found no station reports 0xFFFFFFFF */
+    if (khz == 0xFFFFFFFF)
+    {
+        radio_tuned = false;
+        tuner_signal_power = 0;
+        return;
+    }
+
     tuner_frequency = khz *1000 ;
     radio_tuned = true;
     rmt_tuner_signal_power(buf[6]);
