@@ -438,9 +438,10 @@ void iap_handlepkt_mode0(const unsigned int len, const unsigned char *buf)
             CHECKLEN(3);
 
             /* Supported lingos and versions are read from the lingo_versions
-             * array
+             * array. It only covers lingoes 0-31, and LINGO_SUPPORTED()
+             * masks the index, so check the range first.
              */
-            if (LINGO_SUPPORTED(lingo)) {
+            if ((lingo < 32) && LINGO_SUPPORTED(lingo)) {
                 IAP_TX_INIT(0x00, 0x10);
                 IAP_TX_PUT(lingo);
                 IAP_TX_PUT(LINGO_MAJOR(lingo));
