@@ -1229,12 +1229,31 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
             uint32_t trackcount;
             index = get_u32(&cur_dbrecord[1]);
             trackcount = playlist_amount();
-            if ((cur_dbrecord[0] == 5) && (index > trackcount))
+            /* An index of -1 is how an accessory undoes a selection and
+             * moves up a category level. The spec makes it invalid only
+             * for Track. There is no selection to undo here, so accept
+             * it without touching playback.
+             */
+            if ((index == 0xFFFFFFFF) &&
+                (cur_dbrecord[0] >= 0x02) && (cur_dbrecord[0] <= 0x06) &&
+                (cur_dbrecord[0] != 0x05))
+            {
+                cmd_ok(cmd);
+                break;
+            }
+            /* Every record type from 0x02 to 0x06 reaches audio_skip()
+             * below, not just Track, and audio_skip() walks an
+             * out-of-range offset back one track at a time without
+             * yielding, locking the device up. A valid index is
+             * 0..count-1.
+             */
+            if ((cur_dbrecord[0] >= 0x02) && (cur_dbrecord[0] <= 0x06) &&
+                (index >= trackcount))
             {
                 cmd_ack(cmd, IAP_ACK_BAD_PARAM);
                 break;
             }
-            if ((cur_dbrecord[0] == 1) && (index > (nbr_total_playlists() + 1)))
+            if ((cur_dbrecord[0] == 1) && (index > nbr_total_playlists()))
             {
                 cmd_ack(cmd, IAP_ACK_BAD_PARAM);
                 break;
@@ -2825,6 +2844,16 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
             int paused = !!(audio_status() & AUDIO_STATUS_PAUSE);
             long tracknum = get_u32(&buf[3]);
 
+            /* audio_skip() walks an out-of-range offset back one track at
+             * a time, holding id3_mutex and never yielding, so a wild
+             * index locks the device up rather than being rejected.
+             */
+            if (tracknum < 0 || tracknum >= playlist_amount())
+            {
+                cmd_ack(cmd, IAP_ACK_BAD_PARAM);
+                break;
+            }
+
             audio_pause();
             audio_skip(tracknum - playlist_next(0));
             if (!paused)
@@ -2984,12 +3013,12 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
             uint32_t trackcount;
             index = get_u32(&cur_dbrecord[1]);
             trackcount = playlist_amount();
-            if ((cur_dbrecord[0] == 0x05) && (index > trackcount))
+            if ((cur_dbrecord[0] == 0x05) && (index >= trackcount))
             {
                 cmd_ack(cmd, IAP_ACK_BAD_PARAM);
                 break;
             }
-            if ((cur_dbrecord[0] == 0x01) && (index > (number_of_playlists + 1)))
+            if ((cur_dbrecord[0] == 0x01) && (index > number_of_playlists))
             {
                 cmd_ack(cmd, IAP_ACK_BAD_PARAM);
                 break;
