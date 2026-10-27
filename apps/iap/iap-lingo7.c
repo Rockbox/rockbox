@@ -26,9 +26,9 @@
 
 /*
  * This macro is meant to be used inside an IAP mode message handler.
- * It is passed the expected minimum length of the message inbufferfer.
- * If the inbufferfer does not have the required lenght an ACK
- * packet with a Bad Parameter error is generated.
+ * It is passed the expected minimum length of the message buffer.
+ * If the buffer does not have the required length the packet
+ * is dropped (see cmd_ack()).
  */
 #define CHECKLEN(x) do { \
         if (len < (x)) { \
@@ -36,8 +36,8 @@
             return; \
         }} while(0)
 
-/* Check for authenticated state, and return an ACK Not
- * Authenticated on failure.
+/* Check for authenticated state, and drop the packet on failure
+ * (see cmd_ack()).
  */
 #define CHECKAUTH do { \
         if (!DEVICE_AUTHENTICATED) { \
@@ -46,13 +46,13 @@
         }} while(0)
 
 
+/* The RF Tuner lingo has no acknowledgement from the iPod: command 0x00
+ * is the accessory's AccessoryAck. Refused commands are dropped instead.
+ */
 static void cmd_ack(const unsigned char cmd, const unsigned char status)
 {
-    IAP_TX_INIT(0x07, 0x00);
-    IAP_TX_PUT(status);
-    IAP_TX_PUT(cmd);
-
-    iap_send_tx();
+    (void) cmd;
+    (void) status;
 }
 
 #define cmd_ok(cmd) cmd_ack((cmd), IAP_ACK_OK)
@@ -477,7 +477,7 @@ void iap_handlepkt_mode7(const unsigned int len, const unsigned char *inbuffer)
             break;
         }
 
-        /* The default response is IAP_ACK_BAD_PARAM */
+        /* Unsupported commands are dropped (see cmd_ack()) */
         default:
         {
 #ifdef LOGF_ENABLE
