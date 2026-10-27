@@ -185,6 +185,9 @@ static void serial_acc_tick(void)
         {
             uartc_port_close(&ser_port);
             uartc_close(ser_port.uartc);
+            /* End the departed accessory's iAP session, so the next one
+             * does not inherit it */
+            iap_reset_state(IF_IAP_MP(0));
         }
     }
 
