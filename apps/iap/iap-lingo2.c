@@ -103,6 +103,13 @@ void iap_handlepkt_mode2(const unsigned int len, const unsigned char *buf)
         case 0x00:
         {
             unsigned long btn = BUTTON_NONE;
+            /* True while the accessory still reports any button down,
+             * including Shuffle and Repeat, which map to no BUTTON_*
+             * code. */
+            bool any_down = (buf[2] != 0)
+                         || (len >= 4 && buf[3] != 0)
+                         || (len >= 5 && buf[4] != 0)
+                         || (len >= 6 && buf[5] != 0);
 
             if(buf[2] != 0)
             {
@@ -227,7 +234,14 @@ void iap_handlepkt_mode2(const unsigned int len, const unsigned char *buf)
             else
             {
                 iap_remotebtn = BUTTON_NONE;
-                iap_timeoutbtn = 0;
+                /* Shuffle and Repeat leave btn at BUTTON_NONE. Zeroing
+                 * the timeout while they are held let iap_periodic()
+                 * clear their debounce flags, and the accessory's
+                 * 30-100ms repeat then toggled them again, each time
+                 * calling settings_save(). Keep the timeout alive while
+                 * anything is still down.
+                 */
+                iap_timeoutbtn = any_down ? 3 : 0;
             }
 
             /* power on released */
