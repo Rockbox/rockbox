@@ -2137,9 +2137,9 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
              *
              */
         {
-            int paused = !!(audio_status() & AUDIO_STATUS_PAUSE);
             uint32_t index;
             uint32_t trackcount;
+            CHECKLEN(7);
             index = get_u32(&buf[3]);
             trackcount = playlist_amount();
             if (index >= trackcount)
@@ -2147,18 +2147,30 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
                 cmd_ack(cmd, IAP_ACK_BAD_PARAM);
                 break;
             }
-            audio_pause();
-            if(global_settings.playlist_shuffle)
+            /* The index refers to the order the accessory enumerated the
+             * tracks in, which is the current play order: shuffle is
+             * already applied to it, so reordering the playlist here
+             * would play a different track than the one selected.
+             */
+            if (!(audio_status() & AUDIO_STATUS_PLAY))
             {
-                playlist_randomise(NULL, current_tick, true);
+                /* audio_skip() does nothing while stopped, so start
+                 * playback at the selected track instead */
+                long tracknum = index + playlist_get_first_index(NULL);
+
+                if (tracknum >= (long)trackcount)
+                    tracknum -= trackcount;
+                playlist_start(tracknum, 0, 0);
             }
             else
             {
-                playlist_sort(NULL, true);
-            }
-            audio_skip(index - playlist_next(0));
-            if (!paused)
+                /* The selected track plays even when playback was
+                 * paused. Head units such as the Audi MMI pause before
+                 * selecting the next track and expect it to play. */
+                audio_pause();
+                audio_skip(index - iap_get_trackindex());
                 audio_resume();
+            }
             /* respond with cmd ok packet */
             cmd_ok(cmd);
             break;
