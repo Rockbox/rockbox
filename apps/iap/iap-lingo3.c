@@ -521,6 +521,14 @@ void iap_handlepkt_mode3(const unsigned int len, const unsigned char *buf)
                             IAP_TX_PUT(0x02);
                             break;
                         }
+
+                        default:
+                        {
+                            /* REPEAT_SHUFFLE and REPEAT_AB, see the
+                             * repeat notification in iap_periodic() */
+                            IAP_TX_PUT(0x02);
+                            break;
+                        }
                     }
 
                     iap_send_tx();

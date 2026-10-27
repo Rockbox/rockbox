@@ -1172,6 +1172,16 @@ void iap_periodic(void)
                     IAP_TX_PUT(0x02);
                     break;
                 }
+
+                default:
+                {
+                    /* REPEAT_SHUFFLE and REPEAT_AB have no encoding of
+                     * their own. Both continue over the whole playlist,
+                     * so report "all" rather than leave out the data byte.
+                     */
+                    IAP_TX_PUT(0x02);
+                    break;
+                }
             }
             device.changed_notifications |= BIT_N(8);
 
