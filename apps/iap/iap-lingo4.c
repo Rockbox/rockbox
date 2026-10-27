@@ -2199,33 +2199,85 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
              * Reserved             0x0A - 0xFF
              *
              */
+            int status = audio_status();
+
+            CHECKLEN(4);
+
+            /* Drive the playback engine directly. Synthetic remote
+             * buttons only do the right thing in the WPS: elsewhere Play
+             * selects the highlighted item and Next/Previous move the
+             * cursor.
+             */
             switch(buf[3])
             {
                 case 0x01: /* play/pause */
-                    iap_remotebtn = BUTTON_RC_PLAY;
-                    iap_repeatbtn = 2;
+                    if (status & AUDIO_STATUS_PAUSE)
+                        audio_resume();
+                    else if (status & AUDIO_STATUS_PLAY)
+                        audio_pause();
+                    else if (!iap_play_or_resume())
+                    {
+                        cmd_ack(cmd, IAP_ACK_CMD_FAILED);
+                        return;
+                    }
                     break;
                 case 0x02: /* stop */
-                    iap_remotebtn = BUTTON_RC_PLAY|BUTTON_REPEAT;
-                    iap_repeatbtn = 2;
+                    iap_seek_stop();
+                    audio_stop();
                     break;
                 case 0x03: /* skip++ */
-                    iap_remotebtn = BUTTON_RC_RIGHT;
-                    iap_repeatbtn = 2;
-                    break;
                 case 0x04: /* skip-- */
-                    iap_remotebtn = BUTTON_RC_LEFT;
-                    iap_repeatbtn = 2;
+                    if (!(status & AUDIO_STATUS_PLAY))
+                    {
+                        /* Start playback at the next or previous track
+                         * in play order instead of failing */
+                        long trackcount = playlist_amount();
+                        long pos;
+
+                        if (trackcount <= 0)
+                        {
+                            cmd_ack(cmd, IAP_ACK_CMD_FAILED);
+                            return;
+                        }
+                        pos = (playlist_get_current()->index < 0) ?
+                              0 : (long)iap_get_trackindex();
+                        pos += (buf[3] == 0x03) ? 1 : -1;
+                        if (pos < 0)
+                            pos = 0;
+                        else if (pos >= trackcount)
+                            pos = trackcount - 1;
+                        /* From play order to a playlist index */
+                        pos += playlist_get_first_index(NULL);
+                        if (pos >= trackcount)
+                            pos -= trackcount;
+                        playlist_start(pos, 0, 0);
+                        break;
+                    }
+                    if (buf[3] == 0x03)
+                        audio_next();
+                    else
+                        audio_prev();
                     break;
                 case 0x05: /* ffwd */
-                    iap_remotebtn = BUTTON_RC_RIGHT;
-                    break;
                 case 0x06: /* frwd */
-                    iap_remotebtn = BUTTON_RC_LEFT;
+                    if (!(status & AUDIO_STATUS_PLAY))
+                    {
+                        cmd_ack(cmd, IAP_ACK_CMD_FAILED);
+                        return;
+                    }
+                    iap_seek_start(buf[3] == 0x05);
                     break;
                 case 0x07: /* end ffwd/frwd */
-                    iap_remotebtn = BUTTON_NONE;
+                    iap_seek_stop();
                     break;
+                case 0x08: /* next chapter */
+                case 0x09: /* previous chapter */
+                    /* Tracks have no chapters here */
+                    cmd_ack(cmd, IAP_ACK_CMD_FAILED);
+                    return;
+                default:
+                    cmd_ack(cmd, IAP_ACK_BAD_PARAM);
+                    return;
             }
             /* respond with cmd ok packet */
             cmd_ok(cmd);

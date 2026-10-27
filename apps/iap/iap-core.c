@@ -834,6 +834,47 @@ void iap_get_trackinfo(const unsigned int track, struct mp3entry* id3)
     }
 }
 
+/* Start playback of the current playlist when stopped, or resume it
+ * when paused. Returns false when there is nothing to play.
+ */
+bool iap_play_or_resume(void)
+{
+    int index;
+
+    if (audio_status() & AUDIO_STATUS_PLAY)
+    {
+        audio_resume();
+        return true;
+    }
+
+    if (playlist_amount() <= 0)
+        return false;
+
+    index = playlist_get_current()->index;
+    playlist_start(index >= 0 ? index : 0, 0, 0);
+    return true;
+}
+
+/* Hold a remote seek button until iap_seek_stop(), or until the
+ * timeout releases it should the accessory never end the seek */
+void iap_seek_start(bool forward)
+{
+    iap_remotebtn = forward ? BUTTON_RC_RIGHT : BUTTON_RC_LEFT;
+    iap_repeatbtn = 2;
+    iap_timeoutbtn = IAP_SEEK_TIMEOUT;
+}
+
+void iap_seek_stop(void)
+{
+    if (iap_timeoutbtn == 0)
+        return;
+
+    /* Let the button driver see the release before the next packet */
+    iap_remotebtn = BUTTON_NONE;
+    iap_repeatbtn = 2;
+    iap_timeoutbtn = 0;
+}
+
 uint32_t iap_get_trackpos(void)
 {
     struct mp3entry *id3 = audio_current_track();

@@ -260,6 +260,14 @@ void iap_interface_state_change(const enum interface_state new);
 extern bool iap_btnrepeat;
 extern bool iap_btnshuffle;
 
+/* How long a seek started by an accessory may last without being ended,
+ * in iap_periodic() ticks */
+#define IAP_SEEK_TIMEOUT (100)
+
+bool iap_play_or_resume(void);
+void iap_seek_start(bool forward);
+void iap_seek_stop(void);
+
 uint32_t iap_get_trackpos(void);
 uint32_t iap_get_trackindex(void);
 void iap_get_trackinfo(const unsigned int track, struct mp3entry* id3);
