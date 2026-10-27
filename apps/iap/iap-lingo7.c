@@ -106,6 +106,9 @@ void iap_handlepkt_mode7(const unsigned int len, const unsigned char *inbuffer)
         /* case 02 ToIpod      RetTunerCaps 8 bytes */
         case 0x02:
         {
+            /* The capability bits read below are in bytes 2-5 */
+            CHECKLEN(6);
+
             /* Capabilities are stored as bits in first 4 bytes,
              * inbuffer[2] byte is bits 31:24
              * inbuffer[3] byte is bits 23:16
@@ -321,7 +324,9 @@ void iap_handlepkt_mode7(const unsigned int len, const unsigned char *inbuffer)
         {
             /* Returns Frequency set and RSSI Power Levels
              * These are sent as is to rmt_tuner_freq() in
-             * ../firmware/drivers/tuner/ipod_remote_tuner.c */
+             * ../firmware/drivers/tuner/ipod_remote_tuner.c,
+             * which reads bytes 2-6 */
+            CHECKLEN(7);
             rmt_tuner_freq(len, inbuffer);
             break;
         }
@@ -360,6 +365,8 @@ void iap_handlepkt_mode7(const unsigned int len, const unsigned char *inbuffer)
         /* case 13 ToIpod      TunerSeekDone 7 bytes */
         case 0x13:
         {
+            /* Same format as RetTunerFreq */
+            CHECKLEN(7);
             rmt_tuner_freq(len, inbuffer);
             break;
         }
