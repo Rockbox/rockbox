@@ -1508,13 +1508,16 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
                         switch(buf[3])
                         {
                             case 0x05:
-                                strmemccpy((char *)&data[7], id3.title,64);
+                                strmemccpy((char *)&data[7],
+                                           id3.title ? id3.title : "", 64);
                                 break;
                             case 0x02:
-                                strmemccpy((char *)&data[7], id3.artist,64);
+                                strmemccpy((char *)&data[7],
+                                           id3.artist ? id3.artist : "", 64);
                                 break;
                             case 0x03:
-                                strmemccpy((char *)&data[7], id3.album,64);
+                                strmemccpy((char *)&data[7],
+                                           id3.album ? id3.album : "", 64);
                                 break;
                             case 0x04:
                             case 0x06:
@@ -1856,15 +1859,18 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
                  * be longer than the TX buffer.
                  */
                 case 0x20:
-                    len = copy_utf8(&data[3], id3.title, 63);
+                    len = copy_utf8(&data[3],
+                                    id3.title ? id3.title : "", 63);
                     iap_send_pkt(data, 4+len);
                     break;
                 case 0x22:
-                    len = copy_utf8(&data[3], id3.artist, 63);
+                    len = copy_utf8(&data[3],
+                                    id3.artist ? id3.artist : "", 63);
                     iap_send_pkt(data, 4+len);
                     break;
                 case 0x24:
-                    len = copy_utf8(&data[3], id3.album, 63);
+                    len = copy_utf8(&data[3],
+                                    id3.album ? id3.album : "", 63);
                     iap_send_pkt(data, 4+len);
                     break;
             }

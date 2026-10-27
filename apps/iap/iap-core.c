@@ -283,6 +283,10 @@ void iap_tx_strlcpy(const unsigned char *str)
     ptrdiff_t txfree;
     int r;
 
+    /* Metadata fields are NULL when a file lacks the tag */
+    if (str == NULL)
+        str = "";
+
     txfree = TX_BUFLEN - (iap_txnext - iap_txstart);
     r = strlcpy(iap_txnext, str, txfree);
 
