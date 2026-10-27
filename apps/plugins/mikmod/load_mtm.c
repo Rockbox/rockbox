@@ -88,10 +88,10 @@ static CHAR MTM_Version[] = "MTM";
 
 static int MTM_Test(void)
 {
-	UBYTE id[3];
+	UBYTE id[4];
 
-	if(!_mm_read_UBYTES(id,3,modreader)) return 0;
-	if(!memcmp(id,"MTM",3)) return 1;
+	if(!_mm_read_UBYTES(id,4,modreader)) return 0;
+	if(!memcmp(id,"MTM",3)&&id[3]==0x10) return 1;
 	return 0;
 }
 
@@ -178,6 +178,12 @@ static int MTM_Load(int curious)
 	of.numpat    = mh->lastpattern+1;
 	of.reppos    = 0;
 	of.flags    |= UF_PANNING;
+
+	if(of.numchn > 32) {
+		_mm_errno = MMERR_NOT_A_MODULE;
+		return 0;
+	}
+
 	for(t=0;t<32;t++) of.panning[t]=mh->panpos[t]<< 4;
 	of.numins=of.numsmp=mh->numsamples;
 
