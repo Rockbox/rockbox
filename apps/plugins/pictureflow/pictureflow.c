@@ -3155,7 +3155,7 @@ static void render_slide(struct slide_data *slide, const int alpha)
     int x;
     int dy = PFREAL_ONE;
     for (x = xi; x < w; x++) {
-        int column = (xs - slide_left) / PFREAL_ONE;
+        int column = MAX(0, xs - slide_left) / PFREAL_ONE;
         if (column >= sw)
             break;
         if (zo || slide->angle)
