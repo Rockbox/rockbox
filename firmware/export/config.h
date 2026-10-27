@@ -919,6 +919,12 @@ Lyre prototype 1 */
 #define HAVE_STORAGE_FLUSH
 #endif
 
+/* ATA drives may cache writes, so flush them before power may be cut: on
+ * USB eject, at shutdown and on ROLO. */
+#if (CONFIG_STORAGE & STORAGE_ATA) && !defined(HAVE_STORAGE_FLUSH)
+#define HAVE_STORAGE_FLUSH
+#endif
+
 #if (CONFIG_STORAGE & (CONFIG_STORAGE - 1)) != 0
 /* Multiple storage drivers */
 #define CONFIG_STORAGE_MULTI
