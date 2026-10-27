@@ -1338,6 +1338,20 @@ void iap_handlepkt(void)
         logf("R: %s", hexstring(iap_rxstart+2, (length)));
 #endif
 
+        /* A corrupt length would walk iap_rxpayload past the start of
+         * the buffer, so stop draining and resynchronise instead.
+         */
+        if ((length + 2) > (iap_rxpayload - iap_rxstart))
+        {
+            level = disable_irq_save();
+            iap_rxnext = iap_rxstart;
+            iap_rxpayload = iap_rxstart;
+            iap_rxlen = RX_BUFLEN+2;
+            frame_state.state = ST_SYNC;
+            restore_irq(level);
+            return;
+        }
+
         if (length != 0) {
             unsigned char mode = *(iap_rxstart+2);
             switch (mode) {
@@ -1361,7 +1375,13 @@ void iap_handlepkt(void)
          * cleanly
          */
         level = disable_irq_save();
-        memmove(iap_rxstart, iap_rxstart+(length+2), (RX_BUFLEN+2)-(length+2));
+        /* Move only what is buffered: the complete packets still to
+         * handle and the frame being received, up to iap_rxnext, rather
+         * than the whole 64KB buffer with interrupts disabled. The check
+         * above guarantees the length is not negative.
+         */
+        memmove(iap_rxstart, iap_rxstart+(length+2),
+                (iap_rxnext - iap_rxstart) - (length+2));
         iap_rxnext -= (length+2);
         iap_rxpayload -= (length+2);
         iap_rxlen += (length+2);
