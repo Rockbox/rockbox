@@ -341,7 +341,7 @@ void iap_handlepkt_mode2(const unsigned int len, const unsigned char *buf)
          */
         case 0x04:
         {
-            unsigned char repeatbuf[6];
+            unsigned char repeatbuf[6] = {0};
 
             if (!DEVICE_AUTHENTICATED) {
                 cmd_ack(cmd, IAP_ACK_NO_AUTHEN);
@@ -354,7 +354,10 @@ void iap_handlepkt_mode2(const unsigned int len, const unsigned char *buf)
              * So just route it through the handler again, with 0x00 as the
              * command
              */
-            memcpy(repeatbuf, buf, 6);
+            /* Button bytes 1-3 are optional, so the packet may be
+             * shorter than 6 bytes. Copy only what arrived.
+             */
+            memcpy(repeatbuf, buf, (len<6)?len:6);
             repeatbuf[1] = 0x00;
             iap_handlepkt_mode2((len<6)?len:6, repeatbuf);
 
