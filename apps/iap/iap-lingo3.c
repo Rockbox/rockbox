@@ -271,8 +271,6 @@ void iap_handlepkt_mode3(const unsigned int len, const unsigned char *buf)
             device.track_index = iap_get_trackindex();
             device.chapter_index = 0;
             device.play_status = audio_status();
-            /* TODO: Fix this */
-            device.mute = false;
             device.mute_notified = device.mute;
             device.volume = iap_volume_to_ui_byte(global_status.volume);
             device.power_state = charger_input_state;

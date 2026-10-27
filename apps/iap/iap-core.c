@@ -360,6 +360,7 @@ void iap_reset_device(struct device_t* device)
     device->accinfo = ACCST_NONE;
     device->capabilities = 0;
     device->capabilities_queried = 0;
+    device->mute = false;
 
     interface_state = IST_STANDARD;
 
