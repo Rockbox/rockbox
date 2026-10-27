@@ -258,8 +258,6 @@ static void set_deemphasis(int deemphasis)
 
 static void set_mono(int value)
 {
-    tuner_param &= 0xEF;
-
     if (value != mono_mode)
     {
         tuner_param &= 0xEF;
