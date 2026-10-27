@@ -1380,6 +1380,12 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
                               there are none available. */
                     dbrecordcount = 0;
                     break;
+                default:
+                    /* Reserved category: do not answer with the count
+                     * left over from the previous query */
+                    dbrecordcount = 0;
+                    cmd_ack(cmd, IAP_ACK_UNKNOWN_DB);
+                    return;
             }
             put_u32(&data[3], dbrecordcount);
             iap_send_pkt(data, sizeof(data));
