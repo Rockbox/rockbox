@@ -17,6 +17,7 @@
 ****************************************************************************/
 
 #include <QtCore>
+#include <QRegularExpression>
 #include "ttsexes.h"
 #include "utils.h"
 #include "rbsettings.h"
@@ -100,6 +101,9 @@ TTSStatus TTSExes::voice(const QString& text, const QString& wavfile, QString *e
     exec.replaceInStrings("%options",m_TTSOpts);
     exec.replaceInStrings("%wavfile",wavfile);
     exec.replaceInStrings("%text",text);
+
+    /* Strip out any empty strings (notably if %options is blank) */
+    exec = exec.filter(QRegularExpression(".+"));
 
     int ret;
     if ((ret = QProcess::execute(m_TTSexec, exec))) {
