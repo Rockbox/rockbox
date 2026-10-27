@@ -354,6 +354,7 @@ void iap_reset_device(struct device_t* device)
     device->changed_notifications = 0;
     device->do_notify = false;
     device->pb_notifications = 0;
+    device->pb_track_changed = false;
     device->do_power_notify = false;
     device->accinfo = ACCST_NONE;
     device->capabilities = 0;
@@ -456,25 +457,15 @@ static void iap_thread(void)
     }
 }
 
-/* called by playback when the next track starts */
+/* called by playback when the next track starts. This runs on the
+ * audio thread, so leave building and sending the notification to
+ * iap_periodic(), which owns the TX buffer.
+ */
 static void iap_track_changed(unsigned short id, void *ignored)
 {
     (void)id;
     (void)ignored;
-    if ((interface_state == IST_EXTENDED) &&
-        (device.pb_notifications & BIT_N(2))) {
-        long playlist_pos = playlist_next(0);
-        playlist_pos -= playlist_get_first_index(NULL);
-        if(playlist_pos < 0)
-            playlist_pos += playlist_amount();
-
-        IAP_TX_INIT4(0x04, 0x0027);
-        IAP_TX_PUT(0x01);
-        IAP_TX_PUT_U32(playlist_pos);
-
-        iap_send_tx();
-        return;
-    }
+    device.pb_track_changed = true;
 }
 
 /* Set up the needed infrastructure: the message queue and message
@@ -978,9 +969,23 @@ void iap_periodic(void)
         }
     }
 
-    /* Extended Interface PlayStatusChangeNotification. The track index
-     * change is sent by iap_track_changed().
-     */
+    /* Extended Interface PlayStatusChangeNotification */
+    if (device.pb_track_changed)
+    {
+        device.pb_track_changed = false;
+
+        /* Track index */
+        if ((interface_state == IST_EXTENDED) &&
+            (device.pb_notifications & BIT_N(2)))
+        {
+            IAP_TX_INIT4(0x04, 0x0027);
+            IAP_TX_PUT(0x01);
+            IAP_TX_PUT_U32(iap_get_trackindex());
+
+            iap_send_tx();
+        }
+    }
+
     if ((interface_state == IST_EXTENDED) &&
         (device.pb_notifications & BIT_N(3)))
     {

@@ -116,6 +116,9 @@ struct device_t {
                                      * notifications requested with
                                      * SetPlayStatusChangeNotification
                                      */
+    bool pb_track_changed;          /* A track change is waiting to be
+                                     * notified
+                                     */
     bool do_power_notify;           /* Whether to send power change notifications.
                                      * These are sent automatically to all devices
                                      * that used IdentifyDeviceLingoes to identify

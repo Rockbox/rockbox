@@ -2008,12 +2008,14 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
             {
                 device.pb_notifications = 0;
             }
+            /* Only report track changes from now on */
+            device.pb_track_changed = false;
             /* respond with cmd ok packet */
             cmd_ok(cmd);
             break;
         }
         case 0x0027: /* PlayStatusChangeNotification */
-        /* This response is handled by iap_track_changed() and iap_periodic()
+        /* This response is sent by iap_periodic()
          * within iap-core.c
          * The following is the description for the Apple Firmware
          *
