@@ -148,6 +148,9 @@ static unsigned char* iap_rxpayload;
 static unsigned char* iap_rxnext;
 static uint32_t iap_rxlen;
 static unsigned char* iap_txstart;
+/* Counts RX buffer discards by iap_reset_state(), so that
+ * iap_handlepkt() can tell the packet it is handling has gone */
+static volatile unsigned int iap_rx_discards;
 unsigned char* iap_txpayload;
 unsigned char* iap_txnext;
 
@@ -314,6 +317,8 @@ void iap_reset_auth(struct auth_t* auth)
 
 void iap_reset_state(IF_IAP_MP_NONVOID(int port))
 {
+    int level;
+
     if (!iap_running)
         return;
 
@@ -321,18 +326,26 @@ void iap_reset_state(IF_IAP_MP_NONVOID(int port))
        when we eventually maintain independent state */
     IF_IAP_MP((void)port);
 
+    /* Drop whatever the old accessory left in the RX buffer, or
+     * iap_handlepkt() hands it to the new session. This may run in
+     * interrupt context (a tick on the 6G, a timeout for the headphone
+     * port), so only reset the pointers, with interrupts disabled.
+     */
+    level = disable_irq_save();
+    frame_state.state = ST_SYNC;
+    iap_rxnext = iap_rxstart;
+    iap_rxpayload = iap_rxstart;
+    iap_rxlen = RX_BUFLEN+2;
+    iap_rx_discards++;
+    restore_irq(level);
+
     iap_reset_device(&device);
     iap_bitrate_set(global_settings.serial_bitrate);
-
-#if 0  // XXX this is still screwed up
-    memset(&frame_state, 0, sizeof(frame_state));
-    interface_state = IST_STANDARD;
-    frame_state.state = ST_SYNC;
-
-    iap_reset_buffers();
-#endif
 }
 
+/* Reset the session state. Called from interrupt context via
+ * iap_reset_state(), so this must not block.
+ */
 void iap_reset_device(struct device_t* device)
 {
     iap_reset_auth(&(device->auth));
@@ -344,6 +357,24 @@ void iap_reset_device(struct device_t* device)
     device->accinfo = ACCST_NONE;
     device->capabilities = 0;
     device->capabilities_queried = 0;
+
+    interface_state = IST_STANDARD;
+
+    /* Release a button the accessory was holding. A held seek keeps
+     * iap_timeoutbtn up for several seconds, and nothing will send the
+     * release now.
+     */
+    iap_remotebtn = BUTTON_NONE;
+    iap_timeoutbtn = 0;
+    iap_repeatbtn = 0;
+    iap_btnshuffle = false;
+    iap_btnrepeat = false;
+
+#if CONFIG_TUNER
+    /* Set again when the next accessory identifies with the RF Tuner
+     * lingo */
+    radio_present = 0;
+#endif
 }
 
 static int iap_task(struct timeout *tmo)
@@ -1321,6 +1352,7 @@ void iap_handlepkt(void)
 {
     int level;
     int length;
+    unsigned int discards;
 
     if(!iap_setupflag) return;
     if(!iap_running) return;
@@ -1341,6 +1373,8 @@ void iap_handlepkt(void)
             sleep(1);
             return;
         }
+
+        discards = iap_rx_discards;
 
         /* handle command by mode */
         length = get_u16(iap_rxstart);
@@ -1385,6 +1419,13 @@ void iap_handlepkt(void)
          * cleanly
          */
         level = disable_irq_save();
+        if (discards != iap_rx_discards)
+        {
+            /* iap_reset_state() emptied the buffer while the packet
+             * was being handled, there is nothing left to remove */
+            restore_irq(level);
+            continue;
+        }
         /* Move only what is buffered: the complete packets still to
          * handle and the frame being received, up to iap_rxnext, rather
          * than the whole 64KB buffer with interrupts disabled. The check
