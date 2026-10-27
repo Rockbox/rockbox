@@ -224,6 +224,9 @@ enum character_encoding {
     CHAR_ENC_UTF_8,
     CHAR_ENC_UTF_16_LE,
     CHAR_ENC_UTF_16_BE,
+    /* From here on not text: an embedded cuesheet that is chapters */
+    CHAR_ENC_MP4_CHPL, /* MP4 Nero chapter list ('chpl' atom), read by
+                          mp4_read_chapters() */
 };
 
 /* cache embedded cuesheet details */
@@ -336,6 +339,12 @@ bool get_metadata_afmt(struct mp3entry* id3, int fd, const char* trackname, int 
 void adjust_mp3entry(struct mp3entry *entry, void *dest, const void *orig);
 void copy_mp3entry(struct mp3entry *dest, const struct mp3entry *orig);
 void wipe_mp3entry(struct mp3entry *id3);
+
+/* Called by the chapter readers with the start and UTF-8 title of each
+ * chapter */
+typedef void chapter_add_fn(void *ctx, unsigned long ms, const char *title);
+
+void mp4_read_chapters(int fd, int size, chapter_add_fn *add, void *ctx);
 
 void fill_metadata_from_path(struct mp3entry *id3, const char *trackname);
 int get_audio_base_codec_type(int type);

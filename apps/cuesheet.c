@@ -199,6 +199,29 @@ static enum eCS_SUPPORTED_TAGS cuesheet_tag_get_option(const char *option)
 #undef CS_OPTN
 }
 
+/* Add a chapter from a reader in the metadata code, keeping the tracks in
+ * order of their start */
+static void cue_add_chapter(void *ctx, unsigned long ms, const char *title)
+{
+    struct cuesheet *cue = ctx;
+    if (cue->track_count >= MAX_TRACKS)
+    {
+        /* Keep the first chapters in time, whatever order they come in */
+        if (ms >= cue->tracks[MAX_TRACKS-1].offset)
+            return;
+        cue->track_count--;
+    }
+
+    int i = cue->track_count++;
+    for (; i > 0 && cue->tracks[i-1].offset > ms; i--)
+        cue->tracks[i] = cue->tracks[i-1];
+
+    struct cue_track_info *track = &cue->tracks[i];
+    memset(track, 0, sizeof(*track));
+    track->offset = ms;
+    strmemccpy(track->title, title, sizeof(track->title));
+}
+
 /* parse cuesheet "cue_file" and store the information in "cue" */
 bool parse_cuesheet(struct cuesheet_file *cue_file, struct cuesheet *cue)
 {
@@ -220,6 +243,23 @@ bool parse_cuesheet(struct cuesheet_file *cue_file, struct cuesheet *cue)
         lseek(fd, cue_file->pos, SEEK_SET);
         bytes_left = cue_file->size;
         char_enc = cue_file->encoding;
+    }
+
+    /* Initialization */
+    memset(cue, 0, sizeof(struct cuesheet));
+    strcpy(cue->path, cue_file->path);
+    cue->curr_track = cue->tracks;
+
+    if (is_embedded)
+        strcpy(cue->file, cue->path);
+
+    if (is_embedded && char_enc >= CHAR_ENC_MP4_CHPL) /* chapters */
+    {
+        mp4_read_chapters(fd, bytes_left, cue_add_chapter, cue);
+        close(fd);
+
+        /* One chapter gives nothing to skip between */
+        return cue->track_count > 1;
     }
 
     /* Look for a Unicode BOM */
@@ -251,14 +291,6 @@ bool parse_cuesheet(struct cuesheet_file *cue_file, struct cuesheet *cue)
         if (read_bytes > bytes_left)
             read_bytes = bytes_left;
     }
-
-    /* Initialization */
-    memset(cue, 0, sizeof(struct cuesheet));
-    strcpy(cue->path, cue_file->path);
-    cue->curr_track = cue->tracks;
-
-    if (is_embedded)
-        strcpy(cue->file, cue->path);
 
     while ((line_len = read_line(fd, line, read_bytes)) > 0
         && cue->track_count < MAX_TRACKS )

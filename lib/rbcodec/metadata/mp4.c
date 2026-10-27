@@ -827,14 +827,34 @@ static bool read_mp4_container(int fd, struct mp3entry* id3,
 
         case MP4_chpl:
             {
-                /* ADDME: add support for real chapters. Right now it's only
-                 * used for Nero's gapless hack */
+                /* Nero chapter list, read by mp4_read_chapters(); the
+                 * first chapter's start is also Nero's gapless hack. */
+                uint8_t version    = 0;
                 uint8_t chapters   = 0;
                 uint64_t timestamp = 0;
+                int header = 5;     /* version, flags, chapter count */
 
-                lseek(fd, 8, SEEK_CUR);
+                read_uint8(fd, &version);
+                if (version)
+                    header += 4;    /* reserved */
+                if (size < (uint32_t)header + 8)
+                {
+                    size--;
+                    break;
+                }
+                lseek(fd, header - 2, SEEK_CUR);
                 read_uint8(fd, &chapters);
-                size -= 9;
+                size -= header;
+
+                /* One chapter gives nothing to skip between, and a
+                 * cuesheet takes space on the buffer */
+                if (chapters > 1 && !id3->has_embedded_cuesheet)
+                {
+                    id3->has_embedded_cuesheet = true;
+                    id3->embedded_cuesheet.pos = lseek(fd, 0, SEEK_CUR) - 1;
+                    id3->embedded_cuesheet.size = size + 1;
+                    id3->embedded_cuesheet.encoding = CHAR_ENC_MP4_CHPL;
+                }
 
                 /* the first chapter will be used as the lead_trim */
                 if (chapters > 0) {
@@ -858,6 +878,36 @@ static bool read_mp4_container(int fd, struct mp3entry* id3,
     } while (rc && (size_left > 0) && (errno == 0) && !done);
 
     return rc;
+}
+
+#define MP4_CHAPTER_TEXT 256
+
+/* Read a Nero chapter list of "size" bytes at the file position, from its
+ * chapter count on.  Each chapter is a 64-bit start in 100 ns units, then
+ * a title: a length byte and that many bytes of UTF-8. */
+void mp4_read_chapters(int fd, int size, chapter_add_fn *add, void *ctx)
+{
+    unsigned char title[MP4_CHAPTER_TEXT];
+    uint8_t count = 0;
+
+    read_uint8(fd, &count);
+    size--;
+
+    while (count-- > 0 && size >= 9)
+    {
+        uint64_t start = 0;
+        uint8_t len = 0;
+
+        if (read_uint64be(fd, &start) != 8 || read_uint8(fd, &len) != 1)
+            return;
+
+        size -= 9 + len;
+        if (size < 0 || read(fd, title, len) != len)
+            return;
+
+        title[len] = 0;
+        add(ctx, start / 10000, (char *)title);
+    }
 }
 
 bool get_mp4_metadata(int fd, struct mp3entry* id3)
