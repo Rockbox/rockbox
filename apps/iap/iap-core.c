@@ -1472,9 +1472,11 @@ void iap_interface_state_change(const enum interface_state new)
 {
     if (((interface_state == IST_EXTENDED) && (new == IST_STANDARD)) ||
         ((interface_state == IST_STANDARD) && (new == IST_EXTENDED))) {
+        /* Pause the engine directly: outside the WPS a synthetic Play
+         * button would activate the selected item instead */
         if (audio_status() == AUDIO_STATUS_PLAY)
         {
-            REMOTE_BUTTON(BUTTON_RC_PLAY);
+            audio_pause();
         }
     }
 
