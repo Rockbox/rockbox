@@ -2877,7 +2877,7 @@ bool load_new_slide(void)
 
         int prio_l = center - left + 1;
         int prio_r = right - center + 1;
-        if ((prio_l < prio_r || right >= number_of_slides) && left > 0)
+        if ((prio_l < prio_r || right >= number_of_slides - 1) && left > 0)
         {
             if (pf_sldcache.free == -1 && !free_slide_prio(prio_l))
             {
