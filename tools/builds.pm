@@ -418,8 +418,14 @@ $releasenotes="/wiki/ReleaseNotes400";
         manualok => 0,
     },
     'agptekrocker' => {
-        name => 'Agptek Rocker',
+        name => 'Agptek Rocker (Hosted)',
         status => 3,
+    },
+    'agptekrockernative' => {
+        name => 'Agptek Rocker (native)',
+        status => 2,
+#        manual => "agptekrocker",
+#        manualok => 1,
     },
     'agptekrockernative' => {
         name => 'Agptek Rocker (native)',
