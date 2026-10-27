@@ -358,9 +358,11 @@ static inline bool action_poll_button(action_last_t *last, action_cur_t *cur)
 #ifdef HAVE_SCROLLWHEEL
    /* *********************************************
     * Scrollwheel doesn't generate release events
+    * so it can't satisfy the context change check below
     * further processing needed
     */
-    else if ((last->button & (BUTTON_SCROLL_BACK | BUTTON_SCROLL_FWD)) != 0)
+    else if ((last->button & (BUTTON_SCROLL_BACK | BUTTON_SCROLL_FWD)) != 0
+        || (*button & (BUTTON_SCROLL_BACK | BUTTON_SCROLL_FWD)) != 0)
     {
         ret = false;
     }
