@@ -233,6 +233,17 @@ void iap_handlepkt_mode2(const unsigned int len, const unsigned char *buf)
             }
             else
             {
+                /* Arm the delivery delay on the release edge too, so the
+                 * button driver gets to see BUTTON_NONE. Otherwise a
+                 * release and the next press can be handled back to
+                 * back, no BUTTON_REL is posted, and two taps merge into
+                 * a held press that turns into a seek. A release is
+                 * one-shot, unlike the repeats of a held button, so this
+                 * cannot bring back the stalls the re-arm check above
+                 * avoids.
+                 */
+                if (iap_remotebtn != BUTTON_NONE)
+                    iap_repeatbtn = 2;
                 iap_remotebtn = BUTTON_NONE;
                 /* Shuffle and Repeat leave btn at BUTTON_NONE. Zeroing
                  * the timeout while they are held let iap_periodic()
