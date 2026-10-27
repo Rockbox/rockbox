@@ -1085,7 +1085,14 @@ void iap_handlepkt_mode0(const unsigned int len, const unsigned char *buf)
 
                 iap_send_tx();
             } else {
-                cmd_ack(cmd, IAP_ACK_BAD_PARAM);
+                /* Report setting 0 for the classes we do not implement.
+                 * Accessories may query a preference before setting it,
+                 * and some disconnect when the query is rejected.
+                 */
+                IAP_TX_PUT(buf[2]);
+                IAP_TX_PUT(0x00);
+
+                iap_send_tx();
             }
 
             break;
@@ -1134,7 +1141,11 @@ void iap_handlepkt_mode0(const unsigned int len, const unsigned char *buf)
                     cmd_ok(cmd);
                 }
             } else {
-                cmd_ack(cmd, IAP_ACK_BAD_PARAM);
+                /* Accept the classes we do not implement, such as video
+                 * out, as Apple's firmware does. Accessories that get
+                 * Bad Parameter here disconnect and retry in a loop.
+                 */
+                cmd_ok(cmd);
             }
 
             break;
