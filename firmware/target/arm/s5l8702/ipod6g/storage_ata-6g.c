@@ -1053,7 +1053,12 @@ void ata_spindown(int seconds)
     ata_sleep_timeout = seconds * HZ;
 }
 
-static void ata_flush_cache(void)
+/* Allow more than the usual 1s for the drive to finish writing back its
+ * cache. A flush that still times out is reported, and ata_sleepnow()
+ * then keeps the drive powered and retries later. */
+#define ATA_FLUSH_TIMEOUT 3000000
+
+static int ata_flush_cache(void)
 {
     uint8_t cmd;
 
@@ -1062,12 +1067,12 @@ static void ata_flush_cache(void)
     if (ceata) {
         memset(ceata_taskfile, 0, 16);
         ceata_taskfile[0xf] = CMD_FLUSH_CACHE_EXT;  /* CE-ATA only supports EXT */
-        ceata_wait_idle();
-        ceata_write_multiple_register(0, ceata_taskfile, 16);
-        ceata_wait_idle();
+        PASS_RC(ceata_wait_idle(), 2, 0);
+        PASS_RC(ceata_write_multiple_register(0, ceata_taskfile, 16), 2, 1);
+        PASS_RC(ceata_wait_idle(), 2, 2);
     } else {
         if (!canflush) {
-            return;
+            return 0;
         } else if (ata_lba48 && identify_info[83] & BIT(13)) {
             cmd = CMD_FLUSH_CACHE_EXT; /* Flag, optional, ATA-6 and up, for use with LBA48 devices. Mandatory for CE-ATA */
         } else if (identify_info[83] & BIT(12)) {
@@ -1077,31 +1082,50 @@ static void ata_flush_cache(void)
         } else {
             /* If neither command is supported then don't issue it. */
             canflush = 0;
-            return;
+            return 0;
         }
 
-        ata_wait_for_rdy(1000000);
+        PASS_RC(ata_wait_for_rdy(ATA_FLUSH_TIMEOUT), 2, 3);
         ata_write_cbr(&ATA_PIO_DVR, 0);
         ata_write_cbr(&ATA_PIO_CSD, cmd);
-        ata_wait_for_rdy(1000000);
+        PASS_RC(ata_wait_for_rdy(ATA_FLUSH_TIMEOUT), 2, 4);
     }
+
+    return 0;
 }
 
 int ata_flush(void)
 {
-    if (ata_powered) {
-        mutex_lock(&ata_mutex);
-        ata_flush_cache();
-        mutex_unlock(&ata_mutex);
-    }
-    return 0;
+    int rc = 0;
+
+    /* Check the power state under the lock: ata_sleepnow() may power the
+     * drive down while we wait for it. */
+    mutex_lock(&ata_mutex);
+    if (ata_powered)
+        rc = ata_flush_cache();
+    mutex_unlock(&ata_mutex);
+    return rc;
 }
 
 void ata_sleepnow(void)
 {
     mutex_lock(&ata_mutex);
 
-    ata_flush_cache();
+    if (!ata_powered) {
+        mutex_unlock(&ata_mutex);
+        return;
+    }
+
+    /* Cutting power while the drive still holds unwritten data in its
+     * cache corrupts the filesystem. If the flush fails or times out,
+     * keep the drive powered and try again after another idle period.
+     */
+    if (ata_flush_cache()) {
+        logf("ata FLUSH failed, not powering down");
+        ata_set_active();
+        mutex_unlock(&ata_mutex);
+        return;
+    }
 
     if (ceata || ata_disk_can_sleep()) {
         logf("ata SLEEP %ld", current_tick);
@@ -1115,10 +1139,13 @@ void ata_sleepnow(void)
             sleep(HZ);
             PWRCON(0) |= (1 << 9);
         } else {
-            ata_wait_for_rdy(1000000);
-            ata_write_cbr(&ATA_PIO_DVR, 0);
-            ata_write_cbr(&ATA_PIO_CSD, CMD_STANDBY_IMMEDIATE);
-            ata_wait_for_rdy(1000000);
+            /* STANDBY IMMEDIATE writes back any cached data as well, so
+             * give it the same time as a flush. */
+            if (ata_wait_for_rdy(ATA_FLUSH_TIMEOUT) == 0) {
+                ata_write_cbr(&ATA_PIO_DVR, 0);
+                ata_write_cbr(&ATA_PIO_CSD, CMD_STANDBY_IMMEDIATE);
+                ata_wait_for_rdy(ATA_FLUSH_TIMEOUT);
+            }
             sleep(HZ / 30);
             ATA_CONTROL = 0;
             while (!(ATA_CONTROL & BIT(1)))
