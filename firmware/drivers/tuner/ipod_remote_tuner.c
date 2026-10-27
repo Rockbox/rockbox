@@ -104,7 +104,7 @@ static void rmt_tuner_sleep(int state)
         iap_send_pkt(data1, sizeof(data1));
         /* tuner mode */
         const unsigned char data4[] = {0x07, 0x0E, 0x00 };
-        iap_send_pkt(data4, sizeof(data3));
+        iap_send_pkt(data4, sizeof(data4));
         /* set volume */
         unsigned char data2[] = {0x03, 0x09, 0x04, 0x00, 0x00 };
         data2[4] = (char)((global_status.volume+58) * 4);
