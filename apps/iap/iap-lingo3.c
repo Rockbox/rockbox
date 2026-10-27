@@ -37,9 +37,19 @@
 #include "settings.h"
 #include "metadata.h"
 #include "playback.h"
+#include "sound.h"
 #if CONFIG_TUNER
 #include "ipod_remote_tuner.h"
 #endif
+
+/* Apply the accessory's volume byte, which maps onto -90..+6 dB.
+ * sound_set_volume() keeps it within the codec's range and the volume
+ * limit, and stores it in global_status.volume.
+ */
+static void set_remote_volume(const unsigned char raw)
+{
+    sound_set_volume((int) (raw/2.65625)-90);
+}
 
 /*
  * This macro is meant to be used inside an IAP mode message handler.
@@ -772,7 +782,7 @@ void iap_handlepkt_mode3(const unsigned int len, const unsigned char *buf)
                     CHECKLEN(5);
                     if (buf[0x03]==0x00){
                         /* Not Muted */
-                        global_status.volume = (int) (buf[0x04]/2.65625)-90;
+                        set_remote_volume(buf[0x04]);
                         device.mute = false;
                     }
                     else {
@@ -946,7 +956,7 @@ void iap_handlepkt_mode3(const unsigned int len, const unsigned char *buf)
                     CHECKLEN(7);
                     if (buf[0x03]==0x00){
                         /* Not Muted */
-                        global_status.volume = (int) (buf[0x04]/2.65625)-90;
+                        set_remote_volume(buf[0x04]);
                         device.mute = false;
                     }
                     else {
