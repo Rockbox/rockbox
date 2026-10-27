@@ -66,6 +66,25 @@ static void cmd_ack(const unsigned int cmd, const unsigned char status)
 
 #define cmd_ok(cmd) cmd_ack((cmd), IAP_ACK_OK)
 
+/* Copy at most max bytes of src plus a NUL, cutting before a UTF-8
+ * sequence that would not fit whole, and return the length copied.
+ * dest may be src, to truncate a string in place.
+ */
+static size_t copy_utf8(unsigned char *dest, const char *src, size_t max)
+{
+    size_t len = strlen(src);
+
+    if (len > max)
+    {
+        len = max;
+        while (len > 0 && ((unsigned char)src[len] & 0xC0) == 0x80)
+            len--;
+    }
+    memmove(dest, src, len);
+    dest[len] = '\0';
+    return len;
+}
+
 static void get_playlist_name(unsigned char *dest,
                               unsigned long item_offset,
                               size_t max_length)
@@ -1832,16 +1851,20 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
             /* Return the requested track data */
             switch(cmd)
             {
+                /* The length sent must be what was copied: at most 63
+                 * bytes plus the NUL fit data[70], and the full tag can
+                 * be longer than the TX buffer.
+                 */
                 case 0x20:
-                    len = strlcpy((char *)&data[3], id3.title, 64);
+                    len = copy_utf8(&data[3], id3.title, 63);
                     iap_send_pkt(data, 4+len);
                     break;
                 case 0x22:
-                    len = strlcpy((char *)&data[3], id3.artist, 64);
+                    len = copy_utf8(&data[3], id3.artist, 63);
                     iap_send_pkt(data, 4+len);
                     break;
                 case 0x24:
-                    len = strlcpy((char *)&data[3], id3.album, 64);
+                    len = copy_utf8(&data[3], id3.album, 63);
                     iap_send_pkt(data, 4+len);
                     break;
             }
