@@ -1288,6 +1288,7 @@ void iap_handlepkt_mode3(const unsigned int len, const unsigned char *buf)
             IAP_TX_PUT_U32(playlist_amount());
 
             iap_send_tx();
+            break;
         }
 
         /* RetNumPlayingTracks (0x15)
