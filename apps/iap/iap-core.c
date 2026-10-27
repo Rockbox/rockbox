@@ -355,6 +355,7 @@ void iap_reset_device(struct device_t* device)
     device->do_notify = false;
     device->pb_notifications = 0;
     device->pb_track_changed = false;
+    device->pb_trackpos_ms = 0xFFFFFFFF;
     device->do_power_notify = false;
     device->accinfo = ACCST_NONE;
     device->capabilities = 0;
@@ -989,16 +990,24 @@ void iap_periodic(void)
     if ((interface_state == IST_EXTENDED) &&
         (device.pb_notifications & BIT_N(3)))
     {
-        /* Track position, every 500ms */
+        /* Track position, at most every 500ms, and only when it has
+         * changed: nothing is sent while paused or stopped */
         if (++pb_count >= 5)
         {
+            uint32_t t = iap_get_trackpos();
+
             pb_count = 0;
 
-            IAP_TX_INIT4(0x04, 0x0027);
-            IAP_TX_PUT(0x04);
-            IAP_TX_PUT_U32(iap_get_trackpos());
+            if (t != device.pb_trackpos_ms)
+            {
+                IAP_TX_INIT4(0x04, 0x0027);
+                IAP_TX_PUT(0x04);
+                IAP_TX_PUT_U32(t);
 
-            iap_send_tx();
+                iap_send_tx();
+
+                device.pb_trackpos_ms = t;
+            }
         }
     }
 

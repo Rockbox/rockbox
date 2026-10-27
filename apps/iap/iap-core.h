@@ -119,6 +119,8 @@ struct device_t {
     bool pb_track_changed;          /* A track change is waiting to be
                                      * notified
                                      */
+    uint32_t pb_trackpos_ms;        /* Last track position notified,
+                                     * 0xFFFFFFFF if none yet */
     bool do_power_notify;           /* Whether to send power change notifications.
                                      * These are sent automatically to all devices
                                      * that used IdentifyDeviceLingoes to identify

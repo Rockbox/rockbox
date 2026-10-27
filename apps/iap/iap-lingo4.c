@@ -2008,8 +2008,10 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
             {
                 device.pb_notifications = 0;
             }
-            /* Only report track changes from now on */
+            /* Only report track changes from now on, and report the
+             * current position once */
             device.pb_track_changed = false;
+            device.pb_trackpos_ms = 0xFFFFFFFF;
             /* respond with cmd ok packet */
             cmd_ok(cmd);
             break;
