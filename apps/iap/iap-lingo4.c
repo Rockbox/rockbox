@@ -3020,7 +3020,18 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
              */
         {
             int paused = !!(audio_status() & AUDIO_STATUS_PAUSE);
-            long tracknum = get_u32(&buf[3]);
+            long tracknum;
+
+            CHECKLEN(7);
+            tracknum = get_u32(&buf[3]);
+
+            /* Usable only while playing or paused, as described above:
+             * audio_skip() does nothing while stopped */
+            if (!(audio_status() & AUDIO_STATUS_PLAY))
+            {
+                cmd_ack(cmd, IAP_ACK_CMD_FAILED);
+                break;
+            }
 
             /* audio_skip() walks an out-of-range offset back one track at
              * a time, holding id3_mutex and never yielding, so a wild
