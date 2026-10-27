@@ -145,7 +145,13 @@ struct device_t {
 };
 
 extern struct device_t device;
-#define DEVICE_AUTHENTICATED (device.auth.state == AUST_AUTH)
+/* Provisional authentication: the spec makes every lingo-authenticated
+ * command available once the iPod has acknowledged the accessory's
+ * certificate (AckDevAuthenticationInfo with success), which is when the
+ * state moves to AUST_CERTDONE. The states from there to AUST_AUTH are
+ * the background half of the handshake.
+ */
+#define DEVICE_AUTHENTICATED (device.auth.state >= AUST_CERTDONE)
 #define DEVICE_AUTH_RUNNING ((device.auth.state != AUST_NONE) && (device.auth.state != AUST_AUTH))
 #define DEVICE_LINGO_SUPPORTED(x) (device.lingoes & BIT_N((x)&0x1f))
 
