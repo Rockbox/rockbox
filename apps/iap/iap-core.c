@@ -964,7 +964,7 @@ void iap_periodic(void)
     {
         uint32_t t;
         uint16_t ts;
-        bool changed;
+        bool changed = false;
 
         t = iap_get_trackpos();
         ts = (t / 1000) & 0xFFFF;
