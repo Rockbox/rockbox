@@ -2548,8 +2548,8 @@ static void initialize_slide_cache(void)
         ind_ = next_; \
         next_ = pf_sldcache.cache[ind_].next; \
         i_++; \
-    } while (next_ != pf_sldcache.used && (cond) && i_ < SLIDE_CACHE_SIZE); \
-    if (i_ >= SLIDE_CACHE_SIZE) \
+    } while (next_ != pf_sldcache.used && (cond) && i_ <= SLIDE_CACHE_SIZE); \
+    if (i_ > SLIDE_CACHE_SIZE) \
     /* TODO: Not supposed to happen */ \
         ind_ = -1; \
     ind_; \
@@ -2563,8 +2563,8 @@ static void initialize_slide_cache(void)
         ind_ = next_; \
         next_ = pf_sldcache.cache[ind_].prev; \
         i_++; \
-    } while (ind_ != pf_sldcache.used && (cond) && i_ < SLIDE_CACHE_SIZE); \
-    if (i_ >= SLIDE_CACHE_SIZE) \
+    } while (ind_ != pf_sldcache.used && (cond) && i_ <= SLIDE_CACHE_SIZE); \
+    if (i_ > SLIDE_CACHE_SIZE) \
     /* TODO: Not supposed to happen */ \
         ind_ = -1; \
     ind_; \
