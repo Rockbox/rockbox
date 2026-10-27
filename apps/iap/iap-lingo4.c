@@ -1297,7 +1297,7 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
                 case 0x05: /* Track    */
                 case 0x06: /* Composer */
                 {
-                    audio_skip(index - playlist_next(0));
+                    audio_skip(index - iap_get_trackindex());
                     break;
                 }
                 default:
@@ -1714,13 +1714,9 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
         {
             unsigned char data[] = {0x04, 0x00, 0x1F,
                                     0xFF, 0xFF, 0xFF, 0xFF};
-            long playlist_pos = playlist_next(0);
             int status = audio_status();
-            playlist_pos -= playlist_get_first_index(NULL);
-            if(playlist_pos < 0)
-                playlist_pos += playlist_amount();
             if ((status == AUDIO_STATUS_PLAY) || (status & AUDIO_STATUS_PAUSE))
-                put_u32(&data[3], playlist_pos);
+                put_u32(&data[3], iap_get_trackindex());
             iap_send_pkt(data, sizeof(data));
             break;
         }
@@ -1903,7 +1899,7 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
                 tracknum -= playlist_amount();
             /* If the tracknumber is not the current one,
                read id3 from disk */
-            if(playlist_next(0) != tracknum)
+            if(playlist_get_current()->index != tracknum)
             {
                 struct playlist_track_info info;
                 playlist_get_track_info(NULL, tracknum, &info);
@@ -2948,7 +2944,7 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
             }
 
             audio_pause();
-            audio_skip(tracknum - playlist_next(0));
+            audio_skip(tracknum - iap_get_trackindex());
             if (!paused)
                 audio_resume();
 
@@ -3141,7 +3137,7 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
                     audio_pause();
                     audio_skip(-iap_get_trackindex());
                     playlist_sort(NULL, true);
-                    audio_skip(index - playlist_next(0));
+                    audio_skip(index - iap_get_trackindex());
                     break;
                 }
             }

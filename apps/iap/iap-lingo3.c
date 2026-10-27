@@ -368,7 +368,6 @@ void iap_handlepkt_mode3(const unsigned int len, const unsigned char *buf)
         case 0x0C:
         {
             struct mp3entry* id3;
-            struct playlist_info* playlist;
             int play_status;
             struct tm* tm;
 
@@ -397,8 +396,7 @@ void iap_handlepkt_mode3(const unsigned int len, const unsigned char *buf)
                  */
                 case 0x01:
                 {
-                    playlist = playlist_get_current();
-                    IAP_TX_PUT_U32(playlist->index - playlist->first_index);
+                    IAP_TX_PUT_U32(iap_get_trackindex());
 
                     iap_send_tx();
                     break;
@@ -409,8 +407,7 @@ void iap_handlepkt_mode3(const unsigned int len, const unsigned char *buf)
                  */
                 case 0x02:
                 {
-                    playlist = playlist_get_current();
-                    IAP_TX_PUT_U32(playlist->index - playlist->first_index);
+                    IAP_TX_PUT_U32(iap_get_trackindex());
                     /* Indicate that track does not have chapters */
                     IAP_TX_PUT_U16(0x0000);
                     IAP_TX_PUT_U16(0xFFFF);
@@ -1010,7 +1007,6 @@ void iap_handlepkt_mode3(const unsigned int len, const unsigned char *buf)
         {
             int play_status;
             struct mp3entry* id3;
-            struct playlist_info* playlist;
 
             CHECKAUTH;
 
@@ -1027,8 +1023,7 @@ void iap_handlepkt_mode3(const unsigned int len, const unsigned char *buf)
                     /* Playing */
                     IAP_TX_PUT(0x01);
                 }
-                playlist = playlist_get_current();
-                IAP_TX_PUT_U32(playlist->index - playlist->first_index);
+                IAP_TX_PUT_U32(iap_get_trackindex());
                 id3 = audio_current_track();
                 IAP_TX_PUT_U32(id3->length);
                 IAP_TX_PUT_U32(id3->elapsed);

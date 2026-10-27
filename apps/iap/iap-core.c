@@ -783,7 +783,7 @@ void iap_get_trackinfo(const unsigned int track, struct mp3entry* id3)
 
     /* If the tracknumber is not the current one,
        read id3 from disk */
-    if(playlist_next(0) != tracknum)
+    if(playlist_get_current()->index != tracknum)
     {
         playlist_get_track_info(NULL, tracknum, &info);
         /* memset(id3, 0, sizeof(*id3)) --get_metadata does this for us */
@@ -800,11 +800,19 @@ uint32_t iap_get_trackpos(void)
     return id3->elapsed;
 }
 
+/* The index of the current track as the accessory counts them, from
+ * first_index on. Under shuffle the current track can come before
+ * first_index in the playlist, so wrap the difference around.
+ */
 uint32_t iap_get_trackindex(void)
 {
     struct playlist_info* playlist = playlist_get_current();
+    int index = playlist->index - playlist->first_index;
 
-    return (playlist->index - playlist->first_index);
+    if (index < 0)
+        index += playlist->amount;
+
+    return index;
 }
 
 void iap_periodic(void)
