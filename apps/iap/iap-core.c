@@ -665,8 +665,10 @@ bool iap_getc(IF_IAP_MP(int port,) const unsigned char x)
             /* large packet */
             s->state = ST_LENH;
         } else {
-            /* small packet */
-            if (x > (iap_rxlen-2))
+            /* small packet. Compare by addition: iap_rxlen is unsigned,
+             * so (iap_rxlen-2) wraps once the buffer is within a byte of
+             * full, and every frame would then be accepted. */
+            if ((uint32_t)x + 2 > iap_rxlen)
             {
                 /* Packet too long for buffer */
                 s->state = ST_SYNC;
@@ -686,7 +688,7 @@ bool iap_getc(IF_IAP_MP(int port,) const unsigned char x)
     case ST_LENL:
         s->check += x;
         s->len += x;
-        if ((s->len == 0) || (s->len > (iap_rxlen-2))) {
+        if ((s->len == 0) || ((uint32_t)s->len + 2 > iap_rxlen)) {
             /* invalid length */
             s->state = ST_SYNC;
             break;
