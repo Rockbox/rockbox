@@ -1,6 +1,6 @@
 Source imported from upstream git:
 
-v2.11.3 - e5e799221b45bbb90f5fdc5c69b6b8dfbf017e78
+v2.12.0 - f72a4023617e2d879f2ca93086fd02bc7e3149fe
 
 Minor modifications to silence build warnings with our toolchains and
 disable functions that require malloc()
