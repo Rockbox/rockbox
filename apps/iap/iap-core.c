@@ -1308,34 +1308,13 @@ void iap_interface_state_change(const enum interface_state new)
 
 static void iap_handlepkt_mode5(const unsigned int len, const unsigned char *buf)
 {
+    /* The Accessory Power lingo only has BeginHighPower (0x02) and
+     * EndHighPower (0x03), and both are sent by the iPod. An accessory
+     * has nothing to send here, and the lingo has no acknowledgement,
+     * so ignore whatever arrives.
+     */
     (void) len;
-    unsigned int cmd = buf[1];
-    switch (cmd)
-    {
-        /* Sent from iPod Begin Transmission */
-        case 0x02:
-        {
-            /* RF Transmitter: Begin High Power transmission */
-            unsigned char data0[] = {0x05, 0x02};
-            iap_send_pkt(data0, sizeof(data0));
-            break;
-        }
-
-        /* Sent from iPod End High Power Transmission */
-        case 0x03:
-        {
-            /* RF Transmitter: End High Power transmission */
-            unsigned char data1[] = {0x05, 0x03};
-            iap_send_pkt(data1, sizeof(data1));
-            break;
-        }
-        /* Return Version Number ?*/
-        case 0x04:
-        {
-            /* do nothing */
-            break;
-        }
-    }
+    (void) buf;
 }
 
 void iap_handlepkt(void)
