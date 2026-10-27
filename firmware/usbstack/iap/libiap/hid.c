@@ -175,7 +175,8 @@ IAPBool _iap_send_next_report(struct IAPContext* ctx) {
     ctx->send_busy = iap_true;
 
     const size_t send_size = 1 + report_size->size;
-    check_ret(iap_platform_send_hid_report(ctx, report, send_size) == (int)send_size, iap_false);
+    /* a rejected report never completes, so do not leave send_busy set */
+    check_act(iap_platform_send_hid_report(ctx, report, send_size) == (int)send_size, ctx->send_busy = iap_false; return iap_false);
 
     return iap_true;
 }
