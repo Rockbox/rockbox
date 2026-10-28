@@ -1452,7 +1452,9 @@ static int disk_callback(int btn, struct gui_synclist *lists)
     char buf[128];
     unsigned short* identify_info = ata_get_identify();
     bool timing_info_present = false;
-    (void)btn;
+
+    if (btn != ACTION_REDRAW)
+        return btn;
 
     simplelist_reset_lines();
 
@@ -1843,14 +1845,21 @@ static bool dbg_ata_smart(void)
 #else /* No SD, MMC or ATA */
 static int disk_callback(int btn, struct gui_synclist *lists)
 {
-    (void)lists;
     struct storage_info info;
+
+    if (btn != ACTION_REDRAW)
+        return btn;
+
+    simplelist_reset_lines();
+
+    (void)lists;
+
     storage_get_info(0,&info);
     simplelist_addline("Vendor: %s", info.vendor);
     simplelist_addline("Model: %s", info.product);
     simplelist_addline("Firmware: %s", info.revision);
     simplelist_addline(
-            "Size: %lu MB", (unsigned long)(info.num_sectors*(info.sector_size/512)/2048));
+            "Size: %lu MB", (unsigned long)(info.num_sectors*info.sector_size/1024/1024));
     sector_t free;
     volume_size( IF_MV(0,) NULL, &free );
     simplelist_addline(
