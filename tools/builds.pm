@@ -427,11 +427,6 @@ $releasenotes="/wiki/ReleaseNotes400";
 #        manual => "agptekrocker",
 #        manualok => 1,
     },
-    'agptekrockernative' => {
-        name => 'Agptek Rocker (native)',
-        status => 1,
-        manualok => 0,
-    },
     'xduoox3' => {
         name => 'xDuoo X3',
         status => 3,
