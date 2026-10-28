@@ -214,6 +214,5 @@
 
 #define BOOTFILE_EXT    "sansa"
 #define BOOTFILE        "rockbox." BOOTFILE_EXT
-#define BOOTDIR "/.rockbox"
 
 #define INCLUDE_TIMEOUT_API

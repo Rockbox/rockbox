@@ -34,6 +34,7 @@
 #include "system-echoplayer.h"
 #include "gpio-stm32h7.h"
 #include "regs/cortex-m/cm_debug.h"
+#include "rbpaths.h"
 
 #define SDRAM_SIZE          (MEMORYSIZE * 1024 * 1024)
 

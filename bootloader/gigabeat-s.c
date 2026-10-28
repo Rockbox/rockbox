@@ -41,6 +41,7 @@
 #include "font.h"
 #include "lcd.h"
 #include "version.h"
+#include "rbpaths.h"
 
 #define TAR_CHUNK 512
 #define TAR_HEADER_SIZE 157

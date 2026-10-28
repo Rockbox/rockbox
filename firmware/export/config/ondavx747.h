@@ -196,7 +196,6 @@ No access to the NAND yet..
 #endif
 
 #define BOOTFILE     "rockbox." BOOTFILE_EXT
-#define BOOTDIR      "/.rockbox"
 
 #define CONFIG_USBOTG     USBOTG_JZ4740
 #define HAVE_USBSTACK

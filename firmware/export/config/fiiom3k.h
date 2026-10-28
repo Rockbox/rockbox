@@ -3,7 +3,6 @@
 #define MODEL_NUMBER    114
 #define BOOTFILE_EXT    "m3k"
 #define BOOTFILE        "rockbox." BOOTFILE_EXT
-#define BOOTDIR         "/.rockbox"
 
 /* CPU defines */
 #define CONFIG_CPU          X1000

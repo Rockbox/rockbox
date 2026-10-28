@@ -50,7 +50,6 @@
 /* ROLO */
 #define BOOTFILE_EXT "rocker"
 #define BOOTFILE     "rockbox." BOOTFILE_EXT
-#define BOOTDIR      "/.rockbox"
 
 /* USB */
 #define USB_VID_STR "C502"

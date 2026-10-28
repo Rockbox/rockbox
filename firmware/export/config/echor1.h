@@ -6,7 +6,6 @@
 #define MODEL_NUMBER    119
 #define BOOTFILE_EXT    "echo"
 #define BOOTFILE        "rockbox." BOOTFILE_EXT
-#define BOOTDIR         "/.rockbox"
 
 /* CPU defines */
 #define CONFIG_CPU          STM32H743

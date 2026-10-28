@@ -135,7 +135,6 @@
 #define HAVE_VOLUME_IN_LIST
 
 /* This mount point resides in the rootfs, binded to /mnt/media0/.rockbox */
-#define BOOTDIR "/.rockbox"
 
 /* No special storage */
 #define CONFIG_STORAGE STORAGE_HOSTFS

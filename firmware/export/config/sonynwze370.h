@@ -183,7 +183,6 @@
 
 #define BOOTFILE_EXT    "sony"
 #define BOOTFILE        "rockbox." BOOTFILE_EXT
-#define BOOTDIR "/.rockbox"
 
 #define INCLUDE_TIMEOUT_API
  

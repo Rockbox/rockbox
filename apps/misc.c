@@ -29,6 +29,7 @@
 #include "lcd.h"
 #include "language.h" /* is_lang_rtl() */
 #include "iap-usb.h"
+#include "rbpaths.h"
 
 #ifdef HAVE_DIRCACHE
 #include "dircache.h"

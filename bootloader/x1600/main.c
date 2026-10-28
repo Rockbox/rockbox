@@ -35,6 +35,7 @@
 #include "boot-x1600.h"
 #include "lcd.h"
 #include "i2c-ingenic.h"
+#include "rbpaths.h"
 
 void main(void)
 {

@@ -8,7 +8,6 @@
 #define MODEL_NUMBER    125
 #define BOOTFILE_EXT    "r1"
 #define BOOTFILE        "rockbox." BOOTFILE_EXT
-#define BOOTDIR         "/.rockbox"
 
 /* CPU defines */
 #define CONFIG_CPU          X1600

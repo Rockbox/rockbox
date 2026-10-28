@@ -208,7 +208,6 @@
 
 #define BOOTFILE_EXT "ipod"
 #define BOOTFILE "rockbox." BOOTFILE_EXT
-#define BOOTDIR "/.rockbox"
 
 #define ICODE_ATTR_TREMOR_NOT_MDCT
 

@@ -7,7 +7,6 @@
 #define MODEL_NUMBER 133
 #define BOOTFILE_EXT "rockern"
 #define BOOTFILE     "rockbox." BOOTFILE_EXT
-#define BOOTDIR      "/.rockbox"
 
 /* CPU defines */
 #define CONFIG_CPU      X1000

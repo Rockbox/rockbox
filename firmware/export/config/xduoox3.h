@@ -194,7 +194,6 @@
 
 #define BOOTFILE_EXT "x3"
 #define BOOTFILE     "rockbox." BOOTFILE_EXT
-#define BOOTDIR      "/.rockbox"
 
 #define INCLUDE_TIMEOUT_API
 

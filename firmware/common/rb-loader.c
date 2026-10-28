@@ -25,6 +25,7 @@
 #include "file.h"
 #include "loader_strerror.h"
 #include "checksum.h"
+#include "rbpaths.h"
 
 #if defined(HAVE_BOOTDATA) || defined(HAVE_MULTIBOOT)
 #include "multiboot.h"

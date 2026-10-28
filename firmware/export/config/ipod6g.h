@@ -222,7 +222,6 @@
 
 #define BOOTFILE_EXT "ipod"
 #define BOOTFILE "rockbox." BOOTFILE_EXT
-#define BOOTDIR "/.rockbox"
 
 /* Define this for FM radio input available */
 #define HAVE_FMRADIO_IN

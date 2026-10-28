@@ -85,7 +85,6 @@
 /* ROLO */
 #define BOOTFILE_EXT "r3proii"
 #define BOOTFILE     "rockbox." BOOTFILE_EXT
-#define BOOTDIR      "/.rockbox"
 
 /* USB */
 #define HAVE_USB_ADB

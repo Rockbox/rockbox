@@ -193,7 +193,6 @@
 
 #define BOOTFILE_EXT "ipod"
 #define BOOTFILE "rockbox." BOOTFILE_EXT
-#define BOOTDIR "/.rockbox"
 
 /* Alternative bootfile extension - this is for encrypted images */
 #define BOOTFILE_EXT2 "ipodx"

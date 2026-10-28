@@ -203,7 +203,6 @@
 
 #define BOOTFILE_EXT "sansa"
 #define BOOTFILE "rockbox." BOOTFILE_EXT
-#define BOOTDIR "/.rockbox"
 
 /* Define this if a programmable hotkey is mapped */
 #define HAVE_HOTKEY

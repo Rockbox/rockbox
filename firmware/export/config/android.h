@@ -91,8 +91,6 @@
 /* Define this if a programmable hotkey is mapped */
 #define HAVE_HOTKEY
 
-#define BOOTDIR "/.rockbox"
-
 /* No special storage */
 #define CONFIG_STORAGE STORAGE_HOSTFS
 #define HAVE_STORAGE_FLUSH

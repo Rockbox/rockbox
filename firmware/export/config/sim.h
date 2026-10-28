@@ -60,7 +60,6 @@
 #undef MI4_FORMAT
 #undef BOOTFILE_EXT
 #undef BOOTFILE
-#undef BOOTDIR
 
 #undef BOOTLOADER_ENTRYPOINT
 

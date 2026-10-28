@@ -127,4 +127,8 @@
 #define PLAYLIST_CONTROL_FILE   ROCKBOX_DIR "/.playlist_control"
 #define GLYPH_CACHE_FILE        ROCKBOX_DIR "/.glyphcache"
 
+#ifndef BOOTDIR
+#define BOOTDIR ROCKBOX_DIR
+#endif
+
 #endif /* __PATHS_H__ */

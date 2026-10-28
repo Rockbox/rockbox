@@ -181,7 +181,6 @@
 
 #define BOOTFILE_EXT "gigabeat"
 #define BOOTFILE "rockbox." BOOTFILE_EXT
-#define BOOTDIR "/.rockbox"
 
 /* Define this if a programmable hotkey is mapped */
 #define HAVE_HOTKEY

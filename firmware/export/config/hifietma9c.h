@@ -147,4 +147,3 @@
 #define RKW_FORMAT
 #define BOOTFILE_EXT "rkw"
 #define BOOTFILE "rockbox." BOOTFILE_EXT
-#define BOOTDIR "/.rockbox"

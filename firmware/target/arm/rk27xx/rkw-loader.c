@@ -26,6 +26,7 @@
 #include "crc32-rkw.h"
 #include "file.h"
 #include "panic.h"
+#include "rbpaths.h"
 
 #ifdef BOOTLOADER
 /* Before the NAND bootloader jumps to an image it writes three words at

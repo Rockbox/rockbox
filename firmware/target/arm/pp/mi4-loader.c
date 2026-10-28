@@ -32,6 +32,7 @@
 #if defined(HAVE_BOOTDATA)
 #include "multiboot.h"
 #endif /* HAVE_BOOTDATA */
+#include "rbpaths.h"
 
 static inline unsigned int le2int(unsigned char* buf)
 {

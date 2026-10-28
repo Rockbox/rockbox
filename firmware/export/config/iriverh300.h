@@ -176,7 +176,6 @@
 
 #define BOOTFILE_EXT "iriver"
 #define BOOTFILE "rockbox." BOOTFILE_EXT
-#define BOOTDIR "/.rockbox"
 
 #define FLASH_BASE             0x00000000
 #define BOOTLOADER_ENTRYPOINT  0x003F0000

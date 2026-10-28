@@ -157,7 +157,6 @@
 
 #define BOOTFILE_EXT "mpio"
 #define BOOTFILE "rockbox." BOOTFILE_EXT
-#define BOOTDIR "/.rockbox"
 
 #define BOOTLOADER_ENTRYPOINT  0x001F0000
 #define FLASH_RAMIMAGE_ENTRY   0x00001000

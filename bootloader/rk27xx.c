@@ -23,6 +23,7 @@
 #include "version.h"
 #include "i2c-rk27xx.h"
 #include "loader_strerror.h"
+#include "rbpaths.h"
 
 /* beginning of DRAM */
 #define DRAM_ORIG 0x60000000

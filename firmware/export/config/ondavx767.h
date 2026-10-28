@@ -155,7 +155,6 @@
 
 #define BOOTFILE_EXT "vx767"
 #define BOOTFILE "rockbox." BOOTFILE_EXT
-#define BOOTDIR "/.rockbox"
 
 #define CONFIG_USBOTG   USBOTG_JZ4740
 #define HAVE_USBSTACK
