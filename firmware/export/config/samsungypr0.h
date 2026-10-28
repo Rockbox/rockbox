@@ -11,7 +11,7 @@
 #endif
 
 /* For Rolo and boot loader */
-#define MODEL_NUMBER 100
+#define MODEL_NUMBER 78
 
 #define MODEL_NAME   "Samsung YP-R0"
 
