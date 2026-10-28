@@ -2558,7 +2558,7 @@ fi
     ;;
 
    64|sansafuzeplus)
-    target_id=80
+    target_id=72
     modelname="sansafuzeplus"
     target="SANSA_FUZEPLUS"
     memory=64
@@ -2577,7 +2577,7 @@ fi
     ;;
 
    65|sansaclipzip)
-    target_id=68
+    target_id=76
     modelname="sansaclipzip"
     target="SANSA_CLIPZIP"
     memory=8 # not sure
@@ -2596,7 +2596,7 @@ fi
     ;;
 
    66|sansaconnect)
-    target_id=81
+    target_id=75
     modelname="sansaconnect"
     target="SANSA_CONNECT"
     memory=64
@@ -2766,7 +2766,7 @@ fi
     ;;
 
    95|creativezenv)
-    target_id=92
+    target_id=77
     modelname="creativezenv"
     target="CREATIVE_ZENV"
     memory=32
@@ -3070,7 +3070,7 @@ fi
     ;;
 
    146|samsungypcp3)
-    target_id=117
+    target_id=132
     modelname="samsungypcp3"
     target="SAMSUNG_YPCP3"
     memory=16 # always
@@ -3160,7 +3160,7 @@ fi
     ;;
 
    180|rk27generic)
-    target_id=78
+    target_id=73
     modelname="rk27generic"
     target="RK27_GENERIC"
     memory=16 # always
@@ -3227,7 +3227,7 @@ fi
 
    200|sdlapp)
     application="yes"
-    target_id=73
+    target_id=25
     modelname="sdlapp"
     target="SDLAPP"
     app_set_paths
@@ -3300,7 +3300,7 @@ fi
 
    145|samsungypr1)
     application="yes"
-    target_id=93
+    target_id=42
     modelname="samsungypr1"
     target="SAMSUNG_YPR1"
     memory=24
@@ -3515,7 +3515,7 @@ fi
 
    223|sonynwze460)
     application="yes"
-    target_id=97
+    target_id=56
     modelname="sonynwze460"
     target="SONY_NWZE460"
     memory=16
@@ -3559,7 +3559,7 @@ fi
 
    225|sonynwze580)
     application="yes"
-    target_id=98
+    target_id=108
     modelname="sonynwze580"
     target="SONY_NWZE580"
     memory=16
@@ -3713,7 +3713,7 @@ fi
 
    250|ibassodx50)
     application="yes"
-    target_id=94
+    target_id=44
     modelname="ibassodx50"
     target="DX50"
     app_type="android_ndk"
@@ -3763,7 +3763,7 @@ fi
     ;;
 
    239|agptekrockernative)
-    target_id=126
+    target_id=133
     modelname="agptekrockernative"
     target="AGPTEK_ROCKER_NATIVE"
     memory=32
@@ -3789,7 +3789,7 @@ fi
    240|agptekrocker)
     application="yes"
     app_type="hibyos"
-    target_id=97
+    target_id=107
     modelname="agptekrocker"
     target="AGPTEK_ROCKER"
     memory=8
@@ -4011,7 +4011,7 @@ fi
     ;;
 
    232|ihifi770c)
-    target_id=107
+    target_id=97
     modelname="ihifi770c"
     target="IHIFI770C"
     memory=16
@@ -4033,7 +4033,7 @@ fi
     ;;
 
    231|ihifi770)
-    target_id=108
+    target_id=98
     modelname="ihifi770"
     target="IHIFI770"
     memory=16
@@ -4055,7 +4055,7 @@ fi
     ;;
 
    233|ihifi800)
-    target_id=109
+    target_id=99
     modelname="ihifi800"
     target="IHIFI800"
     memory=16
