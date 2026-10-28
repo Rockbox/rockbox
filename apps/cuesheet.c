@@ -261,7 +261,8 @@ bool parse_cuesheet(struct cuesheet_file *cue_file, struct cuesheet *cue)
                               char_enc == CHAR_ENC_ID3V24_CHAP,
                               cue_add_chapter, cue);
         else
-            mp4_read_chapters(fd, bytes_left, cue_add_chapter, cue);
+            mp4_read_chapters(fd, bytes_left, char_enc == CHAR_ENC_MP4_CHPL,
+                              cue_add_chapter, cue);
         close(fd);
 
         /* One chapter gives nothing to skip between */
