@@ -650,6 +650,96 @@ static void unicode_munge(unsigned char* string, unsigned char* utf8buf, int *le
     }
 }
 
+/* Read the 10-byte header of the next of the "*size" bytes of ID3v2.3 or
+ * 2.4 frames at the file position.  Returns the size of the frame after
+ * the header, or -1 at the end. */
+static long id3_next_frame(int fd, long *size, bool v24,
+                           unsigned char *header)
+{
+    if (*size < 10 || read(fd, header, 10) != 10)
+        return -1;
+
+    long len = v24 ? (long)unsync(header[4], header[5], header[6], header[7])
+                   : (long)bytes2int(header[4], header[5],
+                                     header[6], header[7]);
+    *size -= 10 + len;
+    return (len < 0 || *size < 0) ? -1 : len;
+}
+
+#define ID3_CHAP_BUF 256
+
+/* Find the TIT2 frame in the "size" bytes of frames inside a CHAP frame and
+ * decode it into "title" (ID3_CHAP_BUF bytes), or leave it empty */
+static void id3_chapter_title(int fd, long size, bool v24,
+                              unsigned char *buf, unsigned char *title)
+{
+    long len;
+    while ((len = id3_next_frame(fd, &size, v24, buf)) >= 0)
+    {
+        if (!memcmp(buf, "TIT2", 4) && !buf[9] && len > 1)
+        {
+            int n = read(fd, buf, MIN(len, ID3_CHAP_BUF));
+            if (n <= 1)
+                return;
+
+            /* unicode_munge may look one UTF-16 unit past the end */
+            buf[n] = buf[n + 1] = 0;
+            if (parse_as_utf8((char *)buf, &n))
+            {
+                n = MIN(n, ID3_CHAP_BUF - 1);
+                memcpy(title, buf, n);
+                title[n] = 0;
+            }
+            else
+            {
+                unicode_munge(buf, title, &n, ID3_CHAP_BUF - 1);
+            }
+            return;
+        }
+
+        lseek(fd, len, SEEK_CUR);
+    }
+}
+
+/* Read the chapters from the "size" bytes of ID3v2.3 or 2.4 frames at the
+ * file position, as setid3v2title() found them, and call add() with the
+ * start in ms and the UTF-8 title of each.  Frames other than CHAP, and
+ * CHAP frames with format flags such as compression, are skipped. */
+void id3_read_chapters(int fd, int size, bool v24, chapter_add_fn *add,
+                       void *ctx)
+{
+    unsigned char buf[ID3_CHAP_BUF + 2];
+    unsigned char title[ID3_CHAP_BUF];
+    long left = size;
+    long len;
+
+    while ((len = id3_next_frame(fd, &left, v24, buf)) >= 0)
+    {
+        off_t next = lseek(fd, 0, SEEK_CUR) + len;
+
+        if (!memcmp(buf, "CHAP", 4) && !buf[9])
+        {
+            /* An element ID, then the start and end in ms and in bytes,
+             * then frames such as the title */
+            int n = read(fd, buf, MIN(len, ID3_CHAP_BUF));
+            unsigned char *id_end = n > 0 ? memchr(buf, 0, n) : NULL;
+            long used = id_end ? id_end + 17 - buf : len + 1;
+
+            if (used <= n)
+            {
+                unsigned long ms = bytes2int(id_end[1], id_end[2],
+                                             id_end[3], id_end[4]);
+                title[0] = 0;
+                lseek(fd, next - len + used, SEEK_SET);
+                id3_chapter_title(fd, len - used, v24, buf, title);
+                add(ctx, ms, (char *)title);
+            }
+        }
+
+        lseek(fd, next, SEEK_SET);
+    }
+}
+
 /*
  * Sets the title of an MP3 entry based on its ID3v1 tag.
  *
@@ -817,6 +907,8 @@ void setid3v2title(int fd, struct mp3entry *entry)
     int i;
     int rc;
     bool itunes_gapless = false;
+    int chapters = 0;
+    off_t chapters_pos = 0;
 
 #ifdef HAVE_ALBUMART
     entry->has_embedded_albumart = false;
@@ -939,6 +1031,28 @@ retry_with_limit:
                  * size */
                 framelen = bytes2int(header[4], header[5],
                                      header[6], header[7]);
+            }
+
+            /* Chapters are read by the cuesheet code, from the first CHAP
+             * frame to the end of the last.  One chapter gives nothing
+             * to skip between.  A cuesheet tag takes precedence. */
+            if (!memcmp(header, "CHAP", 4) && !(flags & 0xff)
+                && !global_unsynch && framelen > 0)
+            {
+                enum character_encoding enc = version >= ID3_VER_2_4 ?
+                    CHAR_ENC_ID3V24_CHAP : CHAR_ENC_ID3V23_CHAP;
+                off_t end = lseek(fd, 0, SEEK_CUR) + framelen;
+
+                if (chapters++ == 0)
+                    chapters_pos = end - framelen - 10;
+                else if (!entry->has_embedded_cuesheet
+                         || entry->embedded_cuesheet.encoding == enc)
+                {
+                    entry->has_embedded_cuesheet = true;
+                    entry->embedded_cuesheet.pos = chapters_pos;
+                    entry->embedded_cuesheet.size = end - chapters_pos;
+                    entry->embedded_cuesheet.encoding = enc;
+                }
             }
         } else {
             if(6 != read(fd, header, 6))

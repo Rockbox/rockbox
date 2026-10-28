@@ -227,6 +227,8 @@ enum character_encoding {
     /* From here on not text: an embedded cuesheet that is chapters */
     CHAR_ENC_MP4_CHPL, /* MP4 Nero chapter list ('chpl' atom), read by
                           mp4_read_chapters() */
+    CHAR_ENC_ID3V23_CHAP, /* ID3v2.3 or 2.4 frames holding CHAP frames, */
+    CHAR_ENC_ID3V24_CHAP, /* read by id3_read_chapters() */
 };
 
 /* cache embedded cuesheet details */
@@ -344,6 +346,8 @@ void wipe_mp3entry(struct mp3entry *id3);
  * chapter */
 typedef void chapter_add_fn(void *ctx, unsigned long ms, const char *title);
 
+void id3_read_chapters(int fd, int size, bool v24, chapter_add_fn *add,
+                       void *ctx);
 void mp4_read_chapters(int fd, int size, chapter_add_fn *add, void *ctx);
 
 void fill_metadata_from_path(struct mp3entry *id3, const char *trackname);

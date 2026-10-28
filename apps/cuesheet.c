@@ -255,7 +255,13 @@ bool parse_cuesheet(struct cuesheet_file *cue_file, struct cuesheet *cue)
 
     if (is_embedded && char_enc >= CHAR_ENC_MP4_CHPL) /* chapters */
     {
-        mp4_read_chapters(fd, bytes_left, cue_add_chapter, cue);
+        if (char_enc == CHAR_ENC_ID3V23_CHAP
+            || char_enc == CHAR_ENC_ID3V24_CHAP)
+            id3_read_chapters(fd, bytes_left,
+                              char_enc == CHAR_ENC_ID3V24_CHAP,
+                              cue_add_chapter, cue);
+        else
+            mp4_read_chapters(fd, bytes_left, cue_add_chapter, cue);
         close(fd);
 
         /* One chapter gives nothing to skip between */
