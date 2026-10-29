@@ -1111,7 +1111,7 @@ int plugin_load(const char* plugin, const void* parameter)
     srand(prng_newseed());
 
     if (rc == PLUGIN_ERROR)
-        splash(HZ*2, str(LANG_PLUGIN_ERROR));
+        splash(HZ*2, ID2P(LANG_PLUGIN_ERROR));
 
     if (resume_plugin && rc != PLUGIN_GOTO_PLUGIN && !pfn_tsr_exit)
     {
