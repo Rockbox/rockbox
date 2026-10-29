@@ -1159,7 +1159,7 @@ static void ps_decorrelate(ps_info *ps,
                 const int stride = hybrid ? 32 : 64;
                 const uint8_t n0 = ps->border_position[0];
                 const uint8_t n1 = ps->border_position[ps->num_env];
-                const complex_t *in;
+                complex_t *in;
                 complex_t *out;
                 const real_t *G;
 
