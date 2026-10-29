@@ -878,6 +878,110 @@ void iap_get_trackinfo(const unsigned int track, struct mp3entry* id3)
     }
 }
 
+/* Set while the playlist loaded by iap_load_playlist_ui() has not been
+ * started yet */
+static bool resume_playlist_loaded = false;
+/* Loading is only done once per boot: if the saved playlist can't be
+ * loaded, every later database query would wait for it again.
+ * POSTED: the UI thread has been asked to load it, LOADING: it is. */
+enum { RESUME_IDLE, RESUME_POSTED, RESUME_LOADING, RESUME_DONE };
+static volatile int resume_load_state = RESUME_IDLE;
+static long resume_post_tick;
+/* Requests the UI thread didn't take, or loads that failed. After two,
+ * accessories get the answers for an empty playlist again. */
+static int resume_load_failures = 0;
+#define RESUME_MAX_FAILURES 2
+
+static void resume_load_failed(void)
+{
+    resume_load_state = (++resume_load_failures < RESUME_MAX_FAILURES) ?
+                        RESUME_IDLE : RESUME_DONE;
+}
+
+static bool resume_playlist_wanted(void)
+{
+    return playlist_amount() <= 0 &&
+           global_status.resume_index != -1 &&
+           !(audio_status() & AUDIO_STATUS_PLAY);
+}
+
+/* An accessory that powers the iPod up starts browsing before the user
+ * resumed playback, while the current playlist is still empty. It then
+ * finds no tracks and gives up until it is reconnected. Returns true
+ * when the saved playlist would give it something to show and hasn't
+ * been loaded yet, or is still loading.
+ */
+bool iap_resume_playlist_pending(void)
+{
+    if (resume_load_state == RESUME_POSTED ||
+        resume_load_state == RESUME_LOADING)
+        return true;
+    return resume_load_state == RESUME_IDLE && resume_playlist_wanted();
+}
+
+/* Load the saved playlist without starting playback. playlist_resume()
+ * shows splashes and reads the button queue, so it has to run on the UI
+ * thread: ask it to, then wait with iap_wait_resume_playlist().
+ */
+void iap_load_resume_playlist(void)
+{
+    if (resume_load_state != RESUME_IDLE)
+        return;
+    resume_load_state = RESUME_POSTED;
+    resume_post_tick = current_tick;
+    button_queue_post(SYS_IAP_LOAD_PLAYLIST, 0);
+}
+
+/* Wait at most timeout ticks for the load. Returns true once it is done
+ * or has been given up. */
+bool iap_wait_resume_playlist(long timeout)
+{
+    long end = current_tick + timeout;
+
+    while (resume_load_state != RESUME_DONE && TIME_BEFORE(current_tick, end))
+    {
+        /* The screen showing may not pass system events on, as some
+         * plugins don't. Forget a request not taken within 2 s, so that
+         * a late event is ignored. */
+        if (resume_load_state == RESUME_POSTED &&
+            TIME_AFTER(current_tick, resume_post_tick + 2*HZ))
+        {
+            resume_load_failed();
+            break;
+        }
+        sleep(HZ/20);
+    }
+    return resume_load_state == RESUME_DONE;
+}
+
+/* SYS_IAP_LOAD_PLAYLIST, on the UI thread */
+void iap_load_playlist_ui(void)
+{
+    if (resume_load_state != RESUME_POSTED)
+        return;
+    resume_load_state = RESUME_LOADING;
+    /* Check again: the user may have resumed playback meanwhile */
+    if (resume_playlist_wanted())
+    {
+        int result = playlist_resume();
+
+        /* remove the splashes playlist_resume() left on screen; plugins
+         * read buttons themselves and could take this for a key press */
+        if (get_current_activity() != ACTIVITY_PLUGIN)
+            button_queue_post(BUTTON_REDRAW, 0);
+        if (result != -1)
+            resume_playlist_loaded = true;
+        else if (playlist_amount() <= 0)
+        {
+            /* it may load later, for example once a plugin that took
+             * the buffer has exited */
+            resume_load_failed();
+            return;
+        }
+    }
+    resume_load_state = RESUME_DONE;
+}
+
 /* Start playback of the current playlist when stopped, or resume it
  * when paused. Returns false when there is nothing to play.
  */
@@ -887,12 +991,24 @@ bool iap_play_or_resume(void)
 
     if (audio_status() & AUDIO_STATUS_PLAY)
     {
+        resume_playlist_loaded = false;
         audio_resume();
         return true;
     }
 
     if (playlist_amount() <= 0)
         return false;
+
+    if (resume_playlist_loaded)
+    {
+        /* continue where the user left off */
+        resume_playlist_loaded = false;
+        playlist_resume_track(global_status.resume_index,
+                              global_status.resume_crc32,
+                              global_status.resume_elapsed,
+                              global_status.resume_offset);
+        return true;
+    }
 
     index = playlist_get_current()->index;
     playlist_start(index >= 0 ? index : 0, 0, 0);

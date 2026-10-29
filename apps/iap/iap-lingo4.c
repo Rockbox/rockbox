@@ -85,6 +85,40 @@ static size_t copy_utf8(unsigned char *dest, const char *src, size_t max)
     return len;
 }
 
+static void cmd_pending(const unsigned int cmd, const uint32_t msdelay)
+{
+    IAP_TX_INIT4(0x04, 0x0001);
+    IAP_TX_PUT(IAP_ACK_PENDING);
+    IAP_TX_PUT_U16(cmd);
+    IAP_TX_PUT_U32(msdelay);
+    iap_send_tx();
+}
+
+/* Load the saved playlist before answering the first database query
+ * after a cold start, see iap_resume_playlist_pending(). Loading can
+ * take a while, so tell the accessory to wait for the answer. */
+/* For ResetDBSelection, which is answered with an ACK, so a pending ACK
+ * may come first. Returns false when the playlist is still loading after
+ * 30 s; the accessory must not be shown a partly loaded playlist. */
+static bool load_resume_playlist(const unsigned int cmd)
+{
+    int i;
+
+    if (!iap_resume_playlist_pending())
+        return true;
+
+    for (i = 0; i < 3; i++)
+    {
+        /* asks again if the UI thread didn't take the request */
+        iap_load_resume_playlist();
+        /* answer each pending ACK in time */
+        cmd_pending(cmd, 10000);
+        if (iap_wait_resume_playlist(9 * HZ))
+            return true;
+    }
+    return false;
+}
+
 static void get_playlist_name(unsigned char *dest,
                               unsigned long item_offset,
                               size_t max_length)
@@ -1144,6 +1178,11 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
              *
              */
         {
+            if (!load_resume_playlist(cmd))
+            {
+                cmd_ack(cmd, IAP_ACK_CMD_FAILED);
+                break;
+            }
             cur_dbrecord[0] = 0;
             put_u32(&cur_dbrecord[1],0);
             /* respond with cmd ok packet */
@@ -1359,6 +1398,18 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
         {
             unsigned char data[] = {0x04, 0x00, 0x19,
                                     0x00, 0x00, 0x00, 0x00};
+            /* This command's answer isn't an ACK, so don't send a pending
+             * ACK while loading. Give a short load the time to finish and
+             * fail rather than count a playlist that is still loading. */
+            if (iap_resume_playlist_pending())
+            {
+                iap_load_resume_playlist();
+                if (!iap_wait_resume_playlist(HZ/2))
+                {
+                    cmd_ack(cmd, IAP_ACK_CMD_FAILED);
+                    break;
+                }
+            }
             switch(buf[3]) /* type number */
             {
                 case 0x01: /* total number of playlists */

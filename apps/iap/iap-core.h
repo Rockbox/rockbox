@@ -266,6 +266,9 @@ extern bool iap_btnshuffle;
  * in iap_periodic() ticks */
 #define IAP_SEEK_TIMEOUT (100)
 
+bool iap_resume_playlist_pending(void);
+void iap_load_resume_playlist(void);
+bool iap_wait_resume_playlist(long timeout);
 bool iap_play_or_resume(void);
 void iap_seek_start(bool forward);
 void iap_seek_stop(void);

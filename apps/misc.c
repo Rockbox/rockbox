@@ -711,6 +711,11 @@ long default_event_handler_ex(long event, void (*callback)(void *), void *parame
             unpause_action(true);
             return SYS_CAR_ADAPTER_RESUME;
 #endif
+#ifdef IPOD_ACCESSORY_PROTOCOL
+        case SYS_IAP_LOAD_PLAYLIST:
+            iap_load_playlist_ui();
+            return SYS_IAP_LOAD_PLAYLIST;
+#endif
 #ifdef HAVE_HOTSWAP_STORAGE_AS_MAIN
         case SYS_FS_CHANGED:
         {

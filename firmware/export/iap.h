@@ -49,5 +49,6 @@ const unsigned char *iap_get_serbuf(void);
 extern bool iap_record(bool onoff);
 #endif
 void iap_reset_state(IF_IAP_MP_NONVOID(int port) ); /* 0 is dock, 1 is headphone */
+void iap_load_playlist_ui(void);
 bool dbg_iap(void);
 #endif
