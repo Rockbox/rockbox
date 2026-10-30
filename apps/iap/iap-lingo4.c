@@ -2256,6 +2256,9 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
             CHECKLEN(7);
             index = get_u32(&buf[3]);
             trackcount = playlist_amount();
+            /* -1 plays the first track of the selection */
+            if (index == 0xFFFFFFFF)
+                index = 0;
             if (index >= trackcount)
             {
                 cmd_ack(cmd, IAP_ACK_BAD_PARAM);
