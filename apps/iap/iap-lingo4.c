@@ -2544,20 +2544,15 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
              *  7   0xNN  Telegram payload checksum byte
              *
              */
-            if(buf[3] && !global_settings.playlist_shuffle)
+            CHECKLEN(4);
+            if (buf[3] > 0x02)
             {
-                global_settings.playlist_shuffle = 1;
-                settings_save();
-                if (audio_status() & AUDIO_STATUS_PLAY)
-                    playlist_randomise(NULL, current_tick, true);
+                cmd_ack(cmd, IAP_ACK_BAD_PARAM);
+                break;
             }
-            else if(!buf[3] && global_settings.playlist_shuffle)
-            {
-                global_settings.playlist_shuffle = 0;
-                settings_save();
-                if (audio_status() & AUDIO_STATUS_PLAY)
-                    playlist_sort(NULL, true);
-            }
+            /* Shuffling albums is shuffling tracks here. Byte 7, when
+             * present, is the Restore on Exit byte. */
+            iap_set_shuffle(buf[3] != 0, len >= 5 && buf[4]);
 
             /* respond with cmd ok packet */
             cmd_ok(cmd);
@@ -2668,20 +2663,16 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
              *  7   0xNN  Telegram payload checksum byte
              *
              */
-            int oldmode = global_settings.repeat_mode;
-            if (buf[3] == 0)
-                global_settings.repeat_mode = REPEAT_OFF;
-            else if (buf[3] == 1)
-                global_settings.repeat_mode = REPEAT_ONE;
-            else if (buf[3] == 2)
-                global_settings.repeat_mode = REPEAT_ALL;
+            static const int modes[] = {REPEAT_OFF, REPEAT_ONE, REPEAT_ALL};
 
-            if (oldmode != global_settings.repeat_mode)
+            CHECKLEN(4);
+            if (buf[3] >= ARRAYLEN(modes))
             {
-                settings_save();
-                if (audio_status() & AUDIO_STATUS_PLAY)
-                    audio_flush_and_reload_tracks();
+                cmd_ack(cmd, IAP_ACK_BAD_PARAM);
+                break;
             }
+            /* Byte 7, when present, is the Restore on Exit byte */
+            iap_set_repeat(modes[buf[3]], len >= 5 && buf[4]);
             /* respond with cmd ok packet */
             cmd_ok(cmd);
             break;

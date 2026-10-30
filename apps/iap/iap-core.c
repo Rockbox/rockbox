@@ -100,6 +100,12 @@ bool iap_btnrepeat = false, iap_btnshuffle = false;
 static bool iap_unmute_pending = false;
 /* The user's volume when an accessory muted, see iap_periodic() */
 static int iap_mute_volume;
+/* The shuffle and repeat modes to put back when the accessory detaches,
+ * or -1, see iap_set_shuffle() and iap_set_repeat() */
+static int iap_saved_shuffle = -1;
+static int iap_saved_repeat = -1;
+/* Set when a session ends with saved modes to restore */
+static bool iap_restore_pending = false;
 
 static long thread_stack[(DEFAULT_STACK_SIZE*8)/sizeof(long)];
 static struct event_queue iap_queue;
@@ -370,6 +376,9 @@ void iap_reset_device(struct device_t* device)
     if (device->mute)
         iap_unmute_pending = true;
     device->mute = false;
+    /* Likewise for shuffle and repeat changed with Restore on Exit */
+    if (iap_saved_shuffle >= 0 || iap_saved_repeat >= 0)
+        iap_restore_pending = true;
 
     interface_state = IST_STANDARD;
 
@@ -1064,6 +1073,138 @@ uint32_t iap_get_trackindex(void)
     return index;
 }
 
+static void apply_shuffle(bool shuffle)
+{
+    if (global_settings.playlist_shuffle == shuffle)
+        return;
+
+    global_settings.playlist_shuffle = shuffle;
+    /* A loaded playlist is saved in its play order, so reorder it even
+     * while stopped. Audio is only reloaded while playing. */
+    if (playlist_amount() > 0)
+    {
+        if (shuffle)
+            playlist_randomise(NULL, current_tick, true);
+        else
+            playlist_sort(NULL, true);
+    }
+}
+
+static void apply_repeat(int mode)
+{
+    if (global_settings.repeat_mode == mode)
+        return;
+
+    global_settings.repeat_mode = mode;
+    if (audio_status() & AUDIO_STATUS_PLAY)
+        audio_flush_and_reload_tracks();
+}
+
+/* Put back the shuffle and repeat modes an accessory changed with the
+ * Restore on Exit byte set, once it is gone */
+static void iap_restore_modes(void)
+{
+    if (!iap_restore_pending)
+        return;
+
+    iap_restore_pending = false;
+    if (iap_saved_shuffle < 0 && iap_saved_repeat < 0)
+        return;
+    if (iap_saved_shuffle >= 0)
+        apply_shuffle(iap_saved_shuffle);
+    if (iap_saved_repeat >= 0)
+        apply_repeat(iap_saved_repeat);
+    iap_saved_shuffle = -1;
+    iap_saved_repeat = -1;
+    /* Anything that saved the settings meanwhile wrote the accessory's
+     * modes to disk */
+    settings_save();
+}
+
+/* Set once the modes are final for this power cycle */
+static bool iap_modes_final = false;
+
+/* Called at shutdown on the UI thread, after playback stopped: keep the
+ * modes an accessory changed with Restore on Exit off disk. With
+ * save_playlist false, the playlist won't be saved and isn't reordered.
+ */
+void iap_prepare_shutdown(bool save_playlist)
+{
+    iap_modes_final = true;
+    if (!save_playlist)
+    {
+        if (iap_saved_shuffle >= 0)
+            global_settings.playlist_shuffle = iap_saved_shuffle;
+    }
+    else if (iap_saved_shuffle >= 0 &&
+             iap_saved_shuffle != global_settings.playlist_shuffle)
+    {
+        apply_shuffle(iap_saved_shuffle);
+        /* resume from the track's position in the new order */
+        if (global_status.resume_index != -1 && playlist_amount() > 0)
+            global_status.resume_index = playlist_get_current()->index;
+    }
+    if (iap_saved_repeat >= 0)
+        global_settings.repeat_mode = iap_saved_repeat;
+    iap_saved_shuffle = -1;
+    iap_saved_repeat = -1;
+}
+
+/* SetShuffle. With restore set, the change lasts until the accessory
+ * detaches and isn't saved; otherwise it is kept like a change made on
+ * the iPod. */
+void iap_set_shuffle(bool shuffle, bool restore)
+{
+    if (iap_modes_final)
+        return;
+    /* finish restoring for a previous session first */
+    iap_restore_modes();
+
+    if (restore)
+    {
+        if (iap_saved_shuffle < 0)
+            iap_saved_shuffle = global_settings.playlist_shuffle;
+        apply_shuffle(shuffle);
+    }
+    else
+    {
+        bool was_temporary = iap_saved_shuffle >= 0;
+
+        iap_saved_shuffle = -1;
+        if (was_temporary || global_settings.playlist_shuffle != shuffle)
+        {
+            apply_shuffle(shuffle);
+            settings_save();
+        }
+    }
+}
+
+/* SetRepeat, see iap_set_shuffle() */
+void iap_set_repeat(int mode, bool restore)
+{
+    if (iap_modes_final)
+        return;
+    iap_restore_modes();
+
+    if (restore)
+    {
+        if (iap_saved_repeat < 0)
+            iap_saved_repeat = global_settings.repeat_mode;
+        apply_repeat(mode);
+    }
+    else
+    {
+        bool was_temporary = iap_saved_repeat >= 0;
+
+        iap_saved_repeat = -1;
+        if (was_temporary || global_settings.repeat_mode != mode)
+        {
+            apply_repeat(mode);
+            settings_save();
+        }
+    }
+}
+
 void iap_periodic(void)
 {
     static int count;
@@ -1082,6 +1223,8 @@ void iap_periodic(void)
      * an accessory's mute. The volume notification reports it. */
     if (device.mute && (global_status.volume != iap_mute_volume))
         device.mute = false;
+
+    iap_restore_modes();
 
     /* Handle pending authentication tasks */
     switch (device.auth.state)
@@ -1649,6 +1792,12 @@ void iap_periodic(void)
  */
 void iap_interface_state_change(const enum interface_state new)
 {
+    /* Settings changed with Restore on Exit last until the accessory
+     * leaves the Extended Interface */
+    if (interface_state == IST_EXTENDED && new != IST_EXTENDED &&
+        (iap_saved_shuffle >= 0 || iap_saved_repeat >= 0))
+        iap_restore_pending = true;
+
     if (((interface_state == IST_EXTENDED) && (new == IST_STANDARD)) ||
         ((interface_state == IST_STANDARD) && (new == IST_EXTENDED))) {
         /* Pause the engine directly: outside the WPS a synthetic Play

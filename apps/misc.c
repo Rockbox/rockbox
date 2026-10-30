@@ -442,6 +442,10 @@ static bool clean_shutdown(enum shutdown_type sd_type,
             audio_close_recording();
 #endif
 
+#ifdef IPOD_ACCESSORY_PROTOCOL
+            /* the settings saved above are only written by system_flush() */
+            iap_prepare_shutdown(true);
+#endif
             system_flush();
 #ifdef HAVE_EEPROM_SETTINGS
             if (firmware_settings.initialized)
@@ -452,9 +456,17 @@ static bool clean_shutdown(enum shutdown_type sd_type,
             }
 #endif
         }
-#if defined(HAVE_DIRCACHE) && defined(HAVE_DISK_STORAGE)
+#ifdef HAVE_DISK_STORAGE
         else
+        {
+#ifdef IPOD_ACCESSORY_PROTOCOL
+            /* the settings saved above may still be written */
+            iap_prepare_shutdown(false);
+#endif
+#ifdef HAVE_DIRCACHE
             dircache_disable();
+#endif
+        }
 #endif
 
         if(global_settings.talk_menu)

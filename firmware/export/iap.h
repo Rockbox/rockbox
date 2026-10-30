@@ -50,5 +50,6 @@ extern bool iap_record(bool onoff);
 #endif
 void iap_reset_state(IF_IAP_MP_NONVOID(int port) ); /* 0 is dock, 1 is headphone */
 void iap_load_playlist_ui(void);
+void iap_prepare_shutdown(bool save_playlist);
 bool dbg_iap(void);
 #endif

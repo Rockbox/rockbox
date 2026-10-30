@@ -270,6 +270,8 @@ bool iap_resume_playlist_pending(void);
 void iap_load_resume_playlist(void);
 bool iap_wait_resume_playlist(long timeout);
 bool iap_play_or_resume(void);
+void iap_set_shuffle(bool shuffle, bool restore);
+void iap_set_repeat(int mode, bool restore);
 void iap_seek_start(bool forward);
 void iap_seek_stop(void);
 
