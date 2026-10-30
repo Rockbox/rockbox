@@ -3350,9 +3350,22 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
         {
             /* Set the same as the ReturnMonoDisplayImageLimits */
             unsigned char data[] = {0x04, 0x00, 0x3A,
+#if LCD_DEPTH >= 16
+                                    /* RGB565 in little and in big endian,
+                                     * like the original firmware.
+                                     * SetDisplayImage accepts and
+                                     * discards them. */
+                                    LCD_WIDTH >> 8, LCD_WIDTH & 0xff,
+                                    LCD_HEIGHT >> 8, LCD_HEIGHT & 0xff,
+                                    0x02,
+                                    LCD_WIDTH >> 8, LCD_WIDTH & 0xff,
+                                    LCD_HEIGHT >> 8, LCD_HEIGHT & 0xff,
+                                    0x03};
+#else
                                     LCD_WIDTH >> 8, LCD_WIDTH & 0xff,
                                     LCD_HEIGHT >> 8, LCD_HEIGHT & 0xff,
                                     0x01};
+#endif
             iap_send_pkt(data, sizeof(data));
             break;
         }
