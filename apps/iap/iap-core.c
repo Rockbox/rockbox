@@ -859,6 +859,7 @@ void iap_get_trackinfo(const unsigned int track, struct mp3entry* id3)
 {
     int tracknum;
     struct playlist_track_info info;
+    struct mp3entry *current = NULL;
 
     tracknum = track;
 
@@ -866,15 +867,21 @@ void iap_get_trackinfo(const unsigned int track, struct mp3entry* id3)
     if(tracknum >= playlist_amount())
         tracknum -= playlist_amount();
 
+    /* The playback engine only has the current track's metadata while
+     * playing. When stopped, e.g. right after the saved playlist was
+     * loaded, it is empty and the track would be listed without a name. */
+    if (audio_status() & AUDIO_STATUS_PLAY)
+        current = audio_current_track();
+
     /* If the tracknumber is not the current one,
        read id3 from disk */
-    if(playlist_get_current()->index != tracknum)
+    if(!current || playlist_get_current()->index != tracknum)
     {
         playlist_get_track_info(NULL, tracknum, &info);
         /* memset(id3, 0, sizeof(*id3)) --get_metadata does this for us */
         get_metadata(id3, -1, info.filename);
     } else {
-        memcpy(id3, audio_current_track(), sizeof(*id3));
+        memcpy(id3, current, sizeof(*id3));
     }
 }
 
