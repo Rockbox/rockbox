@@ -189,6 +189,14 @@ static void play_selected_track(uint32_t index)
     }
 }
 
+/* Day of the week of January 1st of a year, 0 is Sunday */
+static int jan1_weekday(int year)
+{
+    int y = year - 1;
+
+    return (1 + y + y / 4 - y / 100 + y / 400) % 7;
+}
+
 static unsigned long nbr_total_playlists(void)
 {
     DIR* dp;
@@ -676,67 +684,94 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
              *
              */
         {
-            if (len < (10))
+            struct mp3entry id3;
+            uint32_t index;
+
+            CHECKLEN(10);
+            index = get_u32(&buf[4]);
+            switch(buf[3])
+            {
+                case 0x00: /* Capabilities */
+                case 0x01: /* Podcast name */
+                case 0x02: /* Release date */
+                case 0x03: /* Description */
+                case 0x04: /* Lyrics */
+                case 0x05: /* Genre */
+                case 0x06: /* Composer */
+                case 0x07: /* Artwork count */
+                    break;
+                default:
+                    cmd_ack(cmd, IAP_ACK_BAD_PARAM);
+                    return;
+            }
+            if (index >= (uint32_t)playlist_amount())
             {
                 cmd_ack(cmd, IAP_ACK_BAD_PARAM);
                 break;
             }
-            struct mp3entry *id3 = audio_current_track();
+            /* Only these types need the track's metadata, which may have
+             * to be read from disk */
+            if (buf[3] == 0x00 || buf[3] == 0x02 ||
+                buf[3] == 0x05 || buf[3] == 0x06)
+                iap_get_trackinfo(index, &id3);
 
+            IAP_TX_INIT4(0x04, 0x000D);
+            IAP_TX_PUT(buf[3]);
             switch(buf[3])
             {
-                case 0x01: /* Podcast Not Supported */
-                case 0x04: /* Lyrics Not Supported */
-                case 0x03: /* Description */
-                case 0x05: /* Genre */
-                case 0x06: /* Composer */
+                case 0x00:
                 {
-                    cmd_ack(cmd, IAP_ACK_BAD_PARAM);
+                    /* Track Capabilities 10Bytes Data */
+                    IAP_TX_PUT_U32(id3.year > 0 ? 0x20 : 0); /* Has release
+                                                               * date */
+                    IAP_TX_PUT_U32(id3.length);  /* Track Length */
+                    IAP_TX_PUT_U16(0x00);        /* Chapter Count */
                     break;
                 }
-                default:
+                case 0x02:
                 {
-                    IAP_TX_INIT4(0x04, 0x000D);
-                    IAP_TX_PUT(buf[3]);
-                    switch(buf[3])
-                    {
-                        case 0x00:
-                        {
-                            /* Track Capabilities 10Bytes Data */
-                            IAP_TX_PUT_U32(0);   /* Track Capabilities. */
-                                                 /* Currently None Supported*/
-                            IAP_TX_PUT_U32(id3->length); /* Track Length */
-                            IAP_TX_PUT_U16(0x00);        /* Chapter Count */
-                            break;
-                        }
-                        case 0x02:
-                        {
-                            /* Track Release Date 7 Bytes Data
-                             * Currently only returns a fixed value,
-                             * Sunday 1st Feb 2011 3Hr 4Min 5Secs
-                             */
-                            IAP_TX_PUT(5);               /* Seconds 0-59 */
-                            IAP_TX_PUT(4);               /* Minutes 0-59 */
-                            IAP_TX_PUT(3);               /* Hours 0-23 */
-                            IAP_TX_PUT(1);               /* Day Of Month 1-31 */
-                            IAP_TX_PUT(2);               /* Month 1-12 */
-                            IAP_TX_PUT_U16(2011);        /* Year */
-                            IAP_TX_PUT(0);               /* Day 0=Sunday */
-                            break;
-                        }
-                         case 0x07:
-                        {
-                            /* Track Artwork Count */
-                            /* Currently not supported */
-                            IAP_TX_PUT_U16(0x00);        /* Format ID */
-                            IAP_TX_PUT_U16(0x00);        /* Image Count */
-                            break;
-                        }
-                    }
-                    iap_send_tx();
+                    /* Track Release Date, all 0 when unknown. Tags only
+                     * give the year, so report January 1st. */
+                    int year = id3.year > 0 ? id3.year : 0;
+
+                    IAP_TX_PUT(0);               /* Seconds 0-59 */
+                    IAP_TX_PUT(0);               /* Minutes 0-59 */
+                    IAP_TX_PUT(0);               /* Hours 0-23 */
+                    IAP_TX_PUT(year ? 1 : 0);    /* Day Of Month 1-31 */
+                    IAP_TX_PUT(year ? 1 : 0);    /* Month 1-12 */
+                    IAP_TX_PUT_U16(year);        /* Year */
+                    IAP_TX_PUT(year ? jan1_weekday(year) : 0); /* 0=Sunday */
+                    break;
+                }
+                case 0x01:
+                    /* Podcast name, empty: tracks aren't podcasts here */
+                    IAP_TX_PUT(0x00);
+                    break;
+                case 0x03:
+                case 0x04:
+                    /* Description or lyrics, empty: the flags (no
+                     * further packets) and the packet index, then the
+                     * text */
+                    IAP_TX_PUT(0x00);
+                    IAP_TX_PUT_U16(0x0000);
+                    IAP_TX_PUT(0x00);
+                    break;
+                case 0x05:
+                    IAP_TX_PUT_STRLCPY(id3.genre_string);
+                    break;
+                case 0x06:
+                    IAP_TX_PUT_STRLCPY(id3.composer);
+                    break;
+                case 0x07:
+                {
+                    /* Track Artwork Count */
+                    /* Currently not supported */
+                    IAP_TX_PUT_U16(0x00);        /* Format ID */
+                    IAP_TX_PUT_U16(0x00);        /* Image Count */
                     break;
                 }
             }
+            iap_send_tx();
             break;
         }
         case 0x000D: /* ReturnIndexedPlayingTrackInfo. See Above */
@@ -1964,23 +1999,18 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
         {
             unsigned char data[70] = {0x04, 0x00, 0xFF};
             struct mp3entry id3;
-            size_t len;
-            long tracknum = get_u32(&buf[3]);
+            size_t slen;
+            uint32_t index;
 
-            data[2] = cmd + 1;
-            memcpy(&id3, audio_current_track(), sizeof(id3));
-            tracknum += playlist_get_first_index(NULL);
-            if(tracknum >= playlist_amount())
-                tracknum -= playlist_amount();
-            /* If the tracknumber is not the current one,
-               read id3 from disk */
-            if(playlist_get_current()->index != tracknum)
+            CHECKLEN(7);
+            index = get_u32(&buf[3]);
+            if (index >= (uint32_t)playlist_amount())
             {
-                struct playlist_track_info info;
-                playlist_get_track_info(NULL, tracknum, &info);
-                /* memset(&id3, 0, sizeof(struct mp3entry)); --get_metadata does this for us */
-                get_metadata(&id3, -1, info.filename);
+                cmd_ack(cmd, IAP_ACK_BAD_PARAM);
+                break;
             }
+            data[2] = cmd + 1;
+            iap_get_trackinfo(index, &id3);
             /* Return the requested track data */
             switch(cmd)
             {
@@ -1989,19 +2019,19 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
                  * be longer than the TX buffer.
                  */
                 case 0x20:
-                    len = copy_utf8(&data[3],
+                    slen = copy_utf8(&data[3],
                                     id3.title ? id3.title : "", 63);
-                    iap_send_pkt(data, 4+len);
+                    iap_send_pkt(data, 4+slen);
                     break;
                 case 0x22:
-                    len = copy_utf8(&data[3],
+                    slen = copy_utf8(&data[3],
                                     id3.artist ? id3.artist : "", 63);
-                    iap_send_pkt(data, 4+len);
+                    iap_send_pkt(data, 4+slen);
                     break;
                 case 0x24:
-                    len = copy_utf8(&data[3],
+                    slen = copy_utf8(&data[3],
                                     id3.album ? id3.album : "", 63);
-                    iap_send_pkt(data, 4+len);
+                    iap_send_pkt(data, 4+slen);
                     break;
             }
             break;
