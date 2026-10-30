@@ -1632,23 +1632,14 @@ void iap_periodic(void)
             iap_send_tx();
 
             device.play_status = play_status;
-			if (play_status != 1) {
-			/* Not Playing */
-			   audio_pause();
 #if CONFIG_TUNER
-               if (radio_present==1) {
-                  tuner_set(RADIO_MUTE,1);
-			   }
+            /* Mute the radio of an Apple Radio Remote while playback
+             * isn't running. Only follow the play state: pausing or
+             * resuming here would at best repeat the change just seen,
+             * and would undo a change made since it was read. */
+            if (radio_present == 1)
+                tuner_set(RADIO_MUTE, play_status != AUDIO_STATUS_PLAY);
 #endif
-			} else {
-			/* Playing */
-			   audio_resume();
-#if CONFIG_TUNER
-			   if (radio_present==1) {
-                   tuner_set(RADIO_MUTE,0);
-               }
-#endif
-			}
         }
     }
 
