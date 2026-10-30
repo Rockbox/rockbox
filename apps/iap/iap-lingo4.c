@@ -1465,6 +1465,7 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
         {
             unsigned char data[] = {0x04, 0x00, 0x19,
                                     0x00, 0x00, 0x00, 0x00};
+            CHECKLEN(4);
             /* This command's answer isn't an ACK, so don't send a pending
              * ACK while loading. Give a short load the time to finish and
              * fail rather than count a playlist that is still loading. */
