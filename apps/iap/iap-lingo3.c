@@ -1475,11 +1475,12 @@ void iap_handlepkt_mode3(const unsigned int len, const unsigned char *buf)
             CHECKAUTH;
             CHECKLEN(4);
 
-            /* Sound check is not supported right now
-             * TODO: Fix
-             */
-
-            cmd_ack(cmd, IAP_ACK_CMD_FAILED);
+            /* Sound check is not supported: turning it off, the state
+             * GetSoundCheckState reports, is all that can succeed */
+            if (buf[2])
+                cmd_ack(cmd, IAP_ACK_CMD_FAILED);
+            else
+                cmd_ok(cmd);
             break;
         }
 
