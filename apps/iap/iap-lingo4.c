@@ -165,6 +165,30 @@ static void seek_to_playlist(unsigned long index)
                                      strrchr(selected_playlist, '/') + 1);
 }
 
+/* Play the track at the given index of the accessory's track list. The
+ * index refers to the order the accessory enumerated the tracks in,
+ * which is the current play order: shuffle is already applied to it. */
+static void play_selected_track(uint32_t index)
+{
+    if (!(audio_status() & AUDIO_STATUS_PLAY))
+    {
+        /* audio_skip() does nothing while stopped, so start
+         * playback at the selected track instead */
+        long trackcount = playlist_amount();
+        long tracknum = index + playlist_get_first_index(NULL);
+
+        if (tracknum >= trackcount)
+            tracknum -= trackcount;
+        playlist_start(tracknum, 0, 0);
+    }
+    else
+    {
+        audio_pause();
+        audio_skip(index - iap_get_trackindex());
+        audio_resume();
+    }
+}
+
 static unsigned long nbr_total_playlists(void)
 {
     DIR* dp;
@@ -1299,11 +1323,11 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
                 cmd_ok(cmd);
                 break;
             }
-            /* Every record type from 0x02 to 0x06 reaches audio_skip()
-             * below, not just Track, and audio_skip() walks an
-             * out-of-range offset back one track at a time without
-             * yielding, locking the device up. A valid index is
-             * 0..count-1.
+            /* Artists and albums are listed one per track, so a valid
+             * index is 0..count-1 for them. Genres and composers are not
+             * listed at all, but selecting them changes nothing.
+             * audio_skip() walks an out-of-range Track offset back one
+             * track at a time without yielding, locking the device up.
              */
             if ((cur_dbrecord[0] >= 0x02) && (cur_dbrecord[0] <= 0x06) &&
                 (index >= trackcount))
@@ -1316,7 +1340,6 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
                 cmd_ack(cmd, IAP_ACK_BAD_PARAM);
                 break;
             }
-            audio_pause();
             switch (cur_dbrecord[0])
             {
                 case 0x01: /* Playlist*/
@@ -1324,31 +1347,32 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
                     if (index != 0x00) /* 0x00 is the On-The-Go Playlist and
                                           we do nothing with it  */
                     {
+                        audio_pause();
                         last_selected_playlist = index;
                         audio_skip(-iap_get_trackindex());
                         seek_to_playlist(last_selected_playlist);
+                        if (!paused)
+                            audio_resume();
                     }
                     break;
                 }
-                case 0x02: /* Artist   */
-                case 0x03: /* Album    */
-                case 0x04: /* Genre    */
                 case 0x05: /* Track    */
-                case 0x06: /* Composer */
                 {
-                    audio_skip(index - iap_get_trackindex());
+                    /* Selecting a single record starts its playback */
+                    play_selected_track(index);
                     break;
                 }
                 default:
                {
-                    /* We don't do anything with the other selections.
-                     * YET.
+                    /* Selecting an artist, album, genre or composer only
+                     * narrows the selection the accessory browses. It
+                     * must not change the playing track: head units send
+                     * this while the user browses and start playback
+                     * with PlayCurrentSelection.
                      */
                     break;
                }
             }
-            if (!paused)
-                audio_resume();
             /* respond with cmd ok packet */
             cmd_ok(cmd);
             break;
@@ -2198,30 +2222,12 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
                 cmd_ack(cmd, IAP_ACK_BAD_PARAM);
                 break;
             }
-            /* The index refers to the order the accessory enumerated the
-             * tracks in, which is the current play order: shuffle is
-             * already applied to it, so reordering the playlist here
-             * would play a different track than the one selected.
-             */
-            if (!(audio_status() & AUDIO_STATUS_PLAY))
-            {
-                /* audio_skip() does nothing while stopped, so start
-                 * playback at the selected track instead */
-                long tracknum = index + playlist_get_first_index(NULL);
-
-                if (tracknum >= (long)trackcount)
-                    tracknum -= trackcount;
-                playlist_start(tracknum, 0, 0);
-            }
-            else
-            {
-                /* The selected track plays even when playback was
-                 * paused. Head units such as the Audi MMI pause before
-                 * selecting the next track and expect it to play. */
-                audio_pause();
-                audio_skip(index - iap_get_trackindex());
-                audio_resume();
-            }
+            /* Don't reorder the playlist here: that would play a
+             * different track than the one selected. The selected track
+             * plays even when playback was paused; head units such as
+             * the Audi MMI pause before selecting the next track and
+             * expect it to play. */
+            play_selected_track(index);
             /* respond with cmd ok packet */
             cmd_ok(cmd);
             break;
@@ -2309,11 +2315,7 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
                             pos = 0;
                         else if (pos >= trackcount)
                             pos = trackcount - 1;
-                        /* From play order to a playlist index */
-                        pos += playlist_get_first_index(NULL);
-                        if (pos >= trackcount)
-                            pos -= trackcount;
-                        playlist_start(pos, 0, 0);
+                        play_selected_track(pos);
                         break;
                     }
                     if (buf[3] == 0x03)
