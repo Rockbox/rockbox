@@ -45,18 +45,18 @@
      ((uint32_t)array[pos+3] << 24))
 
 #define INT322BYTES(array, pos, val) \
-    ((array[pos+0] = (uint32_t)(val) >>  0), \
-     (array[pos+1] = (uint32_t)(val) >>  8), \
-     (array[pos+2] = (uint32_t)(val) >> 16), \
-     (array[pos+3] = (uint32_t)(val) >> 24))
+    ((array[pos+0] = (uint32_t)(val) >>  0) & 0xff, \
+     (array[pos+1] = (uint32_t)(val) >>  8) & 0xff, \
+     (array[pos+2] = (uint32_t)(val) >> 16) & 0xff, \
+     (array[pos+3] = (uint32_t)(val) >> 24) & 0xff)
 
 #define BYTES2INT16(array, pos) \
     (((uint32_t)array[pos+0] << 0) | \
      ((uint32_t)array[pos+1] << 8))
 
 #define INT162BYTES(array, pos, val) \
-    ((array[pos+0] = (uint16_t)(val) >> 0), \
-     (array[pos+1] = (uint16_t)(val) >> 8))
+    ((array[pos+0] = (uint16_t)(val) >> 0) & 0xff, \
+     (array[pos+1] = (uint16_t)(val) >> 8) & 0xff)
 
 #define FATTYPE_FAT12       0
 #define FATTYPE_FAT16       1
@@ -183,12 +183,15 @@ struct fsinfo
     uint32_t nextfree;  /* first cluster to start looking for free
                            clusters, or 0xffffffff for no hint */
 };
+
 /* fsinfo offsets */
-#define FSINFO_SIGNATURE 0
+#define FSINFO_SIGNATURE_H 0
 #define FSINFO_FREECOUNT 488
 #define FSINFO_NEXTFREE  492
+#define FSINFO_SIGNATURE_T 508
 
-#define FSINFO_SIGNATURE_VAL 0x41615252
+#define FSINFO_SIGNATURE_H_VAL 0x41615252UL
+#define FSINFO_SIGNATURE_T_VAL 0xAA550000UL
 
 #ifdef HAVE_FAT16SUPPORT
 #define BPB_FN_SET16(bpb, fn)      (bpb)->fn##__ = fn##16
@@ -1006,6 +1009,12 @@ static void update_fsinfo32(struct bpb *fat_bpb)
         return;
     }
 
+    /* Make sure FSINFO sector is sane before writing anything */
+    if (BYTES2INT32(fsinfo, FSINFO_SIGNATURE_H) != FSINFO_SIGNATURE_H_VAL ||
+        BYTES2INT32(fsinfo, FSINFO_SIGNATURE_T) != FSINFO_SIGNATURE_T_VAL)
+        return;
+
+    /* Update FSINFO */
     INT322BYTES(fsinfo, FSINFO_FREECOUNT, fat_bpb->fsinfo.freecount);
     INT322BYTES(fsinfo, FSINFO_NEXTFREE, fat_bpb->fsinfo.nextfree);
     dc_dirty_buf(fsinfo);
@@ -1287,6 +1296,13 @@ static int fat_mount_internal(struct bpb *fat_bpb)
     else
 #endif /* HAVE_FAT16SUPPORT */
     {
+        if (!fat_bpb->bpb_fsinfo || fat_bpb->bpb_fsinfo >= fat_bpb->bpb_rsvdseccnt)
+        {
+            // Replace !bpb_fsinfo with (fsinfo < bpb_bkbootsec + 3)
+            DEBUGF("%s() - FSInfo out of range", __func__, fat_bpb->bpb_fsinfo);
+            FAT_ERROR(-10);
+        }
+
         /* Read the fsinfo sector */
         rc = storage_read_sectors(IF_MD(fat_bpb->drive,)
                 fat_bpb->startsector + fat_bpb->bpb_fsinfo, 1, buf);
@@ -1298,16 +1314,26 @@ static int fat_mount_internal(struct bpb *fat_bpb)
             FAT_ERROR(rc * 10 - 8);
         }
 
-	/* Sanity check FS info */
-	long info = BYTES2INT32(buf, FSINFO_SIGNATURE);
-	if (info != FSINFO_SIGNATURE_VAL) {
-		DEBUGF("%s() FSInfo signature mismatch (%lx)\n",
-		       __func__, info);
-		FAT_ERROR(-9);
-	}
+        /* Sanity check FS info */
+        unsigned long info = BYTES2INT32(buf, FSINFO_SIGNATURE_H);
+        unsigned long info2 = BYTES2INT32(buf, FSINFO_SIGNATURE_T);
 
-        fat_bpb->fsinfo.freecount = BYTES2INT32(buf, FSINFO_FREECOUNT);
-        fat_bpb->fsinfo.nextfree = BYTES2INT32(buf, FSINFO_NEXTFREE);
+        if (!info && !info2) /* Zeroed FSINFO sector, treat as needing init */
+        {
+            fat_bpb->fsinfo.freecount = 0xffffffff;
+            fat_bpb->fsinfo.nextfree = 0xffffffff;
+        }
+        else if (info != FSINFO_SIGNATURE_H_VAL || (info2 != FSINFO_SIGNATURE_T_VAL))
+        {
+            DEBUGF("%s() FSInfo signature mismatch (%lx/%lx)\n",
+                   __func__, info, info2);
+            FAT_ERROR(-9);
+	}
+        else
+        {
+            fat_bpb->fsinfo.freecount = BYTES2INT32(buf, FSINFO_FREECOUNT);
+            fat_bpb->fsinfo.nextfree = BYTES2INT32(buf, FSINFO_NEXTFREE);
+        }
     }
 
 #ifdef HAVE_FAT16SUPPORT
