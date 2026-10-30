@@ -100,6 +100,14 @@ bool iap_btnrepeat = false, iap_btnshuffle = false;
 static bool iap_unmute_pending = false;
 /* The user's volume when an accessory muted, see iap_periodic() */
 static int iap_mute_volume;
+/* Consecutive iap_periodic() ticks playback has been stopped for, up
+ * to 2. Playback also stops briefly when a new playlist starts, so a
+ * stop is only notified on the second tick. */
+static int pb_stopped_ticks = 2;
+/* The seek in progress, then the seek stop to notify: 0x02 forward,
+ * 0x03 backward, or 0 */
+static unsigned char pb_seeking = 0;
+static unsigned char pb_seek_stopped = 0;
 /* The shuffle and repeat modes to put back when the accessory detaches,
  * or -1, see iap_set_shuffle() and iap_set_repeat() */
 static int iap_saved_shuffle = -1;
@@ -391,6 +399,8 @@ void iap_reset_device(struct device_t* device)
     iap_repeatbtn = 0;
     iap_btnshuffle = false;
     iap_btnrepeat = false;
+    pb_seeking = 0;
+    pb_seek_stopped = 0;
 
 #if CONFIG_TUNER
     /* Set again when the next accessory identifies with the RF Tuner
@@ -1035,6 +1045,7 @@ bool iap_play_or_resume(void)
  * timeout releases it should the accessory never end the seek */
 void iap_seek_start(bool forward)
 {
+    pb_seeking = forward ? 0x02 : 0x03;
     iap_remotebtn = forward ? BUTTON_RC_RIGHT : BUTTON_RC_LEFT;
     iap_repeatbtn = 2;
     iap_timeoutbtn = IAP_SEEK_TIMEOUT;
@@ -1044,6 +1055,9 @@ void iap_seek_stop(void)
 {
     if (iap_timeoutbtn == 0)
         return;
+
+    pb_seek_stopped = pb_seeking;
+    pb_seeking = 0;
 
     /* Let the button driver see the release before the next packet */
     iap_remotebtn = BUTTON_NONE;
@@ -1071,6 +1085,15 @@ uint32_t iap_get_trackindex(void)
         index += playlist->amount;
 
     return index;
+}
+
+/* PlayStatusChangeNotification without extra data */
+static void send_play_status(unsigned char status)
+{
+    IAP_TX_INIT4(0x04, 0x0027);
+    IAP_TX_PUT(status);
+
+    iap_send_tx();
 }
 
 static void apply_shuffle(bool shuffle)
@@ -1269,6 +1292,12 @@ void iap_periodic(void)
 
     if (!iap_timeoutbtn)
     {
+        /* a seek the accessory never ended has been released */
+        if (pb_seeking)
+        {
+            pb_seek_stopped = pb_seeking;
+            pb_seeking = 0;
+        }
         iap_remotebtn = BUTTON_NONE;
         iap_repeatbtn = 0;
         iap_btnshuffle = false;
@@ -1381,6 +1410,26 @@ void iap_periodic(void)
     }
 
     /* Extended Interface PlayStatusChangeNotification */
+    {
+        bool stopped = !(audio_status() & AUDIO_STATUS_PLAY);
+        bool basic = (interface_state == IST_EXTENDED) &&
+                     (device.pb_notifications & BIT_N(0));
+
+        /* Playback stopped */
+        if (!stopped)
+            pb_stopped_ticks = 0;
+        else if (pb_stopped_ticks < 2 && ++pb_stopped_ticks == 2 && basic)
+            send_play_status(0x00);
+
+        /* Playback forward or backward seek stop */
+        if (pb_seek_stopped)
+        {
+            if (basic)
+                send_play_status(pb_seek_stopped);
+            pb_seek_stopped = 0;
+        }
+    }
+
     if (device.pb_track_changed)
     {
         device.pb_track_changed = false;
