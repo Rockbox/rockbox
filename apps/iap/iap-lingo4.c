@@ -183,8 +183,20 @@ static void play_selected_track(uint32_t index)
     }
     else
     {
+        long offset;
+
+        /* Pause first: audio_pause() waits for the audio thread, so a
+         * skip already queued has moved the playlist index by then */
         audio_pause();
-        audio_skip(index - iap_get_trackindex());
+        offset = (long)index - (long)iap_get_trackindex();
+        if (offset != 0)
+            audio_skip(offset);
+        else
+        {
+            /* audio_skip(0) doesn't skip; play the track from the start */
+            audio_pre_ff_rewind();
+            audio_ff_rewind(0);
+        }
         audio_resume();
     }
 }
@@ -2363,7 +2375,21 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
                     if (buf[3] == 0x03)
                         audio_next();
                     else
-                        audio_prev();
+                    {
+                        /* Like the previous button, restart the track
+                         * once it has played for a few seconds. Head
+                         * units such as the Audi MMI rely on this and
+                         * reselect the current track right after. */
+                        struct mp3entry *id3 = audio_current_track();
+
+                        if (id3 && id3->elapsed >= DEFAULT_SKIP_THRESH)
+                        {
+                            audio_pre_ff_rewind();
+                            audio_ff_rewind(0);
+                        }
+                        else
+                            audio_prev();
+                    }
                     break;
                 case 0x05: /* ffwd */
                 case 0x06: /* frwd */
@@ -3107,6 +3133,7 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
         {
             int paused = !!(audio_status() & AUDIO_STATUS_PAUSE);
             long tracknum;
+            long offset;
 
             CHECKLEN(7);
             tracknum = get_u32(&buf[3]);
@@ -3129,8 +3156,18 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
                 break;
             }
 
+            /* Pause first, as in play_selected_track() */
             audio_pause();
-            audio_skip(tracknum - iap_get_trackindex());
+            offset = tracknum - (long)iap_get_trackindex();
+            if (offset != 0)
+                audio_skip(offset);
+            else
+            {
+                /* audio_skip(0) doesn't skip; restart the track, as
+                 * described above */
+                audio_pre_ff_rewind();
+                audio_ff_rewind(0);
+            }
             if (!paused)
                 audio_resume();
 
