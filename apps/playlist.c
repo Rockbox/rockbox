@@ -2433,8 +2433,16 @@ int playlist_insert_context_create(struct playlist_info* playlist,
     if (!playlist)
         playlist = &current_playlist;
 
+    /* Everything release() reads is set before the first way out below,
+     * because both of those ways out keep the lock and the caller's only
+     * means of giving it back is release(). `initialized` stays false, so
+     * release() skips the sync and unlocks. */
     context->playlist = playlist;
     context->initialized = false;
+    context->count = 0;
+    context->progress = progress;
+    context->count_langid = queue ? LANG_PLAYLIST_QUEUE_COUNT
+                                  : LANG_PLAYLIST_INSERT_COUNT;
 
     dc_thread_stop(playlist);
     playlist_write_lock(playlist);
@@ -2455,17 +2463,9 @@ int playlist_insert_context_create(struct playlist_info* playlist,
         }
     }
 
-    context->playlist = playlist;
     context->position = position;
     context->queue = queue;
-    context->count = 0;
-    context->progress = progress;
     context->initialized = true;
-
-    if (queue)
-        context->count_langid = LANG_PLAYLIST_QUEUE_COUNT;
-    else
-        context->count_langid = LANG_PLAYLIST_INSERT_COUNT;
 
     return 0;
 }
@@ -2682,6 +2682,8 @@ int playlist_insert_track(struct playlist_info* playlist, const char *filename,
     if (check_control(playlist) < 0)
     {
         notify_control_access_error();
+        playlist_write_unlock(playlist);
+        dc_thread_start(playlist, false);
         return -1;
     }
 
