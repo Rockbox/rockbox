@@ -2045,7 +2045,11 @@ static bool dbg_tagcache_info(void)
     /* info.timeout = TIMEOUT_NOBLOCK; */
     info.timeout = 1;
     tagcache_screensync_enable(true);
-    return simplelist_show_list(&info);
+    /* SELECT and USB leave the list without ACTION_STD_CANCEL; left on,
+     * screensync makes the next scan wait for this screen forever. */
+    bool ret = simplelist_show_list(&info);
+    tagcache_screensync_enable(false);
+    return ret;
 }
 #endif
 
