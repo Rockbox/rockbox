@@ -1721,6 +1721,8 @@ static bool build_lookup_list(struct tagcache_search *tcs)
     {
         struct master_header tcmh;
         tcs->masterfd = open_master_fd(&tcmh, false);
+        if (tcs->masterfd < 0)
+            return false;
     }
 
     lseek(tcs->masterfd, tcs->seek_pos * sizeof(struct index_entry) +
@@ -1818,7 +1820,11 @@ bool tagcache_search(struct tagcache_search *tcs, int tag)
         {
             tcs->idxfd[tcs->type] = open_tag_fd(&tag_hdr, tcs->type, false);
             if (tcs->idxfd[tcs->type] < 0)
+            {
+                close(tcs->masterfd);
+                tcs->masterfd = -1;
                 return false;
+            }
 
             tcs->entry_count = tag_hdr.entry_count;
         }
