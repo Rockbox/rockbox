@@ -561,4 +561,6 @@ CE lines
 #define I2SIN_MASK_POF    ( 1<<1 ) /* full */
 #define I2SIN_MASK_POER   ( 1<<0 ) /* pop error */
 
+#define HAVE_DBG_PORTS
+
 #endif /*__AS3525_H__*/

@@ -1553,8 +1553,3 @@ bool dbg_hw_info(void)
 #endif
     return false;
 }
-
-bool dbg_ports(void)
-{
-    return false;
-}

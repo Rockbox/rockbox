@@ -245,7 +245,7 @@
 #define O_DCR   0x08        /* DMA Control Register                 */
 #define O_BCR   0x0C        /* 16 or 24 bits depending on BCR24BIT  */
 #define O_DSR   0x10        /* DMA Status Register                  */
-#define O_IVR   0x14        /* Interrupt Vector Register            */ 
+#define O_IVR   0x14        /* Interrupt Vector Register            */
 
 /* DMA Control Register bits */
 #define DMA_INT         (1 << 31)       /* Enable Interrupts            */
@@ -281,5 +281,7 @@
 /* Timer frequency */
 /* timer is based on busclk == cpuclk/2 */
 #define TIMER_FREQ (CPU_FREQ/2)
+
+#define HAVE_DBG_PORTS
 
 #endif

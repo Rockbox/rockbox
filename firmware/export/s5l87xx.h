@@ -2163,4 +2163,6 @@ Information for them was gathered solely by reverse-engineering Apple's firmware
 
 #endif /* CONFIG_CPU == S5L8702 */
 
+#define HAVE_DBG_PORTS
+
 #endif /* __S5L87XX_H__ */

@@ -316,7 +316,6 @@ static bool display_enabled_clocks(void)
 
 bool dbg_ports(void)
 {
-#if CONFIG_CPU == JZ4760B
     int line, i, j, cur;
     int x = 0;
     const int last_port = 5;
@@ -374,7 +373,6 @@ bool dbg_ports(void)
 
     }
     lcd_setfont(FONT_UI);
-#endif /* CONFIG_CPU ==JZ4760B */
 
     return false;
 }

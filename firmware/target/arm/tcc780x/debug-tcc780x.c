@@ -34,11 +34,6 @@
 #define STS    (*(volatile unsigned long *)0xF3001008)
 #define SRC    (*(volatile unsigned long *)0xF3001010)
 
-bool dbg_ports(void)
-{
-    return false;
-}
-
 bool dbg_hw_info(void)
 {
     int line = 0, i, oldline;

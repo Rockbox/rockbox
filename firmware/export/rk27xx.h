@@ -215,7 +215,7 @@
 #define IOMUX_GPIO_A1          (0<<2)
 #define IOMUX_UART0_RXD        (2<<0)
 #define IOMUX_LCD_D16          (1<<0)
-#define IOMUX_GPIO_A0          (0<<0)                 
+#define IOMUX_GPIO_A0          (0<<0)
 
 #define SCU_IOMUXB_CON         (*(volatile unsigned long *)(APB0_SCU + 0x34))
 /* bits 31 - 23 reserved */
@@ -318,7 +318,7 @@
 #define SD_CLOCK_DIS           (1<<11)
 #define SD_CLOCK_EN            (0<<11)
 #define SD_DIV(x)              ((x)&0x7ff)
-                 
+
 #define SD_INT                 (*(volatile unsigned long *)(APB0_SD + 0x24))
 #define CMD_RES_STAT           (1<<6)
 #define DATA_XFER_STAT         (1<<5)
@@ -1092,10 +1092,10 @@
 #define CTLL_DINC_INC        (0<<7)
 #define CTLL_SRC_TR_WIDTH_32 (2<<4)
 #define CTLL_SRC_TR_WIDTH_16 (1<<4)
-#define CTLL_SRC_TR_WIDTH_8  (0<<4)     
+#define CTLL_SRC_TR_WIDTH_8  (0<<4)
 #define CTLL_DST_TR_WIDTH_32 (2<<1)
 #define CTLL_DST_TR_WIDTH_16 (1<<1)
-#define CTLL_DST_TR_WIDTH_8  (0<<1)     
+#define CTLL_DST_TR_WIDTH_8  (0<<1)
 #define CTLL_INT_EN          (1<<0)
 
 #define DWDMA_CTL_H(n)       (*(volatile unsigned long *)(AHB1_DWDMA + 0x1C + 0x58*n))
@@ -1189,3 +1189,5 @@
 
 /* Timer frequency */
 #define TIMER_FREQ 50000000
+
+#define HAVE_DBG_PORTS

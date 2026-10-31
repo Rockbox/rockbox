@@ -1138,4 +1138,6 @@ extern unsigned long _ttbstart;
 /* timer is based on PCLK and minimum division is 2 */
 #define TIMER_FREQ (27000000)
 
+#define HAVE_DBG_PORTS
+
 #endif

@@ -339,7 +339,7 @@ static inline void cpu_boost_unlock(void)
  * break strict aliasing rules' B.S. */
 #define PUN_PTR(type, p) ((type)(intptr_t)(p))
 
-#ifndef SIMULATOR
+#ifdef HAVE_DBG_PORTS
 bool dbg_ports(void);
 #endif
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE) || defined(SONY_NWZ_LINUX) || defined(HIBY_LINUX)

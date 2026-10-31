@@ -231,7 +231,7 @@
 #define DMA_INV3    DMA_CH3(DMA_INVALID)
 
 /* This map encodes the DMA request source field (HWSRCSEL) since it's value
- * depends on channel number and peripheral type. 
+ * depends on channel number and peripheral type.
  */
 #define DMA_SRC_MAP_XDREQ0    (DMA_CH0(0) | DMA_INV1   | DMA_INV2   | DMA_INV3)
 #define DMA_SRC_MAP_XDREQ1    (DMA_INV0   | DMA_CH1(0) | DMA_INV2   | DMA_INV3)
@@ -247,10 +247,10 @@
 #define DMA_SRC_MAP_I2SSDI    (DMA_INV0   | DMA_CH1(2) | DMA_CH2(1) | DMA_INV3)
 #define DMA_SRC_MAP_PCMOUT    (DMA_INV0   | DMA_CH1(5) | DMA_INV2   | DMA_CH3(6))
 #define DMA_SRC_MAP_PCMIN     (DMA_CH0(6) | DMA_INV1   | DMA_CH2(5) | DMA_INV3)
-#define DMA_SRC_MAP_MICIN     (DMA_INV0   | DMA_INV1   | DMA_CH2(6) | DMA_CH3(5))      
-#define DMA_SRC_MAP_SPI0      (DMA_INV0   | DMA_CH1(3) | DMA_INV2   | DMA_INV3)      
-#define DMA_SRC_MAP_SPI1      (DMA_INV0   | DMA_INV1   | DMA_INV2   | DMA_CH3(2))      
-#define DMA_SRC_MAP_TIMER     (DMA_CH0(3) | DMA_INV1   | DMA_CH2(3) | DMA_CH3(3))      
+#define DMA_SRC_MAP_MICIN     (DMA_INV0   | DMA_INV1   | DMA_CH2(6) | DMA_CH3(5))
+#define DMA_SRC_MAP_SPI0      (DMA_INV0   | DMA_CH1(3) | DMA_INV2   | DMA_INV3)
+#define DMA_SRC_MAP_SPI1      (DMA_INV0   | DMA_INV1   | DMA_INV2   | DMA_CH3(2))
+#define DMA_SRC_MAP_TIMER     (DMA_CH0(3) | DMA_INV1   | DMA_CH2(3) | DMA_CH3(3))
 
 /* Clock & Power Management */
 
@@ -475,7 +475,7 @@
 #define IISCON_RX_IDLE                  (1 << 2)
 #define IISCON_IIS_PRESCALER_ENABLE     (1 << 1)
 #define IISCON_IIS_INTERFACE_ENABLE     (1 << 0)
-         
+
 #define IISMOD_MASTER_CLOCK_PCLK        (0 << 9)
 #define IISMOD_MASTER_CLOCK_MPLLIN      (1 << 9)
 #define IISMOD_MASTER_MODE              (0 << 8)
@@ -751,7 +751,8 @@
 #define GPIO_PULLUP_ENABLE  0
 
 #define S3C2440_GPIO_CONFIG(port,pin,function)  port = ( (port & ~(3<<(pin*2)) ) | (function<<(pin*2)) )
-#define S3C2440_GPIO_PULLUP(port,pin,state)     port = ( (port & ~(1<<pin    ) ) | (state<<pin       ) ) 
+#define S3C2440_GPIO_PULLUP(port,pin,state)     port = ( (port & ~(1<<pin    ) ) | (state<<pin       ) )
 
+#define HAVE_DBG_PORTS
 
 #endif /* __S3C2440_H__ */

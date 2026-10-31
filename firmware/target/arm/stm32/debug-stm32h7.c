@@ -181,8 +181,3 @@ bool dbg_hw_info(void)
     info.get_name = hw_info_menu_get_name;
     return simplelist_show_list(&info);
 }
-
-bool dbg_ports(void)
-{
-    return false;
-}

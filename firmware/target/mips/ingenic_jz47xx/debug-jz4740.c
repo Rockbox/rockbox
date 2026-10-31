@@ -128,11 +128,6 @@ static void display_enabled_clocks(void)
             (clkgr & CPM_CLKGR_UART0) ? "stopped" : "running");
 }
 
-bool dbg_ports(void)
-{
-    return false;
-}
-
 bool dbg_hw_info(void)
 {
     int btn = 0;

@@ -705,4 +705,6 @@
 /* Portalplayer chips use a microsecond timer. */
 #define TIMER_FREQ 1000000
 
+#define HAVE_DBG_PORTS
+
 #endif /* __PP5020_H__ */

@@ -93,4 +93,6 @@
 #define CACHEALIGN_SIZE     32
 #define CACHE_SIZE          (16 * 1024)
 
+#define HAVE_DBG_PORTS
+
 #endif /* __X1600_H__ */

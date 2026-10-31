@@ -9665,4 +9665,6 @@ do {	                    			\
 #define CFG_UART_BASE UART1_BASE /* Base of the UART channel */
 #define CFG_BAUDRATE  57600
 
+#define HAVE_DBG_PORTS
+
 #endif /* __JZ4760B_H__ */
