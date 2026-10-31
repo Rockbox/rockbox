@@ -3258,6 +3258,7 @@ int playlist_resume(void)
         int count;
         enum playlist_command current_command = PLAYLIST_COMMAND_COMMENT;
         int last_newline = 0;
+        bool newline_seen = false;
         int str_count = -1;
         bool newline = true;
         bool exit_loop = false;
@@ -3487,6 +3488,7 @@ int playlist_resume(void)
 
                 /* save last_newline in case we need to load more data */
                 last_newline = count;
+                newline_seen = true;
                 newline = true;
 
                 /* to ignore any extra newlines */
@@ -3547,6 +3549,41 @@ int playlist_resume(void)
         {
             if ((total_read + count) >= control_file_size)
             {
+                /* A power cut mid-append leaves a last line with no newline:
+                 * a command that never finished being written. Offer to clear
+                 * the playlist; otherwise, or if nobody answers, drop the line
+                 * and cut it from the file so the next append starts a line.
+                 * The line starts after the chunk's last newline, or at the
+                 * start of the chunk if it has none. */
+                if (!newline && !exit_loop && pl_cmd == &pl_cmds_run)
+                {
+                    static const char *lines[] = {
+                        ID2P(LANG_PLAYLIST_CONTROL_INVALID),
+                        ID2P(LANG_CLEAR_ALL)
+                    };
+                    static const struct text_message message = {lines, 2};
+
+                    if (gui_syncyesno_run_w_tmo(HZ * 5, YESNO_NO, NULL,
+                                                &message, NULL, NULL)
+                        == YESNO_YES)
+                    {
+                        /* keep the file as .old, and leave nothing to
+                         * resume rather than an empty control file */
+                        empty_playlist_unlocked(playlist, true);
+                        rename(PLAYLIST_CONTROL_FILE,
+                               PLAYLIST_CONTROL_FILE".old");
+                        playlist_update_resume_info(NULL);
+                        result = -1;
+                        goto out;
+                    }
+
+                    if (ftruncate(playlist->control_fd, total_read +
+                                  (newline_seen ? last_newline + 1 : 0)) == 0)
+                    {
+                        break;
+                    }
+                }
+
                 /* no newline at end of control file */
                 splashf(HZ*2, "Err: EOF, %s", str(LANG_PLAYLIST_CONTROL_INVALID));
                 result = -15;
