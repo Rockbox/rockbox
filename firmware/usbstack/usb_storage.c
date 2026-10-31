@@ -850,8 +850,8 @@ static void handle_scsi_ready(struct command_block_wrapper* cbw)
     unsigned int length = cbw->data_transfer_length;
     sector_t hw_sector_count;
     unsigned int hw_sector_size;
+    unsigned short lun = cbw->lun;
     bool lun_present=true;
-    int lun = cbw->lun;
 
     if(letoh32(cbw->signature) != CBW_SIGNATURE) {
         logf("ums: bad cbw signature (%x)", cbw->signature);
@@ -1335,10 +1335,9 @@ static void handle_scsi_ready(struct command_block_wrapper* cbw)
             if(!set_transfer_range(load_be32(&cbw->command_block[2]),
                                    load_be16(&cbw->command_block[7]),
                                    block_size_mult, hw_sector_count)) {
-                send_csw(UMS_STATUS_FAIL);
-                cur_sense_data.sense_key=SENSE_ILLEGAL_REQUEST;
+                /* the host is about to send the data: stall it */
+                reject_command(cbw);
                 cur_sense_data.asc=ASC_LBA_OUT_OF_RANGE;
-                cur_sense_data.ascq=0;
             }
             else {
                 receive_block_data(cur_cmd.data[0],
@@ -1371,10 +1370,9 @@ static void handle_scsi_ready(struct command_block_wrapper* cbw)
             if(!set_transfer_range(load_be64(&cbw->command_block[2]),
                                    load_be32(&cbw->command_block[10]),
                                    block_size_mult, hw_sector_count)) {
-                send_csw(UMS_STATUS_FAIL);
-                cur_sense_data.sense_key=SENSE_ILLEGAL_REQUEST;
+                /* the host is about to send the data: stall it */
+                reject_command(cbw);
                 cur_sense_data.asc=ASC_LBA_OUT_OF_RANGE;
-                cur_sense_data.ascq=0;
             }
             else {
                 receive_block_data(cur_cmd.data[0],
