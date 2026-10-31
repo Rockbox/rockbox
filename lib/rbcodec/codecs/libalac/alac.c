@@ -172,7 +172,13 @@ static inline void unreadbits(alac_file *alac, int bits)
         alac->input_buffer_bitaccumulator *= -1;
 }
 
-#define count_leading_zeros(x) bs_generic(x, BS_CLZ|BS_SHORT)
+#define count_leading_zeros(x) bs_generic(x, BS_CLZ)
+
+/* Without a CLZ instruction, bs_generic() is a table lookup and its
+   16-bit form (BS_SHORT) is cheaper; use it when the argument fits. */
+#if !defined(CPU_ARM) || ARM_ARCH < 5
+#define CLZ_BY_TABLE
+#endif
 
 #define RICE_THRESHOLD 8 // maximum number of bits for a rice prefix.
 
@@ -249,11 +255,23 @@ static void entropy_rice_decode(alac_file* alac,
         int32_t        decoded_value;
         int32_t        final_value;
         int32_t        k;
+        uint32_t       x = (history >> 9) + 3;
         
-        k = 31 - rice_kmodifier - count_leading_zeros((history >> 9) + 3);
-        
-        if (k < 0) k += rice_kmodifier;
-        else k = rice_kmodifier;
+#ifdef CLZ_BY_TABLE
+        if (x < 0x10000)
+        {
+            /* the same k as below, for 16-bit x */
+            k = 31 - bs_generic(x, BS_CLZ|BS_SHORT);
+            if (k > rice_kmodifier)
+                k = rice_kmodifier;
+        }
+        else
+#endif
+        {
+            k = 31 - rice_kmodifier - count_leading_zeros(x);
+            if (k < 0) k += rice_kmodifier;
+            else k = rice_kmodifier;
+        }
         
         decoded_value = entropy_decode_value(alac, readsamplesize, k);
         
