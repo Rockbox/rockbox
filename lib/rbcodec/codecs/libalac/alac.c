@@ -285,16 +285,18 @@ static void entropy_rice_decode(alac_file* alac,
             // note: block_size is always 16bit
             block_size = entropy_decode_value(alac, 16, k) & rice_kmodifier_mask;
             
-            // got block_size 0s
+            if (block_size > 0xFFFF)
+                sign_modifier = 0;
+
+            // got block_size 0s, no more than the frame has left
+            if (block_size > output_size - output_count - 1)
+                block_size = output_size - output_count - 1;
             if (block_size > 0)
             {
                 memset(&output_buffer[output_count + 1], 0, 
                        block_size * sizeof(*output_buffer));
                 output_count += block_size;
             }
-            
-            if (block_size > 0xFFFF)
-                sign_modifier = 0;
             
             history = 0;
         }
