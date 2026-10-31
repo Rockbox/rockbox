@@ -231,6 +231,14 @@ void system_init(void)
     if (SDL_InitSubSystem(SDL_INIT_TIMER))
         panicf("%s", SDL_GetError());
 
+    /* The event thread enters the irq handler from its first event, so the
+     * handler's mutex and condition must exist before it starts. */
+    if (!sim_kernel_init())
+    {
+        panicf("Could not initialize kernel!");
+        exit(-1);
+    }
+
 #ifdef SIMULATOR
     {
         SDL_version compiled;

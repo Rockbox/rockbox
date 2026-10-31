@@ -107,7 +107,7 @@ void sim_exit_irq_handler(void)
 #endif
 }
 
-static bool sim_kernel_init(void)
+bool sim_kernel_init(void)
 {
     sim_irq_mtx = SDL_CreateMutex();
     if (sim_irq_mtx == NULL)
@@ -180,12 +180,6 @@ Uint32 tick_timer(Uint32 interval, void *param)
 
 void tick_start(unsigned int interval_in_ms)
 {
-    if (!sim_kernel_init())
-    {
-        panicf("Could not initialize kernel!");
-        exit(-1);
-    }
-
     if (tick_timer_id != 0)
     {
         SDL_RemoveTimer(tick_timer_id);
