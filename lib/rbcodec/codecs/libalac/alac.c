@@ -721,6 +721,9 @@ static inline int decode_frame_mono(
          * as a 32bit integer */
         outputsamples = readbits(alac, 32);
     }
+    /* the output buffers hold ALAC_BLOCKSIZE */
+    if (outputsamples < 0 || outputsamples > ALAC_BLOCKSIZE)
+        return -1;
 
     readsamplesize = infosamplesize - (uncompressed_bytes * 8);
 
@@ -908,6 +911,9 @@ static inline int decode_frame_stereo(
          * as a 32bit integer */
         outputsamples = readbits(alac, 32);
     }
+    /* the output buffers hold ALAC_BLOCKSIZE */
+    if (outputsamples < 0 || outputsamples > ALAC_BLOCKSIZE)
+        return -1;
 
     readsamplesize = infosamplesize - (uncompressed_bytes * 8) + 1;
 
