@@ -236,7 +236,7 @@ unsigned int m4a_seek(demux_res_t* demux_res, stream_t* stream,
         {
             read_time_to_sample_entry(stream, &time_cnt, &time_dur);
         }
-        uint32_t time_var = time_cnt * time_dur;
+        uint64_t time_var = (uint64_t)time_cnt * time_dur;
 
         if (sound_sample_loc < sound_sample_i + time_var)
         {
@@ -320,12 +320,12 @@ unsigned int m4a_seek(demux_res_t* demux_res, stream_t* stream,
 
         if (chunk_first_sample < i + time_cnt)
         {
-            sound_sample_i += (chunk_first_sample - i) * time_dur;
+            sound_sample_i += (uint64_t)(chunk_first_sample - i) * time_dur;
             break;
         }
 
         i += time_cnt;
-        sound_sample_i += time_cnt * time_dur;
+        sound_sample_i += (uint64_t)time_cnt * time_dur;
     }
 
     /* That frame is where to go: the one asked for if the index has every
@@ -448,10 +448,10 @@ unsigned int m4a_seek_raw(demux_res_t* demux_res, stream_t* stream,
             read_time_to_sample_entry(stream, &time_cnt, &time_dur);
         }
         total_samples    += time_cnt;
-        new_sound_sample += time_cnt * time_dur;
+        new_sound_sample += (uint64_t)time_cnt * time_dur;
         if (chunk_sample <= total_samples)
         {
-            new_sound_sample -= (total_samples - chunk_sample) * time_dur;
+            new_sound_sample -= (uint64_t)(total_samples - chunk_sample) * time_dur;
             break;
         }
         ++i;
