@@ -5034,9 +5034,24 @@ void do_tagcache_build(const char *path[])
     cachefd = open_db_fd(TAGCACHE_FILE_TEMP, O_RDONLY);
     if (cachefd >= 0)
     {
-        logf("skipping, cache already waiting for commit");
+        /* An interrupted build left its entries waiting. Commit them now,
+         * as the next boot would, rather than skipping this update. */
         close(cachefd);
-        return ;
+        logf("committing cache waiting from an interrupted build");
+#ifdef __PCTOOL__
+        allocate_tempbuf();
+#endif
+        commit();
+#ifdef __PCTOOL__
+        free_tempbuf();
+#endif
+        cachefd = open_db_fd(TAGCACHE_FILE_TEMP, O_RDONLY);
+        if (cachefd >= 0)
+        {
+            logf("skipping, cache already waiting for commit");
+            close(cachefd);
+            return ;
+        }
     }
 
     cachefd = open_db_fd(TAGCACHE_FILE_TEMP, O_RDWR | O_CREAT | O_TRUNC);
