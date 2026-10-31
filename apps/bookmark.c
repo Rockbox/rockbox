@@ -239,20 +239,22 @@ static bool parse_bookmark(char *filenamebuf,
         len = MIN(TEMP_BUF_SIZE - 1, len);
         strmemccpy(global_temp_buffer, s, len + 1);
 
-        if (end != NULL)
+        /* create_bookmark() always writes the separator, so a line
+         * without one is damaged, and there is no track name to return. */
+        if (end == NULL)
+            return false;
+
+        end++;
+        if (strip_dir)
         {
-            end++;
-            if (strip_dir)
+            s = strrchr(end, '/');
+            if (s)
             {
-                s = strrchr(end, '/');
-                if (s)
-                {
-                    end = s;
-                    end++;
-                }
+                end = s;
+                end++;
             }
-            strmemccpy(filenamebuf, end, filenamebufsz);
         }
+        strmemccpy(filenamebuf, end, filenamebufsz);
      }
 
     return true;
