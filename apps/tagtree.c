@@ -2151,6 +2151,13 @@ int tagtree_enter(struct tree_context* c, bool is_visible)
             return 0;
 
         dptr = (tagtree_get_entry(c, c->special_entry_count+(rand() % (c->filesindir-c->special_entry_count))));
+        /* NULL when the entry had to be read and the search was refused,
+         * as it is while the database is being committed */
+        if (!dptr)
+        {
+            splash(HZ, ID2P(LANG_TAGCACHE_BUSY));
+            return 0;
+        }
         seek = dptr->extraseek;
     }
     newextra = dptr->newtable;
@@ -2550,7 +2557,17 @@ static bool insert_all_playlist(struct tree_context *c,
             }
         }
 
-        if (!tagcache_retrieve(&tcs, tagtree_get_entry(c, i)->extraseek, tcs.type, buf, sizeof buf))
+        struct tagentry *entry = tagtree_get_entry(c, i);
+
+        /* NULL when the entry had to be read and the search was refused,
+         * as it is once a database commit has started */
+        if (!entry)
+        {
+            exit_loop_now = true;
+            break;
+        }
+
+        if (!tagcache_retrieve(&tcs, entry->extraseek, tcs.type, buf, sizeof buf))
             continue;
 
         if (playlist == NULL)
@@ -2694,7 +2711,12 @@ bool tagtree_entries_iterate(struct tagcache_search *tcs,
                 last_tick = current_tick;
             }
 
-            if (!action_cb(tagcache_retrieve(tcs, tagtree_get_entry(tc, i)->extraseek,
+            struct tagentry *entry = tagtree_get_entry(tc, i);
+
+            /* NULL when the entry had to be read and the search was
+             * refused, as it is once a database commit has started */
+            if (!entry ||
+                !action_cb(tagcache_retrieve(tcs, entry->extraseek,
                                              tcs->type, buf, buf_sz) ? buf : NULL))
             {
                 ret = false;

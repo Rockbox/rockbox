@@ -277,6 +277,7 @@ typedef fb_data pix_t;
 #define ERROR_BUFFER_FULL   -2
 #define ERROR_NO_ARTISTS    -3
 #define ERROR_USER_ABORT    -4
+#define ERROR_DB_BUSY       -5 /* a search was refused during a commit */
 
 /* current version for cover cache */
 #define CACHE_VERSION 4
@@ -1291,6 +1292,8 @@ static int create_album_untagged(struct tagcache_search *tcs,
             }
         }
     }
+    else
+        ret = ERROR_DB_BUSY;
 
     return ret;
 }
@@ -1309,7 +1312,8 @@ static int build_artist_index(struct tagcache_search *tcs,
     /* artist names starts at beginning of buf */
     pf_idx.artist_names = *buf;
 
-    rb->tagcache_search(tcs, tag_albumartist);
+    if (!rb->tagcache_search(tcs, tag_albumartist))
+        return ERROR_DB_BUSY;
     res = get_tcs_search_res(ePFS_ARTIST, tcs, &(*buf), bufsz);
     rb->tagcache_search_finish(tcs);
     if (res < SUCCESS)
@@ -1366,6 +1370,8 @@ static int assign_album_year(void)
                     album_year = track_year;
             }
         }
+        else
+            return ERROR_DB_BUSY;
         rb->tagcache_search_finish(&tcs);
 
         pf_idx.album_index[album_idx].year = album_year;
@@ -1407,7 +1413,8 @@ static int create_album_index(void)
     /* album_names starts at the beginning of buf */
     pf_idx.album_names = buf;
 
-    rb->tagcache_search(&tcs, tag_album);
+    if (!rb->tagcache_search(&tcs, tag_album))
+        return ERROR_DB_BUSY;
     res = get_tcs_search_res(ePFS_ALBUM, &tcs, &buf, &buf_size);
     rb->tagcache_search_finish(&tcs);
     if (res < SUCCESS)
@@ -1442,7 +1449,8 @@ static int create_album_index(void)
 
         if (pf_idx.album_index[j].artist_seek >= 0) { continue; }
 
-        rb->tagcache_search(&tcs, tag_albumartist);
+        if (!rb->tagcache_search(&tcs, tag_albumartist))
+            return ERROR_DB_BUSY;
         rb->tagcache_search_add_filter(&tcs, tag_album, pf_idx.album_index[j].seek);
 
         last = 0;
@@ -4647,6 +4655,11 @@ static bool init(void)
     }
     else if (ret == ERROR_USER_ABORT)
         return false;
+    else if (ret == ERROR_DB_BUSY)
+    {
+        error_wait("Database busy");
+        return false;
+    }
 
     number_of_slides = pf_idx.album_ct;
 
