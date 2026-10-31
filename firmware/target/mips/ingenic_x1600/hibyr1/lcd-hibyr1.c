@@ -23,7 +23,7 @@
 #include "kernel.h"
 #include "dpu-x1600.h"
 #include "clk-x1600.h"
-#include "gpio-x1600.h"
+#include "gpio-ingenic.h"
 #include <stdint.h>
 
 /* ST7701S panel, 480x800 RGB666. Initialisation sequence from the vendor

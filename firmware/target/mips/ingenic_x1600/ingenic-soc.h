@@ -24,7 +24,7 @@
 #include "irq-x1600.h"
 #include "x1600/msc.h"
 #include "uart-x1600.h"
-#include "gpio-x1600.h"
+#include "gpio-ingenic.h"
 #include "sfc-x1600.h"
 #include "nand-ingenic.h"
 #include "i2c-ingenic.h"

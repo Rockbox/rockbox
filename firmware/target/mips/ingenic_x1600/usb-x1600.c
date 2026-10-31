@@ -26,7 +26,7 @@
 #include "usb-x1600.h"
 #include "panic.h"
 #include "irq-x1600.h"
-#include "gpio-x1600.h"
+#include "gpio-ingenic.h"
 #include "x1600/cpm.h"
 
 /* USB-Designware driver API */

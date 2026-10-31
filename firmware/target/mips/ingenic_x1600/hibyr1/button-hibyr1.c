@@ -24,7 +24,7 @@
 #include "kernel.h"
 #include "system.h"
 #include "adc.h"
-#include "gpio-x1600.h"
+#include "gpio-ingenic.h"
 #include "irq-x1600.h"
 #include "i2c-ingenic.h"
 #include <stdbool.h>

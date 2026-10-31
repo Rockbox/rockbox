@@ -27,7 +27,7 @@
 #include "boot-x1600.h"
 #include "mips.h"
 #include "panic.h"
-#include "gpio-x1600.h"
+#include "gpio-ingenic.h"
 #include "dma-ingenic.h"
 #include "irq-x1600.h"
 #include "clk-x1600.h"

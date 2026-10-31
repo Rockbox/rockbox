@@ -41,7 +41,7 @@
 #include "adc.h"
 
 #include "clk-x1600.h"
-#include "gpio-x1600.h"
+#include "gpio-ingenic.h"
 #include "x1600/cpm.h"
 #include "x1600/aic.h"
 #include "adc-target.h"

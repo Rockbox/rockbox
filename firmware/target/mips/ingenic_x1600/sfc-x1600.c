@@ -28,7 +28,7 @@
 #include "kernel.h"
 #include "sfc-x1600.h"
 #include "clk-x1600.h"
-#include "gpio-x1600.h"
+#include "gpio-ingenic.h"
 #include "x1600/cpm.h"
 
 /* A quarter of the 128-word FIFO, per the vendor SPL, not the X1000's 31 */

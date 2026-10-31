@@ -26,7 +26,7 @@
 #include "generic_i2c.h"
 #include "aic-x1600.h"
 #include "clk-x1600.h"
-#include "gpio-x1600.h"
+#include "gpio-ingenic.h"
 
 /* X1600 AIC to CS43131 over I2S. The SoC supplies MCLK, 64fs BCLK and
  * LRCLK; the DAC is a slave. */

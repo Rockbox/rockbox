@@ -21,7 +21,7 @@
 #include "backlight.h"
 #include "backlight-target.h"
 #include "lcd.h"
-#include "gpio-x1600.h"
+#include "gpio-ingenic.h"
 
 /* On/off backlight; PWM brightness control is not implemented. */
 #define BL_GPIO GPIO_PC(0)
