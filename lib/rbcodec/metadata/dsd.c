@@ -138,6 +138,10 @@ static bool parse_dff(int fd, struct mp3entry *id3)
         else if (!memcmp(chunk, "DST ", 4))
             return false;
 
+        /* A size past the end would wrap the 32-bit offset back onto this
+         * chunk, and the walk would never end */
+        if (size > (uint64_t)(end - data))
+            return false;
         if (lseek(fd, data + size + (size & 1), SEEK_SET) < 0)
             return false;
     }
