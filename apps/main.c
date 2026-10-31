@@ -597,12 +597,14 @@ static void init(void)
     if(rc)
     {
         lcd_clear_display();
-        lcd_putsf(0, 1, "ATA error: %d", rc);
+        lcd_putsf(0, 1, "Disk error: %d", rc);
         lcd_puts(0, 3, "Press button to debug");
         lcd_update();
         while(!(button_get(true) & BUTTON_REL)); /* DO NOT CHANGE TO ACTION SYSTEM */
+#ifdef HAVE_DBG_PORTS
         dbg_ports();
-        panicf("ata: %d", rc);
+#endif
+        panicf("disk: %d", rc);
     }
 
 #if defined(NEED_ATA_POWER_BATT_MEASURE) && \
