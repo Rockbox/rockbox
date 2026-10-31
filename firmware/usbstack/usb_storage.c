@@ -136,6 +136,7 @@
 #define ASC_READ_ERROR              0x11
 #define ASC_NOT_READY               0x04
 #define ASC_INVALID_COMMAND         0x20
+#define ASC_LOGICAL_UNIT_NOT_SUPPORTED 0x25
 #define ASC_WRITE_PROTECTED         0x27
 
 /* A drive whose driver can only read it is reported write protected */
@@ -330,6 +331,23 @@ static void fill_inquiry(IF_MD_NONVOID(int lun));
 static void send_and_read_next(void);
 static bool ejected[NUM_DRIVES];
 static bool locked[NUM_DRIVES];
+
+static bool set_transfer_range(uint64_t usb_lba, uint32_t usb_count,
+                               unsigned int multiplier, sector_t hw_sector_cnt)
+{
+    usb_lba *= multiplier;
+
+    if(usb_lba > hw_sector_cnt)
+        return false;
+
+    uint64_t blocks = (uint64_t)usb_count * multiplier;
+    if(usb_lba > hw_sector_cnt || blocks > hw_sector_cnt - usb_lba)
+        return false;
+
+    cur_cmd.sector = usb_lba;
+    cur_cmd.count = blocks;
+    return true;
+}
 
 static int usb_interface;
 
@@ -830,10 +848,10 @@ static void handle_scsi_ready(struct command_block_wrapper* cbw)
 {
     struct storage_info info;
     unsigned int length = cbw->data_transfer_length;
-    sector_t block_count;
-    unsigned int block_size;
+    sector_t hw_sector_count;
+    unsigned int hw_sector_size;
     bool lun_present=true;
-    unsigned char lun = cbw->lun;
+    int lun = cbw->lun;
 
     if(letoh32(cbw->signature) != CBW_SIGNATURE) {
         logf("ums: bad cbw signature (%x)", cbw->signature);
@@ -850,13 +868,23 @@ static void handle_scsi_ready(struct command_block_wrapper* cbw)
     if(skip_first) lun++;
 #endif
 
+    /* The LUN comes from the host and indexes ejected[] and locked[], so
+     * refuse one past the last drive before it is used anywhere. */
+    if(lun >= storage_num_drives()) {
+        cur_cmd.data_residue = letoh32(cbw->data_transfer_length);
+        cur_cmd.tag = cbw->tag;
+        reject_command(cbw);
+        cur_sense_data.asc = ASC_LOGICAL_UNIT_NOT_SUPPORTED;
+        return;
+    }
+
     storage_get_info(lun,&info);
 #ifdef USB_USE_RAMDISK
-    block_size = SECTOR_SIZE;
-    block_count = RAMDISK_SIZE;
+    hw_sector_size = SECTOR_SIZE;
+    hw_sector_count = RAMDISK_SIZE;
 #else
-    block_size=info.sector_size;
-    block_count=info.num_sectors;
+    hw_sector_size=info.sector_size;
+    hw_sector_count=info.num_sectors;
 #endif
 
     if(storage_removable(lun) && !storage_present(lun))
@@ -870,8 +898,8 @@ static void handle_scsi_ready(struct command_block_wrapper* cbw)
     block_size_mult = disk_get_sector_multiplier(IF_MD(lun));
 #endif
 
-    uint32_t bsize = block_size*block_size_mult;
-    sector_t bcount = block_count/block_size_mult;
+    uint32_t bsize = hw_sector_size*block_size_mult;
+    sector_t bcount = hw_sector_count/block_size_mult;
 
     cur_cmd.data_residue = letoh32(cbw->data_transfer_length);
     cur_cmd.tag = cbw->tag;
@@ -1218,25 +1246,18 @@ static void handle_scsi_ready(struct command_block_wrapper* cbw)
             cur_cmd.data[0] = tb.transfer_buffer;
             cur_cmd.data[1] = &tb.transfer_buffer[READ_BUFFER_SIZE];
             cur_cmd.data_select=0;
-            cur_cmd.sector = block_size_mult *
-                (cbw->command_block[2] << 24 |
-                 cbw->command_block[3] << 16 |
-                 cbw->command_block[4] << 8  |
-                 cbw->command_block[5] );
-            cur_cmd.count = block_size_mult *
-                (cbw->command_block[7] << 8 |
-                 cbw->command_block[8]);
-            cur_cmd.block_size = block_size;
+            cur_cmd.block_size = hw_sector_size;
 
-            logf("scsi read %llu %d", cur_cmd.sector, cur_cmd.count);
-
-            if((cur_cmd.sector + cur_cmd.count) > block_count) {
+            if(!set_transfer_range(load_be32(&cbw->command_block[2]),
+                                   load_be16(&cbw->command_block[7]),
+                                   block_size_mult, hw_sector_count)) {
                 send_csw(UMS_STATUS_FAIL);
                 cur_sense_data.sense_key=SENSE_ILLEGAL_REQUEST;
                 cur_sense_data.asc=ASC_LBA_OUT_OF_RANGE;
                 cur_sense_data.ascq=0;
             }
             else {
+                logf("scsi read %llu %d", cur_cmd.sector, cur_cmd.count);
 #ifdef USB_USE_RAMDISK
                 memcpy(cur_cmd.data[cur_cmd.data_select],
                         ramdisk_buffer + cur_cmd.sector*cur_cmd.block_size,
@@ -1263,31 +1284,18 @@ static void handle_scsi_ready(struct command_block_wrapper* cbw)
             cur_cmd.data[0] = tb.transfer_buffer;
             cur_cmd.data[1] = &tb.transfer_buffer[READ_BUFFER_SIZE];
             cur_cmd.data_select=0;
-            cur_cmd.sector = block_size_mult *
-                 ((uint64_t)cbw->command_block[2] << 56 |
-                 (uint64_t)cbw->command_block[3] << 48 |
-                 (uint64_t)cbw->command_block[4] << 40 |
-                 (uint64_t)cbw->command_block[5] << 32 |
-                 cbw->command_block[6] << 24 |
-                 cbw->command_block[7] << 16 |
-                 cbw->command_block[8] << 8  |
-                 cbw->command_block[9]);
-            cur_cmd.count = block_size_mult *
-                (cbw->command_block[10] << 24 |
-                 cbw->command_block[11] << 16 |
-                 cbw->command_block[12] << 8 |
-                 cbw->command_block[13]);
-            cur_cmd.block_size = block_size;
+            cur_cmd.block_size = hw_sector_size;
 
-            logf("scsi read %llu %d", cur_cmd.sector, cur_cmd.count);
-
-            if((cur_cmd.sector + cur_cmd.count) > block_count) {
+            if(!set_transfer_range(load_be64(&cbw->command_block[2]),
+                                   load_be32(&cbw->command_block[10]),
+                                   block_size_mult, hw_sector_count)) {
                 send_csw(UMS_STATUS_FAIL);
                 cur_sense_data.sense_key=SENSE_ILLEGAL_REQUEST;
                 cur_sense_data.asc=ASC_LBA_OUT_OF_RANGE;
                 cur_sense_data.ascq=0;
             }
             else {
+                logf("scsi read %llu %d", cur_cmd.sector, cur_cmd.count);
 #ifdef USB_USE_RAMDISK
                 memcpy(cur_cmd.data[cur_cmd.data_select],
                         ramdisk_buffer + cur_cmd.sector*cur_cmd.block_size,
@@ -1321,18 +1329,12 @@ static void handle_scsi_ready(struct command_block_wrapper* cbw)
             cur_cmd.data[0] = tb.transfer_buffer;
             cur_cmd.data[1] = &tb.transfer_buffer[WRITE_BUFFER_SIZE];
             cur_cmd.data_select=0;
-            cur_cmd.sector = block_size_mult *
-                (cbw->command_block[2] << 24 |
-                 cbw->command_block[3] << 16 |
-                 cbw->command_block[4] << 8  |
-                 cbw->command_block[5] );
-            cur_cmd.count = block_size_mult *
-                (cbw->command_block[7] << 8 |
-                 cbw->command_block[8]);
-            cur_cmd.block_size = block_size;
+            cur_cmd.block_size = hw_sector_size;
 
             /* expect data */
-            if((cur_cmd.sector + cur_cmd.count) > block_count) {
+            if(!set_transfer_range(load_be32(&cbw->command_block[2]),
+                                   load_be16(&cbw->command_block[7]),
+                                   block_size_mult, hw_sector_count)) {
                 send_csw(UMS_STATUS_FAIL);
                 cur_sense_data.sense_key=SENSE_ILLEGAL_REQUEST;
                 cur_sense_data.asc=ASC_LBA_OUT_OF_RANGE;
@@ -1363,24 +1365,12 @@ static void handle_scsi_ready(struct command_block_wrapper* cbw)
             cur_cmd.data[0] = tb.transfer_buffer;
             cur_cmd.data[1] = &tb.transfer_buffer[WRITE_BUFFER_SIZE];
             cur_cmd.data_select=0;
-            cur_cmd.sector = block_size_mult *
-                ((uint64_t)cbw->command_block[2] << 56 |
-                 (uint64_t)cbw->command_block[3] << 48 |
-                 (uint64_t)cbw->command_block[4] << 40 |
-                 (uint64_t)cbw->command_block[5] << 32 |
-                 cbw->command_block[6] << 24 |
-                 cbw->command_block[7] << 16 |
-                 cbw->command_block[8] << 8  |
-                 cbw->command_block[9]);
-            cur_cmd.count = block_size_mult *
-                (cbw->command_block[10] << 24 |
-                 cbw->command_block[11] << 16 |
-                 cbw->command_block[12] << 8 |
-                 cbw->command_block[13]);
-            cur_cmd.block_size = block_size;
+            cur_cmd.block_size = hw_sector_size;
 
             /* expect data */
-            if((cur_cmd.sector + cur_cmd.count) > block_count) {
+            if(!set_transfer_range(load_be64(&cbw->command_block[2]),
+                                   load_be32(&cbw->command_block[10]),
+                                   block_size_mult, hw_sector_count)) {
                 send_csw(UMS_STATUS_FAIL);
                 cur_sense_data.sense_key=SENSE_ILLEGAL_REQUEST;
                 cur_sense_data.asc=ASC_LBA_OUT_OF_RANGE;
