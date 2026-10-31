@@ -12,8 +12,10 @@ OPUSLIB_SRC := $(call preprocess, $(RBCODECLIB_DIR)/codecs/libopus/SOURCES)
 OPUSLIB_OBJ := $(call c2obj, $(OPUSLIB_SRC))
 
 # codec specific compilation flags
-# prepend paths to avoid name clash issues
-$(OPUSLIB) : CODECFLAGS := -DHAVE_CONFIG_H \
+# prepend paths to avoid name clash issues. Recursively expanded, so that
+# CODECFLAGS is read when an object is compiled and not as this file is
+# included: codecs.make adds to it afterwards (-O2 among others).
+OPUSFLAGS = -DHAVE_CONFIG_H \
    -I$(RBCODECLIB_DIR)/codecs/libopus \
    -I$(RBCODECLIB_DIR)/codecs/libopus/celt \
    -I$(RBCODECLIB_DIR)/codecs/libopus/silk \
@@ -22,3 +24,13 @@ $(OPUSLIB) : CODECFLAGS := -DHAVE_CONFIG_H \
 $(OPUSLIB): $(OPUSLIB_OBJ)
 	$(SILENT)$(shell rm -f $@)
 	$(call PRINTS,AR $(@F))$(AR) rcs $@ $^ >/dev/null
+
+$(CODECDIR)/libopus/%.o: $(RBCODECLIB_DIR)/codecs/libopus/%.c
+	$(SILENT)mkdir -p $(dir $@)
+	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) \
+		-I$(dir $<) $(OPUSFLAGS) -c $< -o $@
+
+$(CODECDIR)/libopus/%.o: $(RBCODECLIB_DIR)/codecs/libopus/%.S
+	$(SILENT)mkdir -p $(dir $@)
+	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) \
+		-I$(dir $<) $(OPUSFLAGS) -c $< -o $@
