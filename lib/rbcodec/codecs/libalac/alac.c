@@ -1123,6 +1123,11 @@ int alac_decode_frame(alac_file *alac,
     int outputsamples;
     unsigned char *input_buffer_start;
 
+    /* the rice limit sizes reads and shifts in the entropy decoder;
+     * encoders write 14 */
+    if (alac->setinfo_rice_kmodifier < 1 || alac->setinfo_rice_kmodifier > 25)
+        return -1;
+
     /* setup the stream */
     alac->input_buffer = inbuffer;
     alac->input_buffer_bitaccumulator = 0;
