@@ -917,10 +917,14 @@ static bool read_mp4_container(int fd, struct mp3entry* id3,
                     id3->embedded_cuesheet.encoding = CHAR_ENC_MP4_CHPL;
                 }
 
-                /* the first chapter will be used as the lead_trim */
+                /* the first chapter's start, in 100 ns units, will be used
+                 * as the lead_trim if it is short enough to be an encoder
+                 * delay: the first chapter of a real chapter list may start
+                 * seconds in. */
                 if (chapters > 0) {
                     read_uint64be(fd, &timestamp);
-                    id3->lead_trim = (timestamp * id3->frequency) / 10000000;
+                    if (timestamp < 10000000) /* 1 s */
+                        id3->lead_trim = (timestamp * id3->frequency) / 10000000;
                     size -= 8;
                 }
             }
