@@ -537,6 +537,7 @@ void axp2101_power_off(void)
 
 #ifndef BOOTLOADER
 enum {
+    AXP_DEBUG_CHIP_ID,
     AXP_DEBUG_BATTERY_STATUS,
     AXP_DEBUG_INPUT_STATUS,
     AXP_DEBUG_CHARGE_CURRENT,
@@ -604,6 +605,15 @@ static const char* axp2101_debug_menu_get_name(int item, void* data,
     }
 
     switch(item) {
+    case AXP_DEBUG_CHIP_ID: {
+        int id = i2c_reg_read1(AXP_PMU_BUS, AXP_PMU_ADDR, AXP2101_REG_CHIP_ID);
+        if (id < 0)
+            return "Chip ID: error";
+
+        snprintf(buf, buflen, "Chip ID: %02x", id);
+        return buf;
+    } break;
+
     case AXP_DEBUG_BATTERY_STATUS: {
         switch(axp2101_battery_status()) {
         case AXP2101_BATT_FULL:
