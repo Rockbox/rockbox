@@ -327,7 +327,17 @@ bool string_to_cfg(const char *name, char* value, bool *theme_changed)
 #endif
             if (setting_get_cfgvals(setting) == NULL)
             {
-                *(int*)setting->setting = atoi(value);
+                int v = atoi(value);
+                /* A hand-edited .cfg isn't trusted: callers divide and loop
+                 * on these. Some ranges are declared high to low. */
+                if (flags & F_INT_SETTING)
+                {
+                    const struct int_setting *info = setting->int_setting;
+                    int lo = MIN(info->min, info->max);
+                    int hi = MAX(info->min, info->max);
+                    v = MIN(MAX(v, lo), hi);
+                }
+                *(int*)setting->setting = v;
                 logf("Val: %s\r\n",value);
             }
             else
@@ -378,11 +388,11 @@ bool string_to_cfg(const char *name, char* value, bool *theme_changed)
     case F_T_BOOL:
     {
         int temp;
-        if (cfg_string_to_int(setting, &temp, value))
-        {
-            *(bool*)setting->setting = !!temp;
-            logf("Val: %s\r\n", value);
-        }
+        /* An unparsed value leaves the setting alone, and temp unset. */
+        if (!cfg_string_to_int(setting, &temp, value))
+            return false;
+        *(bool*)setting->setting = !!temp;
+        logf("Val: %s\r\n", value);
         if (setting->bool_setting->option_callback)
         {
             setting->bool_setting->option_callback(!!temp);
