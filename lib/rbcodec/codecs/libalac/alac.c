@@ -44,6 +44,10 @@ static int16_t predictor_coef_table[32] IBSS_ATTR;
 static int16_t predictor_coef_table_a[32] IBSS_ATTR;
 static int16_t predictor_coef_table_b[32] IBSS_ATTR;
 
+/* the uncompressed low bytes of a frame's samples, kept apart from the
+ * output buffers which the entropy decoder writes */
+static uint16_t shift_buffer[ALAC_MAX_CHANNELS][ALAC_BLOCKSIZE];
+
 
 /* Endian/aligment safe functions - only used in alac_set_info() */
 static uint32_t get_uint32be(unsigned char* p)
@@ -621,15 +625,15 @@ static void deinterlace_16(int32_t* buffer0,
 
 static void deinterlace_24(int32_t *buffer0, int32_t *buffer1,
                            int uncompressed_bytes,
-                           int32_t *uncompressed_bytes_buffer0,
-                           int32_t *uncompressed_bytes_buffer1,
+                           uint16_t *uncompressed_bytes_buffer0,
+                           uint16_t *uncompressed_bytes_buffer1,
                            int numsamples,
                            uint8_t interlacing_shift,
                            uint8_t interlacing_leftweight) ICODE_ATTR_ALAC;
 static void deinterlace_24(int32_t *buffer0, int32_t *buffer1,
                            int uncompressed_bytes,
-                           int32_t *uncompressed_bytes_buffer0,
-                           int32_t *uncompressed_bytes_buffer1,
+                           uint16_t *uncompressed_bytes_buffer0,
+                           uint16_t *uncompressed_bytes_buffer1,
                            int numsamples,
                            uint8_t interlacing_shift,
                            uint8_t interlacing_leftweight)
@@ -647,10 +651,10 @@ static void deinterlace_24(int32_t *buffer0, int32_t *buffer1,
             midright = buffer0[i];
             difference = buffer1[i];
             
-            buffer0[i] = ((midright - ((difference * interlacing_leftweight)
-                            >> interlacing_shift)) + difference) << SCALE24;
-            buffer1[i] = (midright - ((difference * interlacing_leftweight) 
-                            >> interlacing_shift)) << SCALE24;
+            buffer0[i] = (midright - ((difference * interlacing_leftweight)
+                            >> interlacing_shift)) + difference;
+            buffer1[i] = midright - ((difference * interlacing_leftweight)
+                            >> interlacing_shift);
             
             if (uncompressed_bytes)
             {
@@ -662,6 +666,8 @@ static void deinterlace_24(int32_t *buffer0, int32_t *buffer1,
                 buffer1[i] |= uncompressed_bytes_buffer1[i] & mask;
             }
 
+            buffer0[i] = buffer0[i] << SCALE24;
+            buffer1[i] = buffer1[i] << SCALE24;
         }
         
         return;
@@ -756,8 +762,7 @@ static inline int decode_frame_mono(
             int i;
             for (i = 0; i < outputsamples; i++)
             {
-                outputbuffer[0][i] = readbits(alac, uncompressed_bytes * 8);
-                outputbuffer[1][i] = outputbuffer[0][i];
+                shift_buffer[0][i] = readbits(alac, uncompressed_bytes * 8);
             }
         }
 
@@ -857,7 +862,7 @@ static inline int decode_frame_mono(
                 uint32_t mask;
                 sample = sample << (uncompressed_bytes * 8);
                 mask = ~(0xFFFFFFFF << (uncompressed_bytes * 8));
-                sample |= outputbuffer[0][i] & mask;
+                sample |= shift_buffer[0][i] & mask;
             }
             
             outputbuffer[0][i] = sample << SCALE24;
@@ -967,8 +972,8 @@ static inline int decode_frame_stereo(
             int i;
             for (i = 0; i < outputsamples; i++)
             {
-                outputbuffer[0][i] = readbits(alac, uncompressed_bytes * 8);
-                outputbuffer[1][i] = readbits(alac, uncompressed_bytes * 8);
+                shift_buffer[0][i] = readbits(alac, uncompressed_bytes * 8);
+                shift_buffer[1][i] = readbits(alac, uncompressed_bytes * 8);
             }
         }
 
@@ -1090,8 +1095,8 @@ static inline int decode_frame_stereo(
         deinterlace_24(outputbuffer[0],
                        outputbuffer[1],
                        uncompressed_bytes,
-                       outputbuffer[0],
-                       outputbuffer[1],
+                       shift_buffer[0],
+                       shift_buffer[1],
                        outputsamples,
                        interlacing_shift,
                        interlacing_leftweight);            
