@@ -95,7 +95,7 @@ int iap_repeatbtn = 0;
  * it reaches 0
  */
 unsigned int iap_timeoutbtn = 0;
-bool iap_btnrepeat = false, iap_btnshuffle = false;
+bool iap_btnrepeat = false, iap_btnshuffle = false, iap_btnstop = false;
 /* Set when a session ends while muted, see iap_reset_device() */
 static bool iap_unmute_pending = false;
 /* The user's volume when an accessory muted, see iap_periodic() */
@@ -399,6 +399,7 @@ void iap_reset_device(struct device_t* device)
     iap_repeatbtn = 0;
     iap_btnshuffle = false;
     iap_btnrepeat = false;
+    iap_btnstop = false;
     pb_seeking = 0;
     pb_seek_stopped = 0;
 
@@ -1325,6 +1326,7 @@ void iap_periodic(void)
         iap_repeatbtn = 0;
         iap_btnshuffle = false;
         iap_btnrepeat = false;
+        iap_btnstop = false;
     }
 
     /* Handle power down messages. This is a one-shot event: a shutdown

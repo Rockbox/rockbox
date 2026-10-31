@@ -261,6 +261,7 @@ void iap_interface_state_change(const enum interface_state new);
 
 extern bool iap_btnrepeat;
 extern bool iap_btnshuffle;
+extern bool iap_btnstop;
 
 /* How long a seek started by an accessory may last without being ended,
  * in iap_periodic() ticks */
