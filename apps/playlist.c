@@ -2098,16 +2098,23 @@ int playlist_create(const char *dir, const char *file)
 {
     struct playlist_info* playlist = &current_playlist;
     int status = 0;
+    size_t buflen = 0;
+    int handle = 0;
 
     dc_thread_stop(playlist);
+
+    /* Allocate before taking the lock, as playlist_resume() does: making
+     * room can stop playback, which takes the lock to save the resume
+     * point. */
+    if (file)
+        handle = alloc_tempbuf(&buflen);
+
     playlist_write_lock(playlist);
 
     new_playlist_unlocked(playlist, dir, file);
 
     if (file)
     {
-        size_t buflen;
-        int handle = alloc_tempbuf(&buflen);
         if (handle > 0)
         {
             /* align for faster load times */
