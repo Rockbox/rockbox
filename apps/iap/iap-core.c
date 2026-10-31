@@ -1089,6 +1089,16 @@ void iap_seek_stop(void)
     iap_timeoutbtn = 0;
 }
 
+/* 1 while a seek forward is held, -1 back, 0 for none */
+int iap_seek_dir(void)
+{
+    if (pb_seeking == 0x02)
+        return 1;
+    if (pb_seeking == 0x03)
+        return -1;
+    return 0;
+}
+
 uint32_t iap_get_trackpos(void)
 {
     struct mp3entry *id3 = audio_current_track();

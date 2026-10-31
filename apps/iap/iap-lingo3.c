@@ -410,10 +410,12 @@ void iap_handlepkt_mode3(const unsigned int len, const unsigned char *buf)
                  */
                 case 0x03:
                 {
-                    /* TODO: Handle FF/REW
-                     */
                     play_status = audio_status();
-                    if (play_status & AUDIO_STATUS_PLAY) {
+                    if (iap_seek_dir() > 0) {
+                        IAP_TX_PUT(0x03);   /* FF */
+                    } else if (iap_seek_dir() < 0) {
+                        IAP_TX_PUT(0x04);   /* REW */
+                    } else if (play_status & AUDIO_STATUS_PLAY) {
                         if (play_status & AUDIO_STATUS_PAUSE) {
                             IAP_TX_PUT(0x02);
                         } else {
@@ -743,6 +745,7 @@ void iap_handlepkt_mode3(const unsigned int len, const unsigned char *buf)
                     {
                         case 0x00:
                         {
+                            iap_seek_stop();
                             audio_stop();
                             cmd_ok(cmd);
                             break;
@@ -750,14 +753,43 @@ void iap_handlepkt_mode3(const unsigned int len, const unsigned char *buf)
 
                         case 0x01:
                         {
-                            audio_resume();
+                            /* Playing: from stopped as well, where
+                             * resuming alone did nothing */
+                            iap_seek_stop();
+                            if (!iap_play_or_resume())
+                            {
+                                cmd_ack(cmd, IAP_ACK_CMD_FAILED);
+                                break;
+                            }
                             cmd_ok(cmd);
                             break;
                         }
 
                         case 0x02:
                         {
+                            iap_seek_stop();
                             audio_pause();
+                            cmd_ok(cmd);
+                            break;
+                        }
+
+                        case 0x03: /* FF */
+                        case 0x04: /* REW */
+                        {
+                            /* The same held seek as PlayControl's */
+                            if (!(audio_status() & AUDIO_STATUS_PLAY))
+                            {
+                                cmd_ack(cmd, IAP_ACK_CMD_FAILED);
+                                break;
+                            }
+                            iap_seek_start(buf[0x03] == 0x03);
+                            cmd_ok(cmd);
+                            break;
+                        }
+
+                        case 0x05: /* end FF/REW */
+                        {
+                            iap_seek_stop();
                             cmd_ok(cmd);
                             break;
                         }

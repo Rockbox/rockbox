@@ -275,6 +275,7 @@ void iap_set_shuffle(bool shuffle, bool restore);
 void iap_set_repeat(int mode, bool restore);
 void iap_seek_start(bool forward);
 void iap_seek_stop(void);
+int iap_seek_dir(void);
 
 uint32_t iap_get_trackpos(void);
 uint32_t iap_get_trackindex(void);
