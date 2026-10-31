@@ -146,23 +146,34 @@ static void get_playlist_name(unsigned char *dest,
     closedir(dp);
 }
 
-static void seek_to_playlist(unsigned long index)
+/* Load the playlist at the given index of the playlist catalog and play
+ * it from the start. This runs on the iAP thread, so it uses the playlist
+ * calls directly instead of ft_play_playlist(), whose bookmark and erase
+ * prompts belong to the UI thread. */
+static bool play_playlist(unsigned long index)
 {
-                    unsigned char selected_playlist
-                    [sizeof(global_settings.playlist_catalog_dir)
-                    + 1
-                    + MAX_PATH] = {0};
+    const char *dir = global_settings.playlist_catalog_dir;
+    char file[MAX_PATH] = "";
 
-                    strcpy(selected_playlist,
-                            global_settings.playlist_catalog_dir);
-                    int len = strlen(selected_playlist);
-                    selected_playlist[len] = '/';
-                    get_playlist_name (selected_playlist + len + 1,
-                                       index,
-                                       MAX_PATH);
-                    ft_play_playlist(selected_playlist,
-                                     global_settings.playlist_catalog_dir,
-                                     strrchr(selected_playlist, '/') + 1);
+    /* Party mode only allows adding to the playlist */
+    if (global_settings.party_mode && audio_status())
+        return false;
+
+    get_playlist_name((unsigned char *)file, index, sizeof(file));
+    if (file[0] == '\0')
+        return false;
+
+    /* Stop playback first, so that the audio thread doesn't go on
+     * playing and buffering tracks of the playlist being replaced.
+     * playlist_start() then starts the new one. */
+    audio_stop();
+
+    if (playlist_create(dir, file) == -1 || playlist_amount() == 0)
+        return false;
+    if (global_settings.playlist_shuffle)
+        playlist_shuffle(current_tick, -1);
+    playlist_start(0, 0, 0);
+    return true;
 }
 
 /* Play the track at the given index of the accessory's track list. The
@@ -227,9 +238,6 @@ static void select_db_record(const unsigned int cmd, unsigned char category,
     switch (category)
     {
         case 0x01: /* Playlist */
-        {
-            int paused = !!(audio_status() & AUDIO_STATUS_PAUSE);
-
             if (index > nbr_total_playlists())
             {
                 cmd_ack(cmd, IAP_ACK_BAD_PARAM);
@@ -238,15 +246,16 @@ static void select_db_record(const unsigned int cmd, unsigned char category,
             /* 0x00 is the current playlist, which is already loaded */
             if (index != 0x00)
             {
-                audio_pause();
+                /* Loading a long playlist takes a while */
+                cmd_pending(cmd, 10000);
+                if (!play_playlist(index))
+                {
+                    cmd_ack(cmd, IAP_ACK_CMD_FAILED);
+                    return;
+                }
                 last_selected_playlist = index;
-                audio_skip(-iap_get_trackindex());
-                seek_to_playlist(last_selected_playlist);
-                if (!paused)
-                    audio_resume();
             }
             break;
-        }
         case 0x02: /* Artist */
         case 0x03: /* Album  */
         case 0x05: /* Track  */
