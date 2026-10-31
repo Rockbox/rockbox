@@ -479,13 +479,14 @@ void iap_handlepkt_mode0(const unsigned int len, const unsigned char *buf)
          */
         case 0x13:
         {
-            uint32_t lingoes = get_u32(&buf[2]);
-            uint32_t options = get_u32(&buf[6]);
-            uint32_t deviceid = get_u32(&buf[0x0A]);
+            uint32_t lingoes, options, deviceid;
             bool seen_unsupported = false;
             unsigned char i;
 
             CHECKLEN(14);
+            lingoes = get_u32(&buf[2]);
+            options = get_u32(&buf[6]);
+            deviceid = get_u32(&buf[0x0A]);
 
             /* Issuing this command exits any extended interface states */
             iap_interface_state_change(IST_STANDARD);
@@ -545,7 +546,7 @@ void iap_handlepkt_mode0(const unsigned int len, const unsigned char *buf)
 
             /* Loop through the lingoes advertised by the device.
              * If it tries to use a lingo we do not support, return
-             * a Command Failed ACK.
+             * a Command Failed ACK, as the iPod Classic firmware does.
              */
             for(i=0; i<32; i++) {
                 if (lingoes & BIT_N(i)) {
