@@ -17,29 +17,147 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-
 #include "lcd.h"
+#include "lcd-erosqnative.h"
+#include "power-erosqnative.h"
 #include "kernel.h"
 #include "lcd-x1000.h"
 #include "gpio-ingenic.h"
 #include "system.h"
 #include "devicedata.h"
 
+uint32_t eros_qn_lcd_id;
+uint32_t eros_qn_lcd_id4;
+uint32_t eros_qn_lcd_type;
+int eros_qn_lcd_autodetected;
+
+static void start_bitbang(void)
+{
+    gpioz_configure(GPIO_A, 0xFF, GPIOF_INPUT);
+    gpio_set_function(GPIO_LCD_WR, GPIOF_OUTPUT(1));
+    gpio_set_function(GPIO_LCD_DC, GPIOF_OUTPUT(1));
+}
+
+static void stop_bitbang(void)
+{
+    gpioz_configure(GPIO_A, 0xFF, GPIOF_DEVICE(1));
+    gpio_set_function(GPIO_LCD_WR, GPIOF_DEVICE(1));
+    gpio_set_function(GPIO_LCD_DC, GPIOF_DEVICE(1));
+}
+
+static void set_cs(int level)
+{
+    gpio_set_level(GPIO_LCD_CE, level);
+}
+
+static void set_dcx(int level)
+{
+    gpio_set_level(GPIO_LCD_DC, level);
+}
+
+static void set_wrx(int level)
+{
+    gpio_set_level(GPIO_LCD_WR, level);
+}
+
+static void set_rdx(int level)
+{
+    gpio_set_level(GPIO_LCD_RD, level);
+}
+
+static void set_data_out(uint8_t data)
+{
+    /* Assumes the pins are already in input or output mode */
+    jz_set(GPIO_PAT0(GPIO_A), data & 0xFF);
+    jz_clr(GPIO_PAT0(GPIO_A), (~data) & 0xFF);
+    jz_clr(GPIO_PAT1(GPIO_A), 0xFF);
+}
+
+static void set_data_in(void)
+{
+    /* Assumes the pins are already in input or output mode */
+    jz_set(GPIO_PAT1(GPIO_A), 0xFF);
+}
+
+static uint8_t read_data(void)
+{
+    return REG_GPIO_PIN(GPIO_A) & 0xFF;
+}
+
+static void send_command_byte(uint8_t cmd)
+{
+    set_dcx(0);
+    set_wrx(0);
+    set_data_out(cmd);
+    udelay(1);
+    set_wrx(1);
+    set_dcx(1);
+    set_data_in();
+}
+
+static uint8_t read_data_byte(void)
+{
+    set_rdx(0);
+    udelay(1);
+    uint8_t value = read_data();
+    set_rdx(1);
+    udelay(1);
+    return value;
+}
+
+static uint32_t lcd_readid(void)
+{
+    uint32_t retval = 0;
+
+    set_cs(0);
+    udelay(1);
+
+    send_command_byte(0x04);
+    read_data_byte();
+    retval |= read_data_byte() << 16;
+    retval |= read_data_byte() << 8;
+    retval |= read_data_byte();
+
+    set_cs(1);
+    udelay(1);
+
+    return retval;
+}
+
+static uint32_t lcd_read_id4(void)
+{
+    uint32_t retval = 0;
+
+    set_cs(0);
+    udelay(1);
+
+    send_command_byte(0xD3);
+    read_data_byte();
+    retval |= read_data_byte() << 16;
+    retval |= read_data_byte() << 8;
+    retval |= read_data_byte();
+
+    set_cs(1);
+    udelay(1);
+
+    return retval;
+}
+
 /* for reference on these command/data hex values, see the mipi dcs lcd spec.  *
  * Not everything here is there, but all the standard stuff is.                */
 
 
-/* New Display Eroq 2.1 / Hifiwalker 1.7+ / Surfans v3.2, unknown Controller  *
- * (partially GC9A01 register compatible)                                     *
- *   https://espruino.microcosm.app/api/v1/files/ \                           *
- *   9dc1b976d621a2ab3854312cce862c4a9a50dc1b.html#GC9A01 ,                   *
- *   https://www.buydisplay.com/download/ic/GC9A01A.pdf ,                     *
- *   https://lcddisplay.co/wp-content/uploads/2023/02/GC9A01.pdf              *
- * Init sequence From 'EROS Q （c口）_V2.1_20231209固件.zip'                  *
- * update.upt/.iso -> In 'uboot.bin' at 0x52da0-0x5305f                       *
- *  http://www.eroshifi.com/download/firmware/122.html                        */
-#if !defined(BOOTLOADER) || (EROSQN_VER >= 3)
-static const uint32_t erosqnative_lcd_cmd_enable_v3[] = {
+/* New Display Eroq 2.1 / Hifiwalker 1.7+ / Surfans v3.2, unknown Controller     *
+ * (likely GC9308 based on ID code, similar to GC9306 / GC9A01)                  *
+ *   https://espruino.microcosm.app/api/v1/files/ \                              *
+ *   9dc1b976d621a2ab3854312cce862c4a9a50dc1b.html#GC9A01 ,                      *
+ *   https://www.buydisplay.com/download/ic/GC9A01A.pdf ,                        *
+ *   https://lcddisplay.co/wp-content/uploads/2023/02/GC9A01.pdf                 *
+ *   https://www.smartdisplaytech.com/wp-content/uploads/2023/03/GC9306_spec.pdf *
+ * Init sequence From 'EROS Q （c口）_V2.1_20231209固件.zip'                      *
+ * update.upt/.iso -> In 'uboot.bin' at 0x52da0-0x5305f                          *
+ *  http://www.eroshifi.com/download/firmware/122.html                           */
+static const uint32_t erosqnative_lcd_cmd_enable_gc9308[] = {
 
     /* Unlock EXTC? */
     LCD_INSTR_CMD,      0xfe, // Inter Register Enable1
@@ -154,11 +272,12 @@ static const uint32_t erosqnative_lcd_cmd_enable_v3[] = {
     LCD_INSTR_UDELAY,   20000,
     LCD_INSTR_END,
 };
-#endif
 
-#if !defined(BOOTLOADER) || (EROSQN_VER < 3)
-/* Original Display / Hifiwalker -1.5 / Surfans -2.7 */
-static const uint32_t erosqnative_lcd_cmd_enable_v1[] = {
+/*
+ * Original Display / Hifiwalker -1.5 / Surfans -2.7
+ * Likely an ILI9342C (landscape version of ILI9341)
+ */
+static const uint32_t erosqnative_lcd_cmd_enable_ili9342c[] = {
     /* Set EXTC? */
     LCD_INSTR_CMD,      0xc8,
     LCD_INSTR_DAT,      0xff,
@@ -181,11 +300,11 @@ static const uint32_t erosqnative_lcd_cmd_enable_v1[] = {
     /* VCOM? */
     LCD_INSTR_CMD,      0xc5,
     LCD_INSTR_DAT,      0xda,
-    /* ?? */
+    /* Frame Rate Control */
     LCD_INSTR_CMD,      0xb1,
     LCD_INSTR_DAT,      0x00,
     LCD_INSTR_DAT,      0x1b,
-    /* ?? */
+    /* Display Inversion Control */
     LCD_INSTR_CMD,      0xb4,
     LCD_INSTR_DAT,      0x02,
     /* Positive gamma correction? */
@@ -230,7 +349,6 @@ static const uint32_t erosqnative_lcd_cmd_enable_v1[] = {
     LCD_INSTR_UDELAY,   20000,
     LCD_INSTR_END,
 };
-#endif
 
 static const uint32_t erosqnative_lcd_of_compat_cmd[] = {
     /* Pixel Format Set */
@@ -293,21 +411,57 @@ const struct lcd_tgt_config lcd_tgt_config = {
 
 void lcd_tgt_enable(bool enable)
 {
-    if(enable) {
-        /* power up the panel */
+    if(enable)
+    {
+        /* TODO: remove this after more testing */
+        int device_ver;
 #ifdef BOOTLOADER
-# if EROSQN_VER <= 3
-        gpio_set_level(GPIO_LCD_PWR_HW1, 1);
-# endif
+        device_ver = EROSQN_VER;
 #else
-        if (device_data.hw_rev <= 3)
-        {
-            gpio_set_level(GPIO_LCD_PWR_HW1, 1);
-        }
+        device_ver = device_data.hw_rev;
 #endif
-        mdelay(20);
+
+        /* HW1 through HW3 units use the AXP192 and have an LCD power pin */
+        if (eros_qn_pmu_type == EROS_QN_PMU_AXP192 ||
+            (eros_qn_pmu_type < 0 && device_ver <= 3))
+        {
+            gpio_set_function(GPIO_LCD_PWR_HW1, GPIOF_OUTPUT(1));
+            mdelay(20);
+        }
+
         gpio_set_level(GPIO_LCD_RESET, 1);
         mdelay(12);
+
+        /* perform display detection on first power-on */
+        if (eros_qn_lcd_type == EROS_QN_LCDTYPE_UNKNOWN)
+        {
+            start_bitbang();
+
+            eros_qn_lcd_id = lcd_readid();
+            eros_qn_lcd_id4 = lcd_read_id4(); /* informational only */
+            switch (eros_qn_lcd_id)
+            {
+            case 0xE30000:
+                eros_qn_lcd_type = EROS_QN_LCDTYPE_ILI9342C;
+                eros_qn_lcd_autodetected = true;
+                break;
+
+            case 0x009308:
+                eros_qn_lcd_type = EROS_QN_LCDTYPE_GC9308;
+                eros_qn_lcd_autodetected = true;
+                break;
+
+            /* fall back to hw_rev based method */
+            default:
+                if (device_ver >= 3)
+                    eros_qn_lcd_type = EROS_QN_LCDTYPE_GC9308;
+                else
+                    eros_qn_lcd_type = EROS_QN_LCDTYPE_ILI9342C;
+                break;
+            }
+
+            stop_bitbang();
+        }
 
         /* set the clock */
         lcd_set_clock(X1000_CLK_SCLK_A, 20000000);
@@ -318,22 +472,16 @@ void lcd_tgt_enable(bool enable)
         mdelay(5);
         gpio_set_level(GPIO_LCD_CE, 0);
 
-#ifdef BOOTLOADER
-# if EROSQN_VER >= 3
-        lcd_exec_commands(&erosqnative_lcd_cmd_enable_v3[0]);
-# else
-        lcd_exec_commands(&erosqnative_lcd_cmd_enable_v1[0]);
-# endif
-#else
-        if (device_data.hw_rev >= 3)
+        switch (eros_qn_lcd_type)
         {
-            lcd_exec_commands(&erosqnative_lcd_cmd_enable_v3[0]);
+        case EROS_QN_LCDTYPE_ILI9342C:
+            lcd_exec_commands(&erosqnative_lcd_cmd_enable_ili9342c[0]);
+            break;
+
+        case EROS_QN_LCDTYPE_GC9308:
+            lcd_exec_commands(&erosqnative_lcd_cmd_enable_gc9308[0]);
+            break;
         }
-        else
-        {
-            lcd_exec_commands(&erosqnative_lcd_cmd_enable_v1[0]);
-        }
-#endif
     } else {
         /* doesn't flash white if we don't do anything... */
 #if 0

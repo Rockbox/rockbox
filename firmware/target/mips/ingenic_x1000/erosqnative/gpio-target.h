@@ -4,7 +4,6 @@
 
 /*              Name            Port    Pins            Function */
 DEFINE_PINGROUP(LCD_DATA,       GPIO_A, 0xffff <<  0,   GPIOF_DEVICE(1))
-DEFINE_PINGROUP(LCD_CONTROL,    GPIO_B,   0x1a << 16,   GPIOF_DEVICE(1))
 DEFINE_PINGROUP(MSC0,           GPIO_A,   0x3f << 20,   GPIOF_DEVICE(1))
 DEFINE_PINGROUP(SFC,            GPIO_A,   0x3f << 26,   GPIOF_DEVICE(1))
 DEFINE_PINGROUP(I2S,            GPIO_B,   0x1f <<  0,   GPIOF_DEVICE(1))
@@ -68,8 +67,11 @@ DEFINE_GPIO(BL_PWR,             GPIO_PC(25),    GPIOF_OUTPUT(0))
 /* LCD      */
 /************/
 DEFINE_GPIO(LCD_RESET,          GPIO_PB(13),    GPIOF_OUTPUT(0))
-DEFINE_GPIO(LCD_CE,             GPIO_PB(18),    GPIOF_OUTPUT(1))
 DEFINE_GPIO(LCD_RD,             GPIO_PB(16),    GPIOF_OUTPUT(1))
+DEFINE_GPIO(LCD_WR,             GPIO_PB(17),    GPIOF_DEVICE(1))
+DEFINE_GPIO(LCD_CE,             GPIO_PB(18),    GPIOF_OUTPUT(1))
+DEFINE_GPIO(LCD_TE,             GPIO_PB(19),    GPIOF_DEVICE(1)) // should be unused
+DEFINE_GPIO(LCD_DC,             GPIO_PB(20),    GPIOF_DEVICE(1))
 
 /************/
 /* BUTTONS  */

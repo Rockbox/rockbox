@@ -148,6 +148,7 @@
 
 #if defined(EROS_QN)
 #include "power-erosqnative.h"
+#include "lcd-erosqnative.h"
 #endif
 
 #define SCREEN_MAX_CHARS (LCD_WIDTH / SYSFONT_WIDTH)
@@ -2707,6 +2708,9 @@ static bool dbg_device_data(void)
     simplelist_addline("PMU Type: %s",
                        (eros_qn_pmu_type == EROS_QN_PMU_AXP192 ? "AXP192" :
                        (eros_qn_pmu_type == EROS_QN_PMU_AXP2101 ? "AXP2101" : "unknown!")));
+    simplelist_addline("LCD autodetected: %s", eros_qn_lcd_autodetected ? "yes" : "no");
+    simplelist_addline("LCD ID: %06" PRIx32, eros_qn_lcd_id);
+    simplelist_addline("LCD ID4: %06" PRIx32, eros_qn_lcd_id4);
 #endif
     simplelist_addline("Struct Ver: %d", (int)device_data.version);
 
