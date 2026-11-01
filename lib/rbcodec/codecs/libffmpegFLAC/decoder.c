@@ -470,14 +470,15 @@ static inline int decode_subframe(FLACContext *s, int channel, int32_t* decoded)
     return 0;
 }
 
-static int decode_frame(FLACContext *s,
+static int decode_frame(FLACContext *s, int variable_blocksize,
                         void (*yield)(void)) ICODE_ATTR_FLAC;
-static int decode_frame(FLACContext *s,
+static int decode_frame(FLACContext *s, int variable_blocksize,
                         void (*yield)(void))
 {
     int blocksize_code, sample_rate_code, sample_size_code, crc8;
     int ch_mode, bps, blocksize, samplerate;
     int res, ch;
+    int64_t number;
     GetBitContext *gb = &s->gb;
 
     blocksize_code = get_bits(gb, 4);
@@ -509,22 +510,8 @@ static int decode_frame(FLACContext *s,
         return -15;
     }
 
-    /* Get the samplenumber of the first sample in this block */
-    s->samplenumber=get_utf8(gb);
-
-    /* samplenumber actually contains the frame number for streams
-       with a constant block size - so we multiply by blocksize to
-       get the actual sample number */
-    if (s->min_blocksize == s->max_blocksize) {
-        s->samplenumber*=s->min_blocksize;
-    }
-
-#if 0    
-    if (/*((blocksize_code == 6) || (blocksize_code == 7)) &&*/
-        (s->min_blocksize != s->max_blocksize)){
-    }else{
-    }
-#endif
+    /* The number of the first sample in this block, or of the frame */
+    number = get_utf8(gb);
 
     if (blocksize_code == 0)
         blocksize = s->min_blocksize;
@@ -538,6 +525,17 @@ static int decode_frame(FLACContext *s,
     if(blocksize > s->max_blocksize){
         return -16;
     }
+
+    /* The header's blocking strategy bit tells which number it holds. A
+       stream with a fixed block size numbers its frames instead, and every
+       frame but a shorter last one has the maximum block size. Using the
+       maximum rather than this frame's size keeps that last frame's number
+       right. Streams written before the bit was defined (Flake 0.11) leave
+       it clear and number their samples, so as libFLAC does, a stream
+       whose STREAMINFO block sizes differ is taken as variable too. */
+    if (!variable_blocksize)
+        number *= s->max_blocksize;
+    s->samplenumber = number;
 
     if (sample_rate_code == 0){
         samplerate= s->samplerate;
@@ -700,7 +698,9 @@ int flac_decode_frame(FLACContext *s,
         return -41;
     }
 
-    if ((framesize=decode_frame(s,yield)) < 0){
+    if ((framesize=decode_frame(s, (tmp & 1) ||
+                                s->min_blocksize != s->max_blocksize,
+                                yield)) < 0){
        s->bitstream_size=0;
        s->bitstream_index=0;
        return framesize;
