@@ -104,14 +104,16 @@ static int64_t get_utf8(GetBitContext *gb)
     uint64_t val;
     int ones=0, bytes;
     
+    /* up to seven bytes code 36 bits */
     while(get_bits1(gb))
-        ones++;
+        if (++ones > 7)
+            return -1;
 
     if     (ones==0) bytes=0;
     else if(ones==1) return -1;
     else             bytes= ones - 1;
     
-    val= get_bits(gb, 7-ones);
+    val= ones < 7 ? get_bits(gb, 7-ones) : 0;
     while(bytes--){
         const int tmp = get_bits(gb, 8);
         
@@ -147,6 +149,10 @@ static NO_INLINE int32_t *decode_escaped(GetBitContext *gb, int32_t *decoded,
     return decoded;
 }
 
+/* Rice codes decoded between checks for the end of the data. A code is at
+   most 56 bits, so a corrupt frame is caught within 1 KiB of its end. */
+#define RICE_CHUNK 128
+
 static int decode_residuals(FLACContext *s, int32_t* decoded, int pred_order) ICODE_ATTR_FLAC;
 static int decode_residuals(FLACContext *s, int32_t *decoded, int pred_order)
 {
@@ -174,32 +180,43 @@ static int decode_residuals(FLACContext *s, int32_t *decoded, int pred_order)
         tmp = get_bits(&gb, rice_bits);
         if (tmp == rice_esc) {
             tmp = get_bits(&gb, 5);
+            if ((samples - i) * tmp > get_bits_left(&gb))
+                return -3;
             decoded = decode_escaped(&gb, decoded, samples - i, tmp);
         } else {
             unsigned lim = tmp ? (UINT_MAX >> tmp) + 2 : INT_MAX;
             int real_limit = lim > INT_MAX ? INT_MAX : lim;
             while (i < samples) {
-#if defined(CPU_ARM_CLASSIC) && !defined(FLAC_NO_RICE_ASM)
-                /* The assembly decodes the common case and falls through
-                   anything it does not handle. Every unusual code still goes
-                   through the C reader, and k <= 17 keeps a code inside the
-                   window the assembly reads. */
-                if (tmp <= 17) {
-                    int got = flac_rice_decode_arm(decoded, samples - i, tmp,
-                                                   &gb);
-                    decoded += got;
-                    i       += got;
-                    if (i >= samples)
-                        break;
-                }
-#endif
-                int v = get_sr_golomb_flac(&gb, tmp, real_limit, 0);
-                if ((unsigned) v == 0x80000000){
+                /* A corrupt partition can run past the end of the data, so
+                   check every RICE_CHUNK codes that it has not, which
+                   bounds how far it can read beyond. */
+                int end = samples - i > RICE_CHUNK ? i + RICE_CHUNK : samples;
+                if (get_bits_left(&gb) < 0)
                     return -3;
-                }
 
-                *decoded++ = v;
-                i++;
+                while (i < end) {
+#if defined(CPU_ARM_CLASSIC) && !defined(FLAC_NO_RICE_ASM)
+                    /* The assembly decodes the common case and falls
+                       through anything it does not handle. Every unusual
+                       code still goes through the C reader, and k <= 17
+                       keeps a code inside the window the assembly reads. */
+                    if (tmp <= 17) {
+                        int got = flac_rice_decode_arm(decoded, end - i, tmp,
+                                                       &gb);
+                        decoded += got;
+                        i       += got;
+                        if (i >= end)
+                            break;
+                    }
+#endif
+                    int v = get_sr_golomb_flac(&gb, tmp, real_limit, 0);
+                    if ((unsigned) v == 0x80000000){
+                        return -3;
+                    }
+
+                    *decoded++ = v;
+                    i++;
+                }
             }
         }
         i= 0;
@@ -297,7 +314,7 @@ static void lpc_analyze_remodulate(int32_t *decoded, int coeffs[],
     unsigned sigma = 0;
 
     for (i = order; i < len; i++)
-        sigma |= decoded[i] + ebps;
+        sigma |= (unsigned)decoded[i] + ebps;
 
     if (sigma < 2U*ebps)
         return;
@@ -363,12 +380,13 @@ static int decode_subframe_lpc(FLACContext *s, int32_t* decoded, int pred_order,
         lpc_decode_arm(s->blocksize - pred_order, qlevel, pred_order,
                        decoded + pred_order, coeffs);
         #else
+        /* unsigned, so that a corrupt stream wraps instead of overflowing */
         for (i = pred_order; i < s->blocksize; i++)
         {
             sum = 0;
             for (j = 0; j < pred_order; j++)
-                sum += coeffs[j] * decoded[i-j-1];
-            decoded[i] += sum >> qlevel;
+                sum += (unsigned)coeffs[j] * decoded[i-j-1];
+            decoded[i] = (unsigned)decoded[i] + (sum >> qlevel);
         }
         #endif
     } else {
@@ -412,7 +430,8 @@ static inline int decode_subframe(FLACContext *s, int channel, int32_t* decoded)
             bps++;
     }
 
-    if (get_bits1(&s->gb))
+    /* stop a corrupt frame that has run past the end of the data */
+    if (get_bits_left(&s->gb) < 0 || get_bits1(&s->gb))
     {
         //fprintf(stderr,"invalid subframe padding\n");
         return -9;
@@ -421,9 +440,11 @@ static inline int decode_subframe(FLACContext *s, int channel, int32_t* decoded)
 
     if (get_bits1(&s->gb))
     {
+        /* at least one bit must be left to read */
         wasted = 1;
         while (!get_bits1(&s->gb))
-            wasted++;
+            if (++wasted >= bps)
+                return -13;
         bps -= wasted;
         //fprintf(stderr,"%d wasted bits\n", wasted);
     }
@@ -439,17 +460,24 @@ static inline int decode_subframe(FLACContext *s, int channel, int32_t* decoded)
     else if (type == 1)
     {
         //fprintf(stderr,"coding type: verbatim\n");
+        if (s->blocksize * bps > get_bits_left(&s->gb))
+            return -12;
         for (i = 0; i < s->blocksize; i++)
             decoded[i] = get_sbits(&s->gb, bps);
     }
     else if ((type >= 8) && (type <= 12))
     {
+        /* the warm-up samples must fit in the block */
+        if ((type & ~0x8) > s->blocksize)
+            return -10;
         //fprintf(stderr,"coding type: fixed\n");
         if (decode_subframe_fixed(s, decoded, type & ~0x8, bps) < 0)
             return -10;
     }
     else if (type >= 32)
     {
+        if ((type & ~0x20) + 1 > s->blocksize)
+            return -11;
         //fprintf(stderr,"coding type: lpc\n");
         if (decode_subframe_lpc(s, decoded, (type & ~0x20)+1, bps) < 0)
             return -11;
@@ -512,6 +540,8 @@ static int decode_frame(FLACContext *s, int variable_blocksize,
 
     /* The number of the first sample in this block, or of the frame */
     number = get_utf8(gb);
+    if (number < 0)
+        return -19;
 
     if (blocksize_code == 0)
         blocksize = s->min_blocksize;
@@ -596,10 +626,11 @@ static int flac_downmix(FLACContext *s)
             /* LF = 0.66 LF + 0.33 FC
                LR = 0.66 LR + 0.33 FC */
             for (i=0; i<s->blocksize; ++i) {
-                int32_t a = *(FL)*2 + *(FC);
-                int32_t b = *(FR)*2 + *(FC);
-                *outL++ = ((a + (a<<2))>>4) << scale; /* 1/3 ~= 5>>4 */
-                *outR++ = ((b + (b<<2))>>4) << scale; /* 1/3 ~= 5>>4 */
+                uint32_t a = (uint32_t)*(FL)*2 + *(FC);
+                uint32_t b = (uint32_t)*(FR)*2 + *(FC);
+                /* 1/3 ~= 5>>4 */
+                *outL++ = (uint32_t)((int32_t)(a + (a<<2)) >> 4) << scale;
+                *outR++ = (uint32_t)((int32_t)(b + (b<<2)) >> 4) << scale;
                 FL++; FR++; FC++;
             }
             break;
@@ -611,10 +642,10 @@ static int flac_downmix(FLACContext *s)
             /* LF = 0.50 LF + 0.50 RL + 0.00 RR
                LR = 0.50 LR + 0.00 RL + 0.50 RR */
             for (i=0; i<s->blocksize; ++i) {
-                int32_t a = *(FL) + *(RL);
-                int32_t b = *(FR) + *(RR);
-                *outL++ = (a>>1) << scale;
-                *outR++ = (b>>1) << scale;
+                uint32_t a = (uint32_t)*(FL) + *(RL);
+                uint32_t b = (uint32_t)*(FR) + *(RR);
+                *outL++ = (uint32_t)((int32_t)a >> 1) << scale;
+                *outR++ = (uint32_t)((int32_t)b >> 1) << scale;
                 FL++; FR++; RL++; RR++;
             }
             break;
@@ -627,10 +658,11 @@ static int flac_downmix(FLACContext *s)
             /* LF = 0.40 LF + 0.20 FC + 0.40 RL + 0.00 RR
                LR = 0.40 LR + 0.20 FC + 0.00 RL + 0.40 RR */
             for (i=0; i<s->blocksize; ++i) {
-                int32_t a = *(FL)*2 + *(FC) + *(RL)*2;
-                int32_t b = *(FR)*2 + *(FC) + *(RR)*2;
-                *outL++ = ((a + (a<<1))>>4) << scale; /* 3>>4 ~= 1/5 */
-                *outR++ = ((b + (b<<1))>>4) << scale; /* 3>>4 ~= 1/5 */
+                uint32_t a = (uint32_t)*(FL)*2 + *(FC) + *(RL)*2;
+                uint32_t b = (uint32_t)*(FR)*2 + *(FC) + *(RR)*2;
+                /* 3>>4 ~= 1/5 */
+                *outL++ = (uint32_t)((int32_t)(a + (a<<1)) >> 4) << scale;
+                *outR++ = (uint32_t)((int32_t)(b + (b<<1)) >> 4) << scale;
                 FL++; FR++; FC++; RL++; RR++;
             }
             break;
@@ -644,10 +676,11 @@ static int flac_downmix(FLACContext *s)
             /* LF = 0.33 LF + 0.16 SUB + 0.16 FC + 0.33 RL + 0.00 RR
                LR = 0.33 LR + 0.16 SUB + 0.16 FC + 0.00 RL + 0.33 RR */
             for (i=0; i<s->blocksize; ++i) {
-                int32_t a = *(FL)*2 + *(SB) + *(FC) + *(RL)*2;
-                int32_t b = *(FR)*2 + *(SB) + *(FC) + *(RR)*2;
-                *outL++ = ((a + (a<<2))>>5) << scale; /* 5>>5 ~= 1/6 */
-                *outR++ = ((b + (b<<2))>>5) << scale; /* 5>>5 ~= 1/6 */
+                uint32_t a = (uint32_t)*(FL)*2 + *(SB) + *(FC) + *(RL)*2;
+                uint32_t b = (uint32_t)*(FR)*2 + *(SB) + *(FC) + *(RR)*2;
+                /* 5>>5 ~= 1/6 */
+                *outL++ = (uint32_t)((int32_t)(a + (a<<2)) >> 5) << scale;
+                *outR++ = (uint32_t)((int32_t)(b + (b<<2)) >> 5) << scale;
                 FL++; FR++; SB++; FC++; RL++; RR++;
             }
             break;
@@ -662,10 +695,13 @@ static int flac_downmix(FLACContext *s)
             /* LF = 0.28 LF + 0.14 SUB + 0.14 FC + 0.28 RL + 0.00 RR + 0.14 CR
                LR = 0.28 LR + 0.14 SUB + 0.14 FC + 0.00 RL + 0.28 RR + 0.14 CR */
             for (i=0; i<s->blocksize; ++i) {
-                int32_t a = *(FL)*2 + *(SB) + *(FC) + *(RL)*2 + *(RC);
-                int32_t b = *(FR)*2 + *(SB) + *(FC) + *(RR)*2 + *(RC);
-                *outL++ = ((a + (a<<4))>>6) << scale; /* 9>>6 ~= 1/7 */
-                *outR++ = ((b + (b<<4))>>6) << scale; /* 9>>6 ~= 1/7 */
+                uint32_t a = (uint32_t)*(FL)*2 + *(SB) + *(FC) + *(RL)*2 +
+                             *(RC);
+                uint32_t b = (uint32_t)*(FR)*2 + *(SB) + *(FC) + *(RR)*2 +
+                             *(RC);
+                /* 9>>6 ~= 1/7 */
+                *outL++ = (uint32_t)((int32_t)(a + (a<<4)) >> 6) << scale;
+                *outR++ = (uint32_t)((int32_t)(b + (b<<4)) >> 6) << scale;
                 FL++; FR++; SB++; FC++; RL++; RR++; RC++;
             }
             break;
@@ -717,8 +753,8 @@ int flac_decode_frame(FLACContext *s,
              for (int i = 0; i < s->blocksize; i++) {\
                 int32_t a = s->decoded[0][i];\
                 int32_t b = s->decoded[1][i];\
-                s->decoded[0][i] = (left)  << scale;\
-                s->decoded[1][i] = (right) << scale;\
+                s->decoded[0][i] = (uint32_t)(left)  << scale;\
+                s->decoded[1][i] = (uint32_t)(right) << scale;\
              }
 #endif
 
@@ -735,13 +771,14 @@ int flac_decode_frame(FLACContext *s,
             }
             break;
         case LEFT_SIDE:
-            DECORRELATE(flac_decorrelate_ls_arm, a, a-b)
+            DECORRELATE(flac_decorrelate_ls_arm, a, (uint32_t)a-b)
             break;
         case RIGHT_SIDE:
-            DECORRELATE(flac_decorrelate_rs_arm, a+b, b)
+            DECORRELATE(flac_decorrelate_rs_arm, (uint32_t)a+b, b)
             break;
         case MID_SIDE:
-            DECORRELATE(flac_decorrelate_ms_arm, (a-=b>>1) + b, a)
+            DECORRELATE(flac_decorrelate_ms_arm,
+                        (a = (uint32_t)a - (b>>1)) + (uint32_t)b, a)
             break;
     }
 
