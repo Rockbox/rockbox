@@ -898,9 +898,19 @@ void iap_get_trackinfo(const unsigned int track, struct mp3entry* id3)
     {
         playlist_get_track_info(NULL, tracknum, &info);
         /* memset(id3, 0, sizeof(*id3)) --get_metadata does this for us */
-        get_metadata(id3, -1, info.filename);
+        if (!get_metadata(id3, -1, info.filename))
+            strlcpy(id3->path, info.filename, sizeof(id3->path));
     } else {
         memcpy(id3, current, sizeof(*id3));
+    }
+
+    /* An untagged file, e.g. a voice recording, has no title. The
+     * database lists it by its file name, so send that rather than an
+     * empty title. */
+    if (!id3->title || !id3->title[0])
+    {
+        const char *name = strrchr(id3->path, '/');
+        id3->title = (char *)(name ? name + 1 : id3->path);
     }
 }
 
