@@ -26,13 +26,9 @@
 #include "i2c-target.h"
 #include "button.h"
 
-// #define LOGF_ENABLE
-#include "logf.h"
-
 #include "aic-x1000.h"
 #include "i2c-ingenic.h"
 #include "gpio-ingenic.h"
-#include "devicedata.h"
 
 /*
  * Earlier devices audio path appears to be:
@@ -93,15 +89,8 @@ void audiohw_init(void)
 
     // devices hw2 and newer use es9018k2m i2c dac
     // hw1 devices use swvol
-    // special case hw2 devices with bootloaders identifying as hw1 (pre-version field)
-    if (device_data.hw_rev >= 2 || \
-        (device_data.version == 0xff && eros_qn_discover_dac(true)))
+    if (eros_qn_discover_dac(true))
     {
-#if defined(LOGF_ENABLE)
-        if (device_data.version == 0xff) {
-            logf("OLD BOOTLOADER FOUND, UPDATE IT!");
-        }
-#endif
         es9018k2m_present_flag = true;
         builtin_pcm_sink.caps.volume_type = PCM_SINK_HWVOL;
 
