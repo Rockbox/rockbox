@@ -149,6 +149,7 @@
 #if defined(EROS_QN)
 #include "power-erosqnative.h"
 #include "lcd-erosqnative.h"
+#include "eros_qn_codec.h"
 #endif
 
 #define SCREEN_MAX_CHARS (LCD_WIDTH / SYSFONT_WIDTH)
@@ -2705,6 +2706,7 @@ static bool dbg_device_data(void)
 
 #if defined(EROS_QN)
     simplelist_addline("Hardware Revision: %d", (int)device_data.hw_rev);
+    simplelist_addline("DAC type: %s", es9018k2m_present_flag ? "ES9018K2M" : "PCM5102A");
     simplelist_addline("PMU Type: %s",
                        (eros_qn_pmu_type == EROS_QN_PMU_AXP192 ? "AXP192" :
                        (eros_qn_pmu_type == EROS_QN_PMU_AXP2101 ? "AXP2101" : "unknown!")));
