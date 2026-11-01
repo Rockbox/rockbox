@@ -1088,7 +1088,9 @@ static int process_markers(struct jpeg* p_jpeg)
                     if (p_jpeg->frameheader[i].quanttable_select > 3)
                         return -8; /* Unsupported quantization table */
                     if (p_jpeg->frameheader[i].horizontal_sampling > 2
-                     || p_jpeg->frameheader[i].vertical_sampling > 2)
+                     || p_jpeg->frameheader[i].vertical_sampling > 2
+                     || p_jpeg->frameheader[i].horizontal_sampling < 1
+                     || p_jpeg->frameheader[i].vertical_sampling < 1)
                     return -3; /* Unsupported SOF0 subsampling */
                 }
                 p_jpeg->blocks = n;
