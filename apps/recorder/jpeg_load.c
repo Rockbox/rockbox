@@ -971,9 +971,11 @@ static void jpeg_putc(struct jpeg* p_jpeg)
 }
 #endif
 
+/* A segment shorter than what was read of it leaves a negative count,
+ * which would move the read position back before the buffer. */
 #define e_skip_bytes(jpeg, count) \
 do {\
-    if (UNLIKELY(!skip_bytes((jpeg),(count)))) \
+    if (UNLIKELY((count) < 0 || !skip_bytes((jpeg),(count)))) \
         return -1; \
 } while (0)
 
