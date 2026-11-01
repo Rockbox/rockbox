@@ -377,8 +377,18 @@ static int parsealbumart( struct mp3entry* entry, char* tag, int bufferpos )
 
     if (entry->albumart.type != AA_TYPE_UNKNOWN)
     {
-        /* fixup offset&size for image data */
-        entry->albumart.pos  += tag - start;
+        /* fixup offset&size for image data; in the file, an unsynchronised
+         * frame has a 0x00 after each 0xFF here that is followed by 0x00 or
+         * by 0xE0 and above */
+        int skip = tag - start;
+        if (unsync)
+        {
+            for (char *p = start; p < tag; p++)
+                if ((unsigned char)p[0] == 0xFF
+                    && ((unsigned char)p[1] >= 0xE0 || p[1] == 0))
+                    skip++;
+        }
+        entry->albumart.pos  += skip;
         entry->albumart.size -= tag - start;
         if (unsync)
         {
@@ -1175,6 +1185,11 @@ retry_with_limit:
 
                 /* found a tag matching one in tagList */
                 tag = buffer + bufferpos;
+#ifdef HAVE_ALBUMART
+                /* where the frame starts: what read_unsynched() reads of
+                   the file can be longer than the framelen it returns */
+                off_t frame_pos = lseek(fd, 0, SEEK_CUR);
+#endif
 
                 if(global_unsynch && version <= ID3_VER_2_3)
                     bytesread = read_unsynched(fd, tag, framelen);
@@ -1292,7 +1307,7 @@ retry_with_limit:
                     ((tr->tag_length == 4 && !memcmp( header, "APIC", 4)) ||
                      (tr->tag_length == 3 && !memcmp( header, "PIC" , 3))))
                 {
-                    entry->albumart.pos = lseek(fd, 0, SEEK_CUR) - framelen;
+                    entry->albumart.pos = frame_pos;
                     entry->albumart.size = totframelen;
                     entry->albumart.type = (unsynch || (global_unsynch && version <= ID3_VER_2_3))
                                            ? AA_FLAG_ID3_UNSYNC
