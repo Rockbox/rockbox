@@ -115,7 +115,7 @@ int load_firmware(unsigned char* buf, const char* firmware, int buffer_size)
                                  BOOTDIR, firmware) > 0)
             {
                 ret = load_firmware_filename(buf, filename, buffer_size);
-            /* if firmware has no boot_data don't load from external drive */
+                /* if firmware has no boot_data don't load from external drive */
                 if (!write_bootdata(buf, ret, i))
                     ret = EKEY_NOT_FOUND;
             }
@@ -128,16 +128,16 @@ int load_firmware(unsigned char* buf, const char* firmware, int buffer_size)
             snprintf(filename, sizeof(filename), BOOTDIR "/%s",firmware);
 
             ret = load_firmware_filename(buf, filename, buffer_size);
-
             if (ret < 0)
             {
                 /* Check in root dir */
                 snprintf(filename, sizeof(filename),"/%s",firmware);
                 ret = load_firmware_filename(buf, filename, buffer_size);
             }
+
 #ifdef HAVE_BOOTDATA
-                /* 0 is the default boot volume */
-                write_bootdata(buf, ret, 0);
+            /* 0 is the default boot volume */
+            write_bootdata(buf, ret, 0);
 #endif
         }
     }
@@ -145,7 +145,7 @@ int load_firmware(unsigned char* buf, const char* firmware, int buffer_size)
         ret = load_firmware_filename(buf, firmware, buffer_size);
 
 #ifdef HAVE_DEVICEDATA
-        write_devicedata(buf, ret);
+    write_devicedata(buf, ret);
 #endif
 
     return ret;
