@@ -29,10 +29,6 @@
 #include "mips.h"
 #include "bootdata.h"
 
-#if defined(HAVE_DEVICEDATA) && !defined(BOOTLOADER)
-#include "devicedata.h"
-#endif
-
     .text
     .extern main
     .extern system_early_init
@@ -62,9 +58,6 @@ _header:
 #ifndef BOOTLOADER
     /* Multiboot support header; this is not part of the above header. */
     put_boot_data_here
-#ifdef HAVE_DEVICEDATA
-    put_device_data_here
-#endif
 #endif
 
 _realstart:
