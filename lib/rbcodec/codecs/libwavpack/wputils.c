@@ -29,6 +29,7 @@ static const uint32_t sample_rates [] = { 6000, 8000, 9600, 11025, 12000, 16000,
 ///////////////////////////// executable code ////////////////////////////////
 
 static uint32_t read_next_header (read_stream infile, WavpackHeader *wphdr);
+static int skip_block (WavpackContext *wpc);
         
 // This function reads data from the specified stream in search of a valid
 // WavPack 4.0 audio block. If this fails in 1 megabyte (or an invalid or
@@ -41,9 +42,9 @@ static uint32_t read_next_header (read_stream infile, WavpackHeader *wphdr);
 // purposes this uses a single static copy of the WavpackContext structure,
 // so obviously it cannot be used for more than one file at a time. Also,
 // this function will not handle "correction" files, plays only the first
-// two channels of multi-channel files, and is limited in resolution in some
-// large integer or floating point files (but always provides at least 24 bits
-// of resolution).
+// two channels of multi-channel files (unless WavpackUnpackDownmix() is
+// used), and is limited in resolution in some large integer or floating
+// point files (but always provides at least 24 bits of resolution).
 
 static WavpackContext wpc IBSS_ATTR;
 
@@ -58,9 +59,10 @@ WavpackContext *WavpackOpenFileInput (read_stream infile, char *error)
     wpc.norm_offset = 0;
     wpc.open_flags = 0;
 
-    // open the source file for reading and store the size
+    // open the source file for reading and store the size; a multichannel
+    // frame must start with its initial block, so skip any others
 
-    while (!wps->wphdr.block_samples) {
+    while (!wps->wphdr.block_samples || !(wps->wphdr.flags & INITIAL_BLOCK)) {
 
         bcount = read_next_header (wpc.infile, &wps->wphdr);
 
@@ -79,6 +81,15 @@ WavpackContext *WavpackOpenFileInput (read_stream infile, char *error)
 
         if (wps->wphdr.block_samples && wps->wphdr.total_samples != (uint32_t) -1)
             wpc.total_samples = wps->wphdr.total_samples;
+
+        if (wps->wphdr.block_samples && !(wps->wphdr.flags & INITIAL_BLOCK)) {
+            if (!skip_block (&wpc)) {
+                strcpy_loc (error, "invalid WavPack file!");
+                return NULL;
+            }
+
+            continue;
+        }
 
         if (!unpack_init (&wpc)) {
             strcpy_loc (error, wpc.error_message [0] ? wpc.error_message :
@@ -237,6 +248,204 @@ uint32_t WavpackUnpackSamples (WavpackContext *wpc, int32_t *buffer, uint32_t sa
     return samples_unpacked;
 }
 
+#ifdef WAVPACK_DOWNMIX
+
+// Speakers of the WAVEFORMATEXTENSIBLE channel mask that go to one side when
+// a multichannel file is downmixed; all others are shared by both sides.
+
+#define LEFT_SPEAKERS   0x9251  // FL, BL, FLC, SL, TFL, TBL
+#define RIGHT_SPEAKERS  0x244a2 // FR, BR, FRC, SR, TFR, TBR
+
+// Work out the 8.24 weight of each channel in the left and right outputs.
+// As in the FLAC decoder, a side speaker counts twice as much as a shared
+// one (centre, LFE, back centre...) and the weights of each output sum to
+// exactly 1.0, so the downmix cannot clip; the rounding remainder goes to
+// the largest weight. If no channel feeds one side, all feed it equally.
+// Without a channel mask, the usual WAVE layouts for 3 to 8 channels are
+// assumed; channels beyond the mask count as shared.
+
+static void downmix_weights (WavpackContext *wpc, int32_t *left, int32_t *right)
+{
+    static const uint32_t default_masks [] = { 0x7, 0x33, 0x37, 0x3f, 0x70f, 0x63f };
+    int num_channels = wpc->config.num_channels, sum_left = 0, sum_right = 0, i;
+    int big_left = 0, big_right = 0;
+    int32_t rest_left = 1 << 24, rest_right = 1 << 24;
+    uint32_t mask = wpc->config.channel_mask, bit = 1;
+
+    if (!mask)
+        mask = default_masks [num_channels - 3];
+
+    for (i = 0; i < num_channels; ++i) {
+        while (bit && !(mask & bit))
+            bit <<= 1;
+
+        left [i] = (bit & LEFT_SPEAKERS) ? 2 : (bit & RIGHT_SPEAKERS) ? 0 : 1;
+        right [i] = 2 - left [i];
+        sum_left += left [i];
+        sum_right += right [i];
+        bit <<= 1;
+    }
+
+    for (i = 0; i < num_channels; ++i) {
+        if (!sum_left)
+            left [i] = 1;
+
+        if (!sum_right)
+            right [i] = 1;
+
+        if (left [i] > left [big_left])
+            big_left = i;
+
+        if (right [i] > right [big_right])
+            big_right = i;
+    }
+
+    if (!sum_left)
+        sum_left = num_channels;
+
+    if (!sum_right)
+        sum_right = num_channels;
+
+    for (i = 0; i < num_channels; ++i) {
+        left [i] = (left [i] << 24) / sum_left;
+        right [i] = (right [i] << 24) / sum_right;
+        rest_left -= left [i];
+        rest_right -= right [i];
+    }
+
+    left [big_left] += rest_left;
+    right [big_right] += rest_right;
+}
+
+#define DOWNMIX(sample, weight) ((int32_t)(((int64_t)(sample) * (weight)) >> 24))
+
+// Unpack one complete multichannel frame, that is every block from the one
+// marked INITIAL_BLOCK to the one marked FINAL_BLOCK, and downmix it to
+// stereo. The frame is returned as interleaved left and right samples in
+// "buffer", which must have room for 2 * "samples" int32_t's. The blocks
+// are decoded one after the other through "temp", which must hold
+// 2 * "temp_samples" int32_t's. A frame of more than "samples" samples
+// cannot be mixed, so only its initial block (normally the front pair) is
+// returned, over as many calls as it takes. The number of samples returned
+// is the return value, or 0 at the end of the file or on an error. This must only be used on files of 3 to MAX_CHANNELS
+// channels, and not mixed with WavpackUnpackSamples().
+
+uint32_t WavpackUnpackDownmix (WavpackContext *wpc, int32_t *buffer, uint32_t samples,
+    int32_t *temp, uint32_t temp_samples)
+{
+    WavpackStream *wps = &wpc->stream;
+    int32_t weight_left [MAX_CHANNELS], weight_right [MAX_CHANNELS];
+    uint32_t frame_index = 0, frame_samples = 0, flags, count, i;
+    int chan = 0, block_chans;
+    int32_t *dst;
+
+    while (1) {
+        if (!wps->wphdr.block_samples ||
+            wps->sample_index >= wps->wphdr.block_index + wps->wphdr.block_samples) {
+                if (read_next_header (wpc->infile, &wps->wphdr) == (uint32_t) -1)
+                    return 0;
+
+                wps->block_bytes_left = wps->wphdr.ckSize - 24;
+
+                if (wps->wphdr.version < MIN_STREAM_VERS || wps->wphdr.version > MAX_STREAM_VERS) {
+                    strcpy_loc (wpc->error_message, "invalid WavPack file!");
+                    return 0;
+                }
+
+                if (wps->wphdr.block_samples && !chan && !(wps->wphdr.flags & INITIAL_BLOCK)) {
+                    wps->wphdr.block_samples = 0;
+
+                    if (!skip_block (wpc))
+                        return 0;
+
+                    continue;
+                }
+
+                if (!unpack_init (wpc))
+                    return 0;
+
+                if (!wps->wphdr.block_samples)
+                    continue;
+        }
+
+        flags = wps->wphdr.flags;
+        block_chans = (flags & MONO_FLAG) ? 1 : 2;
+
+        if (!chan) {
+            frame_index = wps->wphdr.block_index;
+            frame_samples = wps->wphdr.block_samples;
+
+            if (wpc->config.num_channels < 3 || wpc->config.num_channels > MAX_CHANNELS) {
+                strcpy_loc (wpc->error_message, "unsupported WavPack frame!");
+                return 0;
+            }
+
+            if (frame_samples > samples || wps->sample_index != frame_index) {
+                count = frame_index + frame_samples - wps->sample_index;
+
+                if (count > samples)
+                    count = samples;
+
+                unpack_samples (wpc, buffer, count);
+
+                if (block_chans == 1)
+                    for (i = count; i--;)
+                        buffer [i * 2] = buffer [i * 2 + 1] = buffer [i];
+
+                if (wps->sample_index == frame_index + frame_samples && check_crc_error (wpc))
+                    wpc->crc_errors++;
+
+                return count;
+            }
+
+            downmix_weights (wpc, weight_left, weight_right);
+            memset (buffer, 0, frame_samples * 2 * sizeof (*buffer));
+        }
+        else if ((flags & INITIAL_BLOCK) || wps->wphdr.block_index != frame_index ||
+            wps->wphdr.block_samples != frame_samples) {
+                strcpy_loc (wpc->error_message, "invalid WavPack frame!");
+                return 0;
+        }
+
+        if (chan + block_chans > wpc->config.num_channels) {
+            strcpy_loc (wpc->error_message, "invalid WavPack frame!");
+            return 0;
+        }
+
+        while (wps->sample_index < frame_index + frame_samples) {
+            dst = buffer + (wps->sample_index - frame_index) * 2;
+            count = frame_index + frame_samples - wps->sample_index;
+
+            if (count > temp_samples)
+                count = temp_samples;
+
+            unpack_samples (wpc, temp, count);
+
+            if (block_chans == 1)
+                for (i = 0; i < count; ++i, dst += 2) {
+                    dst [0] += DOWNMIX (temp [i], weight_left [chan]);
+                    dst [1] += DOWNMIX (temp [i], weight_right [chan]);
+                }
+            else
+                for (i = 0; i < count * 2; i += 2, dst += 2) {
+                    dst [0] += DOWNMIX (temp [i], weight_left [chan]) +
+                        DOWNMIX (temp [i + 1], weight_left [chan + 1]);
+                    dst [1] += DOWNMIX (temp [i], weight_right [chan]) +
+                        DOWNMIX (temp [i + 1], weight_right [chan + 1]);
+                }
+        }
+
+        if (check_crc_error (wpc))
+            wpc->crc_errors++;
+
+        chan += block_chans;
+
+        if (flags & FINAL_BLOCK)
+            return frame_samples;
+    }
+}
+#endif
+
 // Get total number of samples contained in the WavPack file, or -1 if unknown
 
 uint32_t WavpackGetNumSamples (WavpackContext *wpc)
@@ -318,6 +527,29 @@ int WavpackGetReducedChannels (WavpackContext *wpc)
         return wpc->reduced_channels ? wpc->reduced_channels : wpc->config.num_channels;
     else
         return 2;
+}
+
+// Skip the rest of the block whose header was just read, as given by its
+// size rather than by searching for the next header. Returns FALSE if the
+// file ends first.
+
+static int skip_block (WavpackContext *wpc)
+{
+    int32_t count;
+
+    while (wpc->stream.block_bytes_left > 0) {
+        count = wpc->stream.block_bytes_left;
+
+        if (count > (int32_t) sizeof (wpc->read_buffer))
+            count = sizeof (wpc->read_buffer);
+
+        if (wpc->infile (wpc->read_buffer, count) != count)
+            return FALSE;
+
+        wpc->stream.block_bytes_left -= count;
+    }
+
+    return TRUE;
 }
 
 // Read from current file position until a valid 32-byte WavPack 4.0 header is

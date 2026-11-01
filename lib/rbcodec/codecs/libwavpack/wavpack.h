@@ -76,6 +76,15 @@ typedef struct {
 
 #define MONO_DATA (MONO_FLAG | FALSE_STEREO)
 
+#define MAX_CHANNELS    8       // most channels we will downmix to stereo
+
+// Mixing every channel of a multichannel file costs several times the
+// CPU of playing its front pair, more than ARMv4 and ColdFire players
+// can spare, so they keep playing the front pair only.
+#if !(defined(CPU_ARM) && ARM_ARCH < 5) && !defined(CPU_COLDFIRE)
+#define WAVPACK_DOWNMIX
+#endif
+
 #define MIN_STREAM_VERS     0x402       // lowest stream version we'll decode
 #define MAX_STREAM_VERS     0x410       // highest stream version we'll decode
 #define CUR_STREAM_VERS     0x403       // stream version we are writing now
@@ -427,6 +436,10 @@ int WavpackGetMode (WavpackContext *wpc);
 #define MODE_FAST       0x40
 
 uint32_t WavpackUnpackSamples (WavpackContext *wpc, int32_t *buffer, uint32_t samples);
+#ifdef WAVPACK_DOWNMIX
+uint32_t WavpackUnpackDownmix (WavpackContext *wpc, int32_t *buffer, uint32_t samples,
+    int32_t *temp, uint32_t temp_samples);
+#endif
 uint32_t WavpackGetNumSamples (WavpackContext *wpc);
 uint32_t WavpackGetSampleIndex (WavpackContext *wpc);
 int WavpackGetNumErrors (WavpackContext *wpc);

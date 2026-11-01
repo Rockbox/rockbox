@@ -56,6 +56,10 @@ enum codec_status codec_run(void)
     int nchans, sr_100;
     unsigned long offset;
     intptr_t param;
+#ifdef WAVPACK_DOWNMIX
+    int32_t *mix_buffer = NULL;
+    size_t mix_samples = 0;
+#endif
 
     if (codec_init())
         return CODEC_ERROR;
@@ -75,6 +79,22 @@ enum codec_status codec_run(void)
     codec_set_replaygain(ci->id3);
     /* bps = WavpackGetBytesPerSample (wpc); */
     nchans = WavpackGetReducedChannels (wpc);
+
+#ifdef WAVPACK_DOWNMIX
+    /* Downmix 3 to 8 channels to stereo a whole frame at a time, if the
+       frame fits in the spare codec memory; otherwise play the first two */
+    if (WavpackGetNumChannels (wpc) > 2 &&
+        WavpackGetNumChannels (wpc) <= MAX_CHANNELS) {
+        mix_buffer = codec_malloc_spare (&mix_samples);
+        mix_samples /= 2 * sizeof (int32_t);
+
+        if (wpc->stream.wphdr.block_samples <= mix_samples)
+            nchans = 2;
+        else
+            mix_buffer = NULL;
+    }
+#endif
+
     ci->configure(DSP_SET_STEREO_MODE, nchans == 2 ? STEREO_INTERLEAVED : STEREO_MONO);
     sr_100 = ci->id3->frequency / 100;
 
@@ -123,12 +143,26 @@ enum codec_status codec_run(void)
             ci->seek_complete();
         }
 
-        nsamples = WavpackUnpackSamples (wpc, temp_buffer, BUFFER_SIZE / nchans);  
+#ifdef WAVPACK_DOWNMIX
+        if (mix_buffer) {
+            nsamples = WavpackUnpackDownmix (wpc, mix_buffer, mix_samples,
+                                             temp_buffer, BUFFER_SIZE / 2);
 
-        if (!nsamples)
-            break;
+            if (!nsamples)
+                break;
 
-        ci->pcmbuf_insert (temp_buffer, NULL, nsamples);
+            ci->pcmbuf_insert (mix_buffer, NULL, nsamples);
+        }
+        else
+#endif
+        {
+            nsamples = WavpackUnpackSamples (wpc, temp_buffer, BUFFER_SIZE / nchans);
+
+            if (!nsamples)
+                break;
+
+            ci->pcmbuf_insert (temp_buffer, NULL, nsamples);
+        }
         ci->set_elapsed (WavpackGetSampleIndex (wpc) / sr_100 * 10);
     }
 
