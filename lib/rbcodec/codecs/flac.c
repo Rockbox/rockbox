@@ -319,11 +319,43 @@ static bool frame_sync(FLACContext* fc) {
      * fill fc with its metadata.
      */
     if(flac_decode_frame(fc,
-       bit_buffer, buff_size, ci->yield) < 0) {
+       bit_buffer, buff_size, ci->yield) != 0) {
         return false;
     }
 
     return true;
+}
+
+/* How far to look past a bad frame for a good one before giving up on the
+   stream */
+#define MAX_RESYNC_BYTES (1024*1024)
+
+/* Find the next frame that decodes after one that did not, starting a byte
+   on so as not to find the same one again. Returns false at the end of the
+   file, or with ci->curpos less than that far on when there is none. */
+static bool flac_resync(FLACContext* fc)
+{
+    off_t start = ci->curpos;
+
+    while (ci->curpos - start < MAX_RESYNC_BYTES) {
+        off_t pos = ci->curpos;
+
+        bit_buffer = flac_request_frame(&buff_size, MAX_FRAMESIZE+16);
+        if (buff_size < MIN_FRAME_SIZE)
+            return false;
+
+        init_get_bits(&fc->gb, bit_buffer, buff_size*8);
+        skip_bits(&fc->gb, 8);
+        if (frame_sync(fc))
+            return true;
+
+        /* frame_sync() stopped at a sync code that did not decode, which
+           the next pass skips, or found none in this buffer */
+        if (ci->curpos == pos)
+            ci->advance_buffer(buff_size - 1);
+    }
+
+    return false;
 }
 
 /* Seek to sample - adapted from libFLAC 1.1.3b2+ */
@@ -578,10 +610,22 @@ enum codec_status codec_run(void)
             ci->seek_complete();
         }
 
-        if((res=flac_decode_frame(&fc,buf,
-                             bytesleft,ci->yield)) < 0) {
-             LOGF("FLAC: Frame %d, error %d\n",frame,res);
-             return CODEC_ERROR;
+        res = flac_decode_frame(&fc, buf, bytesleft, ci->yield);
+        if (res < 0) {
+            /* skip the bad data to the next good frame, which the elapsed
+               time follows from its sample number */
+            LOGF("FLAC: Frame %d, error %d\n",frame,res);
+            if (!flac_resync(&fc)) {
+                if (ci->curpos + MIN_FRAME_SIZE > ci->filesize)
+                    break;
+                return CODEC_ERROR;
+            }
+            buf = bit_buffer;
+            bytesleft = buff_size;
+            fc.sample_skip = 0; /* a seek's skip was into the bad frame */
+            res = 0;
+        } else if (res > 0) {
+            break; /* too little data left for a frame */
         }
         consumed=fc.gb.index/8;
         if (res == 0 && consumed > (int)bytesleft) {
