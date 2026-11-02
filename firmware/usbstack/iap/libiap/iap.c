@@ -1019,7 +1019,7 @@ static int32_t handle_in_idps(struct IAPContext* ctx, uint8_t lingo, uint16_t co
         }
         break;
     }
-    return iap_false;
+    return -IAPAckStatus_EBadParameter;
 }
 
 static IAPBool send_auth_challenge_sig_cb(struct IAPContext* ctx) {
@@ -1179,17 +1179,27 @@ IAPBool _iap_feed_packet(struct IAPContext* ctx, const uint8_t* const data, cons
     /* now span contains only payload */
 
     /* request handling */
-    if(ctx->trans_id_support == TransIDUnknown) {
-        check_ret(lingo == IAPLingoID_General, iap_false);
+    /* An accessory may identify again at any time, e.g. after resetting
+     * its own iAP stack, and the way it identifies decides whether it
+     * uses transaction IDs. Start over from the connected phase. */
+    const IAPBool identify = lingo == IAPLingoID_General &&
+                             (command == IAPGeneralCommandID_StartIDPS ||
+                              command == IAPGeneralCommandID_IdentifyDeviceLingoes);
+    if(identify) {
         if(command == IAPGeneralCommandID_StartIDPS) {
             ctx->trans_id_support = TransIDSupported;
-        } else if(command == IAPGeneralCommandID_IdentifyDeviceLingoes) {
+        } else {
             ctx->trans_id_support  = TransIDNotSupported;
             ctx->handling_trans_id = -1;
-        } else {
-            warn("the first command(%02X:%04X) must be StartIDPS or IdentifyDeviceLingoes", lingo, command);
-            return iap_false;
         }
+        ctx->phase                       = IAPPhase_Connected;
+        ctx->enabled_notifications_3     = 0;
+        ctx->enabled_notifications_4     = 0;
+        ctx->waiting_for_audio_attrs_ack = iap_false;
+        ctx->on_send_complete            = NULL;
+    } else if(ctx->trans_id_support == TransIDUnknown) {
+        warn("the first command(%02X:%04X) must be StartIDPS or IdentifyDeviceLingoes", lingo, command);
+        return iap_false;
     }
     if(ctx->trans_id_support == TransIDSupported) {
         check_ret(iap_span_read_16(&span, &buf.u16), iap_false);
