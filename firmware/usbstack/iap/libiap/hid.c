@@ -46,7 +46,7 @@ static struct ReportSize input_report_size_table_hs[] = {
 static struct ReportSize output_report_size_table_hs[] = {
     {.id = 0x0D, .size = 0x05},
     {.id = 0x0E, .size = 0x09},
-    {.id = 0x1F, .size = 0x0D},
+    {.id = 0x0F, .size = 0x0D},
     {.id = 0x10, .size = 0x11},
     {.id = 0x11, .size = 0x19},
     {.id = 0x12, .size = 0x31},

@@ -233,7 +233,7 @@ static const uint8_t ipod_hid_report_hs[] = {
 
     OUTPUT_REPORT(0x0D, 0x05),
     OUTPUT_REPORT(0x0E, 0x09),
-    OUTPUT_REPORT(0x1F, 0x0D),
+    OUTPUT_REPORT(0x0F, 0x0D),
     OUTPUT_REPORT(0x10, 0x11),
     OUTPUT_REPORT(0x11, 0x19),
     OUTPUT_REPORT(0x12, 0x31),
