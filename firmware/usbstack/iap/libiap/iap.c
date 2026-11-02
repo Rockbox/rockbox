@@ -975,7 +975,7 @@ static int32_t handle_in_connected(struct IAPContext* ctx, uint8_t lingo, uint16
         switch(command) {
         case IAPGeneralCommandID_IdentifyDeviceLingoes: {
             read_request(IAPIdentifyDeviceLingoesPayload);
-            switch(swap_32(request->options)) {
+            switch(swap_32(request->options) & IAPIdentifyDeviceLingoesOptions_AuthMask) {
             case IAPIdentifyDeviceLingoesOptions_NoAuth:
                 break;
             case IAPIdentifyDeviceLingoesOptions_DeferAuth:

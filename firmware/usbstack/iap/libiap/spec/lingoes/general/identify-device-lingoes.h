@@ -21,6 +21,10 @@ enum IAPIdentifyDeviceLingoesOptions {
     IAPIdentifyDeviceLingoesOptions_NoAuth        = 0b00,
     IAPIdentifyDeviceLingoesOptions_DeferAuth     = 0b01,
     IAPIdentifyDeviceLingoesOptions_ImmediateAuth = 0b10,
+    /* [1] Table 3-25: bits 1:0 select authentication, the rest are
+     * reserved, but some accessories set them (a Nissan head unit sends
+     * 0x06), so look only at these */
+    IAPIdentifyDeviceLingoesOptions_AuthMask      = 0b11,
 };
 
 struct IAPIdentifyDeviceLingoesPayload {
