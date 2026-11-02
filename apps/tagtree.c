@@ -119,6 +119,7 @@ enum variables {
     menu_next,
     menu_load,
     menu_reload,
+    menu_edit,
     menu_shuffle_songs,
 };
 
@@ -130,6 +131,8 @@ static uint32_t uniqbuf[UNIQBUF_SIZE / sizeof(uint32_t)];
 #define MAX_MENU_ID_SIZE 32
 
 #define RELOAD_TAGTREE (-1024)
+#define EDIT_TAGTREE (-1025)
+#define TAGNAVI_EDITOR PLUGIN_APPS_DIR "/tagnavi_edit.rock"
 
 static int(*qsort_fn)(const char*, const char*, size_t);
 /* dummmy functions to allow compatibility strncasecmp */
@@ -399,6 +402,7 @@ static int get_tag(int *tag)
         TAG_MATCH("lastoffset", tag_lastoffset) \
         TAG_MATCH("%root_menu", var_rootmenu) \
         TAG_MATCH("albumartist", tag_albumartist) \
+        TAG_MATCH("%edit_menus", menu_edit) \
         TAG_MATCH("lastelapsed", tag_lastelapsed) \
         TAG_MATCH("%menu_start", var_menu_start) \
         TAG_MATCH("%byfirstletter", menu_byfirstletter) \
@@ -1659,6 +1663,9 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
     if (tag == menu_reload)
         return RELOAD_TAGTREE;
 
+    if (tag == menu_edit)
+        return EDIT_TAGTREE;
+
     if (tag == tag_virt_basename) /* basename shortcut */
     {
         is_basename = true;
@@ -2122,6 +2129,13 @@ int tagtree_load(struct tree_context* c)
 
     loaded_entries_crc = 0;
 
+    if (count == EDIT_TAGTREE)
+    {
+        /* run the menu editor, then load whatever it saved */
+        plugin_load(TAGNAVI_EDITOR, NULL);
+        count = RELOAD_TAGTREE;
+    }
+
     if (count < 0)
     {
         if (count != RELOAD_TAGTREE)
@@ -2129,6 +2143,7 @@ int tagtree_load(struct tree_context* c)
         else /* unload and re-init tagtree */
         {
             splash(HZ, ID2P(LANG_WAIT));
+            tagnavi_reload_pending = false;
             tagtree_unload(c);
             tagnavi_loaded = initialize_tagtree();
             if (!tagnavi_loaded)

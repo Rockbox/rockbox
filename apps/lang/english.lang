@@ -17285,3 +17285,17 @@
     recording_remote: "remote recording screen skin"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_TAGNAVI_EDIT_MENUS
+  desc: Database menu, opens the menu editor
+  user: core
+  <source>
+    *: "Edit Menus"
+  </source>
+  <dest>
+    *: "Edit Menus"
+  </dest>
+  <voice>
+    *: "Edit Menus"
+  </voice>
+</phrase>

@@ -242,7 +242,7 @@ struct tn_screen {
     struct tn_clause *clauses;    /* screen 1: the item's filters */
 };
 
-enum { E_COMMENT, E_RAW, E_BROWSE, E_SHUFFLE, E_LINK, E_RELOAD };
+enum { E_COMMENT, E_RAW, E_BROWSE, E_SHUFFLE, E_LINK, E_RELOAD, E_EDIT };
 
 struct tn_entry {
     struct tn_entry *next;
@@ -555,12 +555,13 @@ static struct tn_entry *parse_entry(const char *line)
     for (;;)
     {
         t = peek();
-        if (word_is(t, "%reload") && count == 0)
+        if ((word_is(t, "%reload") || word_is(t, "%edit_menus")) && count == 0)
         {
+            int kind = word_is(t, "%reload") ? E_RELOAD : E_EDIT;
             tpos++;
             if (peek())
                 return NULL;
-            e->kind = E_RELOAD;
+            e->kind = kind;
             return e;
         }
         int fld = field_of(t);
@@ -788,6 +789,10 @@ static void out_entry(const struct tn_entry *e)
         case E_RELOAD:
             outq(e->name);
             out(" -> %reload");
+            break;
+        case E_EDIT:
+            outq(e->name);
+            out(" -> %edit_menus");
             break;
         default:
             outq(e->name);
@@ -2751,7 +2756,7 @@ static void add_item(struct tn_stmt *m)
 {
     const char *const kinds[] = {
         "Browse by fields", LSTR(LANG_SHUFFLE_SONGS), "New submenu",
-        "Link an existing menu", "Reload menus item",
+        "Link an existing menu", "Reload menus item", LSTR(LANG_TAGNAVI_EDIT_MENUS),
     };
     if (count_visible(m) >= TAGMENU_MAX_ITEMS)
     {
@@ -2804,7 +2809,8 @@ static void add_item(struct tn_stmt *m)
             return;
         }
         case 4:
-            if ((e = new_entry(E_RELOAD, "Reload menus")))
+        case 5:
+            if ((e = k == 4 ? new_entry(E_RELOAD, "Reload menus") : new_entry(E_EDIT, "Edit Menus")))
             {
                 append_entry(m, e);
                 changed();
@@ -2837,6 +2843,9 @@ static void open_item(struct tn_stmt *m, struct tn_entry *e)
         }
         case E_RELOAD:
             rb->splash(HZ * 2, "Reloads the menu files when opened in the Database");
+            break;
+        case E_EDIT:
+            rb->splash(HZ * 2, "Opens this editor from the Database");
             break;
         case E_RAW:
         {
@@ -3120,6 +3129,7 @@ static void edit_items(struct tn_stmt *m, bool is_root)
                     add_row(R_ENTRY, Icon_Questionmark, e, "%s (not understood)", e->name);
                     break;
                 case E_RELOAD:
+                case E_EDIT:
                     add_row(R_ENTRY, Icon_Menu_functioncall, e, "%s", e->name);
                     break;
                 default:
