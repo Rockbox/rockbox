@@ -302,9 +302,11 @@ static int32_t handle_command(struct IAPContext* ctx, uint8_t lingo, uint16_t co
             case IAPLingoID_SimpleRemote:
                 response->bits = swap_64(IAPRetIPodOptionsForLingoSimpleRemoteBits_ContextSpecificControls);
                 break;
+            case IAPLingoID_ExtendedInterface:
+                response->bits = swap_64(IAPRetIPodOptionsForLingoExtendedInterfaceBits_PlayControl);
+                break;
             case IAPLingoID_General:
             case IAPLingoID_DisplayRemote:
-            case IAPLingoID_ExtendedInterface:
             case IAPLingoID_DigitalAudio:
             case IAPLingoID_Storage: /* TODO: this is not supported */
                 response->bits = 0;
