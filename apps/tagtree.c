@@ -1479,6 +1479,32 @@ bool tagtree_ready(void)
     return tagnavi_loaded;
 }
 
+static bool tagnavi_reload_pending;
+
+/* Called (e.g. by a plugin) after the menu files have changed. The menus
+ * are reloaded the next time the Database is opened. */
+void tagtree_request_reload(void)
+{
+    tagnavi_reload_pending = true;
+}
+
+/* Called when the Database is opened. Returns true if the menus were
+ * reloaded, in which case browsing starts again from the root menu. */
+bool tagtree_reload_if_pending(struct tree_context *c)
+{
+    if (!tagnavi_reload_pending)
+        return false;
+    tagnavi_reload_pending = false;
+
+    if (tagnavi_loaded)
+        tagtree_unload(NULL);
+    tagnavi_loaded = initialize_tagtree();
+
+    c->currtable = 0;
+    c->currextra = 0;
+    return true;
+}
+
 static int format_str(struct tagcache_search *tcs, struct display_format *fmt,
                       char *buf, int buf_size)
 {

@@ -896,6 +896,9 @@ static const struct plugin_api rockbox_api = {
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
     settings_apply,
+#ifdef HAVE_TAGCACHE
+    tagtree_request_reload,
+#endif
 };
 
 static int plugin_buffer_handle;

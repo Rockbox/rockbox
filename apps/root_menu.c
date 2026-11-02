@@ -270,6 +270,11 @@ static int browser(void* param)
             }
             if (!tagcache_is_usable())
                 return GO_TO_PREVIOUS;
+            if (tagtree_reload_if_pending(tc))
+            {
+                last_db_dirlevel = 0;
+                last_db_selection = 0;
+            }
             if (!tagtree_ready())
             {
                 splashf(HZ*3, "%s\n%s", str(LANG_FILE_NOT_FOUND),
