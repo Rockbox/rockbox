@@ -16052,20 +16052,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_WPS
-  desc: in Settings
-  user: core
-  <source>
-    *: "What's Playing Screen"
-  </source>
-  <dest>
-    *: "What's Playing Screen"
-  </dest>
-  <voice>
-    *: "What's Playing Screen"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_DEFAULT_BROWSER
   desc: deprecated
   user: core

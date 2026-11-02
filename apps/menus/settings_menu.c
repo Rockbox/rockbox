@@ -813,7 +813,7 @@ MENUITEM_FUNCTION(reset_wps_item, 0, ID2P(LANG_RESET), reset_wps_items, NULL, Ic
 /***********************************/
 /*    WPS Settings MENU            */
 
-MAKE_MENU(wps_settings, ID2P(LANG_WPS), 0, Icon_Playback_menu
+MAKE_MENU(wps_settings, ID2P(LANG_WHILE_PLAYING), 0, Icon_Playback_menu
 #ifdef HAVE_HOTKEY
             ,&hotkey_wps_item /* this is item 0 */
 #else
