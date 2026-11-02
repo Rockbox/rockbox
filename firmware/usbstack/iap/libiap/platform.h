@@ -83,6 +83,7 @@ struct IAPPlatformArtwork {
 void* iap_platform_malloc(struct IAPContext* iap_ctx, size_t size, int flags);
 void  iap_platform_free(struct IAPContext* iap_ctx, void* ptr);
 int   iap_platform_send_hid_report(struct IAPContext* iap_ctx, const void* ptr, size_t size);
+void  iap_platform_get_random(struct IAPContext* iap_ctx, void* ptr, size_t size);
 
 /* system info */
 IAPBool iap_platform_get_ipod_serial_num(struct IAPContext* iap_ctx, struct IAPSpan* serial);

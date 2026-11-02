@@ -1027,6 +1027,9 @@ static IAPBool send_auth_challenge_sig_cb(struct IAPContext* ctx) {
     struct IAPSpan                     request_span = _iap_get_buffer_for_send_payload(ctx);
     struct IAPGetAccAuthSigPayload2p0* request      = iap_span_alloc(&request_span, sizeof(*request));
     check_ret(request != NULL, iap_false);
+    /* random, as the accessory is to sign a challenge it can't have
+     * signed before: see RetAccessoryAuthenticationSignature */
+    iap_platform_get_random(ctx, request->challenge, sizeof(request->challenge));
     request->retry = 1;
     check_ret(_iap_send_packet(ctx, IAPLingoID_General, IAPGeneralCommandID_GetAccessoryAuthenticationSignature, _iap_next_trans_id(ctx), request_span.ptr), iap_false);
     return iap_true;
@@ -1056,6 +1059,11 @@ static int32_t handle_in_auth(struct IAPContext* ctx, uint8_t lingo, uint16_t co
             }
         } break;
         case IAPGeneralCommandID_RetAccessoryAuthenticationSignature: {
+            /* The signature is accepted without being checked. To
+             * authenticate the accessory, verify it here: it signs the
+             * challenge sent by send_auth_challenge_sig_cb() with the key of
+             * the certificate sent in RetAccessoryAuthenticationInfo, which
+             * would have to be kept, and checked against Apple's CA. */
             print("accessory signature");
             /* iap_platform_dump_hex(request->ptr, request->size); */
 

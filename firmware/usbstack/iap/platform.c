@@ -17,6 +17,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include <stdlib.h>
 #include "audio.h"
 #include "buffering.h"
 #include "core_alloc.h"
@@ -76,6 +77,16 @@ int iap_platform_send_hid_report(struct IAPContext* iap_ctx, const void* ptr, si
 #endif
     const int ret = usb_drv_send_nonblocking(HID_EP_IN, (void*)ptr, size);
     return ret == 0 ? (int)size : ret;
+}
+
+/* not cryptographic, which is enough while the signature of the
+ * authentication challenge isn't verified */
+void iap_platform_get_random(struct IAPContext* iap_ctx, void* ptr, size_t size) {
+    (void)iap_ctx;
+    uint8_t* p = ptr;
+    while(size-- > 0) {
+        *p++ = rand();
+    }
 }
 
 IAPBool iap_platform_get_ipod_serial_num(struct IAPContext* iap_ctx, struct IAPSpan* serial) {
