@@ -59,73 +59,42 @@
 
 #if CONFIG_TUNER
 
-#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
-#define FM_PRESET
-#define FM_MODE
-#define FM_NEXT_PRESET
-#define FM_PREV_PRESET
-
-#elif (CONFIG_KEYPAD == IRIVER_H10_PAD) || (CONFIG_KEYPAD == GIGABEAT_S_PAD)
-#define FM_PRESET
-#define FM_MODE
-
-#elif (CONFIG_KEYPAD == IAUDIO_X5M5_PAD)
-#define FM_PRESET
-#define FM_MODE
+#if (CONFIG_KEYPAD == IAUDIO_X5M5_PAD)
 /* This should be removeable if the whole tuning thing is sorted out since
    proper tuning quiets the screen almost entirely in that extreme measures
    have to be taken to hear any interference. */
 #define HAVE_NOISY_IDLE_MODE
+#endif
 
-#elif (CONFIG_KEYPAD == SANSA_E200_PAD) || (CONFIG_KEYPAD == SANSA_C200_PAD) ||\
-      (CONFIG_KEYPAD == SANSA_FUZE_PAD) || (CONFIG_KEYPAD == SANSA_CLIP_PAD) ||\
-      (CONFIG_KEYPAD == PHILIPS_HDD1630_PAD)||(CONFIG_KEYPAD == COWON_D2_PAD)||\
-      (CONFIG_KEYPAD == SAMSUNG_YH92X_PAD)||(CONFIG_KEYPAD == MPIO_HD200_PAD)||\
-      (CONFIG_KEYPAD == PHILIPS_HDD6330_PAD) || (CONFIG_KEYPAD == SONY_NWZ_PAD)
-#define FM_MENU
+/* optional actions: define if the target's keymap has
+ * ACTION_FM_MODE, ACTION_FM_PRESET, ACTION_FM_NEXT_PRESET,
+ * ACTION_FM_PREV_PRESET or ACTION_FM_RECORD defined.       */
+#if (CONFIG_KEYPAD == IPOD_1G2G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) || \
+    (CONFIG_KEYPAD == IPOD_4G_PAD)
+#define FM_MODE
+
+#elif (CONFIG_KEYPAD == COWON_D2_PAD) || (CONFIG_KEYPAD == GIGABEAT_S_PAD) || \
+      (CONFIG_KEYPAD == IAUDIO_X5M5_PAD) || (CONFIG_KEYPAD == IRIVER_H10_PAD) || \
+      (CONFIG_KEYPAD == MPIO_HD200_PAD) || (CONFIG_KEYPAD == PHILIPS_HDD1630_PAD) || \
+      (CONFIG_KEYPAD == PHILIPS_HDD6330_PAD) || (CONFIG_KEYPAD == SAMSUNG_YH92X_PAD) || \
+      (CONFIG_KEYPAD == SANSA_C200_PAD) || (CONFIG_KEYPAD == SANSA_E200_PAD) || \
+      (CONFIG_KEYPAD == SANSA_CLIP_PAD) || (CONFIG_KEYPAD == SANSA_FUZE_PAD) || \
+      (CONFIG_KEYPAD == SONY_NWZ_PAD)
 #define FM_PRESET
-#define FM_STOP
-#define FM_MODE
-#define FM_EXIT
-#define FM_PLAY
-
-#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) || \
-      (CONFIG_KEYPAD == IPOD_1G2G_PAD)
-#define FM_MENU
-#define FM_STOP
-#define FM_EXIT
-#define FM_PLAY
 #define FM_MODE
 
-#elif (CONFIG_KEYPAD == RK27XX_GENERIC_PAD)
-#define FM_MENU
-#define FM_PLAY
-#define FM_STOP
-#define FM_EXIT
-
-#elif (CONFIG_KEYPAD == SAMSUNG_YPR0_PAD)
-#define FM_MENU
+#elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
 #define FM_PRESET
-#define FM_STOP
 #define FM_MODE
-#define FM_EXIT
-#define FM_PLAY
+#define FM_NEXT_PRESET
+#define FM_PREV_PRESET
+
+#elif (CONFIG_KEYPAD == SAMSUNG_YPR0_PAD) || (CONFIG_KEYPAD == SANSA_FUZEPLUS_PAD)
+#define FM_PRESET
+#define FM_MODE
 #define FM_PREV_PRESET
 #define FM_NEXT_PRESET
 #define FM_RECORD
-
-#elif (CONFIG_KEYPAD == SANSA_FUZEPLUS_PAD)
-#define FM_PRESET_ADD
-#define FM_PRESET_ACTION
-#define FM_MENU
-#define FM_PRESET
-#define FM_STOP
-#define FM_MODE
-#define FM_EXIT
-#define FM_PLAY
-#define FM_RECORD
-#define FM_PREV_PRESET
-#define FM_NEXT_PRESET
 
 #endif
 

@@ -71,14 +71,10 @@ MENUITEM_FUNCTION(recsettings_item, 0, ID2P(LANG_RECORDING_SETTINGS),
 #endif /* defined(HAVE_FMRADIO_REC) */
 #endif /* HAVE_RECORDING */
 
-#ifndef FM_PRESET
 MENUITEM_FUNCTION(radio_presets_item, 0, ID2P(LANG_PRESET),
                   handle_radio_presets, NULL, Icon_NOICON);
-#endif
-#ifndef FM_PRESET_ADD
 MENUITEM_FUNCTION(radio_addpreset_item, 0, ID2P(LANG_FM_ADD_PRESET),
                   handle_radio_add_preset, NULL, Icon_NOICON);
-#endif
 
 MENUITEM_FUNCTION(presetload_item, 0, ID2P(LANG_FM_PRESET_LOAD),
                   preset_list_load, NULL, Icon_NOICON);
@@ -93,7 +89,6 @@ MENUITEM_SETTING(force_mono, &global_settings.fm_force_mono, NULL);
 MENUITEM_SETTING(sync_rds_time, &global_settings.sync_rds_time, NULL);
 #endif
 
-#ifndef FM_MODE
 
 static char* get_mode_text(int selected_item, void * data,
                            char *buffer, size_t buffer_len)
@@ -128,7 +123,6 @@ static int toggle_radio_mode(void)
 MENUITEM_FUNCTION_DYNTEXT(radio_mode_item, 0, toggle_radio_mode,
                           get_mode_text, mode_speak_item,
                           NULL, NULL, Icon_NOICON);
-#endif
 
 MENUITEM_FUNCTION_W_PARAM(scan_presets_item, 0,
                           ID2P(LANG_FM_SCAN_PRESETS),
@@ -136,17 +130,11 @@ MENUITEM_FUNCTION_W_PARAM(scan_presets_item, 0,
 
 MAKE_MENU(radio_settings_menu, ID2P(LANG_FM_MENU), NULL,
             Icon_Radio_screen,
-#ifndef FM_PRESET
             &radio_presets_item,
-#endif
-#ifndef FM_PRESET_ADD
             &radio_addpreset_item,
-#endif
             &presetload_item, &presetsave_item, &presetclear_item,
             &force_mono,
-#ifndef FM_MODE
             &radio_mode_item,
-#endif
             &set_region, &sound_settings,
 #ifdef FM_RECORDING_SCREEN
             &recscreen_item,
