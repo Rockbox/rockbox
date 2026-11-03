@@ -994,7 +994,7 @@ static int32_t handle_in_connected(struct IAPContext* ctx, uint8_t lingo, uint16
         }
         break;
     }
-    return -IAPAckStatus_EUnknownID;
+    return -IAPAckStatus_EBadParameter;
 }
 
 static int32_t handle_in_idps(struct IAPContext* ctx, uint8_t lingo, uint16_t command, struct IAPSpan* request_span, struct IAPSpan* response_span) {
@@ -1068,7 +1068,7 @@ static int32_t handle_in_auth(struct IAPContext* ctx, uint8_t lingo, uint16_t co
         }
         break;
     }
-    return -IAPAckStatus_EUnknownID;
+    return -IAPAckStatus_EBadParameter;
 }
 
 static int32_t build_ipod_ack_response(uint8_t lingo, uint16_t command, uint8_t status, struct IAPSpan* response_span) {
