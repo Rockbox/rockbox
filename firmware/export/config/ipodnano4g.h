@@ -188,8 +188,10 @@
 /* The exact type of CPU */
 #define CONFIG_CPU S5L8720
 
-/* Define this to the CPU frequency */
-#define CPU_FREQ        266000000           // TODO: TBC
+/* PLL0 output with the bootloader's PMS (0x06008501) and CPU divisor 1.
+ * (OSC0 * 133 / PDIV) / 2. OSC0 is 24 MHz with PDIV 6, or 12 MHz with
+ * PDIV 3; both lock at 266 MHz. */
+#define CPU_FREQ        266000000
 
 /* Define this if you have adjustable CPU frequency */
 #define HAVE_ADJUSTABLE_CPU_FREQ

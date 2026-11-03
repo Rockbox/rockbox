@@ -31,9 +31,14 @@
 #define CPUFREQ_DEFAULT 54000000
 #define CPUFREQ_NORMAL  54000000
 #elif (CONFIG_CPU == S5L8720)
+/* PLL0 SDIV 0/1/2/3/4. The CPU post-divider stays at /1: writing it
+ * while running freezes the CPU. Bus divisors keep AHB at 133.
+ * USB is 532 (AHB /4), boost is 266 (AHB /2), normal is 66.5,
+ * and the optional low step is 33.25 (AHB /1). */
 #define CPUFREQ_MAX     266000000
-#define CPUFREQ_DEFAULT 133000000
-#define CPUFREQ_NORMAL  133000000
+#define CPUFREQ_NORMAL  (CPUFREQ_MAX / 4)
+#define CPUFREQ_DEFAULT CPUFREQ_NORMAL
+#define CPUFREQ_USB     (CPUFREQ_MAX * 2)
 #endif
 
 #define STORAGE_WANTS_ALIGN

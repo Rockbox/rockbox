@@ -116,9 +116,13 @@ void cpu_boost(bool on_off)
 #endif /* CPU_BOOST_LOGGING */
     if(on_off)
     {
-        /* Boost the frequency if not already boosted */
+        /* Boost the frequency if not already boosted.
+         * USB idle on the 8720 is already faster than boost. */
         if(++boost_counter == 1)
-            set_cpu_frequency(CPUFREQ_MAX);
+#if CONFIG_CPU == S5L8720
+            if (!cpu_idle)
+#endif
+                set_cpu_frequency(CPUFREQ_MAX);
     }
     else
     {
@@ -126,7 +130,11 @@ void cpu_boost(bool on_off)
         if(--boost_counter <= 0)
         {
             if(cpu_idle)
+#if CONFIG_CPU == S5L8720
+                set_cpu_frequency(CPUFREQ_USB);
+#else
                 set_cpu_frequency(CPUFREQ_DEFAULT);
+#endif
             else
                 set_cpu_frequency(CPUFREQ_NORMAL);
 
@@ -153,7 +161,11 @@ void cpu_idle_mode(bool on_off)
     if(boost_counter == 0)
     {
         if(cpu_idle)
+#if CONFIG_CPU == S5L8720
+            set_cpu_frequency(CPUFREQ_USB);
+#else
             set_cpu_frequency(CPUFREQ_DEFAULT);
+#endif
         else
             set_cpu_frequency(CPUFREQ_NORMAL);
     }

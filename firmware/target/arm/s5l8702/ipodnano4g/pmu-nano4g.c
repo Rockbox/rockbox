@@ -103,10 +103,13 @@ void pmu_enter_standby(void)
 }
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-void pmu_set_cpu_voltage(bool high)
+void pmu_set_cpu_voltage(unsigned mv)
 {
-    // TODO
-    (void) high;
+    /* D1759 core buck, register 0x14. code = (mV - 725) / 25.
+     * 1200 mV is 0x13, 1100 mV is 0x0f. 532 and 266 MHz use 1200,
+     * 133, 66.5 and 33.25 MHz use 1100.
+     * Register 0x15 is standby and stays at the 0x0d preinit wrote. */
+    pmu_write(D1759_REG_VCORE, (mv - 725) / 25);
 }
 #endif
 

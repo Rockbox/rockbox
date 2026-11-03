@@ -137,7 +137,7 @@ void pmu_set_wake_condition(unsigned char condition);
 void pmu_enter_standby(void);
 // void pmu_nand_power(bool on);
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-void pmu_set_cpu_voltage(bool high);
+void pmu_set_cpu_voltage(unsigned mv);
 #endif
 #if (CONFIG_RTC == RTC_NANO3G)
 void pmu_read_rtc(unsigned char* buffer);

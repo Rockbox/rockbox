@@ -265,13 +265,12 @@ unsigned pll_get_cfg_freq(int pll);
 unsigned pll_get_out_freq(int pll);
 unsigned soc_get_oscsel_freq(void);
 int soc_get_hsdiv(void);
-
-#ifdef BOOTLOADER
-void usec_timer_init(void);
-
 void soc_set_system_divs(unsigned cdiv, unsigned hdiv, unsigned hprat);
 unsigned soc_get_system_divs(unsigned *cdiv, unsigned *hdiv, unsigned *pdiv);
 void soc_set_hsdiv(int hsdiv);
+
+#ifdef BOOTLOADER
+void usec_timer_init(void);
 
 #if CONFIG_CPU == S5L8702
 void cg16_config(volatile uint16_t* cg16,

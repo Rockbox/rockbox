@@ -105,6 +105,16 @@ default_interrupt(INT_IRQ63);
 
 static int current_irq IBSS_ATTR;
 
+#if CONFIG_CPU == S5L8720
+static const struct clocking_mode clk_modes[] =
+{
+    /* Bootloader image: PLL0 SDIV 1, CPU /1, buses /2.
+     * 133 and 532 MHz are PLL SDIV changes in set_cpu_frequency.
+     * The CPU post-divider stays /1. */
+    /* cdiv  hdiv  hprat  hsdiv */   /* CClk  HClk  PClk */
+    { 1,    2,    1,     1 },        /* 266   133   133  */
+};
+#else
 static const struct clocking_mode clk_modes[] =
 {
    /* cdiv  hdiv  hprat  hsdiv */    /* CClk  HClk  PClk  SM1Clk  FPS */
@@ -116,6 +126,7 @@ static const struct clocking_mode clk_modes[] =
     { 4,    4,    2,     2 },        /* 54    54    27    27      21  */
 #endif
 };
+#endif
 #define N_CLK_MODES (sizeof(clk_modes) / sizeof(struct clocking_mode))
 
 enum {
@@ -268,11 +279,134 @@ void system_exception_wait(void)
 }
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
+#if CONFIG_CPU == S5L8720
+/* EFI writes PLL0 SDIV and waits until those bits read back.
+ * SDIV 0 is 532 MHz, 1 is 266, 2 is 133. */
+static void pll0_set_sdiv(unsigned sdiv)
+{
+    uint32_t pms = (PLL0PMS & ~PLLPMS_SDIV_MSK) | (sdiv & PLLPMS_SDIV_MSK);
+
+    PLL0PMS = pms;
+    for (int i = 0; i < 1000000; i++)
+        if ((PLL0PMS & PLLPMS_SDIV_MSK) == (sdiv & PLLPMS_SDIV_MSK))
+            return;
+}
+
+/* FCLK/hdiv stays at 133 MHz while PLL0 is at least 133. SDIV 0 is
+ * 532 so the buses are /4, SDIV 1 is 266 so they are /2, and SDIV 2
+ * is already 133. At SDIV 3 and 4 the buses follow 66.5 and 33.25. */
+static unsigned hdiv_for_sdiv(unsigned sdiv)
+{
+    if (sdiv == 0)
+        return 4;
+    return sdiv <= 1 ? 2 : 1;
+}
+
+/* Panel clock stays at the 266 MHz PLL0 divided by 16. SDIV 0
+ * doubles PLL0, and DIV1 cannot reach 32, so DIV2 takes that bit.
+ * Each slower SDIV halves DIV1: 16, 8. */
+static void lcd_divs_for_sdiv(unsigned sdiv, unsigned *div1, unsigned *div2)
+{
+    *div2 = 1;
+    if (sdiv < 1) {
+        *div1 = 16;
+        *div2 = 2;
+        return;
+    }
+    if (sdiv > 5)
+        sdiv = 5;
+    *div1 = 16u >> (sdiv - 1);
+}
+
+static void lcd_follow_pll(unsigned want1, unsigned want2)
+{
+    uint16_t v = CG16_LCD;
+    unsigned div1 = (v & CG16_DIV1_MSK) + 1;
+    unsigned div2 = ((v >> CG16_DIV2_POS) & CG16_DIV2_MSK) + 1;
+    unsigned sel = (v >> CG16_SEL_POS) & CG16_SEL_MSK;
+    volatile uint32_t *reg32;
+    int shift;
+
+    if ((v & CG16_DISABLE_BIT) || sel != CG16_SEL_PLL0)
+        return;
+    if (want1 < 1 || want1 > 16 || want2 < 1 || want2 > 16)
+        return;
+    if (div1 == want1 && div2 == want2)
+        return;
+
+    v = (v & ~(CG16_DIV1_MSK | (CG16_DIV2_MSK << CG16_DIV2_POS)))
+      | ((want1 - 1) & CG16_DIV1_MSK)
+      | (((want2 - 1) & CG16_DIV2_MSK) << CG16_DIV2_POS);
+    reg32 = (volatile uint32_t *)((uintptr_t)&CG16_LCD & ~3);
+    shift = ((uintptr_t)&CG16_LCD & 2) << 3;
+    *reg32 = (*reg32 & (0xffff0000u >> shift)) | ((uint32_t)v << shift);
+}
+
+/* pmu_preinit() leaves the core rail at 1200 mV. */
+static unsigned vcore_mv = 1200;
+
+static unsigned vcore_mv_for(long frequency)
+{
+    /* 266 and 532 MHz are 1200 mV. Lower steps share 1100 mV. */
+    if (frequency >= CPUFREQ_MAX)
+        return 1200;
+    return 1100;
+}
+#endif
+
 void set_cpu_frequency(long frequency)
 {
     if (cpu_frequency == frequency)
         return;
 
+#if CONFIG_CPU == S5L8720
+    /* CPU post-divider writes freeze the CPU, so it stays at /1.
+     * Slowing drops PLL0 before the buses open. Speeding closes the
+     * buses before PLL0 rises. AHB peaks at 133. */
+    if (!(PLLMODE & PLLMODE_EN_BIT(0)))
+        return;
+
+    /* 532, 266, 133, 66.5, then 33.25. Panic (0) takes 133. */
+    unsigned sdiv = 2;
+    unsigned lcd1, lcd2;
+    if (frequency >= CPUFREQ_USB)
+        sdiv = 0;
+    else if (frequency >= CPUFREQ_MAX)
+        sdiv = 1;
+    else if (frequency && frequency <= CPUFREQ_NORMAL / 2)
+        sdiv = 4;
+    else if (frequency && frequency <= CPUFREQ_NORMAL)
+        sdiv = 3;
+    unsigned cur = PLL0PMS & PLLPMS_SDIV_MSK;
+    unsigned hdiv = hdiv_for_sdiv(sdiv);
+    unsigned mv = vcore_mv_for(frequency);
+    int irq = disable_irq_save();
+
+    lcd_divs_for_sdiv(sdiv, &lcd1, &lcd2);
+
+    /* Raise the rail before the clock. 33.25, 66.5 and 133 MHz are
+     * 1100 mV. 266 and 532 MHz are 1200 mV. */
+    if (mv > vcore_mv)
+        pmu_set_cpu_voltage(mv);
+    if (sdiv < cur) {
+        /* Close the buses and raise the LCD divisor before PLL0,
+         * so AHB stays at 133 and the panel never runs fast. */
+        soc_set_system_divs(1, hdiv, 1);
+        lcd_follow_pll(lcd1, lcd2);
+        pll0_set_sdiv(sdiv);
+    } else if (sdiv > cur) {
+        pll0_set_sdiv(sdiv);
+        soc_set_system_divs(1, hdiv, 1);
+        /* Open AHB before raising the LCD interface clock. At the
+         * 33 MHz PLL step the old /2 bus divider would otherwise leave
+         * both clocks at 16.6 MHz during the transition. */
+        lcd_follow_pll(lcd1, lcd2);
+    }
+    if (mv < vcore_mv)
+        pmu_set_cpu_voltage(mv);
+    vcore_mv = mv;
+    restore_irq(irq);
+#else
     if (frequency == CPUFREQ_MAX)
     {
         pmu_set_cpu_voltage(true); /* high */
@@ -283,6 +417,7 @@ void set_cpu_frequency(long frequency)
         set_clocking_level(CLK_UNBOOST);
         pmu_set_cpu_voltage(false); /* low */
     }
+#endif
 
     cpu_frequency = frequency;
 }
@@ -366,7 +501,9 @@ static void syscon_preinit(void)
 
     // soc_set_system_divs(1, 2, 1 /*hprat*/);
 
-    // XXX: Without this, SDRAM does not work!
+    /* CPU/1, AHB/2, APB/2, EFI clock 18 /2. Same encoding as
+     * soc_set_system_divs(1, 2, 1). Absolute store: SDRAM does
+     * not come up if this image is not written here. */
     uint32_t val = 0x404040;
     CLKCON1 = val;
     while (CLKCON1 != val);
