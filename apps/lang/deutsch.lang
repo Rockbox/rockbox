@@ -15793,20 +15793,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_WPS
-  desc: in Settings
-  user: core
-  <source>
-    *: "What's Playing Screen"
-  </source>
-  <dest>
-    *: "Wiedergabebildschirm"
-  </dest>
-  <voice>
-    *: "Wiedergabebildschirm"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_DEFAULT_BROWSER
   desc: deprecated
   user: core
@@ -17190,7 +17176,7 @@
   </source>
   <dest>
     *: none
-    recording: "Recording Screen"
+    recording: "Aufnahmebildschirm"
   </dest>
   <voice>
     *: none
@@ -17224,7 +17210,7 @@
   </source>
   <dest>
     *: none
-    recording_remote: "Remote Recording Screen"
+    recording_remote: "Remote Aufnahmebildschirm"
   </dest>
   <voice>
     *: none
