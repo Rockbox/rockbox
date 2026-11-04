@@ -39,6 +39,7 @@ enum d1759_regs {
     D1759_REG_IRQMASKC      = 0x09,
     D1759_REG_SYSCTRL       = 0x0a, /* preinit writes 0x70 */
     D1759_REG_WAKE          = 0x0d, /* preinit gates bit 5 from PMU 0x7f */
+    D1759_REG_VCORE         = 0x14, /* active core buck, code = (mV - 725) / 25 */
     D1759_REG_LEDOUT        = 0x30,
     D1759_REG_LEDCTL        = 0x31,
     D1759_REG_ILIM          = 0x33, /* preinit keeps bits 0..1, sets 0x50 */
