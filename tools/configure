@@ -4771,7 +4771,7 @@ fi
 if test "$ARG_ARM_THUMB" = "1"; then
   extradefines="$extradefines -DUSE_THUMB"
   GCCOPTS="$GCCOPTS -mthumb-interwork"
-  CC="$toolsdir/thumb-cc.py $CC"
+  CC="$toolsdir/thumb-cc.pl $CC"
 fi
 
 if test "X$endian" = "Xbig"; then
