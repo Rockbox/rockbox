@@ -37,18 +37,9 @@
 #include "settings.h"
 #include "metadata.h"
 #include "playback.h"
-#include "sound.h"
 #if CONFIG_TUNER
 #include "ipod_remote_tuner.h"
 #endif
-
-/* Apply the accessory's UI volume byte. sound_set_volume() keeps the
- * result within the volume limit and stores it in global_status.volume.
- */
-static void set_remote_volume(const unsigned char raw)
-{
-    sound_set_volume(iap_byte_to_volume(raw));
-}
 
 /*
  * This macro is meant to be used inside an IAP mode message handler.
@@ -785,11 +776,11 @@ void iap_handlepkt_mode3(const unsigned int len, const unsigned char *buf)
                     CHECKLEN(5);
                     if (buf[0x03]==0x00){
                         /* Not Muted */
-                        set_remote_volume(buf[0x04]);
-                        device.mute = false;
+                        global_status.volume = iap_byte_to_volume(buf[0x04]);
+                        iap_set_mute(false);
                     }
                     else {
-                        device.mute = true;
+                        iap_set_mute(true);
                     }
                     cmd_ok(cmd);
                     break;
@@ -952,18 +943,21 @@ void iap_handlepkt_mode3(const unsigned int len, const unsigned char *buf)
 
                 /* Volume/Mute/Absolute
                  * Data length: 4
-                 * TODO: Fix this
                  */
                 case 0x10:
                 {
                     CHECKLEN(7);
                     if (buf[0x03]==0x00){
-                        /* Not Muted */
-                        set_remote_volume(buf[0x04]);
-                        device.mute = false;
+                        /* Not Muted. A UI volume of 0 means the absolute
+                         * volume that follows it applies. */
+                        if (buf[0x04] != 0)
+                            global_status.volume = iap_byte_to_volume(buf[0x04]);
+                        else
+                            global_status.volume = iap_abs_byte_to_volume(buf[0x05]);
+                        iap_set_mute(false);
                     }
                     else {
-                        device.mute = true;
+                        iap_set_mute(true);
                     }
 
                     cmd_ok(cmd);

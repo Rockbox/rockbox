@@ -42,6 +42,7 @@
 #include "action.h"
 #include "powermgmt.h"
 #include "usb.h"
+#include "misc.h"
 
 #include "tuner.h"
 #if CONFIG_TUNER
@@ -95,6 +96,10 @@ int iap_repeatbtn = 0;
  */
 unsigned int iap_timeoutbtn = 0;
 bool iap_btnrepeat = false, iap_btnshuffle = false;
+/* Set when a session ends while muted, see iap_reset_device() */
+static bool iap_unmute_pending = false;
+/* The user's volume when an accessory muted, see iap_periodic() */
+static int iap_mute_volume;
 
 static long thread_stack[(DEFAULT_STACK_SIZE*8)/sizeof(long)];
 static struct event_queue iap_queue;
@@ -360,6 +365,10 @@ void iap_reset_device(struct device_t* device)
     device->accinfo = ACCST_NONE;
     device->capabilities = 0;
     device->capabilities_queried = 0;
+    /* Lift a mute the accessory left behind. That needs the codec, so
+     * leave it to iap_periodic(): this may run in interrupt context. */
+    if (device->mute)
+        iap_unmute_pending = true;
     device->mute = false;
 
     interface_state = IST_STANDARD;
@@ -434,6 +443,41 @@ int iap_byte_to_volume(unsigned char level)
         return lo;
 
     return lo + (level * (hi - lo) + 127) / 255;
+}
+
+/* The inverse of iap_volume_to_byte(), still kept within the volume
+ * limit */
+int iap_abs_byte_to_volume(unsigned char level)
+{
+    int lo = sound_min(SOUND_VOLUME);
+    int hi = sound_max(SOUND_VOLUME);
+
+    if (hi <= lo)
+        return lo;
+
+    return MIN(lo + (level * (hi - lo) + 127) / 255, iap_ui_volume_max());
+}
+
+/* Mute or unmute on behalf of an accessory. Thread context only.
+ *
+ * sound_set_volume() also stores the value in global_status.volume, so
+ * put the user's volume back after muting, or unmuting would restore the
+ * mute level.
+ */
+void iap_set_mute(bool mute)
+{
+    if (mute)
+    {
+        iap_mute_volume = global_status.volume;
+        sound_set_volume(sound_min(SOUND_VOLUME));
+        global_status.volume = iap_mute_volume;
+    }
+    else
+    {
+        setvol();
+    }
+
+    device.mute = mute;
 }
 
 void iap_set_remote_volume(void)
@@ -903,6 +947,18 @@ void iap_periodic(void)
     static int pb_count;
 
     if(!iap_setupflag) return;
+
+    if (iap_unmute_pending)
+    {
+        iap_unmute_pending = false;
+        if (!device.mute)
+            setvol();
+    }
+
+    /* setvol() makes a volume changed on the player audible, which lifts
+     * an accessory's mute. The volume notification reports it. */
+    if (device.mute && (global_status.volume != iap_mute_volume))
+        device.mute = false;
 
     /* Handle pending authentication tasks */
     switch (device.auth.state)
