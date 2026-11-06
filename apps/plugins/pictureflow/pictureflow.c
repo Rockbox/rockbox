@@ -1662,7 +1662,7 @@ static int load_album_index(void){
     }
 
 failure:
-    rb->splash(HZ/2, "Failed to load index");
+    rb->splashf(HZ/2, ID2P(LANG_ERROR_FORMATSTR), "Failed to load index");
     if (fr >= 0)
         rb->close(fr);
 
@@ -1859,7 +1859,7 @@ static int id3_get_index(struct mp3entry *id3)
         }
 
     }
-    rb->splash(HZ/2, "Album Not Found!");
+    rb->splashf(HZ/2, ID2P(LANG_ERROR_FORMATSTR), "Album Not Found!");
     return pf_cfg.last_album;
 }
 
@@ -2369,7 +2369,7 @@ static bool incremental_albumart_cache(bool verbose)
 
     if (!save_pfraw(aa_cache.pfraw_file, &aa_cache.input_bmp))
     {
-        if (verbose) { rb->splash(HZ, "Could not write bmp"); }
+        if (verbose) { rb->splashf(HZ, ID2P(LANG_ERROR_FORMATSTR), "Could not write bmp"); }
         goto aa_failure;
     }
     aa_cache.slides++;
@@ -4557,7 +4557,7 @@ static void draw_album_text(void)
 */
 static void error_wait(const char *message)
 {
-    rb->splashf(0, "%s. Press any button to continue.", message);
+    rb->splashf(0, "%s. Press any button to continue.", message); // FIXME
     while (rb->get_action(CONTEXT_STD, 1) == ACTION_NONE)
         rb->yield();
     rb->sleep(2 * HZ);
@@ -4639,7 +4639,7 @@ static bool init(void)
         {
             pf_cfg.cache_version = CACHE_REBUILD;
             if (save_album_index() < 0)
-                rb->splash(HZ, "Could not write index");
+                rb->splashf(HZ, ID2P(LANG_ERROR_FORMATSTR), "Could not write index");
         }
     }
 
@@ -4657,7 +4657,7 @@ static bool init(void)
         return false;
     else if (ret == ERROR_DB_BUSY)
     {
-        error_wait("Database busy");
+        error_wait(rb->str(LANG_TAGCACHE_BUSY));
         return false;
     }
 
@@ -4694,8 +4694,7 @@ static bool init(void)
         error_wait("Could not create album art cache");
     }
     else if(aa_cache.inspected < pf_idx.album_ct)
-        rb->splash(HZ * 2, "Updating album art cache in background");
-
+        rb->splash(HZ * 2, ID2P(LANG_TAGCACHE_FORCE_UPDATE_SPLASH));
     if (pf_cfg.cache_version != CACHE_VERSION)
         config_save(CACHE_VERSION, pf_cfg.update_albumart);
 
