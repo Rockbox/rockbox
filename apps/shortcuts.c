@@ -543,9 +543,22 @@ static int shortcut_menu_speak_item(int selected_item, void * data)
         talk_file(NULL, NULL, sc->talk_clip, NULL, NULL, false);
         return 0;
     }
+    if (sc->name[0])
+    {
+        switch (sc->type)
+        {
+        case SHORTCUT_BROWSER:
+        case SHORTCUT_FILE:
+        case SHORTCUT_PLAYLISTMENU:
+            talk_spell(sc->name, false);
+            return 0;
+        default:
+            break;
+        }
+    }
     switch (sc->type)
     {
-    case SHORTCUT_BROWSER:;
+    case SHORTCUT_BROWSER:
         DIR* dir;
         struct dirent* entry;
         char* slash = strrchr(sc->u.path, PATH_SEPCH);
