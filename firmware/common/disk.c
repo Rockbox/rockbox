@@ -256,8 +256,10 @@ bool disk_init(IF_MD_NONVOID(int drive))
 #endif
 
             for (unsigned int i = 0 ; i < (sizeof(try_gpt) / sizeof(try_gpt[0])) ; i++) {
-                if (storage_read_sectors(IF_MD(drive,) try_gpt[i], 1, sector))
+                if (storage_read_sectors(IF_MD(drive,) try_gpt[i], 1, sector)) {
+                    disk_writer_unlock();
                     goto done;
+                }
                 part_lba = BYTES2INT64(ptr, 0);
                 if (part_lba == 0x5452415020494645ULL) {
                     part_entries = 1;
@@ -301,8 +303,10 @@ bool disk_init(IF_MD_NONVOID(int drive))
 
 	    int part = 0;
 reload:
-	    if (storage_read_sectors(IF_MD(drive,) part_lba, 1, sector))
+	    if (storage_read_sectors(IF_MD(drive,) part_lba, 1, sector)) {
+                disk_writer_unlock();
                 goto done;
+            }
             uint8_t *pptr = ptr;
             while (part < MAX_PARTITIONS_PER_DRIVE && part_entries) {
                 if (pptr - ptr >= LOG_SECTOR_SIZE(drive)) {
