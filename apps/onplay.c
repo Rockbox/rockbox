@@ -1039,7 +1039,15 @@ MENUITEM_FUNCTION_W_PARAM(pictureflow_item, 0, ID2P(LANG_ONPLAY_PICTUREFLOW),
 #endif
 static bool onplay_add_to_shortcuts(void)
 {
-    shortcuts_add(SHORTCUT_BROWSER, selected_file.path);
+    if ((selected_file.attr & ATTR_DIRECTORY) == ATTR_DIRECTORY ||
+            !filetype_supported(selected_file.attr))
+    {
+        shortcuts_add(SHORTCUT_BROWSER, selected_file.path);
+    }
+    else
+    {
+        shortcuts_add(SHORTCUT_FILE, selected_file.path);
+    }
     return false;
 }
 MENUITEM_FUNCTION(add_to_faves_item, 0, ID2P(LANG_ADD_TO_FAVES),
