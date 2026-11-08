@@ -32,7 +32,7 @@ DEFINE_PINGROUP(I2C2,           GPIO_D,      3 <<  0,   GPIOF_DEVICE(1))
 /* mute DAC: 0 - mute, 1 - play */
 /* Note: This seems to actually be power to the DAC in general,
  * at least on the ES9018K2M devices. Was "DAC_XMIT". */
-DEFINE_GPIO(DAC_PWR,           GPIO_PB(12),    GPIOF_OUTPUT(0))
+DEFINE_GPIO(DAC_PWR,            GPIO_PB(12),    GPIOF_OUTPUT(0))
 
 /* Headphone Amp power */
 DEFINE_GPIO(HPAMP_POWER,        GPIO_PB(6),     GPIOF_OUTPUT(0))
@@ -107,16 +107,16 @@ DEFINE_GPIO(BTN_SCROLL_B,       GPIO_PB(23),    GPIOF_INPUT)
 DEFINE_GPIO(BT_PWR,             GPIO_PC(22),    GPIOF_OUTPUT(0))
 
 /* uart0_rxd */
-DEFINE_GPIO(BT_HCI_RXD,       GPIO_PC(10),    GPIOF_DEVICE(0b00))
+DEFINE_GPIO(BT_HCI_RXD,         GPIO_PC(10),    GPIOF_DEVICE(0))
 
 /* uart0_txd */
-DEFINE_GPIO(BT_HCI_TXD,       GPIO_PC(11),    GPIOF_DEVICE(0b00))
+DEFINE_GPIO(BT_HCI_TXD,         GPIO_PC(11),    GPIOF_DEVICE(0))
 
 /* uart0_cts */
-DEFINE_GPIO(BT_HCI_CTS,       GPIO_PC(12),    GPIOF_DEVICE(0b00))
+DEFINE_GPIO(BT_HCI_CTS,         GPIO_PC(12),    GPIOF_DEVICE(0))
 
 /* uart0_rts */
-DEFINE_GPIO(BT_HCI_RTS,       GPIO_PC(13),    GPIOF_DEVICE(0b00))
+DEFINE_GPIO(BT_HCI_RTS,         GPIO_PC(13),    GPIOF_DEVICE(0))
 
 
 
@@ -124,25 +124,25 @@ DEFINE_GPIO(BT_HCI_RTS,       GPIO_PC(13),    GPIOF_DEVICE(0b00))
 /****************************** */
 /* HW1/2/3-ONLY STUFF           */
 /****************************** */
-DEFINE_GPIO(HW1_START,              GPIO_PC(0),    GPIOF_OUTPUT(0))
+DEFINE_GPIO(HW1_START,          GPIO_PC(0),     GPIOF_OUTPUT(0))
 /************/
 /* BUTTONS  */
 /************/
-DEFINE_GPIO(BTN_BACK_HW1,           GPIO_PD(5),     GPIOF_INPUT)
-DEFINE_GPIO(BTN_POWER_HW1,          GPIO_PB(7),     GPIOF_INPUT)
+DEFINE_GPIO(BTN_BACK_HW1,       GPIO_PD(5),     GPIOF_INPUT)
+DEFINE_GPIO(BTN_POWER_HW1,      GPIO_PB(7),     GPIOF_INPUT)
 
 /**********************/
 /* BLUETOOTH STUFF    */
 /**********************/
 // GPIO 83 --> port C, pin 19
-DEFINE_GPIO(BT_REG_ON_HW1,          GPIO_PC(19),    GPIOF_OUTPUT(0))
+DEFINE_GPIO(BT_REG_ON_HW1,      GPIO_PC(19),    GPIOF_OUTPUT(0))
 
 /************/
 /* LCD      */
 /************/
 /* LCD */
-DEFINE_GPIO(LCD_PWR_HW1,            GPIO_PB(14),    GPIOF_OUTPUT(0))
-DEFINE_GPIO(HW1_END,                GPIO_PC(0),    GPIOF_OUTPUT(0))
+DEFINE_GPIO(LCD_PWR_HW1,        GPIO_PB(14),    GPIOF_OUTPUT(0))
+DEFINE_GPIO(HW1_END,            GPIO_PC(0),     GPIOF_OUTPUT(0))
 
 
 
@@ -150,13 +150,13 @@ DEFINE_GPIO(HW1_END,                GPIO_PC(0),    GPIOF_OUTPUT(0))
 /****************************** */
 /* HW4-ONLY STUFF               */
 /****************************** */
-DEFINE_GPIO(HW4_START,              GPIO_PC(0),    GPIOF_OUTPUT(0))
-DEFINE_GPIO(BLUELIGHT_HW4,          GPIO_PB(7),    GPIOF_OUTPUT(1))
+DEFINE_GPIO(HW4_START,          GPIO_PC(0),     GPIOF_OUTPUT(0))
+DEFINE_GPIO(BLUELIGHT_HW4,      GPIO_PB(7),     GPIOF_OUTPUT(1))
 /************/
 /* BUTTONS  */
 /************/
-DEFINE_GPIO(BTN_BACK_HW4,           GPIO_PA(18),     GPIOF_INPUT)
-DEFINE_GPIO(BTN_POWER_HW4,          GPIO_PB(31),     GPIOF_INPUT)
+DEFINE_GPIO(BTN_BACK_HW4,       GPIO_PA(18),    GPIOF_INPUT)
+DEFINE_GPIO(BTN_POWER_HW4,      GPIO_PB(31),    GPIOF_INPUT)
 
 /**********************/
 /* BLUETOOTH STUFF    */
@@ -171,7 +171,7 @@ DEFINE_GPIO(HOST_WAKE_BT,       GPIO_PC(19),    GPIOF_OUTPUT(0))
 
 /* bt_reg_on */
 // gpio 82 --> port C, pin 18
-DEFINE_GPIO(BT_REG_ON_HW4,       GPIO_PC(18),    GPIOF_OUTPUT(0))
+DEFINE_GPIO(BT_REG_ON_HW4,      GPIO_PC(18),    GPIOF_OUTPUT(0))
 
 /**************/
 /* USB        */
@@ -186,9 +186,9 @@ DEFINE_GPIO(TCS1421_CFG0,       GPIO_PD(5),     GPIOF_OUTPUT(0))
 /***************/
 /* HP_DETECT */
 // gpio 46 --> port B, pin 14
-DEFINE_GPIO(HP_DETECT_HW4,          GPIO_PB(14), GPIOF_INPUT)
+DEFINE_GPIO(HP_DETECT_HW4,      GPIO_PB(14),    GPIOF_INPUT)
 
 /* LO_DETECT */
 // gpio 54 --> Port B, pin 22
-DEFINE_GPIO(LO_DETECT_HW4,          GPIO_PB(22), GPIOF_INPUT)
-DEFINE_GPIO(HW4_END,                GPIO_PC(0),  GPIOF_OUTPUT(0))
+DEFINE_GPIO(LO_DETECT_HW4,      GPIO_PB(22),    GPIOF_INPUT)
+DEFINE_GPIO(HW4_END,            GPIO_PC(0),     GPIOF_OUTPUT(0))
