@@ -28,6 +28,7 @@
 #include "axp-2101.h"
 #include "i2c-ingenic.h"
 #include "power-erosqnative.h"
+#include "gpio-ingenic.h"
 
 int eros_qn_pmu_type = -1;
 
@@ -148,6 +149,18 @@ static void power_init_axp192(void)
 #endif
 }
 
+static void gpio_init_hw1_to_hw3(void)
+{
+    gpio_set_function(GPIO_LCD_PWR_HW1, GPIOF_OUTPUT(0));
+}
+
+static void gpio_init_hw4(void)
+{
+    gpio_set_function(GPIO_BLUELIGHT_HW4, GPIOF_OUTPUT(1));
+    gpio_set_function(GPIO_BT_REG_ON_HW4, GPIOF_OUTPUT(0));
+    gpio_set_function(GPIO_TCS1421_CFG0_HW4, GPIOF_OUTPUT(0));
+}
+
 void power_init(void)
 {
     /* Initialize driver */
@@ -169,9 +182,11 @@ void power_init(void)
     {
     case EROS_QN_PMU_AXP192:
         power_init_axp192();
+        gpio_init_hw1_to_hw3();
         break;
     case EROS_QN_PMU_AXP2101:
         power_init_axp2101();
+        gpio_init_hw4();
         break;
     default:
         /* Don't do anything if we don't know what PMU is used */

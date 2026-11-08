@@ -1,21 +1,7 @@
-/* -------------------- NOTES ------------------- */
-
-/* I have a suspicion this isn't right for AXP_IRQ,
- * and it's not used right now anyway.  copied from m3k. */
-/* DEFINE_GPIO(AXP_IRQ,            GPIO_PB(10),    GPIOF_INPUT) */
-
-/* ---------------------------------------------- */
-
-/* WARNING WARNING WARNING WARNING WARNING WARNING WARNING */
-/* ======================================================= */
-/*         DO NOT CHANGE THE ORDER OF THESE DEFINES        */
-/*         WITHOUT CONSIDERING GPIO-X1000.C!!              */
-/* ======================================================= */
-/* WARNING WARNING WARNING WARNING WARNING WARNING WARNING */
-
 /**************************/
 /* PIN GROUPINGS          */
 /************************ */
+
 /*              Name            Port    Pins            Function */
 DEFINE_PINGROUP(LCD_DATA,       GPIO_A, 0xffff <<  0,   GPIOF_DEVICE(1))
 DEFINE_PINGROUP(LCD_CONTROL,    GPIO_B,   0x1a << 16,   GPIOF_DEVICE(1))
@@ -81,7 +67,6 @@ DEFINE_GPIO(BL_PWR,             GPIO_PC(25),    GPIOF_OUTPUT(0))
 /************/
 /* LCD      */
 /************/
-/* LCD */
 DEFINE_GPIO(LCD_RESET,          GPIO_PB(13),    GPIOF_OUTPUT(0))
 DEFINE_GPIO(LCD_CE,             GPIO_PB(18),    GPIOF_OUTPUT(1))
 DEFINE_GPIO(LCD_RD,             GPIO_PB(16),    GPIOF_OUTPUT(1))
@@ -89,7 +74,6 @@ DEFINE_GPIO(LCD_RD,             GPIO_PB(16),    GPIOF_OUTPUT(1))
 /************/
 /* BUTTONS  */
 /************/
-/* Buttons */
 DEFINE_GPIO(BTN_PLAY,           GPIO_PA(16),    GPIOF_INPUT)
 DEFINE_GPIO(BTN_VOL_UP,         GPIO_PA(17),    GPIOF_INPUT)
 DEFINE_GPIO(BTN_VOL_DOWN,       GPIO_PA(19),    GPIOF_INPUT)
@@ -119,12 +103,22 @@ DEFINE_GPIO(BT_HCI_CTS,         GPIO_PC(12),    GPIOF_DEVICE(0))
 DEFINE_GPIO(BT_HCI_RTS,         GPIO_PC(13),    GPIOF_DEVICE(0))
 
 
+/*
+ * WARNING: the _HW1 and _HW4 GPIOs have conflicting functions in several cases.
+ * We can't identify the hardware variant until after detecting the PMU type,
+ * which happens after GPIO initialization. Therefore, any GPIOs whose direction
+ * changes depending the hardware variant are set to INPUT mode as a safe default.
+ *
+ * Later, once the PMU type is detected in power_init() we set these GPIOs to
+ * their correct function. Be careful not to use them before this point! This is
+ * usually no problem because power_init() happens very early.
+ */
 
 
 /****************************** */
 /* HW1/2/3-ONLY STUFF           */
 /****************************** */
-DEFINE_GPIO(HW1_START,          GPIO_PC(0),     GPIOF_OUTPUT(0))
+
 /************/
 /* BUTTONS  */
 /************/
@@ -140,9 +134,7 @@ DEFINE_GPIO(BT_REG_ON_HW1,      GPIO_PC(19),    GPIOF_OUTPUT(0))
 /************/
 /* LCD      */
 /************/
-/* LCD */
-DEFINE_GPIO(LCD_PWR_HW1,        GPIO_PB(14),    GPIOF_OUTPUT(0))
-DEFINE_GPIO(HW1_END,            GPIO_PC(0),     GPIOF_OUTPUT(0))
+DEFINE_GPIO(LCD_PWR_HW1,        GPIO_PB(14),    GPIOF_INPUT)    // actual: output, active high
 
 
 
@@ -150,8 +142,8 @@ DEFINE_GPIO(HW1_END,            GPIO_PC(0),     GPIOF_OUTPUT(0))
 /****************************** */
 /* HW4-ONLY STUFF               */
 /****************************** */
-DEFINE_GPIO(HW4_START,          GPIO_PC(0),     GPIOF_OUTPUT(0))
-DEFINE_GPIO(BLUELIGHT_HW4,      GPIO_PB(7),     GPIOF_OUTPUT(1))
+DEFINE_GPIO(BLUELIGHT_HW4,      GPIO_PB(7),     GPIOF_INPUT)    // actual: output, active high
+
 /************/
 /* BUTTONS  */
 /************/
@@ -171,7 +163,7 @@ DEFINE_GPIO(HOST_WAKE_BT,       GPIO_PC(19),    GPIOF_OUTPUT(0))
 
 /* bt_reg_on */
 // gpio 82 --> port C, pin 18
-DEFINE_GPIO(BT_REG_ON_HW4,      GPIO_PC(18),    GPIOF_OUTPUT(0))
+DEFINE_GPIO(BT_REG_ON_HW4,      GPIO_PC(18),    GPIOF_INPUT)    // actual: output, active high
 
 /**************/
 /* USB        */
@@ -179,7 +171,7 @@ DEFINE_GPIO(BT_REG_ON_HW4,      GPIO_PC(18),    GPIOF_OUTPUT(0))
 /* USB_TCS1421_CFG0 */
 // set TCS1421_CFG0:1 to 00, Upstream Facing Port (tried others, they don't work)
 // gpio 101 --> port D, pin 5
-DEFINE_GPIO(TCS1421_CFG0,       GPIO_PD(5),     GPIOF_OUTPUT(0))
+DEFINE_GPIO(TCS1421_CFG0_HW4,   GPIO_PD(5),     GPIOF_INPUT)    // actual: output, driven low
 
 /***************/
 /* PLUG DETECT */
@@ -191,4 +183,3 @@ DEFINE_GPIO(HP_DETECT_HW4,      GPIO_PB(14),    GPIOF_INPUT)
 /* LO_DETECT */
 // gpio 54 --> Port B, pin 22
 DEFINE_GPIO(LO_DETECT_HW4,      GPIO_PB(22),    GPIOF_INPUT)
-DEFINE_GPIO(HW4_END,            GPIO_PC(0),     GPIOF_OUTPUT(0))
