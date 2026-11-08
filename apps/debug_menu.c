@@ -146,6 +146,10 @@
 #include <sys/sysinfo.h>
 #endif
 
+#if defined(EROS_QN)
+#include "power-erosqnative.h"
+#endif
+
 #define SCREEN_MAX_CHARS (LCD_WIDTH / SYSFONT_WIDTH)
 
 static const char* threads_getname(int selected_item, void *data,
@@ -2700,6 +2704,9 @@ static bool dbg_device_data(void)
 
 #if defined(EROS_QN)
     simplelist_addline("Hardware Revision: %d", (int)device_data.hw_rev);
+    simplelist_addline("PMU Type: %s",
+                       (eros_qn_pmu_type == EROS_QN_PMU_AXP192 ? "AXP192" :
+                       (eros_qn_pmu_type == EROS_QN_PMU_AXP2101 ? "AXP2101" : "unknown!")));
 #endif
     simplelist_addline("Struct Ver: %d", (int)device_data.version);
 
