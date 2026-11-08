@@ -108,6 +108,7 @@ extern int axp_supply_get_voltage(int supply);
 /* Basic battery and power supply status */
 extern int axp_battery_status(void);
 extern int axp_input_status(void);
+extern unsigned int axp_power_input_status(void);
 
 /* ADC access -- ADCs which are not enabled will return INT_MIN if read.
  * The output of axp_adc_read() is normalized to appropriate units:

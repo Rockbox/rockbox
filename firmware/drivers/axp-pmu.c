@@ -556,35 +556,21 @@ bool axp_debug_menu(void)
 }
 #endif /* !BOOTLOADER */
 
-/* This is basically the only valid implementation, so define it here */
-unsigned int power_input_status(void)
+unsigned int axp_power_input_status(void)
 {
     unsigned int state = 0;
-#if defined(EROS_QN)
-    int devicever;
-# if defined(BOOTLOADER)
-    devicever = EROSQN_VER;
-# else
-    devicever = device_data.hw_rev;
-# endif
-    if (devicever >= 4) {
-        return axp2101_power_input_status();
-    } else
-#endif
-    {
-        int input_status = axp_input_status();
+    int input_status = axp_input_status();
 
-        if(input_status & AXP_INPUT_AC)
-            state |= POWER_INPUT_MAIN_CHARGER;
+    if(input_status & AXP_INPUT_AC)
+        state |= POWER_INPUT_MAIN_CHARGER;
 
-        if(input_status & AXP_INPUT_USB)
-            state |= POWER_INPUT_USB_CHARGER;
+    if(input_status & AXP_INPUT_USB)
+        state |= POWER_INPUT_USB_CHARGER;
 
 #ifdef HAVE_BATTERY_SWITCH
-        if(input_status & AXP_INPUT_BATTERY)
-            state |= POWER_INPUT_BATTERY;
+    if(input_status & AXP_INPUT_BATTERY)
+        state |= POWER_INPUT_BATTERY;
 #endif
-    }
 
     return state;
 }

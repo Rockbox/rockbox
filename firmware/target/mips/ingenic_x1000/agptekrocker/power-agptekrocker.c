@@ -103,6 +103,11 @@ bool charging_state(void)
     return axp_battery_status() == AXP_BATT_CHARGING;
 }
 
+unsigned int power_input_status(void)
+{
+    return axp_power_input_status();
+}
+
 int _battery_voltage(void)
 {
     return axp_adc_read(ADC_BATTERY_VOLTAGE);
