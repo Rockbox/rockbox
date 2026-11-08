@@ -23,7 +23,7 @@
 #include "backlight.h"
 #include "powermgmt.h"
 #include "panic.h"
-#include "axp-pmu.h"
+#include "axp-192.h"
 #include "gpio-ingenic.h"
 #include "irq-x1000.h"
 #include "i2c-ingenic.h"

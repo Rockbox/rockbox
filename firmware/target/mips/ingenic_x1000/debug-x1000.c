@@ -173,8 +173,8 @@ extern bool dbg_shanlingq1_touchscreen(void);
 #ifdef EROS_QN
 extern bool erosqn_power_debug_menu(void);
 #endif
-#ifdef HAVE_AXP_PMU
-extern bool axp_debug_menu(void);
+#ifdef HAVE_AXP192
+extern bool axp192_debug_menu(void);
 #endif
 #ifdef HAVE_CW2015
 extern bool cw2015_debug_menu(void);
@@ -197,8 +197,8 @@ static const struct {
 #ifdef SHANLING_Q1
     {"Touchscreen", &dbg_shanlingq1_touchscreen},
 #endif
-#if defined(HAVE_AXP_PMU) && !defined(EROS_QN)
-    {"Power stats", &axp_debug_menu},
+#if defined(HAVE_AXP192) && !defined(EROS_QN)
+    {"Power stats", &axp192_debug_menu},
 #endif
 #if defined(EROS_QN)
     {"Power stats", &erosqn_power_debug_menu},

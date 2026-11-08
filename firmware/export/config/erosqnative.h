@@ -104,7 +104,7 @@
 
 #ifndef SIMULATOR
 #define HAVE_AXP2101
-#define HAVE_AXP_PMU 192
+#define HAVE_AXP192
 #define HAVE_POWEROFF_WHILE_CHARGING
 #endif
 

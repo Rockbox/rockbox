@@ -22,7 +22,7 @@
 #include "button.h"
 #include "touchscreen.h"
 #include "ft6x06.h"
-#include "axp-pmu.h"
+#include "axp-192.h"
 #include "kernel.h"
 #include "backlight.h"
 #include "powermgmt.h"

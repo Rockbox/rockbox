@@ -25,7 +25,7 @@
 #ifdef HAVE_USB_CHARGING_ENABLE
 # include "usb_core.h"
 #endif
-#include "axp-pmu.h"
+#include "axp-192.h"
 #include "i2c-ingenic.h"
 
 unsigned short battery_level_disksafe = 3470;
@@ -49,37 +49,36 @@ void power_init(void)
 {
     /* Initialize driver */
     i2c_ingenic_set_freq(2, I2C_FREQ_400K);
-    axp_init();
 
     /* Set lowest sample rate */
-    axp_adc_set_rate(AXP_ADC_RATE_25HZ);
+    axp192_adc_set_rate(AXP192_ADC_RATE_25HZ);
 
     /* Enable required ADCs */
-    axp_adc_set_enabled(
-        (1 << ADC_BATTERY_VOLTAGE) |
-        (1 << ADC_CHARGE_CURRENT) |
-        (1 << ADC_DISCHARGE_CURRENT) |
-        (1 << ADC_VBUS_VOLTAGE) |
-        (1 << ADC_VBUS_CURRENT) |
-        (1 << ADC_INTERNAL_TEMP) |
-        (1 << ADC_APS_VOLTAGE));
+    axp192_adc_set_enabled(
+        (1 << AXP192_ADC_BATTERY_VOLTAGE) |
+        (1 << AXP192_ADC_CHARGE_CURRENT) |
+        (1 << AXP192_ADC_DISCHARGE_CURRENT) |
+        (1 << AXP192_ADC_VBUS_VOLTAGE) |
+        (1 << AXP192_ADC_VBUS_CURRENT) |
+        (1 << AXP192_ADC_INTERNAL_TEMP) |
+        (1 << AXP192_ADC_APS_VOLTAGE));
 
     /*
      * Drop VCORE voltage to the standard 1200mV, for some reason the
      * default is 1400mV which is unnecessarily high and outside the
      * recommended operating range.
      */
-    axp_supply_set_voltage(AXP_SUPPLY_DCDC2, 1200);
+    axp192_supply_set_voltage(AXP192_SUPPLY_DCDC2, 1200);
 
     /* Turn on all power outputs */
     i2c_reg_modify1(AXP_PMU_BUS, AXP_PMU_ADDR,
-                    AXP_REG_PWROUTPUTCTRL2, 0, 0x5f, NULL);
+                    AXP192_REG_PWROUTPUTCTRL2, 0, 0x5f, NULL);
     i2c_reg_modify1(AXP_PMU_BUS, AXP_PMU_ADDR,
-                    AXP_REG_DCDCWORKINGMODE, 0, 0xc0, NULL);
+                    AXP192_REG_DCDCWORKINGMODE, 0, 0xc0, NULL);
 
     /* Set the default charging current. This is the same as the
      * OF's setting, although it's not strictly within the USB spec. */
-    axp_set_charge_current(780);
+    axp192_set_charge_current(780);
 
     /* Short delay to give power outputs time to stabilize */
     mdelay(200);
@@ -88,7 +87,7 @@ void power_init(void)
 #ifdef HAVE_USB_CHARGING_ENABLE
 void usb_charging_maxcurrent_change(int maxcurrent)
 {
-    axp_set_charge_current(maxcurrent);
+    axp192_set_charge_current(maxcurrent);
 }
 #endif
 
@@ -98,31 +97,31 @@ void adc_init(void)
 
 void power_off(void)
 {
-    axp_power_off();
+    axp192_power_off();
     while(1);
 }
 
 bool charging_state(void)
 {
-    return axp_battery_status() == AXP_BATT_CHARGING;
+    return axp192_battery_status() == AXP192_BATT_CHARGING;
 }
 
 unsigned int power_input_status(void)
 {
-    return axp_power_input_status();
+    return axp192_power_input_status();
 }
 
 int _battery_voltage(void)
 {
-    return axp_adc_read(ADC_BATTERY_VOLTAGE);
+    return axp192_adc_read(AXP192_ADC_BATTERY_VOLTAGE);
 }
 
 #if CONFIG_BATTERY_MEASURE & CURRENT_MEASURE
 int _battery_current(void)
 {
     if(charging_state())
-        return axp_adc_read(ADC_CHARGE_CURRENT);
+        return axp192_adc_read(AXP192_ADC_CHARGE_CURRENT);
     else
-        return axp_adc_read(ADC_DISCHARGE_CURRENT);
+        return axp192_adc_read(AXP192_ADC_DISCHARGE_CURRENT);
 }
 #endif

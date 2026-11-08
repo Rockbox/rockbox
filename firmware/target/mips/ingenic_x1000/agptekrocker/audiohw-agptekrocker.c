@@ -24,7 +24,7 @@
 #include "aic-x1000.h"
 #include "i2c-ingenic.h"
 #include "gpio-ingenic.h"
-#include "axp-pmu.h"
+#include "axp-192.h"
 #include "logf.h"
 
 /* X1000 AIC is I2S master and drives MCLK/BCLK/LRCLK, the CS42L51 runs
@@ -44,7 +44,7 @@ static void codec_power(bool on)
 {
     if(on) {
         i2c_reg_modify1(AXP_PMU_BUS, AXP_PMU_ADDR,
-                        AXP_REG_PWROUTPUTCTRL2, 0, AXP192_LDO2_EN, NULL);
+                        AXP192_REG_PWROUTPUTCTRL2, 0, AXP192_LDO2_EN, NULL);
         gpio_set_level(GPIO_AMP_PWR, 1);
         mdelay(10);
         gpio_set_level(GPIO_CS42L51_RESET, 1);
@@ -53,7 +53,7 @@ static void codec_power(bool on)
         gpio_set_level(GPIO_CS42L51_RESET, 0);
         gpio_set_level(GPIO_AMP_PWR, 0);
         i2c_reg_modify1(AXP_PMU_BUS, AXP_PMU_ADDR,
-                        AXP_REG_PWROUTPUTCTRL2, AXP192_LDO2_EN, 0, NULL);
+                        AXP192_REG_PWROUTPUTCTRL2, AXP192_LDO2_EN, 0, NULL);
     }
 }
 

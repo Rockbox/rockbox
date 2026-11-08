@@ -81,7 +81,7 @@
 #ifndef SIMULATOR
 /* TODO: get the CW2015 driver working correctly */
 /* #define HAVE_CW2015 */
-#define HAVE_AXP_PMU 192 /* Presumed */
+#define HAVE_AXP192
 #define HAVE_POWEROFF_WHILE_CHARGING
 #endif
 

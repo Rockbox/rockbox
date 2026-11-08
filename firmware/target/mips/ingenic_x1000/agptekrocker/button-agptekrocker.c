@@ -21,7 +21,7 @@
 #include "button.h"
 #include "system.h"
 #include "kernel.h"
-#include "axp-pmu.h"
+#include "axp-192.h"
 #include "gpio-ingenic.h"
 #include "i2c-async.h"
 #include <stdbool.h>
@@ -116,7 +116,7 @@ static void adckey_init(void)
     /* Enable the GPIO0 ADC channel. Note axp_adc_set_enabled() rewrites
      * ADCENABLE2, so this must happen after power_init(). */
     i2c_reg_modify1(AXP_PMU_BUS, AXP_PMU_ADDR,
-                    AXP_REG_ADCENABLE2, 0, AXP192_ADCEN2_GPIO0, NULL);
+                    AXP192_REG_ADCENABLE2, 0, AXP192_ADCEN2_GPIO0, NULL);
 
     timeout_register(&tmo, &adckey_tmo_cb, ADCKEY_POLL_TIME, (intptr_t)&desc);
 }
