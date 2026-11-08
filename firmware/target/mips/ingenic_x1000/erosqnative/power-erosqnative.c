@@ -267,3 +267,18 @@ int _battery_current(void)
     }
 }
 #endif
+
+bool erosqn_power_debug_menu(void)
+{
+    int devicever;
+#if defined(BOOTLOADER)
+    devicever = EROSQN_VER;
+#else
+    devicever = device_data.hw_rev;
+#endif
+
+    if (devicever >= 4)
+        return axp2101_debug_menu();
+    else
+        return axp_debug_menu();
+}

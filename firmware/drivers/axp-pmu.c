@@ -24,11 +24,6 @@
 #include "i2c-async.h"
 #include <string.h>
 
-#if defined(HAVE_AXP2101)
-# include "axp-2101.h"
-# include "devicedata.h"
-#endif
-
 /* Headers for the debug menu */
 #ifndef BOOTLOADER
 # include "action.h"
@@ -535,24 +530,11 @@ static const char* axp_debug_menu_get_name(int item, void* data,
 
 bool axp_debug_menu(void)
 {
-#if defined(EROS_QN)
-    int devicever;
-# if defined(BOOTLOADER)
-    devicever = EROSQN_VER;
-# else
-    devicever = device_data.hw_rev;
-# endif
-    if (devicever >= 4) {
-        return axp2101_debug_menu();
-    } else
-#endif
-    {
-        struct simplelist_info info;
-        simplelist_info_init(&info, "AXP debug", AXP_DEBUG_NUM_ENTRIES, NULL);
-        info.action_callback = axp_debug_menu_cb;
-        info.get_name = axp_debug_menu_get_name;
-        return simplelist_show_list(&info);
-    }
+    struct simplelist_info info;
+    simplelist_info_init(&info, "AXP debug", AXP_DEBUG_NUM_ENTRIES, NULL);
+    info.action_callback = axp_debug_menu_cb;
+    info.get_name = axp_debug_menu_get_name;
+    return simplelist_show_list(&info);
 }
 #endif /* !BOOTLOADER */
 
