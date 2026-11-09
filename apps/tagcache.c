@@ -4948,6 +4948,27 @@ static int free_search_roots(struct search_roots_ll * start)
 #define free_search_roots(a) do {} while(0)
 #endif
 
+/* Note: path must _not_ have a trailing slash! */
+static bool skip_hidden_folders(char* dirname, char* path)
+{
+    /* Check for hidden folders, also implicitly skips Linux ".Trash-*"
+     * and MacOS ".Trashes". */
+    if (dirname[0] == '.') // Found hidden file
+        return true;
+    if (strcmp(dirname, "__MACOSX") == 0) // Found MacOS "__MACOSX"
+        return true;
+
+    if (strrchr(path, '/') != path) // Not at root of drive, skip trash checks
+        return false;
+
+    if (strcmp(dirname, "Recycled") == 0) // Found Windows "Recycled"
+        return true;
+    if (strcmp(dirname, "$RECYCLE.BIN") == 0) // Found Windows "$RECYCLE.BIN"
+        return true;
+
+    return false;
+}
+
 static bool check_dir(const char *dirname, int add_files)
 {
     int success = false;
@@ -4980,6 +5001,8 @@ static bool check_dir(const char *dirname, int add_files)
         if (is_dotdir_name(entry->d_name))
             continue;
 
+        if (skip_hidden_folders(entry->d_name, curpath))
+            continue;
         struct dirinfo info = dir_get_info(dir, entry);
         size_t len = strlen(curpath);
         path_append(&curpath[len-1], PA_SEP_HARD, entry->d_name,
