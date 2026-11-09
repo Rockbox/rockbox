@@ -76,6 +76,10 @@ static int last_bl = -1;
 
 void backlight_hw_on(void)
 {
+    /* called on every key press: skip the gsp::Lcd session when already on */
+    if (last_bl == 1)
+        return;
+
     lcd_mutex_lock();
     if (last_bl != 1) {
 #ifdef HAVE_LCD_ENABLE
@@ -89,6 +93,9 @@ void backlight_hw_on(void)
 
 void backlight_hw_off(void)
 {
+    if (last_bl == 0)
+        return;
+
     lcd_mutex_lock();
     if (last_bl != 0) {
         /* power off both screens to save battery */

@@ -187,8 +187,9 @@ ssize_t readwrite(struct filestr_desc *file, void *buf, size_t nbyte,
                                   AtomicGet(&file->offset));
     }
 
+    /* n_err.n holds the bytes transferred, also on error */
     if ((n_err.err != NULL) && strcmp(n_err.err, "io.EOF")) {
-        FILE_ERROR(ERRNO, -3); 
+        FILE_ERROR(EIO, -3);
     }
 
 file_error:;
@@ -279,7 +280,7 @@ ssize_t console_read(int fildes, void *buf, size_t nbyte)
 
     ssize_t rc;
 
-    if (file->stream.flags & O_WRONLY)
+    if ((file->stream.flags & O_ACCMODE) == O_WRONLY)
     {
         logf("read(fd=%d,buf=%p,nb=%lu) - "
                "descriptor is write-only mode\n",
@@ -305,7 +306,7 @@ ssize_t console_write(int fildes, const void *buf, size_t nbyte)
 
     ssize_t rc;
 
-    if (file->stream.flags & O_RDONLY)
+    if ((file->stream.flags & O_ACCMODE) == O_RDONLY) /* O_RDONLY is 0 */
     {
         logf("write(fd=%d,buf=%p,nb=%lu) - "
                "descriptor is read-only mode\n",

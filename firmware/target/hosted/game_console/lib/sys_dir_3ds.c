@@ -23,7 +23,6 @@
 #include "fs_defines.h"
 
 #include <3ds/archive.h>
-#include <3ds/util/utf.h>
 /* this includes a couple of 3ds headers */
 #include "sys_file.h"
 #include "sys_file_internal.h"
@@ -34,6 +33,7 @@
 #include "pathfuncs.h"
 #include "timefuncs.h"
 #include "system.h"
+#include "rbunicode.h"
 
 
 /* This file is based on firmware/common/dir.c */
@@ -139,15 +139,17 @@ DIR * console_opendir(const char *dirname)
     filestr_base_init(&dir->stream);
     Result res = FSUSER_OpenDirectory(&dir->stream.handle,
                                       sdmcArchive,
-                                      fsMakePath(PATH_ASCII, dirname));
+                                      FS_PATH(dirname));
     if (R_FAILED(res)) {
+        /* libctru stores a handle even when the call fails */
+        dir->stream.handle = 0;
         logf("Open failed: %lld\n", fs_error());
-        FILE_ERROR(EMFILE, -1);
+        FILE_ERROR(ENOENT, -1);
     }
 
     dir->stream.cache = NewPageReaderDirectory(dir->stream.handle, defaultPageSize);
     if (dir->stream.cache == NULL) {
-        FILE_ERROR(ERRNO, -2);
+        FILE_ERROR(EIO, -2);
     }
 
     dir->stream.size = 0;
@@ -156,14 +158,18 @@ DIR * console_opendir(const char *dirname)
     /* we will use file path to implement console_samedir function */
     strcpy(dir->stream.path, dirname);
 
+    /* the stream keeps the handle open until closedir() */
     dirp = (DIR *)dir;
+    file_internal_unlock_WRITER();
+    return dirp;
+
 file_error:
-    if (dir->stream.handle != 0) {
+    if (dir && dir->stream.handle != 0) {
         FSDIR_Close(dir->stream.handle);
         dir->stream.handle = 0;
     }
     file_internal_unlock_WRITER();
-    return dirp;
+    return NULL;
 }
 
 /* close a directory stream */
@@ -220,11 +226,16 @@ void dirstr_entry_init(FS_DirectoryEntry *dirEntry, struct dirent *entry)
     /* size */
     entry->info.size = dirEntry->fileSize;
 
-    /* name */
-    uint8_t d_name[0xA0 + 1];
-    memset(d_name, '\0', 0xA0);
-    utf16_to_utf8(d_name, (uint16_t *) &dirEntry->name, 0xA0);
-    memcpy(entry->d_name, d_name, 0xA0);
+    /* name: UTF-16LE, NUL terminated. utf16decode() never writes a
+     * partial character */
+    int len16 = 0;
+    while (len16 < (int)ARRAYLEN(dirEntry->name) && dirEntry->name[len16])
+        len16++;
+
+    unsigned char *end = utf16decode((const unsigned char *)dirEntry->name,
+                                     (unsigned char *)entry->d_name, len16,
+                                     sizeof(entry->d_name) - 1, true);
+    *end = '\0';
 }
 
 /* read a directory */
@@ -295,7 +306,7 @@ int console_mkdir(const char *path)
     file_internal_lock_WRITER();
 
     Result res = FSUSER_CreateDirectory(sdmcArchive,
-                                        fsMakePath(PATH_ASCII, path),
+                                        FS_PATH(path),
                                         0);
     if (R_FAILED(res)) {
         if (R_DESCRIPTION(res) == RD_DIRECTORY_ALREADY_EXISTS)
@@ -333,7 +344,7 @@ int console_rmdir(const char *name)
 
     file_internal_lock_WRITER();
     Result res = FSUSER_DeleteDirectory(sdmcArchive,
-                                        fsMakePath(PATH_ASCII, name));
+                                        FS_PATH(name));
     if (R_FAILED(res))
         FILE_ERROR(ERRNO, -1);
 
@@ -374,7 +385,7 @@ bool console_dir_exists(const char *dirname)
     Handle handle;
     Result res = FSUSER_OpenDirectory(&handle,
                                       sdmcArchive,
-                                      fsMakePath(PATH_ASCII, dirname));
+                                      FS_PATH(dirname));
     if (R_FAILED(res)) {
         logf("Directory not found: %ld\n", fs_error());
         FILE_ERROR(EMFILE, -1);

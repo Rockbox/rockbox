@@ -23,6 +23,7 @@
 #include <stdio.h>
 
 #include <3ds/types.h>
+#include <3ds/result.h>
 #include <3ds/services/apt.h>
 #include <3ds/services/hid.h>
 #include <3ds/services/mcuhwc.h>
@@ -68,11 +69,21 @@ static double map_values(double n, double source_start, double source_end, doubl
     return (double) round(final_number * calc_scale) / calc_scale;
 }
 
+/* The slider and headphone state are IPC requests (MCU, DSP) that the
+ * button tick would otherwise make 100 times a second: ask less often */
+#define SLOW_POLL_TICKS (HZ / 10)
+
 void update_sound_slider_level(void)
 {
+      static long next_poll;
+      if (TIME_BEFORE(current_tick, next_poll))
+          return;
+      next_poll = current_tick + SLOW_POLL_TICKS;
+
       /* update global volume based on sound slider level */
       u8 level;
-      MCUHWC_GetSoundSliderLevel(&level);
+      if (R_FAILED(MCUHWC_GetSoundSliderLevel(&level)))
+          return;
       
       if (level != old_slider_level) {
           int volume = (int) map_values((double) level,
@@ -81,8 +92,12 @@ void update_sound_slider_level(void)
                                         (double) sound_min(SOUND_VOLUME),
                                         (double) sound_max(SOUND_VOLUME),
                                         0);
-         global_status.volume = volume;
-         setvol();
+         /* This runs in the button tick, not on the UI thread: setvol()
+          * saves the status file right away on hosted targets, and file
+          * I/O from here can deadlock (it froze the app). The slider sets
+          * the hardware volume itself; let the UI thread update Rockbox's
+          * copy, as on Android. */
+         queue_broadcast(SYS_VOLUME_CHANGED, volume);
          old_slider_level = level;
       }
 }
@@ -199,7 +214,15 @@ void touchscreen_enable_device(bool en)
 
 bool headphones_inserted(void)
 {
-    bool is_inserted;
-    DSP_GetHeadphoneStatus(&is_inserted);
+    static long next_poll;
+    static bool is_inserted;
+
+    if (TIME_BEFORE(current_tick, next_poll))
+        return is_inserted;
+    next_poll = current_tick + SLOW_POLL_TICKS;
+
+    bool now;
+    if (R_SUCCEEDED(DSP_GetHeadphoneStatus(&now)))
+        is_inserted = now;
     return is_inserted;
 }

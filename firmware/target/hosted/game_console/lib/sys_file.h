@@ -87,6 +87,16 @@ static inline void file_internal_unlock_WRITER(void)
     sync_RWMutexUnlock(&file_internal_mrsw);
 }
 
+#ifdef N3DS
+/* FS_Path for a UTF-8 Rockbox path. PATH_ASCII would hand non-ASCII bytes
+ * to FS unconverted, so names with accents or Japanese are never found.
+ * buf receives the UTF-16 copy and must outlive the FS call. */
+#define SYS_FS_PATH_MAX 261 /* MAX_PATH + 1 */
+FS_Path sys_fs_path(const char *path, u16 *buf, size_t len);
+#define FS_PATH(path) \
+    sys_fs_path((path), (u16[SYS_FS_PATH_MAX]){ 0 }, SYS_FS_PATH_MAX)
+#endif
+
 #define ERRNO 0 /* maintain errno value */
 #define _RC   0 /* maintain rc value */
 

@@ -61,10 +61,12 @@ typedef const char* file_error_t;
 #ifdef N3DS
 typedef struct {
     Handle  file;
-    s64     start;
-    s64     end;
-    s64     size;
-    bool    isLastPage;
+    s64     start;      /* files: offset of the page; dirs: next entry */
+    s64     end;        /* files: start + valid bytes; dirs: entries */
+    s64     size;       /* valid bytes (files) or entries (dirs) */
+    s64     capacity;   /* buffer size in bytes (files) or entries (dirs) */
+    bool    isLastPage; /* files: the page ends at end of file */
+    bool    dirty;      /* files: written since the last FSFILE_Flush */
 
     u8      *buffer;
 } PageReader;

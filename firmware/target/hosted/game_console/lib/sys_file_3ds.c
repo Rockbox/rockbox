@@ -40,8 +40,43 @@
 /* Define LOGF_ENABLE to enable logf output in this file */
 // #define LOGF_ENABLE
 #include "logf.h"
+#include "rbunicode.h"
 
 extern FS_Archive sdmcArchive;
+
+FS_Path sys_fs_path(const char *path, u16 *buf, size_t len)
+{
+    const unsigned char *s = (const unsigned char *)path;
+    size_t n = 0;
+
+    while (*s)
+    {
+        ucschar_t ucs;
+        s = utf8decode(s, &ucs);
+
+        if (ucs >= 0x10000) {
+            /* surrogate pair */
+            if (n + 2 >= len)
+                goto too_long;
+            ucs -= 0x10000;
+            buf[n++] = 0xD800 | (ucs >> 10);
+            buf[n++] = 0xDC00 | (ucs & 0x3FF);
+        } else {
+            if (n + 1 >= len)
+                goto too_long;
+            buf[n++] = ucs;
+        }
+    }
+
+    buf[n] = 0;
+    return fsMakePath(PATH_UTF16, buf);
+
+too_long:
+    return fsMakePath(PATH_ASCII, path); /* FS rejects it */
+}
+
+/* FSUSER_RenameFile result when the target already exists */
+#define FS_RES_ALREADY_EXISTS 0xC82044BE
 
 /* check for file existence */
 int test_stream_exists_internal(const char *path)
@@ -52,15 +87,17 @@ int test_stream_exists_internal(const char *path)
     Handle handle;
     Result res = FSUSER_OpenFile(&handle,
                              sdmcArchive,
-                             fsMakePath(PATH_ASCII, path),
+                             FS_PATH(path),
                              FS_OPEN_READ,
                              0);
     if (R_FAILED(res)) {
         /* not a file, try to open a directory */
         res = FSUSER_OpenDirectory(&handle,
                                    sdmcArchive,
-                                   fsMakePath(PATH_ASCII, path));
+                                   FS_PATH(path));
         if (R_FAILED(res)) {
+            /* libctru stores a handle even when the call fails */
+            handle = 0;
             logf("File does not exist\n");
             FILE_ERROR(ERRNO, -1);
         }
@@ -85,10 +122,12 @@ int open_internal_inner2(Handle *handle, const char *path, u32 openFlags, u32 at
     int rc;
     Result res = FSUSER_OpenFile(handle,
                              sdmcArchive,
-                             fsMakePath(PATH_ASCII, path),
+                             FS_PATH(path),
                              openFlags,
                              attributes);
     if (R_FAILED(res)) {
+       /* libctru stores a handle even when the call fails */
+       *handle = 0;
        FILE_ERROR(ERRNO, -1);
     }
 
@@ -197,8 +236,9 @@ file_error:
             PageReader_Free(file->stream.cache);
             file->stream.cache = NULL;
         }
-    
-        FSFILE_Close(file->stream.handle);
+
+        if (file->stream.handle != 0)
+            FSFILE_Close(file->stream.handle);
         file->stream.handle = 0;
     }
 
@@ -222,11 +262,13 @@ int console_close(int fildes)
     }
 
     if (file->stream.cache != NULL) {
-        /* FSFILE_Flush(file->stream.handle); */
+        /* writes don't flush one by one (FS_WRITE_FLUSH), do it once here */
+        if (file->stream.cache->dirty)
+            FSFILE_Flush(file->stream.handle);
         PageReader_Free(file->stream.cache);
         file->stream.cache = NULL;
     }
-    
+
     FSFILE_Close(file->stream.handle);
     file->stream.handle = 0;
     file->stream.path[0] = '\0';
@@ -248,7 +290,7 @@ int console_ftruncate(int fildes, off_t length)
 
     int rc;
 
-    if (file->stream.flags & O_RDONLY)
+    if ((file->stream.flags & O_ACCMODE) == O_RDONLY) /* O_RDONLY is 0 */
     {
         logf("Descriptor is read-only mode\n");
         FILE_ERROR(EBADF, -2);
@@ -266,6 +308,7 @@ int console_ftruncate(int fildes, off_t length)
     }
 
     *file->sizep = length;
+    PageReader_Invalidate(file->stream.cache);
 
     rc = 0;
 file_error:
@@ -284,7 +327,7 @@ int console_fsync(int fildes)
 
     int rc;
 
-    if (file->stream.flags & O_RDONLY)
+    if ((file->stream.flags & O_ACCMODE) == O_RDONLY) /* O_RDONLY is 0 */
     {
         logf("Descriptor is read-only mode\n");
         FILE_ERROR(EINVAL, -2);
@@ -293,8 +336,9 @@ int console_fsync(int fildes)
     /* flush all pending changes to disk */
     Result res = FSFILE_Flush(file->stream.handle);
     if (R_FAILED(res)) {
-        FILE_ERROR(ERRNO, -3);
+        FILE_ERROR(EIO, -3);
     }
+    file->stream.cache->dirty = false;
 
     rc = 0;
 file_error:
@@ -311,7 +355,7 @@ int console_remove(const char *path)
 
     file_internal_lock_WRITER();
     Result res = FSUSER_DeleteFile(sdmcArchive,
-                                   fsMakePath(PATH_ASCII, path));
+                                   FS_PATH(path));
     if (R_FAILED(res))
         FILE_ERROR(ERRNO, -1);
 
@@ -342,39 +386,56 @@ int console_rename(const char *old, const char *new)
         FILE_ERROR(ERRNO, _RC);
     }
 
-    /* open 'old'; it must exist */
-    Handle open1rc;
-    Result res = FSUSER_OpenFile(&open1rc,
-                             sdmcArchive, 
-                             fsMakePath(PATH_ASCII, old),
+    /* 'old' must exist. Close it again right away: FS won't rename an open
+       file. */
+    Handle handle;
+    Result res = FSUSER_OpenFile(&handle,
+                             sdmcArchive,
+                             FS_PATH(old),
                              FS_OPEN_READ,
                              0);
-    if (R_FAILED(res)) {
+    if (R_SUCCEEDED(res)) {
+        FSFILE_Close(handle);
+    }
+    else {
         /* not a file, try to open a directory */
-        res = FSUSER_OpenDirectory(&open1rc,
+        res = FSUSER_OpenDirectory(&handle,
                                    sdmcArchive,
-                                   fsMakePath(PATH_ASCII, old));
+                                   FS_PATH(old));
         if (R_FAILED(res)) {
             logf("Failed opening old\n");
             FILE_ERROR(ERRNO, -1);
         }
 
+        FSDIR_Close(handle);
         are_dirs = true;
     }
 
     if (are_dirs) {
         /* rename directory */
-        FSUSER_RenameDirectory(sdmcArchive,
-                               fsMakePath(PATH_ASCII, old),
-                               sdmcArchive,
-                               fsMakePath(PATH_ASCII, new));
+        res = FSUSER_RenameDirectory(sdmcArchive,
+                                     FS_PATH(old),
+                                     sdmcArchive,
+                                     FS_PATH(new));
     }
     else {
         /* rename file */
-        FSUSER_RenameFile(sdmcArchive,
-                          fsMakePath(PATH_ASCII, old),
-                          sdmcArchive,
-                          fsMakePath(PATH_ASCII, new));
+        res = FSUSER_RenameFile(sdmcArchive,
+                                FS_PATH(old),
+                                sdmcArchive,
+                                FS_PATH(new));
+
+        /* rename() replaces an existing file, FS refuses to. Never delete
+           'new' if it is 'old' under another case. */
+        if ((u32)res == FS_RES_ALREADY_EXISTS && strcasecmp(new, old) != 0) {
+            res = FSUSER_DeleteFile(sdmcArchive,
+                                    FS_PATH(new));
+            if (R_SUCCEEDED(res))
+                res = FSUSER_RenameFile(sdmcArchive,
+                                        FS_PATH(old),
+                                        sdmcArchive,
+                                        FS_PATH(new));
+        }
     }
 
     if (R_FAILED(res)) {
@@ -384,14 +445,6 @@ int console_rename(const char *old, const char *new)
 
     rc = 0;
 file_error:
-    /* for now, there is nothing to fail upon closing the old stream */
-    if (open1rc > 0) {
-        if (are_dirs)
-            FSDIR_Close(open1rc);
-        else
-            FSFILE_Close(open1rc);
-    }
-
     file_internal_unlock_WRITER();
     return rc;
 }

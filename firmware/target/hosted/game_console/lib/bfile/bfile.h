@@ -18,6 +18,9 @@ int_error_t PageReader_ReadAt(PageReader *p, u8 *buffer, size_t size, off_t offs
 int_error_t PageReader_WriteAt(PageReader *p, u8 *buffer, size_t size, off_t offset, bool flush_cache);
 
 #ifdef N3DS
+// Drop the cached page, e.g. after the file size changed.
+void PageReader_Invalidate(PageReader *p);
+
 // NewPageReader creates a new PageReader struct with pageSize, for directory use.
 PageReader *NewPageReaderDirectory(Handle file, s64 pageSize);
 

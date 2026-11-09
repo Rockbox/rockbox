@@ -81,6 +81,10 @@
 #define HAVE_HEADPHONE_DETECTION
 #define HAVE_SW_TONE_CONTROLS
 /* #define HAVE_SW_VOLUME_CONTROL */
+
+/* The volume slider sets the hardware volume directly; the port reports
+ * changes with SYS_VOLUME_CHANGED (button-3ds.c) */
+#define PLATFORM_HAS_VOLUME_CHANGE
 /* #define PCM_SW_VOLUME_UNBUFFERED */
 /* #define PCM_SW_VOLUME_FRACBITS  (16) */
 
