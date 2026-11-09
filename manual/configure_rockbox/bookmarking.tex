@@ -13,19 +13,27 @@
   the bookmark to load. There are other ways to load a bookmarks mentioned
   below.
 
-  You can also configure what directories will save bookmarks by creating a file
-  named 'bookmark.ignore' in a directory if you would like to never create a bookmark
-  when files are played from it.
+  You can also configure what media file directories will either honor the
+  \setting{Bookmark on Stop} setting or never save a bookmark regardless of
+  the \setting{Bookmark on Stop} setting. This is done by creating a file
+  named 'bookmark.ignore'. Doing so will ensure that bookmarks will not be
+  auto-created or auto-updated in said directory or any of its subdirectories.
 
-  \note{You can still manually create a bookmark but ignored directories will
-         not update existing bookmarks nor auto create them for files located
-         in ignored directories. }
+  The file 'bookmark.unignore' provides the opposite functionality. It is used
+  in a subdirectory to cancel the 'bookmark.ignore' only for that subdirectory.
 
-  The file 'bookmark.unignore' provides the opposite functionality.
-  For instance in the root of the drive you could create '/bookmark.ignore'
-  and no files played from this drive would get bookmarks.
-  If you then created '/podcasts/bookmark.unignore' tracks played from the podcast
-  directory would get bookmarks.
+  \note{You can still manually create a bookmark regardless of the 'bookmark.ignore'
+         and 'bookmark.unignore' files. They only affect automatic bookmark creation
+         and updating.}
+
+  A typical use of this is to create a '/bookmark.ignore' file in the root of the drive.
+  Then no files played from this drive would get bookmarks. If you then created
+  '/podcasts/bookmark.unignore', tracks played from the podcast directory would get bookmarks.
+
+  \note{The 'bookmark.ignore' and 'bookmark.unignore' files operate based on the
+         the location of the media file, not the playlist! In the above example,
+         the files could be played directly or from a playlist and the auto-bookmarking
+         behavior would be the same.}
 
   \note{If the current playlist has been modified or is unsaved, such as when
         playing tracks from the \setting{Database}, Rockbox will automatically
