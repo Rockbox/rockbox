@@ -35,6 +35,9 @@ struct regs
   #include <errno.h>
 #if defined(DX50) || defined (DX90)
   #define DEFAULT_STACK_SIZE 0x2000 /* Bytes */
+#elif defined(N3DS)
+  /* Threads call into newlib and libctru, give them room */
+  #define DEFAULT_STACK_SIZE 0x4000 /* Bytes */
 #else
   #define DEFAULT_STACK_SIZE 0x1000 /* Bytes */
 #endif

@@ -21,6 +21,9 @@
 #define _SYS_FILE_H
 
 #include "bfile.h"
+#ifdef N3DS
+#include "kernel.h" /* struct mutex, struct mrsw_lock */
+#endif
 
 /* Include for file.h and dir.h because mkdir and friends may be here */
 #include <sys/stat.h>
@@ -34,8 +37,29 @@ struct filestr_base {
     int             flags;            /* stream flags */
     char            path[MAX_PATH+1];
 
+#ifdef N3DS
+    /* Rockbox threads may block for FS I/O while holding file locks, so
+     * these must be Rockbox kernel objects, not libctru ones */
+    struct mutex    mtx;              /* serialization for this stream */
+#else
     sysMutex        mtx;              /* serialization for this stream */
+#endif
 };
+
+#ifdef N3DS
+#define filestr_mutex_init(m)   mutex_init(m)
+
+static inline void filestr_lock(struct filestr_base *stream)
+{
+    mutex_lock(&stream->mtx);
+}
+
+static inline void filestr_unlock(struct filestr_base *stream)
+{
+    mutex_unlock(&stream->mtx);
+}
+#else
+#define filestr_mutex_init(m)   sys_mutex_init(m)
 
 static inline void filestr_lock(struct filestr_base *stream)
 {
@@ -46,6 +70,7 @@ static inline void filestr_unlock(struct filestr_base *stream)
 {
     sys_mutex_unlock(&stream->mtx);
 }
+#endif
 
 /* stream lock doesn't have to be used if getting RW lock writer access */
 #define FILESTR_WRITER 0
@@ -59,6 +84,18 @@ static inline void filestr_unlock(struct filestr_base *stream)
 
 /** Synchronization used throughout **/
 
+#ifdef N3DS
+extern struct mrsw_lock file_internal_mrsw;
+
+static inline void file_internal_lock_READER(void)
+    { mrsw_read_acquire(&file_internal_mrsw); }
+static inline void file_internal_unlock_READER(void)
+    { mrsw_read_release(&file_internal_mrsw); }
+static inline void file_internal_lock_WRITER(void)
+    { mrsw_write_acquire(&file_internal_mrsw); }
+static inline void file_internal_unlock_WRITER(void)
+    { mrsw_write_release(&file_internal_mrsw); }
+#else
 /* acquire the filesystem lock as READER */
 static inline void file_internal_lock_READER(void)
 {
@@ -86,6 +123,7 @@ static inline void file_internal_unlock_WRITER(void)
     extern sync_RWMutex file_internal_mrsw;
     sync_RWMutexUnlock(&file_internal_mrsw);
 }
+#endif /* N3DS */
 
 #ifdef N3DS
 /* FS_Path for a UTF-8 Rockbox path. PATH_ASCII would hand non-ASCII bytes

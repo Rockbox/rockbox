@@ -2143,20 +2143,22 @@ target/hosted/tinyalsa/pcm.c
 #ifdef CPU_ARM
 asm/arm/lcd-as-memframe.S
 #endif
+#ifndef N3DS
 target/hosted/game_console/kernel-console.c
 target/hosted/game_console/thread-console.c
 target/hosted/game_console/timer-console.c
-target/hosted/game_console/lib/sys_atomic.c
-target/hosted/game_console/lib/sys_file_common.c
 target/hosted/game_console/lib/sys_timer_common.c
 target/hosted/game_console/lib/bfile/bfile-rwmutex.c
 target/hosted/game_console/lib/sys_cond_generic.c
+#endif
+target/hosted/game_console/lib/sys_atomic.c
+target/hosted/game_console/lib/sys_file_common.c
 
 #ifdef N3DS
 target/hosted/game_console/lib/sys_file_3ds.c
 target/hosted/game_console/lib/sys_dir_3ds.c
-target/hosted/game_console/lib/sys_thread_3ds.c
 target/hosted/game_console/lib/sys_timer_3ds.c
+target/hosted/game_console/3ds/kernel-3ds.c
 target/hosted/game_console/lib/bfile/bfile-3ds.c
 target/hosted/game_console/3ds/backlight-3ds.c
 target/hosted/game_console/3ds/button-3ds.c
@@ -2249,7 +2251,7 @@ kernel/semaphore.c
 #endif
 #ifdef HAVE_SDL_THREADS
 target/hosted/sdl/thread-sdl.c
-#elif !(CONFIG_PLATFORM & PLATFORM_GAME_CONSOLE)
+#elif !(CONFIG_PLATFORM & PLATFORM_GAME_CONSOLE) || defined(N3DS)
 kernel/thread.c
 #endif
 kernel/thread-common.c

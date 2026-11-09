@@ -223,7 +223,7 @@ void filestr_base_init(struct filestr_base *stream)
     stream->cache = NULL;
     stream->handle = 0;
     stream->size = 0;
-    sys_mutex_init(&stream->mtx);
+    filestr_mutex_init(&stream->mtx);
 }
 
 int open_internal_inner1(const char *path, int oflag);

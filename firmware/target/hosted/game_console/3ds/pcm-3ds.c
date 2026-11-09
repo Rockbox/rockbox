@@ -31,10 +31,10 @@
 #include <3ds/ndsp/channel.h>
 #include <3ds/services/dsp.h>
 #include <3ds/synchronization.h>
+#include <3ds/svc.h>
 #include <3ds/allocator/linear.h>
 
 #include "sys_atomic.h"
-#include "sys_thread.h"
 
 #include "config.h"
 #include "debug.h"
@@ -83,13 +83,20 @@ static s16 *_dsp_audio_buffer = NULL;
 /* Microphone sampling rate */
 extern int _pcm_encode_rate;
 
+static inline int current_thread_id(void)
+{
+    u32 thread_id = 0;
+    svcGetThreadId(&thread_id, CUR_THREAD_HANDLE);
+    return (int)thread_id;
+}
+
 static inline bool is_in_audio_thread(int audio_thread_id)
 {
     /* The device thread locks the same mutex, but not through the public API.
        This check is in case the application, in the audio callback,
        tries to lock the thread that we've already locked from the
        device thread...just in case we only have non-recursive mutexes. */
-    if ( (sys_thread_id() == audio_thread_id)) {
+    if ( (current_thread_id() == audio_thread_id)) {
         return true;
     }
 
@@ -122,17 +129,22 @@ static void pcm_write_to_soundcard(const void *pcm_buffer, size_t pcm_buffer_siz
 
 bool fill_buffer(ndspWaveBuf *dsp_buffer)
 {
+    /* The pcm thread is a libctru thread outside the Rockbox scheduler:
+     * run Rockbox callbacks as an emulated interrupt. */
+    sim_enter_irq_handler();
     if(_pcm_buffer_size == 0)
     {
         /* Retrive a new PCM buffer from Rockbox. */
         if(!pcm_play_dma_complete_callback(PCM_DMAST_OK, &_pcm_buffer, &_pcm_buffer_size))
         {
+            sim_exit_irq_handler();
             /* DEBUGF("DEBUG %s: No new buffer.\n", __func__); */
             svcSleepThread(10000);
             return false;
         }
     }
     pcm_play_dma_status_callback(PCM_DMAST_STARTED);
+    sim_exit_irq_handler();
 
     /* This relies on Rockbox PCM frame buffer size == ALSA PCM frame buffer size. */
     pcm_write_to_soundcard(_pcm_buffer, _pcm_buffer_size, dsp_buffer);
@@ -147,7 +159,7 @@ void pcm_thread_run(void* nothing)
 
     DEBUGF("DEBUG %s: Thread start.\n", __func__);
     
-    _pcm_thread_id = sys_thread_id();
+    _pcm_thread_id = current_thread_id();
 
     while(!AtomicGet(&_pcm_shutdown))
     {

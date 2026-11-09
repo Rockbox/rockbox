@@ -62,7 +62,12 @@ int set_irq_level(int level);
 #define restore_irq(level) \
     ((void)set_irq_level(level))
 
+#ifdef N3DS
+/* Idle until an emulated interrupt handler has run (or a short timeout) */
+void wait_for_interrupt(void);
+#else
 #define wait_for_interrupt()
+#endif
 
 #include "system-hosted.h"
 

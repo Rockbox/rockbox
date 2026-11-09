@@ -37,7 +37,6 @@
 #include <3ds/allocator/linear.h>
 
 #include "sys_atomic.h"
-#include "sys_thread.h"
 
 #include "config.h"
 #include "debug.h"
@@ -77,11 +76,11 @@ static volatile int _dma_shutdown  = 0;
 
 
 /* Mutex for PCM thread suspend/unsuspend. */
-static sysMutex _dma_suspended_mtx;
+static LightLock _dma_suspended_mtx;
 
 
 /* Signal condition for PCM thread suspend/unsuspend. */
-static sysCond *_dma_suspended_cond;
+static CondVar _dma_suspended_cond;
 
 
 /* Bytes left in the Rockbox PCM frame buffer. */
@@ -184,14 +183,15 @@ static void pcm_rec_thread_run(void* nothing)
 
     while(!AtomicGet(&_dma_shutdown))
     {
-        sys_mutex_lock(&_dma_suspended_mtx);
-        while((AtomicGet(&_dma_state) == DMA_STOPPED) || (AtomicGet(&_dma_locked) == 1))
+        LightLock_Lock(&_dma_suspended_mtx);
+        while(((AtomicGet(&_dma_state) == DMA_STOPPED) || (AtomicGet(&_dma_locked) == 1)) &&
+              !AtomicGet(&_dma_shutdown))
         {
             DEBUGF("DEBUG %s: Recording suspended.\n", __func__);
-            sys_cond_wait(_dma_suspended_cond, &_dma_suspended_mtx);
+            CondVar_Wait(&_dma_suspended_cond, &_dma_suspended_mtx);
             DEBUGF("DEBUG %s: Recording resumed.\n", __func__);
         }
-        sys_mutex_unlock(&_dma_suspended_mtx);
+        LightLock_Unlock(&_dma_suspended_mtx);
 
         if(AtomicGet(&_dma_state) == DMA_STOP_PENDING)
         {
@@ -201,9 +201,13 @@ static void pcm_rec_thread_run(void* nothing)
         {
             /* try to get some new data from the microphone */
             if (record_and_resample_stereo_fixed_point() > 0) {
-                if (pcm_rec_dma_complete_callback(PCM_DMAST_OK, &_pcm_buffer, &_pcm_buffer_size)) {
+                /* libctru thread: run Rockbox callbacks as an emulated irq */
+                sim_enter_irq_handler();
+                bool more = pcm_rec_dma_complete_callback(PCM_DMAST_OK, &_pcm_buffer, &_pcm_buffer_size);
+                if (more)
                     pcm_rec_dma_status_callback(PCM_DMAST_STARTED);
-
+                sim_exit_irq_handler();
+                if (more) {
                     _pcm_frame_samples = _pcm_buffer_size / (2 * sizeof(int16_t));
                 }
                 else {
@@ -226,17 +230,17 @@ static void pcm_rec_thread_run(void* nothing)
 
 void pcm_rec_lock(void)
 {
-    sys_mutex_lock(&_dma_suspended_mtx);
+    LightLock_Lock(&_dma_suspended_mtx);
     AtomicSet(&_dma_locked, 1);
-    sys_mutex_unlock(&_dma_suspended_mtx);
+    LightLock_Unlock(&_dma_suspended_mtx);
 }
 
 void pcm_rec_unlock(void)
 {
-    sys_mutex_lock(&_dma_suspended_mtx);
+    LightLock_Lock(&_dma_suspended_mtx);
     AtomicSet(&_dma_locked, 0);
-    sys_cond_signal(_dma_suspended_cond);
-    sys_mutex_unlock(&_dma_suspended_mtx);
+    CondVar_Signal(&_dma_suspended_cond);
+    LightLock_Unlock(&_dma_suspended_mtx);
 }
 
 void pcm_rec_dma_init(void)
@@ -251,10 +255,10 @@ void pcm_rec_dma_init(void)
 
     _mic_buffer_size = micGetSampleDataSize();
 
-    sys_mutex_init(&_dma_suspended_mtx);
-    _dma_suspended_cond = sys_cond_create();
+    LightLock_Init(&_dma_suspended_mtx);
+    CondVar_Init(&_dma_suspended_cond);
 
-    sys_mutex_lock(&_dma_suspended_mtx);
+    LightLock_Lock(&_dma_suspended_mtx);
     AtomicSet(&_dma_state, DMA_STOPPED);
     AtomicSet(&_dma_locked, 1);
     AtomicSet(&_dma_shutdown, 0);
@@ -266,20 +270,22 @@ void pcm_rec_dma_init(void)
                                    0x18,            /* high priority */
                                    -1,              /* run on any core */
                                    false);
-    sys_mutex_unlock(&_dma_suspended_mtx);
+    LightLock_Unlock(&_dma_suspended_mtx);
 }
 
 void pcm_rec_dma_close(void)
 {
     logf("pcm_rec_dma_close()\n");
-    sys_mutex_lock(&_dma_suspended_mtx);
+    LightLock_Lock(&_dma_suspended_mtx);
     AtomicSet(&_dma_state, DMA_SHUTDOWN_PENDING);
     AtomicSet(&_dma_shutdown, 1);
+    /* wake the thread if it is parked, and let it take the lock to exit */
+    CondVar_Broadcast(&_dma_suspended_cond);
+    LightLock_Unlock(&_dma_suspended_mtx);
 
     /* wait thread to finish */
     threadJoin(_pcm_rec_thread, UINT64_MAX);
     threadFree(_pcm_rec_thread);
-    sys_mutex_unlock(&_dma_suspended_mtx);
 
     if (_mic_buffer) {
         free(_mic_buffer);
@@ -341,10 +347,10 @@ void pcm_rec_dma_start(void *start, size_t size)
                        _mic_buffer_size,                        /* buffer size */
                        true);                                   /* loop */
 
-    sys_mutex_lock(&_dma_suspended_mtx);
+    LightLock_Lock(&_dma_suspended_mtx);
     AtomicSet(&_dma_state, DMA_RECORDING);
-    sys_cond_signal(_dma_suspended_cond);
-    sys_mutex_unlock(&_dma_suspended_mtx);
+    CondVar_Signal(&_dma_suspended_cond);
+    LightLock_Unlock(&_dma_suspended_mtx);
 
     _mic_read_offset = micGetLastSampleOffset();
 }
@@ -352,9 +358,9 @@ void pcm_rec_dma_start(void *start, size_t size)
 void pcm_rec_dma_stop(void)
 {
     logf("pcm_rec_dma_stop()\n");
-    sys_mutex_lock(&_dma_suspended_mtx);
+    LightLock_Lock(&_dma_suspended_mtx);
     AtomicSet(&_dma_state, DMA_STOP_PENDING);
-    sys_mutex_unlock(&_dma_suspended_mtx);
+    LightLock_Unlock(&_dma_suspended_mtx);
 
     MICU_StopSampling();
 }

@@ -34,7 +34,6 @@
 
 #include "system.h"
 #include "kernel.h"
-#include "thread-console.h"
 #include "system-console.h"
 #include "button-console.h"
 #include "lcd-bitmap.h"
@@ -52,7 +51,7 @@ s32 main_thread_priority = 0x30;
 bool is_n3ds = false;
 
 /* filesystem */
-sync_RWMutex file_internal_mrsw;
+struct mrsw_lock file_internal_mrsw;
 FS_Archive sdmcArchive;
 
 void ctru_sys_quit(void)
@@ -62,19 +61,13 @@ void ctru_sys_quit(void)
 
 void power_off(void)
 {
-    /* shut down Rockbox kernel threads */
-    struct thread_entry* t = sim_thread_unlock();
-    sim_thread_shutdown();
-
-    /* lock again before entering the scheduler */
-    sim_thread_lock(t);
+    /* Rockbox threads are not libctru threads, nothing to join */
     sim_do_exit();
 }
 
 void sim_do_exit()
 {
     sim_kernel_shutdown();
-    sys_timer_quit();
     mcuhwc_close();
     cfguExit();
     exit(EXIT_SUCCESS);
@@ -139,7 +132,6 @@ void system_init(void)
     aptSetSleepAllowed(false);
 
     sys_console_init();
-    sys_timer_init();
     
     svcGetThreadPriority(&main_thread_priority, CUR_THREAD_HANDLE);
     if (main_thread_priority != 0x30) {
@@ -151,7 +143,7 @@ void system_init(void)
     is_n3ds = svcGetSystemInfo(&dummyInfo, 0x10001, 0) == 0;
 
     /* filesystem */
-    sync_RWMutexInit(&file_internal_mrsw);
+    mrsw_init(&file_internal_mrsw);
     Result res = FSUSER_OpenArchive(&sdmcArchive,
                                     ARCHIVE_SDMC,
                                     fsMakePath(PATH_ASCII, ""));
@@ -173,7 +165,10 @@ void system_init(void)
 
 void system_reboot(void)
 {
-    sim_thread_exception_wait();
+    /* Park here (e.g. after a panic) until the user closes the app */
+    while (aptMainLoop())
+        svcSleepThread(100000000LL);
+    sim_do_exit();
 }
 
 void system_exception_wait(void)

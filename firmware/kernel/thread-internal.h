@@ -31,7 +31,7 @@
  *
  * simulator (possibly) doesn't simulate stack usage anyway but well ... */
 
-#if defined(HAVE_SDL_THREADS) || defined(__PCTOOL__) || defined(N3DS) || defined(SONY_PSP)
+#if defined(HAVE_SDL_THREADS) || defined(__PCTOOL__) || defined(SONY_PSP)
 struct regs
 {
     void *t;             /* OS thread */
