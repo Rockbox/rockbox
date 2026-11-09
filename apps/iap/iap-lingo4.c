@@ -189,6 +189,83 @@ static void play_selected_track(uint32_t index)
     }
 }
 
+static unsigned long nbr_total_playlists(void);
+
+/* SelectDBRecord and SelectSortDBRecord */
+static void select_db_record(const unsigned int cmd, unsigned char category,
+                             uint32_t index)
+{
+    uint32_t trackcount = playlist_amount();
+
+    if (category < 0x01 || category > 0x08)
+    {
+        cmd_ack(cmd, IAP_ACK_UNKNOWN_DB);
+        return;
+    }
+
+    /* An index of -1 undoes a selection, moving up a category level.
+     * The spec makes it invalid only for Track. There is no selection
+     * to undo here, so accept it without touching playback. */
+    if (index == 0xFFFFFFFF)
+    {
+        cmd_ack(cmd, (category == 0x05) ? IAP_ACK_BAD_PARAM : IAP_ACK_OK);
+        return;
+    }
+
+    switch (category)
+    {
+        case 0x01: /* Playlist */
+        {
+            int paused = !!(audio_status() & AUDIO_STATUS_PAUSE);
+
+            if (index > nbr_total_playlists())
+            {
+                cmd_ack(cmd, IAP_ACK_BAD_PARAM);
+                return;
+            }
+            /* 0x00 is the current playlist, which is already loaded */
+            if (index != 0x00)
+            {
+                audio_pause();
+                last_selected_playlist = index;
+                audio_skip(-iap_get_trackindex());
+                seek_to_playlist(last_selected_playlist);
+                if (!paused)
+                    audio_resume();
+            }
+            break;
+        }
+        case 0x02: /* Artist */
+        case 0x03: /* Album  */
+        case 0x05: /* Track  */
+            /* Artists and albums are listed one per track. audio_skip()
+             * walks an out-of-range offset back one track at a time
+             * without yielding, locking the device up. */
+            if (index >= trackcount)
+            {
+                cmd_ack(cmd, IAP_ACK_BAD_PARAM);
+                return;
+            }
+            /* Selecting a single record starts its playback. Selecting
+             * an artist or album only narrows what the accessory
+             * browses, and must not change the playing track: head
+             * units send it while the user browses and start playback
+             * with PlayCurrentSelection. */
+            if (category == 0x05)
+                play_selected_track(index);
+            break;
+        default:
+            /* No genres, composers, audiobooks or podcasts are listed,
+             * so there is no record to select */
+            cmd_ack(cmd, IAP_ACK_BAD_PARAM);
+            return;
+    }
+
+    cur_dbrecord[0] = category;
+    put_u32(&cur_dbrecord[1], index);
+    cmd_ok(cmd);
+}
+
 /* Day of the week of January 1st of a year, 0 is Sunday */
 static int jan1_weekday(int year)
 {
@@ -1339,77 +1416,8 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
              * the value of cur_dbrecord[0]
              */
         {
-            memcpy(cur_dbrecord, buf + 3, 5);
-
-            int paused = !!(audio_status() & AUDIO_STATUS_PAUSE);
-            uint32_t index;
-            uint32_t trackcount;
-            index = get_u32(&cur_dbrecord[1]);
-            trackcount = playlist_amount();
-            /* An index of -1 is how an accessory undoes a selection and
-             * moves up a category level. The spec makes it invalid only
-             * for Track. There is no selection to undo here, so accept
-             * it without touching playback.
-             */
-            if ((index == 0xFFFFFFFF) &&
-                (cur_dbrecord[0] >= 0x02) && (cur_dbrecord[0] <= 0x06) &&
-                (cur_dbrecord[0] != 0x05))
-            {
-                cmd_ok(cmd);
-                break;
-            }
-            /* Artists and albums are listed one per track, so a valid
-             * index is 0..count-1 for them. Genres and composers are not
-             * listed at all, but selecting them changes nothing.
-             * audio_skip() walks an out-of-range Track offset back one
-             * track at a time without yielding, locking the device up.
-             */
-            if ((cur_dbrecord[0] >= 0x02) && (cur_dbrecord[0] <= 0x06) &&
-                (index >= trackcount))
-            {
-                cmd_ack(cmd, IAP_ACK_BAD_PARAM);
-                break;
-            }
-            if ((cur_dbrecord[0] == 1) && (index > nbr_total_playlists()))
-            {
-                cmd_ack(cmd, IAP_ACK_BAD_PARAM);
-                break;
-            }
-            switch (cur_dbrecord[0])
-            {
-                case 0x01: /* Playlist*/
-                {
-                    if (index != 0x00) /* 0x00 is the On-The-Go Playlist and
-                                          we do nothing with it  */
-                    {
-                        audio_pause();
-                        last_selected_playlist = index;
-                        audio_skip(-iap_get_trackindex());
-                        seek_to_playlist(last_selected_playlist);
-                        if (!paused)
-                            audio_resume();
-                    }
-                    break;
-                }
-                case 0x05: /* Track    */
-                {
-                    /* Selecting a single record starts its playback */
-                    play_selected_track(index);
-                    break;
-                }
-                default:
-               {
-                    /* Selecting an artist, album, genre or composer only
-                     * narrows the selection the accessory browses. It
-                     * must not change the playing track: head units send
-                     * this while the user browses and start playback
-                     * with PlayCurrentSelection.
-                     */
-                    break;
-               }
-            }
-            /* respond with cmd ok packet */
-            cmd_ok(cmd);
+            CHECKLEN(8);
+            select_db_record(cmd, buf[3], get_u32(&buf[4]));
             break;
         }
         case 0x0018: /* GetNumberCategorizedDBRecords */
@@ -3268,57 +3276,12 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
              * the value of cur_dbrecord[0]
              */
         {
-            memcpy(cur_dbrecord, buf + 3, 5);
-
-            int paused = !!(audio_status() & AUDIO_STATUS_PAUSE);
-            unsigned int number_of_playlists = nbr_total_playlists();
-            uint32_t index;
-            uint32_t trackcount;
-            index = get_u32(&cur_dbrecord[1]);
-            trackcount = playlist_amount();
-            if ((cur_dbrecord[0] == 0x05) && (index >= trackcount))
-            {
-                cmd_ack(cmd, IAP_ACK_BAD_PARAM);
-                break;
-            }
-            if ((cur_dbrecord[0] == 0x01) && (index > number_of_playlists))
-            {
-                cmd_ack(cmd, IAP_ACK_BAD_PARAM);
-                break;
-            }
-            switch (cur_dbrecord[0])
-            {
-                case 0x01: /* Playlist*/
-                {
-                    if (index != 0x00) /* 0x00 is the On-The-Go Playlist and
-                                          we do nothing with it  */
-                    {
-                        audio_pause();
-                        audio_skip(-iap_get_trackindex());
-                        playlist_sort(NULL, true);
-                        last_selected_playlist = index;
-                        seek_to_playlist(last_selected_playlist);
-                    }
-                    break;
-                }
-                case 0x02: /* Artist   Do Nothing  */
-                case 0x03: /* Album    Do Nothing  */
-                case 0x04: /* Genre    Do Nothing  */
-                case 0x06: /* Composer Do Nothing  */
-                    break;
-                case 0x05: /* Track*/
-                {
-                    audio_pause();
-                    audio_skip(-iap_get_trackindex());
-                    playlist_sort(NULL, true);
-                    audio_skip(index - iap_get_trackindex());
-                    break;
-                }
-            }
-            if (!paused)
-                audio_resume();
-            /* respond with cmd ok packet */
-            cmd_ok(cmd);
+            /* Nothing is sorted: tracks keep the play order, the order
+             * RetrieveCategorizedDatabaseRecords lists them in. Sorting
+             * the playlist would undo shuffle and move every track the
+             * accessory already listed. */
+            CHECKLEN(9);
+            select_db_record(cmd, buf[3], get_u32(&buf[4]));
             break;
         }
         case 0x0039: /* GetColorDisplayImageLimits */
