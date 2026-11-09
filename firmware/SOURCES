@@ -2156,6 +2156,7 @@ target/hosted/game_console/lib/sys_file_common.c
 
 #ifdef N3DS
 target/hosted/game_console/lib/sys_file_3ds.c
+target/hosted/game_console/lib/sys_fs_async_3ds.c
 target/hosted/game_console/lib/sys_dir_3ds.c
 target/hosted/game_console/lib/sys_timer_3ds.c
 target/hosted/game_console/3ds/kernel-3ds.c

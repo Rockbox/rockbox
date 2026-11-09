@@ -34,9 +34,18 @@
 #include "debug.h"
 #include "pathfuncs.h"
 #include "string-extra.h"
+#include "sys_fs_async_3ds.h"
+
+void sys_dir_set_ui_thread(void); /* sys_dir_3ds.c */
 
 void paths_init(void)
 {
+    /* kernel is up: move blocking FS calls off the Rockbox threads */
+    sys_fs_async_init();
+
+    /* main thread == UI thread, see sys_dir_3ds.c */
+    sys_dir_set_ui_thread();
+
     mkdir(ROCKBOX_DIR __MKDIR_MODE_ARG);
     mkdir(ROCKBOX_DIR "/backdrops" __MKDIR_MODE_ARG);
     mkdir(ROCKBOX_DIR "/eqs" __MKDIR_MODE_ARG);

@@ -33,6 +33,9 @@
 #include "pathfuncs.h"
 #include "timefuncs.h"
 #include "system.h"
+#include "thread.h"
+#include "settings.h" /* file browser sort order */
+#include "misc.h"     /* get_current_activity() */
 #include "rbunicode.h"
 
 
@@ -41,6 +44,7 @@
 /* Define LOGF_ENABLE to enable logf output in this file */
 // #define LOGF_ENABLE
 #include "logf.h"
+#include "sys_fs_async_3ds.h"
 
 /* structure used for open directory streams */
 static struct dirstr_desc
@@ -263,24 +267,9 @@ struct dirent * console_readdir(DIR *dirp)
 
     res = &dir->entry;
     dirstr_entry_init(&dirEntry, res);
-  
-    /* time */
-    char full_path[MAX_PATH+1];
 
-    if (!strcmp(PATH_ROOTSTR, dir->stream.path))
-        snprintf(full_path, MAX_PATH, "%s%s", dir->stream.path, res->d_name);
-    else
-        snprintf(full_path, MAX_PATH, "%s/%s", dir->stream.path, res->d_name);
-
-    u64 mtime;
-    archive_getmtime(full_path, &mtime);
-
-    /* DEBUGF("archive_getmtime(%s): %lld\n", full_path, mtime); */
-
-    uint16_t dosdate, dostime;
-    dostime_localtime(mtime, &dosdate, &dostime);
-    res->info.wrtdate = dosdate;
-    res->info.wrttime = dostime;
+    /* No timestamp here: FS_DirectoryEntry has none, and fetching it costs
+     * one FS request per entry, see console_dir_get_info() */
 
 file_error:
     RELEASE_DIRSTR(READER, dir);
@@ -378,7 +367,8 @@ int console_samedir(DIR *dirp1, DIR *dirp2)
 /* test directory existence (returns 'false' if a file) */
 bool console_dir_exists(const char *dirname)
 {
-    file_internal_lock_WRITER();
+    /* touches no shared state: don't keep readers waiting during the lookup */
+    file_internal_lock_READER();
 
     int rc;
 
@@ -396,8 +386,36 @@ file_error:
     if (rc == 0) {
         FSDIR_Close(handle);
     }
-    file_internal_unlock_WRITER();
+    file_internal_unlock_READER();
     return rc == 0 ? true : false;
+}
+
+/* The 3DS FS has no per-entry timestamp: archive_getmtime() is one FS
+ * request per entry, which makes listing big folders very slow. Skip it
+ * for the file browser (UI thread, no plugin running) unless it sorts by
+ * date. Other callers (tagcache, plugins) always get the real date. */
+static unsigned int ui_thread_id;
+static bool ui_thread_known = false;
+
+void sys_dir_set_ui_thread(void)
+{
+    ui_thread_id = thread_self();
+    ui_thread_known = true;
+}
+
+static bool sort_by_date(int sort)
+{
+    return sort == SORT_DATE || sort == SORT_DATE_REVERSED;
+}
+
+static bool dir_mtime_wanted(void)
+{
+    if (!ui_thread_known || thread_self() != ui_thread_id)
+        return true;
+    if (get_current_activity() == ACTIVITY_PLUGIN)
+        return true;
+    return sort_by_date(global_settings.sort_dir) ||
+           sort_by_date(global_settings.sort_file);
 }
 
 /* get the portable info from the native entry */
@@ -412,6 +430,25 @@ struct dirinfo console_dir_get_info(DIR *dirp, struct dirent *entry)
 
     if ((file_size_t)entry->info.size > FILE_SIZE_MAX)
         FILE_ERROR(EOVERFLOW, _RC);
+
+    if (dir_mtime_wanted())
+    {
+        struct dirstr_desc *dir = (struct dirstr_desc *)dirp;
+        char full_path[MAX_PATH+1];
+
+        if (!strcmp(PATH_ROOTSTR, dir->stream.path))
+            snprintf(full_path, MAX_PATH, "%s%s", dir->stream.path, entry->d_name);
+        else
+            snprintf(full_path, MAX_PATH, "%s/%s", dir->stream.path, entry->d_name);
+
+        u64 mtime = 0;
+        archive_getmtime(full_path, &mtime);
+
+        uint16_t dosdate, dostime;
+        dostime_localtime(mtime, &dosdate, &dostime);
+        entry->info.wrtdate = dosdate;
+        entry->info.wrttime = dostime;
+    }
 
     return (struct dirinfo)
     {

@@ -41,6 +41,7 @@
 // #define LOGF_ENABLE
 #include "logf.h"
 #include "rbunicode.h"
+#include "sys_fs_async_3ds.h"
 
 extern FS_Archive sdmcArchive;
 
@@ -75,6 +76,8 @@ too_long:
     return fsMakePath(PATH_ASCII, path); /* FS rejects it */
 }
 
+/* FSUSER_OpenFile result for a path that does not exist */
+#define FS_RES_NOT_FOUND 0xC8804478
 /* FSUSER_RenameFile result when the target already exists */
 #define FS_RES_ALREADY_EXISTS 0xC82044BE
 
@@ -91,10 +94,14 @@ int test_stream_exists_internal(const char *path)
                              FS_OPEN_READ,
                              0);
     if (R_FAILED(res)) {
-        /* not a file, try to open a directory */
-        res = FSUSER_OpenDirectory(&handle,
-                                   sdmcArchive,
-                                   FS_PATH(path));
+        /* Not a file, try to open a directory, unless the error already
+         * says nothing is there (a directory fails with 0xC92044FA).
+         * Lookups of missing names are slow and frequent: album art search
+         * tries about 37 names per track. */
+        if ((u32)res != FS_RES_NOT_FOUND)
+            res = FSUSER_OpenDirectory(&handle,
+                                       sdmcArchive,
+                                       FS_PATH(path));
         if (R_FAILED(res)) {
             /* libctru stores a handle even when the call fails */
             handle = 0;

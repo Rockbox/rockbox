@@ -10,6 +10,7 @@
 #define LOGF_ENABLE
 #endif
 #include "logf.h"
+#include "sys_fs_async_3ds.h"
 
 /*
  * File pages start at multiples of the page capacity, so reads that move

@@ -239,9 +239,11 @@ int console_open(const char *path, int oflag, ...)
 {
     logf("open(path=\"%s\",oflag=%X)\n", path, (unsigned)oflag);
 
+#ifndef N3DS
     /* we need to wait a little here when playing a folder with many small files
        to prevent other threads starvation */
     sleep(10);
+#endif /* N3DS: FS I/O runs on a worker thread, see sys_fs_async_3ds.c */
 
     return open_internal_locked(path, oflag);
 }
@@ -378,8 +380,17 @@ int console_relate(const char *path1, const char *path2)
 int test_stream_exists_internal(const char *path);
 bool console_file_exists(const char *path)
 {
+#ifdef N3DS
+    /* Touches no shared state, and the FS lookups are slow: as a writer this
+     * keeps readdir() waiting, which stalls the UI while the audio thread
+     * searches for album art. */
+    file_internal_lock_READER();
+    bool rc = test_stream_exists_internal(path) > 0;
+    file_internal_unlock_READER();
+#else
     file_internal_lock_WRITER();
     bool rc = test_stream_exists_internal(path) > 0;
     file_internal_unlock_WRITER();
+#endif
     return rc;
 }
