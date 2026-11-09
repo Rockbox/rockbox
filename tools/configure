@@ -928,7 +928,7 @@ devkitarmcc () {
     SHARED_LDFLAGS="-shared"
     SHARED_CFLAGS="-fPIC -fvisibility=hidden"
 
-    LDOPTS="-specs=3dsx.specs -L$DEVKITPRO/libctru/lib -L$DEVKITPRO/portlibs/3ds/lib -ldl -lCTRL -lctru -lm"
+    LDOPTS="-specs=3dsx.specs -L$DEVKITPRO/libctru/lib -L$DEVKITPRO/portlibs/3ds/lib -ldl -lCTRL -lcitro2d -lcitro3d -lctru -lm"
     GLOBAL_LDOPTS="$GLOBAL_LDOPTS -march=armv6k -mtune=mpcore -mfloat-abi=hard -mtp=soft"
 
     # let's allow building shared libraries even if unresolved symbols are found,

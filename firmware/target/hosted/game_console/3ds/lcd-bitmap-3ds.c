@@ -19,6 +19,7 @@
  ****************************************************************************/
 
 #include <math.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -27,7 +28,6 @@
 #undef RGB565
 #endif
 
-#include <3ds/allocator/linear.h>
 #include <3ds/console.h>
 #include <3ds/services/cfgu.h>
 
@@ -36,93 +36,49 @@
 #include "button-console.h"
 #include "screendump.h"
 #include "lcd-target.h"
+#include "kernel.h"
+#include "lcd-gpu-3ds.h"
 
 /*#define LOGF_ENABLE*/
 #include "logf.h"
 
 static u8 system_model = CFG_MODEL_3DS;
 
-typedef struct
+/*
+ * The bottom screen is presented with the GPU (lcd-gpu-3ds.c): the frame is
+ * copied into a staging buffer that always holds the whole screen, so a
+ * rect only copies its own rows. With interrupts on, waiting for the GPU
+ * or for the last frame's VBlank lets the other threads run. With
+ * interrupts off (early boot, panic) yield() and sleep() can't be used:
+ * the frame waits for the GPU and lcd_gpu_end() for the VBlank instead.
+ */
+static void update_framebuffer_rect(const fb_data *src, int x, int y,
+                                    int w, int h)
 {
-    int width, height;
-} dimensions_t;
+    if (!lcd_gpu_ready())
+        return;
 
-typedef struct
-{
-    int x, y, w, h;
-} rect_t;
+    int oldlevel = disable_irq_save();
+    restore_irq(oldlevel);
 
-static inline void copy_framebuffer_16_rect(u16 *dest, const dimensions_t dest_dim,
-    const u16 *src, const dimensions_t src_dim, const rect_t src_rect)
-{
-    const int dst_stride = dest_dim.width;
-    const int src_stride = src_dim.width;
+    if (oldlevel == 0) {
+        while (!lcd_gpu_try_begin())
+            yield();
 
-    const u16 *s = src +
-                   src_rect.y * src_stride +
-                   src_rect.x;
-
-    u16 *d = dest +
-             src_rect.x * dst_stride +
-             (dst_stride - src_rect.y - 1);
-
-    for (int row = 0; row < src_rect.h; ++row) {
-        const u16 *sp = s;
-        u16 *dp = d;
-
-        int col = src_rect.w;
-
-        while (col >= 4) {
-            dp[0]              = sp[0];
-            dp[dst_stride]     = sp[1];
-            dp[dst_stride * 2] = sp[2];
-            dp[dst_stride * 3] = sp[3];
-
-            sp += 4;
-            dp += dst_stride * 4;
-            col -= 4;
-        }
-
-        while (col--) {
-            *dp = *sp++;
-            dp += dst_stride;
-        }
-
-        s += src_stride;
-        --d;
+        /* At over ~60 updates/s the last frame is still waiting for its
+         * VBlank. Sleep this thread instead of blocking all of them in
+         * lcd_gpu_end(); nothing else presents meanwhile, and another
+         * thread's update waits in lcd_gpu_try_begin() above. */
+        while (lcd_gpu_present_pending())
+            sleep(1);
+    } else if (!lcd_gpu_begin()) {
+        /* a frame is already open: a panic inside an update */
+        return;
     }
-}
 
-void update_framebuffer_rect(const u16 *src, const rect_t src_rect)
-{
-    u16 fb_width, fb_height;
-    u32 bufsize;
-    u8* fb = gfxGetFramebuffer(GFX_BOTTOM, GFX_LEFT, &fb_width, &fb_height);
-    bufsize = fb_width * fb_height * 2;
-
-    copy_framebuffer_16_rect((void *)fb, (dimensions_t){ fb_width, fb_height },
-                             src, (dimensions_t){ LCD_WIDTH, LCD_HEIGHT }, src_rect);
-
-    // do not swap buffers for a partial blit
-    GSPGPU_FlushDataCache(fb, bufsize);
-    /* gspWaitForVBlank(); */
-}
-
-void update_framebuffer(const u16 *src)
-{
-    u16 fb_width, fb_height;
-    u32 bufsize;
-    u8* fb = gfxGetFramebuffer(GFX_BOTTOM, GFX_LEFT, &fb_width, &fb_height);
-    bufsize = fb_width * fb_height * 2;
-
-    copy_framebuffer_16_rect((void *)fb, (dimensions_t){ fb_width, fb_height },
-                             src, (dimensions_t){ LCD_WIDTH, LCD_HEIGHT }, (rect_t){0, 0, LCD_WIDTH, LCD_HEIGHT});
-
-    // flush cache and swap framebuffer
-    /* gfxFlushBuffers(); */
-    GSPGPU_FlushDataCache(fb, bufsize);
-    gfxSwapBuffers();
-    gspWaitForVBlank();
+    /* copy last, after any sleep, so the newest pixels are shown */
+    lcd_gpu_copy_rows(src, LCD_WIDTH, x, y, w, h);
+    lcd_gpu_end();
 }
 
 void lcd_update_rect(int x, int y, int width, int height)
@@ -141,15 +97,12 @@ void lcd_update_rect(int x, int y, int width, int height)
     if (height <= 0)
         return; /* nothing left to do */
 
-    fb_data *src = FBADDR(0,0);
-    update_framebuffer_rect(src, (rect_t){x, y, width, height});
+    update_framebuffer_rect(FBADDR(0,0), x, y, width, height);
 }
 
 void lcd_update(void)
 {
-    /* update a full screen rect */
-    fb_data *src = FBADDR(0,0);
-    update_framebuffer(src);
+    update_framebuffer_rect(FBADDR(0,0), 0, 0, LCD_WIDTH, LCD_HEIGHT);
 }
 
 void sys_console_init(void)
@@ -162,6 +115,13 @@ void lcd_init_device(void)
 {
     gfxSetDoubleBuffering(GFX_BOTTOM, true);
 
+    if (!lcd_gpu_init(LCD_WIDTH, LCD_HEIGHT)) {
+        /* the top screen console doesn't need the GPU */
+        printf("LCD: GPU init failed, can't show the display.\n"
+               "Close the app with HOME.\n");
+        system_exception_wait();
+    }
+
     /* hidInit(); */
 
     /* Set dpi value from system model */
@@ -171,6 +131,7 @@ void lcd_init_device(void)
 void lcd_shutdown(void)
 {
     /* hidExit(); */
+    lcd_gpu_exit();
     gfxExit();
 }
 

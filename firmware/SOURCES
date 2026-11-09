@@ -2166,6 +2166,7 @@ target/hosted/game_console/3ds/button-3ds.c
 target/hosted/game_console/3ds/filesystem-3ds.c
 target/hosted/game_console/3ds/lc-3ds.c
 target/hosted/game_console/3ds/lcd-bitmap-3ds.c
+target/hosted/game_console/3ds/lcd-gpu-3ds.c
 target/hosted/game_console/3ds/lc-program-resolver.c
 target/hosted/game_console/3ds/luminance-3ds.c
 target/hosted/game_console/3ds/pcm-3ds.c
