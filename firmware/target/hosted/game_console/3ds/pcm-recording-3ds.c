@@ -113,6 +113,21 @@ static Thread _pcm_rec_thread = NULL;
 
 static int _pcm_resample_pos = 0;
 
+/* mic samples per output frame, FP_SHIFT fixed point; set at start */
+static u32 _pcm_resample_step = FP_ONE;
+
+/* a filled chunk waiting for the callback (recording was locked) */
+static bool _chunk_ready = false;
+
+/* Mic ring buffer: 3 s at 32.7 kHz mono, as in the devkitPro mic example.
+ * The recording thread may fall behind while Rockbox has interrupts
+ * disabled or an FS request blocks; this is how long it can before audio
+ * is lost. */
+#define MIC_BUFFER_SIZE 0x30000
+
+/* poll interval while waiting for the mic to fill a chunk */
+#define REC_POLL_NS (10 * 1000000ULL)
+
 static int record_and_resample_stereo_fixed_point(void)
 {
     const u32 sample_bytes = sizeof(s16);
@@ -122,14 +137,17 @@ static int record_and_resample_stereo_fixed_point(void)
         (write_offset >= _mic_read_offset) ? (write_offset - _mic_read_offset) : (_mic_buffer_size - _mic_read_offset + write_offset);
     available /= sample_bytes;
 
-    const u32 step = ((u32)_mic_rate << FP_SHIFT) / _pcm_encode_rate;
+    const u32 step = _pcm_resample_step;
 
     u32 needed = ((u32)_pcm_frame_samples * step >> FP_SHIFT) + 2;
     if (available < needed) {
         return 0;
     }
 
-    if (available > (_mic_buffer_size / sample_bytes) / 2) {
+    /* Fell so far behind that the mic is about to overwrite unread data:
+     * skip to the newest data. This loses audio. */
+    if (available > (_mic_buffer_size / sample_bytes) * 3 / 4) {
+        logf("rec overrun: dropped %lu samples\n", available);
         _mic_read_offset = write_offset;
         _pcm_resample_pos = 0;
         return 0;
@@ -158,7 +176,9 @@ static int record_and_resample_stereo_fixed_point(void)
         s32 sa = src[a];
         s32 sb = src[b];
 
-        s32 sample = sa + (((sb - sa) * (s32)frac) >> FP_SHIFT);
+        /* 15 bit fraction: (sb - sa) spans 17 bits, the product must fit
+         * in 32 */
+        s32 sample = sa + (((sb - sa) * (s32)(frac >> 1)) >> (FP_SHIFT - 1));
 
         dst[i * 2 + 0] = (s16)sample;
         dst[i * 2 + 1] = (s16)sample;
@@ -200,24 +220,39 @@ static void pcm_rec_thread_run(void* nothing)
         else if(AtomicGet(&_dma_state) == DMA_RECORDING)
         {
             /* try to get some new data from the microphone */
-            if (record_and_resample_stereo_fixed_point() > 0) {
-                /* libctru thread: run Rockbox callbacks as an emulated irq */
+            if (!_chunk_ready && record_and_resample_stereo_fixed_point() > 0)
+                _chunk_ready = true;
+
+            if (_chunk_ready) {
+                /* libctru thread: run Rockbox callbacks as an emulated irq.
+                 * pcm_rec_lock() may have been called since the check
+                 * above: check again where it can't change, else keep the
+                 * chunk for after pcm_rec_unlock() */
+                bool delivered = false, more = false;
                 sim_enter_irq_handler();
-                bool more = pcm_rec_dma_complete_callback(PCM_DMAST_OK, &_pcm_buffer, &_pcm_buffer_size);
-                if (more)
-                    pcm_rec_dma_status_callback(PCM_DMAST_STARTED);
-                sim_exit_irq_handler();
-                if (more) {
-                    _pcm_frame_samples = _pcm_buffer_size / (2 * sizeof(int16_t));
+                if (!AtomicGet(&_dma_locked) &&
+                    AtomicGet(&_dma_state) == DMA_RECORDING) {
+                    _chunk_ready = false;
+                    delivered = true;
+                    more = pcm_rec_dma_complete_callback(PCM_DMAST_OK, &_pcm_buffer, &_pcm_buffer_size);
+                    if (more)
+                        pcm_rec_dma_status_callback(PCM_DMAST_STARTED);
                 }
-                else {
+                sim_exit_irq_handler();
+
+                if (delivered && more) {
+                    _pcm_frame_samples = _pcm_buffer_size / (2 * sizeof(int16_t));
+                    /* catch up: the next chunk may be waiting already */
+                    continue;
+                }
+                else if (delivered) {
                     logf("Recording stopped ...\r");
                     AtomicSet(&_dma_state, DMA_STOPPED);
                 }
             }
 
             /* wait for more captured data */
-            svcSleepThread(20 * 1000000ULL);
+            svcSleepThread(REC_POLL_NS);
         }
     }
 
@@ -230,9 +265,15 @@ static void pcm_rec_thread_run(void* nothing)
 
 void pcm_rec_lock(void)
 {
+    /* Like masking the DMA interrupt: the callback runs as an emulated
+     * interrupt, so taking the irq lock waits for one in progress, and
+     * the flag keeps later ones out. The thread never holds the LightLock
+     * while entering a handler, so this order can't deadlock. */
+    int oldlevel = disable_irq_save();
     LightLock_Lock(&_dma_suspended_mtx);
     AtomicSet(&_dma_locked, 1);
     LightLock_Unlock(&_dma_suspended_mtx);
+    restore_irq(oldlevel);
 }
 
 void pcm_rec_unlock(void)
@@ -246,13 +287,17 @@ void pcm_rec_unlock(void)
 void pcm_rec_dma_init(void)
 {
     logf("pcm_rec_dma_init()\n");
-    u32 micbuf_size = 0x10000;
+    u32 micbuf_size = MIC_BUFFER_SIZE;
     _mic_buffer = memalign(0x1000, micbuf_size);
     Result res = micInit(_mic_buffer, micbuf_size);
     if(R_FAILED(res)) {
         logf("micInit failed: 0x%lX", res);
     }
 
+    /* TODO: the MIC hardware loses ~2 samples (~60 us) each time sampling
+     * wraps around this ring, i.e. once every ~3 s. Measured with a test
+     * tone in the raw ring data, so the driver reads it correctly; the
+     * samples never reach the buffer. Inaudible, ignored for now. */
     _mic_buffer_size = micGetSampleDataSize();
 
     LightLock_Init(&_dma_suspended_mtx);
@@ -287,13 +332,16 @@ void pcm_rec_dma_close(void)
     threadJoin(_pcm_rec_thread, UINT64_MAX);
     threadFree(_pcm_rec_thread);
 
+    /* the MIC service writes into the buffer until sampling stops and the
+     * shared memory is unmapped: free it only after micExit() */
+    MICU_StopSampling();
+    micExit();
+
     if (_mic_buffer) {
         free(_mic_buffer);
         _mic_buffer = NULL;
         _mic_buffer_size = 0;
     }
-
-    micExit();
 }
 
 MICU_SampleRate MICU_GetSampleRate(int freq)
@@ -334,11 +382,14 @@ void pcm_rec_dma_start(void *start, size_t size)
 
     _pcm_frame_samples = _pcm_buffer_size / (2 * sizeof(int16_t));
     _pcm_resample_pos = 0;
+    _chunk_ready = false;
 
     logf("_pcm_frame_samples = %d\n", _pcm_frame_samples);
 
     /* hardware real frequency value to resample from */
     _mic_rate = realSampleRate(_pcm_encode_rate);
+    /* rounded from the exact rate (32728.498 Hz, not 32728) */
+    _pcm_resample_step = (u32)(_mic_rate * FP_ONE / _pcm_encode_rate + 0.5f);
 
     /* start sampling microphone data */
     MICU_StartSampling(MICU_ENCODING_PCM16_SIGNED,              /* encoding */
@@ -347,12 +398,13 @@ void pcm_rec_dma_start(void *start, size_t size)
                        _mic_buffer_size,                        /* buffer size */
                        true);                                   /* loop */
 
+    /* before waking the thread: it runs at a higher priority */
+    _mic_read_offset = micGetLastSampleOffset();
+
     LightLock_Lock(&_dma_suspended_mtx);
     AtomicSet(&_dma_state, DMA_RECORDING);
     CondVar_Signal(&_dma_suspended_cond);
     LightLock_Unlock(&_dma_suspended_mtx);
-
-    _mic_read_offset = micGetLastSampleOffset();
 }
 
 void pcm_rec_dma_stop(void)
