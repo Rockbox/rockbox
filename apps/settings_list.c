@@ -1387,7 +1387,7 @@ const struct settings_list settings[] = {
                   /** Slow CPU benefits greatly from building smaller playlists
                   On the iPod Mini 2nd gen, creating a playlist of 2000 entries takes around 10 seconds */
                   2000,
-#elif MEMORYSIZE > 1
+#elif MEMORYSIZE > 2
                   10000,
 #else
                   400,
