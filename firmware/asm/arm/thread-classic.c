@@ -63,6 +63,9 @@ static inline void store_context(void* addr)
         "stmia  %0, { r4-r11, sp, lr } \n"
         : : "r" (addr)
     );
+#ifdef __ARM_PCS_VFP
+    asm volatile("vstmia %0, { d8-d15 }" : : "r" (((struct regs *)addr)->d) : "memory");
+#endif
 }
 
 /*---------------------------------------------------------------------------
@@ -71,6 +74,10 @@ static inline void store_context(void* addr)
  */
 static inline void load_context(const void* addr)
 {
+#ifdef __ARM_PCS_VFP
+    /* Before the asm below: it may jump to a new thread's start routine */
+    asm volatile("vldmia %0, { d8-d15 }" : : "r" (((const struct regs *)addr)->d) : "memory");
+#endif
     asm volatile(
         BEGIN_ARM_ASM_SYNTAX_UNIFIED
         "ldr     r0, [%0, #40]          \n" /* Load start pointer */

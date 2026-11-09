@@ -26,6 +26,9 @@ struct regs
     uint32_t sp;    /*    32 - Stack pointer (r13) */
     uint32_t lr;    /*    36 - r14 (lr) */
     uint32_t start; /*    40 - Thread start address, or NULL when started */
+#ifdef __ARM_PCS_VFP
+    uint64_t d[8];  /* 48-104 - Registers d8-d15 (callee-saved, hard-float) */
+#endif
 };
 
 #if (CONFIG_PLATFORM & PLATFORM_HOSTED)
