@@ -95,6 +95,17 @@
 #endif
 #define NODEFAULT INT(0)
 
+/* Approximate size of a single playlist entry in bytes */
+#if defined(HAVE_DIRCACHE)
+# define PLAYLIST_ENTRY_SIZE 16
+#else
+# define PLAYLIST_ENTRY_SIZE 4
+#endif
+
+/* Allow playlist to be up to 1/16th of physical RAM, rounded to nearest 1000 */
+#define PLAYLIST_ABSOLUTE_MAX_SIZE \
+    (((MEMORYSIZE * 1000 * 1000 / 16 / PLAYLIST_ENTRY_SIZE) / 1000) * 1000)
+
 #ifdef HAVE_TOUCHSCREEN
 #if defined(APPLICATION) \
  || defined(ONDA_VX747)  \
@@ -1392,7 +1403,7 @@ const struct settings_list settings[] = {
 #else
                   400,
 #endif
-                  "max files in playlist", UNIT_INT, 1000, 32000, 1000,
+                  "max files in playlist", UNIT_INT, 1000, PLAYLIST_ABSOLUTE_MAX_SIZE, 1000,
                   NULL, NULL, NULL),
     INT_SETTING(F_BANFROMQS, max_files_in_dir, LANG_MAX_FILES_IN_DIR,
                 MAX_FILES_IN_DIR_DEFAULT, "max files in dir", UNIT_INT,
