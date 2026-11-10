@@ -1401,7 +1401,7 @@ const struct settings_list settings[] = {
 #elif MEMORYSIZE > 2
                   10000,
 #else
-                  400,
+                  1000,
 #endif
                   "max files in playlist", UNIT_INT, 1000, PLAYLIST_ABSOLUTE_MAX_SIZE, 1000,
                   NULL, NULL, NULL),
