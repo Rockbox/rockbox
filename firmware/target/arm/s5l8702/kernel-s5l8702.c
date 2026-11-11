@@ -20,6 +20,7 @@
 #include "config.h"
 #include "system.h"
 #include "kernel.h"
+#include "clocking-s5l8702.h"
 
 /*  S5L8702 driver for the kernel timer
 
@@ -37,31 +38,17 @@ void INT_TIMERB(void)
 void tick_start(unsigned int interval_in_ms)
 {
     int cycles = 10 * interval_in_ms;
-    
-#if CONFIG_CPU == S5L8702    
-    /* configure timer for 10 kHz (12 MHz / 16 / 75) */
+
+    /* configure timer for 10 kHz (crystal / 16 / prescaler) */
     TBCMD = (1 << 1);   /* TB_CLR */
-    TBPRE = 75 - 1;     /* prescaler */
+    TBPRE = S5L8702_OSC0_HZ / 16 / 10000 - 1;
     TBCON = (0 << 13) | /* TB_INT1_EN */
             (1 << 12) | /* TB_INT0_EN */
             (0 << 11) | /* TB_START */
             (2 << 8) |  /* TB_CS = ECLK / 16 */
-            (1 << 6) |  /* select ECLK (12 MHz) */
+            (1 << 6) |  /* select ECLK */
             (0 << 4);   /* TB_MODE_SEL = interval mode */
     TBDATA0 = cycles;   /* set interval period */
     TBCMD = (1 << 0);   /* TB_EN */
-#elif CONFIG_CPU == S5L8720
-    /* configure timer for 10 kHz (24 MHz / 16 / 150) */
-    TBCMD = (1 << 1);   /* TB_CLR */    
-    TBPRE = 150 - 1;    /* prescaler */
-    TBCON = (0 << 13) | /* TB_INT1_EN */
-            (1 << 12) | /* TB_INT0_EN */
-            (0 << 11) | /* TB_START */
-            (2 << 8) |  /* TB_CS = ECLK / 16 */
-            (1 << 6) |  /* select ECLK (24 MHz) */
-            (0 << 4);   /* TB_MODE_SEL = interval mode */
-    TBDATA0 = cycles;   /* set interval period */
-    TBCMD = (1 << 0);   /* TB_EN */
-#endif    
 }
 

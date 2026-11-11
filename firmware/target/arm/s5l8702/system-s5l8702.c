@@ -224,6 +224,18 @@ static void vic_init(void)
     VIC1EDGE1 = ~0;
 }
 
+#if CONFIG_CPU == S5L8720
+static void nano4g_usec_timer_configure(void)
+{
+    /* CS=4 selects ECLK/1. CS=0 divides it by two, and cannot be used
+     * with a prescaler calculated from the full crystal frequency. */
+    TECON = (4 << 8) | (1 << 6);
+    TEPRE = S5L8702_OSC0_HZ / 1000000 - 1;
+    TEDATA0 = ~0u;
+    TECMD = 3;
+}
+#endif
+
 void system_init(void)
 {
     /*
@@ -238,6 +250,9 @@ void system_init(void)
 #endif
 
     clocking_init(clk_modes, 0);
+#if CONFIG_CPU == S5L8720
+    nano4g_usec_timer_configure();
+#endif
 #ifndef BOOTLOADER
     gpio_preinit();
     if (i2c_preinit(0))
@@ -553,8 +568,7 @@ static bool syscon_preinit(void)
         return false;
     /* usec_timer_init() ran on the BootROM clock. Keep Timer E at 1 MHz
      * after changing ECLK to the Nano 4G crystal rate. */
-    TEPRE = (sec_epoch ? 24 : 12) - 1;
-    TECMD = 0x3;
+    nano4g_usec_timer_configure();
     cg16_config(&CG16_5L,    false, CG16_SEL_OSC,  1, 1, 0x0);
     cg16_config(&CG16_6L,    false, CG16_SEL_OSC,  1, 1, 0x0);
 #endif
