@@ -31,6 +31,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include "devicedata.h"
+#include "power-erosqnative.h"
 
 #ifndef BOOTLOADER
 # include "settings.h"
@@ -104,52 +105,53 @@ static int hp_detect_tmo_cb(struct timeout* tmo)
     return HPD_POLL_TIME;
 }
 
-static void hp_detect_init(int version)
+static void hp_detect_init_hw1_to_hw3(void)
 {
-    if (version <= 3) {
-        static struct timeout tmo;
-        static const uint8_t gpio_reg = AXP192_REG_GPIOSTATE1;
-        static i2c_descriptor desc = {
-            .slave_addr = AXP_PMU_ADDR,
-            .bus_cond = I2C_START | I2C_STOP,
-            .tran_mode = I2C_READ,
-            .buffer[0] = (void*)&gpio_reg,
-            .count[0] = 1,
-            .buffer[1] = &hp_detect_debounce1,
-            .count[1] = 1,
-            .callback = NULL,
-            .arg = 0,
-            .next = NULL,
-        };
+    static struct timeout tmo;
+    static const uint8_t gpio_reg = AXP192_REG_GPIOSTATE1;
+    static i2c_descriptor desc = {
+        .slave_addr = AXP_PMU_ADDR,
+        .bus_cond = I2C_START | I2C_STOP,
+        .tran_mode = I2C_READ,
+        .buffer[0] = (void*)&gpio_reg,
+        .count[0] = 1,
+        .buffer[1] = &hp_detect_debounce1,
+        .count[1] = 1,
+        .callback = NULL,
+        .arg = 0,
+        .next = NULL,
+    };
 
-        /* Headphone and LO detects are wired to AXP192 GPIOs 0 and 1,
-        * set them to inputs. */
-        i2c_reg_write1(AXP_PMU_BUS, AXP_PMU_ADDR, AXP192_REG_GPIO0FUNCTION, 0x01); /* HP detect */
-        i2c_reg_write1(AXP_PMU_BUS, AXP_PMU_ADDR, AXP192_REG_GPIO1FUNCTION, 0x01); /* LO detect */
+    /* Headphone and LO detects are wired to AXP192 GPIOs 0 and 1,
+     * set them to inputs. */
+    i2c_reg_write1(AXP_PMU_BUS, AXP_PMU_ADDR, AXP192_REG_GPIO0FUNCTION, 0x01); /* HP detect */
+    i2c_reg_write1(AXP_PMU_BUS, AXP_PMU_ADDR, AXP192_REG_GPIO1FUNCTION, 0x01); /* LO detect */
 
-        /* Get an initial reading before startup */
-        int r = i2c_reg_read1(AXP_PMU_BUS, AXP_PMU_ADDR, gpio_reg);
-        if(r >= 0)
-        {
-            hp_detect_reg = r;
-            hp_detect_debounce1 = r;
-            hp_detect_debounce2 = r;
-            hp_detect_reg_old = hp_detect_reg;
-        }
-
-        /* Poll the register every second */
-        timeout_register(&tmo, &hp_detect_tmo_cb, HPD_POLL_TIME, (intptr_t)&desc);
-    } else {
-        uint32_t b = REG_GPIO_PIN(GPIO_B);
-
-        // initialize headphone detect variables
-        // HP_detect PB14 --> bit 4
-        // LO_detect PB22 --> bit 5
-        hp_detect_reg = ( (b>>10)&(0x10) | (b>>17)&(0x20) );
-        hp_detect_debounce1 = hp_detect_reg;
-        hp_detect_debounce2 = hp_detect_reg;
+    /* Get an initial reading before startup */
+    int r = i2c_reg_read1(AXP_PMU_BUS, AXP_PMU_ADDR, gpio_reg);
+    if(r >= 0)
+    {
+        hp_detect_reg = r;
+        hp_detect_debounce1 = r;
+        hp_detect_debounce2 = r;
         hp_detect_reg_old = hp_detect_reg;
     }
+
+    /* Poll the register every second */
+    timeout_register(&tmo, &hp_detect_tmo_cb, HPD_POLL_TIME, (intptr_t)&desc);
+}
+
+static void hp_detect_init_hw4(void)
+{
+    uint32_t b = REG_GPIO_PIN(GPIO_B);
+
+    // initialize headphone detect variables
+    // HP_detect PB14 --> bit 4
+    // LO_detect PB22 --> bit 5
+    hp_detect_reg = ( (b>>10)&(0x10) | (b>>17)&(0x20) );
+    hp_detect_debounce1 = hp_detect_reg;
+    hp_detect_debounce2 = hp_detect_reg;
+    hp_detect_reg_old = hp_detect_reg;
 }
 #endif
 
@@ -231,7 +233,19 @@ void button_init_device(void)
 
     /* Set up headphone and line out detect polling */
 #ifndef BOOTLOADER
-    hp_detect_init(device_data.hw_rev);
+    switch (eros_qn_pmu_type)
+    {
+    case EROS_QN_PMU_AXP192:
+        hp_detect_init_hw1_to_hw3();
+        break;
+    case EROS_QN_PMU_AXP2101:
+        hp_detect_init_hw4();
+        break;
+    default:
+        /* unknown PMU, assume headphones inserted */
+        hp_detect_reg_old = hp_detect_reg = 0x10;
+        break;
+    }
 #endif
 }
 
@@ -283,30 +297,26 @@ int button_read_device(void)
     if((a & (1 << 16)) == 0) r  |= BUTTON_PLAY;
     if((a & (1 << 17)) == 0) r  |= BUTTON_VOL_UP;
     if((a & (1 << 19)) == 0) r  |= BUTTON_VOL_DOWN;
-#ifdef BOOTLOADER
-# if EROSQN_VER >= 4
-    if((b & (1 << 31)) == 0) r |= BUTTON_POWER;
-    if((a & (1 << 18)) == 0) r |= BUTTON_BACK;
-# else
-    if((b & (1 << 7)) == 0) r  |= BUTTON_POWER;
-    if((d & (1 << 5)) == 0) r  |= BUTTON_BACK;
-# endif
-#else
-    if (device_data.hw_rev >= 4){
+
+    if (eros_qn_pmu_type == EROS_QN_PMU_AXP2101)
+    {
+        /* HW4 GPIO mapping */
         if((b & (1 << 31)) == 0) r |= BUTTON_POWER;
         if((a & (1 << 18)) == 0) r |= BUTTON_BACK;
-    } else {
+    }
+    else
+    {
+        /* HW1-HW3 mapping */
         if((b & (1 << 7)) == 0) r  |= BUTTON_POWER;
         if((d & (1 << 5)) == 0) r  |= BUTTON_BACK;
     }
-#endif
+
     if((b & (1 << 28)) == 0) r  |= BUTTON_MENU;
-    
     if((d & (1 <<  4)) == 0) r  |= BUTTON_PREV;
     if((c & (1 << 24)) == 0) r  |= BUTTON_NEXT;
 
 #ifndef BOOTLOADER
-    if (device_data.hw_rev >= 4){
+    if (eros_qn_pmu_type == EROS_QN_PMU_AXP2101) {
         // get new HP/LO detect states
         // HP_detect PB14 --> hp_detect bit 4
         // LO_detect PB22 --> hp_detect bit 5
@@ -314,11 +324,11 @@ int button_read_device(void)
 
         // enter them into the debounce process
         if (hp_detect_debounce1 == hp_detect_debounce2){
-        if (debounce_count >= 2){
-            debounce_count = 2;
-        } else {
-            debounce_count = debounce_count + 1;
-        }
+            if (debounce_count >= 2) {
+                debounce_count = 2;
+            } else {
+                debounce_count = debounce_count + 1;
+            }
         } else {
             debounce_count = 0;
             hp_detect_debounce2 = hp_detect_debounce1;
