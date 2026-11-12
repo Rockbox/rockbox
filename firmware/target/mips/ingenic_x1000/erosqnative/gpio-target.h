@@ -3,12 +3,12 @@
 /************************ */
 
 /*              Name            Port    Pins            Function */
-DEFINE_PINGROUP(LCD_DATA,       GPIO_A, 0xffff <<  0,   GPIOF_DEVICE(1))
-DEFINE_PINGROUP(MSC0,           GPIO_A,   0x3f << 20,   GPIOF_DEVICE(1))
-DEFINE_PINGROUP(SFC,            GPIO_A,   0x3f << 26,   GPIOF_DEVICE(1))
-DEFINE_PINGROUP(I2S,            GPIO_B,   0x1f <<  0,   GPIOF_DEVICE(1))
-DEFINE_PINGROUP(I2C1,           GPIO_C,      3 << 26,   GPIOF_DEVICE(0))
-DEFINE_PINGROUP(I2C2,           GPIO_D,      3 <<  0,   GPIOF_DEVICE(1))
+DEFINE_PINGROUP(LCD_DATA,       GPIO_A, 0xff <<  0,     GPIOF_DEVICE(1))
+DEFINE_PINGROUP(MSC0,           GPIO_A, 0x3f << 20,     GPIOF_DEVICE(1))
+DEFINE_PINGROUP(SFC,            GPIO_A, 0x3f << 26,     GPIOF_DEVICE(1))
+DEFINE_PINGROUP(I2S,            GPIO_B, 0x1f <<  0,     GPIOF_DEVICE(1))
+DEFINE_PINGROUP(I2C1,           GPIO_C, 0x03 << 26,     GPIOF_DEVICE(0))
+DEFINE_PINGROUP(I2C2,           GPIO_D, 0x03 <<  0,     GPIOF_DEVICE(1))
 
 /*          Name                Pin             Function */
 /*************************/
