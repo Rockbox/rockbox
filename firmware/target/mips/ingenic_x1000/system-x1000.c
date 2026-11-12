@@ -94,14 +94,31 @@ void fill_devicedata(struct device_data_t *data)
 {
 # ifdef BOOTLOADER
     memset(data->payload, 0xff, data->length);
-#  if EROSQN_VER == 1
-    // version 2 has newer dac, 1 has old dac.
-    data->hw_rev = eros_qn_discover_dac(false) ? 2 : 1;
-#  else
-    // versions 3 and 4 both have new dac
-    data->hw_rev = EROSQN_VER;
-#  endif
     data->version = DEIVCE_DATA_VERSION;
+
+    /*
+     * For backward compatibility with old rockbox versions which rely on
+     * the hw_rev field instead of runtime hardware detection.
+     */
+    if (eros_qn_pmu_type == EROS_QN_PMU_AXP2101)
+    {
+        /* only HW4 has AXP2101 */
+        data->hw_rev = 4;
+    }
+    else if (eros_qn_lcd_type == EROS_QN_LCDTYPE_GC9308)
+    {
+        /* HW3 uses new LCD */
+        data->hw_rev = 3;
+    }
+    else if (eros_qn_discover_dac(false))
+    {
+        /* HW2 uses ES9018K2M DAC instead of PCM5102 */
+        data->hw_rev = 2;
+    }
+    else
+    {
+        data->hw_rev = 1;
+    }
 # else
     uint8_t hw_rev = device_data.hw_rev;
     uint8_t version = device_data.version;
