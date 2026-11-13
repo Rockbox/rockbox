@@ -892,16 +892,29 @@ void iap_get_trackinfo(const unsigned int track, struct mp3entry* id3)
     if (audio_status() & AUDIO_STATUS_PLAY)
         current = audio_current_track();
 
-    /* If the tracknumber is not the current one,
-       read id3 from disk */
-    if(!current || playlist_get_current()->index != tracknum)
+    if (playlist_get_track_info(NULL, tracknum, &info) < 0)
+        info.filename[0] = '\0';
+
+    /* Read the id3 from disk if the track is not the one playing. Right
+     * after a skip, the playlist is at the new track before the playback
+     * engine has switched to it, so compare the files too: an accessory
+     * that asks for the new track's title right away would get the old
+     * one's, and may not ask again. Playback drops leading directories
+     * of a playlist entry that don't exist, so a track that plays may
+     * not be read by the name in the playlist; keep the playing track's
+     * then. */
+    if (current && playlist_get_current()->index == tracknum &&
+        !strcmp(current->path, info.filename))
     {
-        playlist_get_track_info(NULL, tracknum, &info);
-        /* memset(id3, 0, sizeof(*id3)) --get_metadata does this for us */
-        if (!get_metadata(id3, -1, info.filename))
-            strlcpy(id3->path, info.filename, sizeof(id3->path));
-    } else {
         memcpy(id3, current, sizeof(*id3));
+    }
+    /* memset(id3, 0, sizeof(*id3)) --get_metadata does this for us */
+    else if (!get_metadata(id3, -1, info.filename))
+    {
+        if (current && playlist_get_current()->index == tracknum)
+            memcpy(id3, current, sizeof(*id3));
+        else
+            strlcpy(id3->path, info.filename, sizeof(id3->path));
     }
 
     /* An untagged file, e.g. a voice recording, has no title. The
