@@ -49,11 +49,26 @@ static bool dbg_clocks(void)
     return false;
 }
 
-static void dbg_gpios_show_state(void)
+static void dbg_gpios_show_state(bool hi_z_only)
 {
     const char portname[] = "ABCD";
-    for(int i = 0; i < 4; ++i)
-        lcd_putsf(0, i, "GPIO %c: %08x", portname[i], REG_GPIO_PIN(i));
+    int line = 0;
+
+    lcd_putsf(0, line++, "Showing %s", hi_z_only ? "input pins only" : "all pins");
+
+    for(int i = 0; i < 4; ++i) {
+        uint32_t bits = REG_GPIO_PIN(i);
+        uint32_t mask = 0xFFFFFFFF;
+        if (hi_z_only) {
+            mask = (REG_GPIO_PAT1(i) &
+                    REG_GPIO_MSK(i)  &
+                    ~REG_GPIO_INT(i));
+        }
+
+        lcd_putsf(0, line++, "GPIO %c: %08x", portname[i], bits & mask);
+        if (hi_z_only)
+            lcd_putsf(2, line++, "Mask: %08x", mask);
+    }
 }
 
 static void dbg_gpios_show_config(void)
@@ -76,7 +91,7 @@ static void dbg_gpios_show_config(void)
 
 static bool dbg_gpios(void)
 {
-    enum { STATE, CONFIG, NUM_SCREENS };
+    enum { STATE, STATE_HIZ, CONFIG, NUM_SCREENS };
     const int timeouts[NUM_SCREENS] = { 1, HZ };
     int screen = STATE;
 
@@ -87,7 +102,10 @@ static bool dbg_gpios(void)
             dbg_gpios_show_config();
             break;
         case STATE:
-            dbg_gpios_show_state();
+            dbg_gpios_show_state(false);
+            break;
+        case STATE_HIZ:
+            dbg_gpios_show_state(true);
             break;
         }
 
