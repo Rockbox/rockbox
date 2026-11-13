@@ -446,6 +446,16 @@ static void set_elapsed(unsigned long value)
 }
 
 
+/* Whether <size> bytes from ci.curpos are all in the buffer.  The codec
+   may have skipped or seeked outside it in either direction. */
+static bool in_buffer(size_t size)
+{
+    off_t start = ci.curpos - offset;
+
+    return start >= 0 && (size_t)start <= audiobufsize &&
+           size <= audiobufsize - (size_t)start;
+}
+
 /* Read next <size> amount bytes from file buffer to <ptr>.
    Will return number of bytes read or 0 if end of file. */
 static size_t read_filebuf(void *ptr, size_t size)
@@ -457,7 +467,7 @@ static size_t read_filebuf(void *ptr, size_t size)
         size_t realsize = MIN(track.filesize-ci.curpos,size);
         
        /* check if we have enough bytes ready*/
-       if(realsize >(audiobufsize - (ci.curpos-offset)))
+       if (!in_buffer(realsize))
        {
            /*rebuffer so that we start at ci.curpos*/
            fill_buffer(ci.curpos);
@@ -478,8 +488,8 @@ static void* request_buffer(size_t *realsize, size_t reqsize)
 {
     *realsize = MIN(track.filesize-ci.curpos,reqsize);
 
-    /*check if we have enough bytes ready - requested > bufsize-currentbufpos*/
-    if(*realsize>(audiobufsize - (ci.curpos-offset)))
+    /* check if we have enough bytes ready */
+    if (!in_buffer(*realsize))
     {
         /*rebuffer so that we start at ci.curpos*/
        fill_buffer(ci.curpos);
