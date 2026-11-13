@@ -150,6 +150,7 @@
 #include "power-erosqnative.h"
 #include "lcd-erosqnative.h"
 #include "eros_qn_codec.h"
+#include "x1000/gpio.h"
 #endif
 
 #define SCREEN_MAX_CHARS (LCD_WIDTH / SYSFONT_WIDTH)
@@ -2713,6 +2714,15 @@ static bool dbg_device_data(void)
     simplelist_addline("LCD autodetected: %s", eros_qn_lcd_autodetected ? "yes" : "no");
     simplelist_addline("LCD ID: %06" PRIx32, eros_qn_lcd_id);
     simplelist_addline("LCD ID4: %06" PRIx32, eros_qn_lcd_id4);
+
+    /* Print state of input gpios */
+    for (int i = 0; i < 4; ++i)
+    {
+        simplelist_addline("GPIO_%c: %08lx", "ABCD"[i], (REG_GPIO_PIN(i) &
+                                                         REG_GPIO_PAT1(i) &
+                                                         REG_GPIO_MSK(i) &
+                                                         ~REG_GPIO_INT(i)));
+    }
 #endif
     simplelist_addline("Struct Ver: %d", (int)device_data.version);
 
