@@ -1,1 +1,4 @@
 alac.c
+#if defined(CPU_ARM_CLASSIC)
+arm.S
+#endif

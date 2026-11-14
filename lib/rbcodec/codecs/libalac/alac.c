@@ -520,6 +520,145 @@ static void entropy_rice_decode(alac_file* alac,
                                 ((v > 0) ? (1) : \
                                            (0)))
 
+/* The unrolled predictors below hold the coefficients as 32-bit values
+ * for a whole frame, where the table and the generic loop keep them as
+ * int16_t and wrap.  Each sample moves a coefficient by at most one, so the
+ * two agree unless one could pass the int16 range within the frame. */
+static inline int coefs_fit(const int16_t *coefs, int n, int output_size)
+{
+    int j;
+
+    for (j = 0; j < n; j++)
+    {
+        int c = coefs[j];
+        if (c < 0)
+            c = -c;
+        if (c > 32767 - output_size)
+            return 0;
+    }
+    return 1;
+}
+
+#ifdef CPU_ARM_CLASSIC
+/* arm.S */
+void alac_fir_adapt_4_arm(int32_t *x, int32_t *end, int16_t *coefs,
+                          uint32_t packed);
+void alac_fir_adapt_5_arm(int32_t *x, int32_t *end, int16_t *coefs,
+                          uint32_t packed);
+void alac_fir_adapt_6_arm(int32_t *x, int32_t *end, int16_t *coefs,
+                          uint32_t packed);
+void alac_fir_adapt_7_arm(int32_t *x, int32_t *end, int16_t *coefs,
+                          uint32_t packed);
+void alac_fir_adapt_8_arm(int32_t *x, int32_t *end, int16_t *coefs,
+                          uint32_t packed);
+#endif
+
+#ifndef CPU_ARM_CLASSIC
+/* The adaptive FIR for a fixed order N, which the compiler unrolls.  The
+ * coefficients are held in locals for the whole call, and the differences
+ * from the oldest sample, x[N - j] - x[0], are computed once per sample and
+ * used both for the prediction and for adapting the coefficients.
+ *
+ * The adaptation is sign-sign: coefficient j moves by the sign of its
+ * difference, against the sign of the error, starting from the newest
+ * sample, until the error is used up.  Each step uses up
+ * (|d| >> quant) * (N - j) of it; for negative errors the shift is of
+ * -|d|, which rounds the other way. */
+static inline __attribute__((always_inline))
+void fir_adapt_order(const int32_t *error_buffer, int32_t *x, int output_size,
+                     int readsamplesize, int16_t *coef_table, const int N,
+                     int quant)
+{
+    int32_t c[8];
+    const int round = 1 << (quant - 1);
+    const int sh = 32 - readsamplesize;
+    int i, j;
+
+    for (j = 0; j < N; j++)
+        c[j] = coef_table[j];
+
+    for (i = N + 1; i < output_size; i++)
+    {
+        int32_t d[8];
+        int32_t top = x[0];
+        int32_t sum = 0;
+        int32_t err = error_buffer[i];
+        int32_t out;
+
+        for (j = 0; j < N; j++)
+        {
+            d[j] = x[N - j] - top;
+            sum += d[j] * c[j];
+        }
+
+        out = ((sum + round) >> quant) + top + err;
+        x[N + 1] = (out << sh) >> sh;
+
+        if (err > 0)
+        {
+            for (j = N - 1; j >= 0; j--)
+            {
+                int32_t dj = d[j];
+                if (dj > 0)
+                {
+                    c[j]++;
+                    err -= (dj >> quant) * (N - j);
+                }
+                else if (dj < 0)
+                {
+                    c[j]--;
+                    err -= ((-dj) >> quant) * (N - j);
+                }
+                if (err <= 0)
+                    break;
+            }
+        }
+        else if (err < 0)
+        {
+            for (j = N - 1; j >= 0; j--)
+            {
+                int32_t dj = d[j];
+                if (dj > 0)
+                {
+                    c[j]--;
+                    err -= ((-dj) >> quant) * (N - j);
+                }
+                else if (dj < 0)
+                {
+                    c[j]++;
+                    err -= (dj >> quant) * (N - j);
+                }
+                if (err >= 0)
+                    break;
+            }
+        }
+
+        x++;
+    }
+
+    for (j = 0; j < N; j++)
+        coef_table[j] = c[j];
+}
+
+#define FIR_ADAPT(n)                                                        \
+static void fir_adapt_##n(const int32_t *error_buffer, int32_t *x,         \
+                          int output_size, int readsamplesize,             \
+                          int16_t *coef_table, int quant)                  \
+                          __attribute__((noinline)) ICODE_ATTR_ALAC;        \
+static void fir_adapt_##n(const int32_t *error_buffer, int32_t *x,         \
+                          int output_size, int readsamplesize,             \
+                          int16_t *coef_table, int quant)                  \
+{                                                                           \
+    fir_adapt_order(error_buffer, x, output_size, readsamplesize,          \
+                    coef_table, n, quant);                                  \
+}
+FIR_ADAPT(4)
+FIR_ADAPT(5)
+FIR_ADAPT(6)
+FIR_ADAPT(7)
+FIR_ADAPT(8)
+#endif /* !CPU_ARM_CLASSIC */
+
 static void predictor_decompress_fir_adapt(int32_t *error_buffer,
                                            int32_t *buffer_out,
                                            int output_size,
@@ -580,150 +719,76 @@ static void predictor_decompress_fir_adapt(int32_t *error_buffer,
         }
     }
 
-    /* 4 and 8 are very common cases (the only ones i've seen).
-
-      The following code is an initial attempt to unroll and optimise
-      these two cases by the Rockbox project.  More work is needed. 
-     */
-
-    /* optimised case: 4 */
-    if (predictor_coef_num == 4)
+    /* Apple's encoder uses orders 4 and 8, FFmpeg's 4 to 6 by default */
+    if (predictor_coef_num >= 4 && predictor_coef_num <= 8 &&
+        output_size > predictor_coef_num + 1 &&
+        predictor_quantitization >= 1 && predictor_quantitization <= 15 &&
+        coefs_fit(predictor_coef_table, predictor_coef_num, output_size))
     {
-        for (i = 4 + 1; i < output_size; i++)
+#ifdef CPU_ARM_CLASSIC
+        if (error_buffer == buffer_out &&
+            readsamplesize >= 1 && readsamplesize <= 32)
         {
-            int sum = 0;
-            int outval;
-            int error_val = error_buffer[i];
+            int q = predictor_quantitization;
+            uint32_t packed = q | ((32 - readsamplesize) << 8) |
+                              ((1u << (q - 1)) << 16);
+            int32_t *end = buffer_out + output_size - predictor_coef_num - 1;
 
-            sum = (buffer_out[4] - buffer_out[0]) * predictor_coef_table[0]
-                + (buffer_out[3] - buffer_out[0]) * predictor_coef_table[1]
-                + (buffer_out[2] - buffer_out[0]) * predictor_coef_table[2]
-                + (buffer_out[1] - buffer_out[0]) * predictor_coef_table[3];
-
-            outval = (1 << (predictor_quantitization-1)) + sum;
-            outval = outval >> predictor_quantitization;
-            outval = outval + buffer_out[0] + error_val;
-            outval = SIGN_EXTENDED32(outval, readsamplesize);
-
-            buffer_out[4+1] = outval;
-
-            if (error_val > 0)
+            switch (predictor_coef_num)
             {
-                int predictor_num = 4 - 1;
-
-                while (predictor_num >= 0 && error_val > 0)
-                {
-                    int val = buffer_out[0] - buffer_out[4 - predictor_num];
-
-                    if (val!=0) {
-                       if (val < 0) {
-                         predictor_coef_table[predictor_num]++;
-                         val=-val;
-                       } else {
-                         predictor_coef_table[predictor_num]--;
-                       }
-                       error_val -= ((val >> predictor_quantitization) * (4 - predictor_num));
-                    }                      
-                    predictor_num--;
-                }
+            case 4:
+                alac_fir_adapt_4_arm(buffer_out, end, predictor_coef_table,
+                                     packed);
+                return;
+            case 5:
+                alac_fir_adapt_5_arm(buffer_out, end, predictor_coef_table,
+                                     packed);
+                return;
+            case 6:
+                alac_fir_adapt_6_arm(buffer_out, end, predictor_coef_table,
+                                     packed);
+                return;
+            case 7:
+                alac_fir_adapt_7_arm(buffer_out, end, predictor_coef_table,
+                                     packed);
+                return;
+            case 8:
+                alac_fir_adapt_8_arm(buffer_out, end, predictor_coef_table,
+                                     packed);
+                return;
             }
-            else if (error_val < 0)
-            {
-                int predictor_num = 4 - 1;
-
-                while (predictor_num >= 0 && error_val < 0)
-                {
-                    int val = buffer_out[0] - buffer_out[4 - predictor_num];
-
-                    if (val != 0) {
-                      if (val > 0) {
-                        predictor_coef_table[predictor_num]++;
-                        val=-val; /* neg value */
-                      } else {
-                        predictor_coef_table[predictor_num]--;
-                      }
-                      error_val -= ((val >> predictor_quantitization) * (4 - predictor_num));
-                    }
-                    predictor_num--;
-                }
-            }
-
-            buffer_out++;
         }
-        return;
+#else
+        switch (predictor_coef_num)
+        {
+        case 4:
+            fir_adapt_4(error_buffer, buffer_out, output_size,
+                        readsamplesize, predictor_coef_table,
+                        predictor_quantitization);
+            return;
+        case 5:
+            fir_adapt_5(error_buffer, buffer_out, output_size,
+                        readsamplesize, predictor_coef_table,
+                        predictor_quantitization);
+            return;
+        case 6:
+            fir_adapt_6(error_buffer, buffer_out, output_size,
+                        readsamplesize, predictor_coef_table,
+                        predictor_quantitization);
+            return;
+        case 7:
+            fir_adapt_7(error_buffer, buffer_out, output_size,
+                        readsamplesize, predictor_coef_table,
+                        predictor_quantitization);
+            return;
+        case 8:
+            fir_adapt_8(error_buffer, buffer_out, output_size,
+                        readsamplesize, predictor_coef_table,
+                        predictor_quantitization);
+            return;
+        }
+#endif
     }
-
-    /* optimised case: 8 */
-    if (predictor_coef_num == 8)
-    {
-        for (i = 8 + 1;
-             i < output_size;
-             i++)
-        {
-            int sum;
-            int outval;
-            int error_val = error_buffer[i];
-
-            sum = (buffer_out[8] - buffer_out[0]) * predictor_coef_table[0]
-                + (buffer_out[7] - buffer_out[0]) * predictor_coef_table[1]
-                + (buffer_out[6] - buffer_out[0]) * predictor_coef_table[2]
-                + (buffer_out[5] - buffer_out[0]) * predictor_coef_table[3]
-                + (buffer_out[4] - buffer_out[0]) * predictor_coef_table[4]
-                + (buffer_out[3] - buffer_out[0]) * predictor_coef_table[5]
-                + (buffer_out[2] - buffer_out[0]) * predictor_coef_table[6]
-                + (buffer_out[1] - buffer_out[0]) * predictor_coef_table[7];
-
-            outval = (1 << (predictor_quantitization-1)) + sum;
-            outval = outval >> predictor_quantitization;
-            outval = outval + buffer_out[0] + error_val;
-            outval = SIGN_EXTENDED32(outval, readsamplesize);
-
-            buffer_out[8+1] = outval;
-
-            if (error_val > 0)
-            {
-                int predictor_num = 8 - 1;
-
-                while (predictor_num >= 0 && error_val > 0)
-                {
-                    int val = buffer_out[0] - buffer_out[8 - predictor_num];
-
-                    if (val!=0) {
-                       if (val < 0) {
-                         predictor_coef_table[predictor_num]++;
-                         val=-val;
-                       } else {
-                         predictor_coef_table[predictor_num]--;
-                       }
-                       error_val -= ((val >> predictor_quantitization) * (8 - predictor_num));
-                    }                      
-                    predictor_num--;
-                }
-            }
-            else if (error_val < 0)
-            {
-                int predictor_num = 8 - 1;
-
-                while (predictor_num >= 0 && error_val < 0)
-                {
-                    int val = buffer_out[0] - buffer_out[8 - predictor_num];
-                    if (val != 0) {
-                      if (val > 0) {
-                        predictor_coef_table[predictor_num]++;
-                        val=-val; /* neg value */
-                      } else {
-                        predictor_coef_table[predictor_num]--;
-                      }
-                      error_val -= ((val >> predictor_quantitization) * (8 - predictor_num));
-                    }
-                    predictor_num--;
-                }
-            }
-
-            buffer_out++;
-        }
-        return;
-    } 
 
     /* general case */
     if (predictor_coef_num > 0)
