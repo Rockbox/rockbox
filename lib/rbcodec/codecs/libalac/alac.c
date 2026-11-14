@@ -184,9 +184,6 @@ static inline void unreadbits(alac_file *alac, int bits)
 
 static inline int32_t entropy_decode_value(alac_file* alac,
                              int readsamplesize,
-                             int k) ICODE_ATTR_ALAC;
-static inline int32_t entropy_decode_value(alac_file* alac,
-                             int readsamplesize,
                              int k)
 {
     int32_t x = 0; // decoded value
@@ -229,15 +226,9 @@ static inline int32_t entropy_decode_value(alac_file* alac,
     return x;
 }
 
-static void entropy_rice_decode(alac_file* alac,
-                         int32_t* output_buffer,
-                         int output_size,
-                         int readsamplesize,
-                         int rice_initialhistory,
-                         int rice_kmodifier,
-                         int rice_historymult,
-                         int rice_kmodifier_mask) ICODE_ATTR_ALAC;
-static void entropy_rice_decode(alac_file* alac,
+/* The original decoder, kept for streams outside what the fast one
+ * handles (see entropy_rice_decode). */
+static void entropy_rice_decode_generic(alac_file* alac,
                          int32_t* output_buffer,
                          int output_size,
                          int readsamplesize,
@@ -320,6 +311,207 @@ static void entropy_rice_decode(alac_file* alac,
         }
     }
 }
+
+/* Fast entropy decoder.  The next bits of the stream are kept in a word,
+ * left-aligned, with zeros below them, so that a whole Rice code is read
+ * with a count of leading ones and one shift instead of a bit at a time.
+ * It holds at most 32 bits, so it reads at most four bytes past the
+ * current position, against three for readbits(). */
+
+#define CACHE_REFILL()                                      \
+    while (bits <= 24) {                                    \
+        cache |= (uint32_t)*p++ << (24 - bits);             \
+        bits += 8;                                          \
+    }
+
+/* Two bytes when 16 bits or fewer are left, which leaves at least 17.
+ * The empty asm stops gcc turning the two byte loads into a halfword
+ * load and a byte swap, which costs three more instructions on ARM. */
+#define CACHE_REFILL16()                                    \
+    if (bits <= 16) {                                       \
+        uint32_t b0_ = p[0];                                \
+        asm ("" : "+r" (b0_));                              \
+        cache |= ((b0_ << 8) | p[1]) << (16 - bits);        \
+        p += 2;                                             \
+        bits += 16;                                         \
+    }
+
+/* Number of leading ones in the cache, at most RICE_THRESHOLD + 1. */
+static inline unsigned int cache_leading_ones(uint32_t cache)
+{
+#if defined(CPU_ARM) && ARM_ARCH >= 5
+    return __builtin_clz(~cache | (1u << (31 - (RICE_THRESHOLD + 1))));
+#else
+    /* bs_log2_tab, as rice_k() uses, so the loop needs one table address */
+    uint32_t top = (~cache) >> 24;
+    if (LIKELY(top))
+        return 7 - bs_log2_tab[top];
+    return 8 + ((cache >> 23) & 1);
+#endif
+}
+
+/* k for the next value: floor(log2((history >> 9) + 3)), at most kmodifier.
+ * lim is 1 << kmodifier. */
+static inline int rice_k(int history, int kmodifier, uint32_t lim)
+{
+    uint32_t v = (history >> 9) + 3;
+#if defined(CPU_ARM) && ARM_ARCH >= 5
+    int k = 31 - __builtin_clz(v);
+    (void)lim;
+    return k < kmodifier ? k : kmodifier;
+#else
+    (void)kmodifier;
+    if (v > lim)
+        v = lim;
+    return bs_generic(v, BS_LOG2 | BS_SHORT);
+#endif
+}
+
+/* One value, as entropy_decode_value().  Needs 1 <= k <= 16 and
+ * 1 <= readsamplesize <= 32, and enough bits: ones + 1 + k for the code,
+ * which 25 always is; the escape refills for itself after its prefix. */
+#define CACHE_DECODE_VALUE(x, k, readsamplesize)                        \
+do {                                                                    \
+    unsigned int ones_ = cache_leading_ones(cache);                     \
+    if (LIKELY(ones_ <= RICE_THRESHOLD)) {                              \
+        uint32_t v_;                                                    \
+        int used_ = (k);                                                \
+        cache <<= ones_ + 1;                                            \
+        v_ = cache >> (32 - (k));                                       \
+        (x) = (ones_ << (k)) - ones_;                                   \
+        if (v_ > 1)                                                     \
+            (x) += v_ - 1;                                              \
+        else                                                            \
+            used_ -= 1;                                                 \
+        cache <<= used_;                                                \
+        bits -= ones_ + 1 + used_;                                      \
+    } else {                                                            \
+        int n_ = (readsamplesize);                                      \
+        cache <<= RICE_THRESHOLD + 1;                                   \
+        bits -= RICE_THRESHOLD + 1;                                     \
+        CACHE_REFILL();                                                 \
+        (x) = 0;                                                        \
+        if (n_ > 16) {                                                  \
+            n_ -= 16;                                                   \
+            (x) = (cache >> (32 - n_)) << 16;                           \
+            cache <<= n_;                                               \
+            bits -= n_;                                                 \
+            CACHE_REFILL();                                             \
+            n_ = 16;                                                    \
+        }                                                               \
+        (x) |= cache >> (32 - n_);                                      \
+        cache <<= n_;                                                   \
+        bits -= n_;                                                     \
+    }                                                                   \
+} while (0)
+
+static void entropy_rice_decode(alac_file* alac,
+                         int32_t* output_buffer,
+                         int output_size,
+                         int readsamplesize,
+                         int rice_initialhistory,
+                         int rice_kmodifier,
+                         int rice_historymult,
+                         int rice_kmodifier_mask) ICODE_ATTR_ALAC;
+static void entropy_rice_decode(alac_file* alac,
+                         int32_t* output_buffer,
+                         int output_size,
+                         int readsamplesize,
+                         int rice_initialhistory,
+                         int rice_kmodifier,
+                         int rice_historymult,
+                         int rice_kmodifier_mask)
+{
+    const unsigned char *p;
+    uint32_t cache;
+    int bits;
+    int history = rice_initialhistory;
+    int sign_modifier = 0;
+    uint32_t lim = (uint32_t)rice_kmodifier_mask + 1;
+    int32_t *out = output_buffer;
+    int32_t *end = output_buffer + output_size;
+
+    /* The fast path needs k <= 15 (for BS_SHORT on ARMv4 and the 16-bit
+     * peek) and values below 2^31 (for the sign arithmetic). */
+    if (UNLIKELY(rice_kmodifier < 1 || rice_kmodifier > 15 ||
+                 readsamplesize < 1 || readsamplesize > 31))
+    {
+        entropy_rice_decode_generic(alac, output_buffer, output_size,
+                                    readsamplesize, rice_initialhistory,
+                                    rice_kmodifier, rice_historymult,
+                                    rice_kmodifier_mask);
+        return;
+    }
+
+    p = alac->input_buffer;
+    cache = 0;
+    bits = 0;
+    CACHE_REFILL();
+    cache <<= alac->input_buffer_bitaccumulator;
+    bits -= alac->input_buffer_bitaccumulator;
+
+    while (out < end)
+    {
+        uint32_t x;
+        int32_t decoded_value;
+        int k;
+
+        CACHE_REFILL16();
+        k = rice_k(history, rice_kmodifier, lim);
+        /* 17 bits cover the code unless the prefix or k is long */
+        if (UNLIKELY(cache_leading_ones(cache) + 1 + k > (unsigned)bits))
+            CACHE_REFILL();
+        CACHE_DECODE_VALUE(x, k, readsamplesize);
+
+        decoded_value = x + sign_modifier;
+        /* (decoded_value + 1) / 2, negated if decoded_value is odd */
+        *out++ = (decoded_value >> 1) ^ -(decoded_value & 1);
+
+        sign_modifier = 0;
+
+        history += (decoded_value * rice_historymult)
+                - ((history * rice_historymult) >> 9);
+
+        if (decoded_value > 0xFFFF)
+            history = 0xFFFF;
+
+        /* special case, for compressed blocks of 0 */
+        if (UNLIKELY(history < 128))
+        {
+            if (out >= end)
+                break;
+
+            int32_t block_size;
+
+            sign_modifier = 1;
+
+            k = count_leading_zeros(history) + ((history + 16) / 64) - 24;
+
+            CACHE_REFILL();
+            CACHE_DECODE_VALUE(x, k, 16);
+            block_size = x & rice_kmodifier_mask;
+
+            if (block_size > 0xFFFF)
+                sign_modifier = 0;
+
+            /* no more than the frame has left */
+            if (block_size > end - out)
+                block_size = end - out;
+            if (block_size > 0)
+            {
+                memset(out, 0, block_size * sizeof(*out));
+                out += block_size;
+            }
+
+            history = 0;
+        }
+    }
+
+    /* hand the position back, rounded to the bit */
+    alac->input_buffer = (unsigned char *)p - ((bits + 7) >> 3);
+    alac->input_buffer_bitaccumulator = (8 - (bits & 7)) & 7;
+}
+
 
 #define SIGN_EXTENDED32(val, bits) ((val << (32 - bits)) >> (32 - bits))
 
