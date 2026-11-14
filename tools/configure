@@ -3777,6 +3777,7 @@ fi
     boottool="$rootdir/tools/mkspl-x1000 -type=nand -ppb=2 -bpp=2 "
     output="rockbox.rockern"
     bootoutput="bootloader.rockern"
+    sysfont="08-Rockfont"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset="$x1000tools"
