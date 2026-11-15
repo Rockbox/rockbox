@@ -178,6 +178,7 @@
 #define HAVE_USB_POWER
 
 #define HAVE_USB_CHARGING_ENABLE
+#define TARGET_USB_CHARGING_DEFAULT USB_CHARGING_FORCE
 
 /* define this if the hardware can be powered off while charging */
 #define HAVE_POWEROFF_WHILE_CHARGING
