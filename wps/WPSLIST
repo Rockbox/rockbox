@@ -124,6 +124,7 @@ fms.128x96x2:    cabbiev2-128x96x2.fms
 fms.128x64x1:    cabbiev2-128x64x1.fms
 fms.320x240x(16|24|32):    cabbiev2-320x240x16.fms
 fms.240x400x(16|24|32):    cabbiev2-240x400x16.fms
+fms.240x320x(16|24|32):    cabbiev2-240x320x16.fms
 fms.220x176x(16|24|32):    cabbiev2-220x176x16.fms
 fms.176x220x(16|24|32):    cabbiev2-176x220x16.fms
 fms.176x132x(16|24|32):    cabbiev2-176x132x16.fms
