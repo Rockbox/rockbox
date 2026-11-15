@@ -507,7 +507,14 @@ static int open_internal_inner1(const char *path, int oflag,
 
 file_error:
     if (fildes >= 0)
+    {
+        /* inner2 may already have released the stream. Closing the allocated
+         * slot can then report EBADF, or cleanup can fail independently.
+         * Neither error may replace the reason the open itself failed. */
+        int open_errno = errno;
         rbfs_close(fildes);
+        errno = open_errno;
+    }
     return rc;
 }
 
