@@ -131,6 +131,7 @@ __pycache__
 /tools/generate_rocklatin
 /tools/descramble
 /tools/convbdf
+/tools/fmssasm
 /tools/convttf
 /tools/bmp2rb
 /tools/codepages
