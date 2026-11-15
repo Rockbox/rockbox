@@ -26,6 +26,7 @@
 #include "pmu-target.h"
 #include "usb_core.h"   /* for usb_charging_maxcurrent_change */
 #include "powermgmt.h"
+#include "button.h"
 #ifndef BOOTLOADER
 #include "lcd.h"
 #endif
@@ -41,6 +42,7 @@ void power_off(void)
 {
 //     /* USB inserted or EXTON1 */
 //     pmu_set_wake_condition(/*TODO*/);
+    button_restart_wheel();
     pmu_enter_standby();
     while(1);
 }

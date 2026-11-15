@@ -425,6 +425,20 @@ static void s5l_clickwheel_init(void)
 #endif
 }
 
+#ifdef IPOD_NANO4G
+static volatile bool wheel_shutting_down;
+
+/* After power_off() a button press only turns the unit on again while the
+ * click wheel runs, so start it again if the hold switch stopped it */
+void button_restart_wheel(void)
+{
+    int oldlevel = disable_irq_save();
+    wheel_shutting_down = true;
+    s5l_clickwheel_init();
+    restore_irq(oldlevel);
+}
+#endif
+
 void button_init_device(void)
 {
     semaphore_init(&button_init_wakeup, 1, 0);
@@ -474,6 +488,12 @@ bool headphones_inserted(void)
  */
 int button_read_device(void)
 {
+#ifdef IPOD_NANO4G
+    /* The tick must not stop the wake source after power_off() has
+     * prepared it, even if a Hold edge arrives during shutdown. */
+    if (wheel_shutting_down)
+        return 0;
+#endif
     static bool hold_button = false;
     bool hold_button_old;
 

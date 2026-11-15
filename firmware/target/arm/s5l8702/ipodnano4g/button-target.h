@@ -27,6 +27,7 @@
 void ipod_mini_button_int(void);
 void ipod_3g_button_int(void);
 void ipod_4g_button_int(void);
+void button_restart_wheel(void);
 
 /* iPod specific button codes */
 
