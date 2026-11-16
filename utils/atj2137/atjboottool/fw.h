@@ -29,5 +29,16 @@ typedef int (*fw_extract_callback_t)(const char *name, uint8_t *buf, size_t size
 int fw_unpack(uint8_t *buf, size_t size, fw_extract_callback_t cb, bool big_endian);
 /* Check if a file looks like an AFI file */
 bool fw_check(uint8_t *buf, size_t size);
+/* Find file 'name' (8.3, any case) in an LFI image (f2 variant): *data
+ * points into buf, *data_size is its real length. Returns 0 if found. */
+int fw_find(const uint8_t *buf, size_t size, const char *name,
+            const uint8_t **data, size_t *data_size);
+/* Replace the content of file 'name' (8.3, any case) in an LFI image (f2
+ * variant): the other files stay where they are, the file goes to its old
+ * place if it fits, else after the last file; the checksums BREC checks are
+ * recomputed. *out is malloc()ed. Returns 0 on success. */
+int fw_replace(const uint8_t *buf, size_t size, const char *name,
+               const uint8_t *data, size_t data_size, uint8_t **out,
+               size_t *out_size);
 
 #endif /* __FW_H__ */ 

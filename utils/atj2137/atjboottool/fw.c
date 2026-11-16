@@ -18,6 +18,7 @@
  *
  ****************************************************************************/
 #include <string.h>
+#include <strings.h>
 #include <stdlib.h>
 #include <ctype.h>
 #include "misc.h"
@@ -204,6 +205,29 @@ int fw_unpack(uint8_t *buf, size_t size, fw_extract_callback_t unpack_cb, bool b
         cprintf_field("  MTP VID: ", "0x%x\n", hdr->mtp_vid);
         cprintf_field("  MTP PID: ", "0x%x\n", hdr->mtp_pid);
         cprintf_field("  FW Version: ", "%.64s\n", hdr->fw_ver);
+
+        /* what BREC checks, little endian images only */
+        if(!big_endian)
+        {
+            uint32_t chk = afi_checksum(buf + 0x200, 0x1e00);
+            cprintf_field("  Directory checksum: ", "0x%x ", hdr->checksum);
+            if(chk != hdr->checksum)
+            {
+                cprintf(RED, "Mismatch, 0x%x expected\n", chk);
+                return 1;
+            }
+            cprintf(RED, "Ok\n");
+            uint16_t header_chk = lfi_header_checksum(buf, 510, false);
+            uint16_t stored;
+            memcpy(&stored, buf + 510, 2);
+            cprintf_field("  Header checksum: ", "0x%x ", stored);
+            if(header_chk != stored)
+            {
+                cprintf(RED, "Mismatch, 0x%x expected\n", header_chk);
+                return 1;
+            }
+            cprintf(RED, "Ok\n");
+        }
     }
     else
     {
@@ -290,6 +314,154 @@ int fw_unpack(uint8_t *buf, size_t size, fw_extract_callback_t unpack_cb, bool b
             cprintf(RED, "Ok\n");
     }
 
+    return 0;
+}
+
+/* LFI (f2 variant, little endian) as BREC checks it: the 16-bit sum of
+ * the header sector up to 0x1fe is stored at 0x1fe, the 32-bit sum of the
+ * directory (sectors 1-15) at 0x1c. The files follow from sector 16 in
+ * directory order, each padded with zeros to whole sectors: size is the
+ * padded length, bytes the real one, checksum the 32-bit sum over size.
+ * The header word at 0x80 is the stride of the two copies on the NAND, in
+ * sectors: the image must not grow past it. */
+#define LFI_DIR_START       0x200
+#define LFI_DATA_START      0x2000
+#define LFI_ALIGN           512
+#define LFI_DIR_CHECKSUM    0x1c
+#define LFI_COPY_STRIDE     0x80
+#define LFI_HDR_CHECKSUM    0x1fe
+
+int fw_find(const uint8_t *buf, size_t size, const char *name,
+            const uint8_t **data, size_t *data_size)
+{
+    const struct fw_hdr_t *hdr = (const void *)buf;
+
+    if(size < sizeof(struct fw_hdr_t) ||
+       memcmp(hdr->sig, g_fw_signature_f2, FW_SIG_SIZE) != 0)
+    {
+        cprintf(GREY, "Not an LFI file (f2 variant)\n");
+        return 1;
+    }
+    for(int i = 0; i < FW_ENTRIES; i++)
+    {
+        const struct fw_entry_t *entry = &hdr->entry[i];
+        if(entry->name[0] == 0)
+        {
+            continue;
+        }
+        char filename[16];
+        build_filename_fw(filename, (struct fw_entry_t *)entry);
+        if(strcasecmp(filename, name) != 0)
+        {
+            continue;
+        }
+        size_t offset = (size_t)entry->block_offset << 9;
+        size_t len = entry->bytes ? entry->bytes : entry->size;
+        if(offset + len > size)
+        {
+            cprintf(GREY, "Entry %s lies outside the image\n", name);
+            return 1;
+        }
+        *data = buf + offset;
+        *data_size = len;
+        return 0;
+    }
+    cprintf(GREY, "No entry %s in the image\n", name);
+    return 1;
+}
+
+int fw_replace(const uint8_t *buf, size_t size, const char *name,
+               const uint8_t *data, size_t data_size, uint8_t **out,
+               size_t *out_size)
+{
+    const struct fw_hdr_t *hdr = (const void *)buf;
+
+    if(size < sizeof(struct fw_hdr_t) ||
+       memcmp(hdr->sig, g_fw_signature_f2, FW_SIG_SIZE) != 0)
+    {
+        cprintf(GREY, "Not an LFI file (f2 variant)\n");
+        return 1;
+    }
+
+    /* find the entry and where the files end */
+    int found = -1;
+    size_t files_end = LFI_DATA_START;
+    for(int i = 0; i < FW_ENTRIES; i++)
+    {
+        const struct fw_entry_t *entry = &hdr->entry[i];
+        if(entry->name[0] == 0)
+        {
+            continue;
+        }
+        size_t offset = (size_t)entry->block_offset << 9;
+        if(offset + entry->size > size)
+        {
+            cprintf(GREY, "Entry %d lies outside the image\n", i);
+            return 1;
+        }
+        if(offset + entry->size > files_end)
+        {
+            files_end = offset + entry->size;
+        }
+        char filename[16];
+        build_filename_fw(filename, (struct fw_entry_t *)entry);
+        if(strcasecmp(filename, name) == 0)
+        {
+            found = i;
+        }
+    }
+    if(found < 0)
+    {
+        cprintf(GREY, "No entry %s in the image\n", name);
+        return 1;
+    }
+
+    /* The other files stay where they are, the OF may find them by more
+     * than the directory: the file in its old place if it fits, else after
+     * the last one. */
+    const struct fw_entry_t *old = &hdr->entry[found];
+    size_t padded = (data_size + LFI_ALIGN - 1) / LFI_ALIGN * LFI_ALIGN;
+    size_t pos = (size_t)old->block_offset << 9;
+    size_t total = size;
+    if(padded > old->size)
+    {
+        pos = (files_end + LFI_ALIGN - 1) / LFI_ALIGN * LFI_ALIGN;
+        if(pos + padded > total)
+        {
+            total = pos + padded;
+        }
+    }
+    uint32_t stride;
+    memcpy(&stride, buf + LFI_COPY_STRIDE, 4);
+    if(total > (size_t)stride * 512)
+    {
+        cprintf(GREY, "The image would be %zu bytes, more than the copy stride "
+                "(%u sectors)\n", total, stride);
+        return 1;
+    }
+
+    uint8_t *o = calloc(1, total);
+    if(o == NULL)
+    {
+        return 1;
+    }
+    memcpy(o, buf, size);
+    struct fw_hdr_t *nhdr = (void *)o;
+    struct fw_entry_t *entry = &nhdr->entry[found];
+    /* nothing of the old content left behind in the slot */
+    memset(o + pos, 0, padded > old->size ? padded : old->size);
+    memcpy(o + pos, data, data_size);
+    entry->block_offset = pos >> 9;
+    entry->size = padded;
+    entry->bytes = data_size;
+    entry->checksum = afi_checksum(o + pos, padded);
+
+    uint32_t dir_chk = afi_checksum(o + LFI_DIR_START, LFI_DATA_START - LFI_DIR_START);
+    memcpy(o + LFI_DIR_CHECKSUM, &dir_chk, 4);
+    uint16_t hdr_chk = lfi_header_checksum(o, LFI_HDR_CHECKSUM, false);
+    memcpy(o + LFI_HDR_CHECKSUM, &hdr_chk, 2);
+    *out = o;
+    *out_size = total;
     return 0;
 }
 

@@ -18,6 +18,7 @@
  *
  ****************************************************************************/
 #include <string.h>
+#include <strings.h>
 #include <stdlib.h>
 #include <ctype.h>
 #include "misc.h"
@@ -194,6 +195,107 @@ int afi_unpack(uint8_t *buf, size_t size, afi_extract_callback_t unpack_cb)
     else
         cprintf(RED, "Ok\n");
 
+    return 0;
+}
+
+/* The directory (header, entries, post header) fills the first 0x1000 bytes,
+ * the files follow back to back in directory order, each a multiple of 512
+ * bytes. A replaced file is padded with zeros to that and everything after it
+ * moves; types, load addresses and descriptions stay. */
+#define AFI_DATA_START  0x1000
+#define AFI_ALIGN       512
+
+int afi_replace(const uint8_t *buf, size_t size, const char *name,
+                const uint8_t *data, size_t data_size, uint8_t **out,
+                size_t *out_size)
+{
+    const struct afi_t *afi = (const void *)buf;
+
+    if(size < AFI_DATA_START || !afi_check((uint8_t *)buf, size) ||
+       afi->hdr.afi_size > size)
+    {
+        cprintf(GREY, "Not an AFI file\n");
+        return 1;
+    }
+
+    /* find the entry and the new total size */
+    int found = -1;
+    size_t total = AFI_DATA_START;
+    uint32_t prev_end = AFI_DATA_START;
+    for(int i = 0; i < AFI_ENTRIES; i++)
+    {
+        const struct afi_entry_t *entry = &afi->entry[i];
+        if(entry->name[0] == 0)
+        {
+            continue;
+        }
+        if(entry->offset + entry->size > afi->hdr.afi_size)
+        {
+            cprintf(GREY, "Entry %d lies outside the archive\n", i);
+            return 1;
+        }
+        /* the layout is rebuilt in directory order */
+        if(entry->offset < prev_end)
+        {
+            cprintf(GREY, "Entry %d is not in directory order\n", i);
+            return 1;
+        }
+        prev_end = entry->offset + entry->size;
+        char filename[16];
+        build_filename(filename, (struct afi_entry_t *)entry);
+        if(strcasecmp(filename, name) == 0)
+        {
+            found = i;
+            total += (data_size + AFI_ALIGN - 1) / AFI_ALIGN * AFI_ALIGN;
+        }
+        else
+        {
+            total += entry->size;
+        }
+    }
+    if(found < 0)
+    {
+        cprintf(GREY, "No entry %s in the archive\n", name);
+        return 1;
+    }
+
+    uint8_t *o = calloc(1, total);
+    if(o == NULL)
+    {
+        return 1;
+    }
+    memcpy(o, buf, AFI_DATA_START);
+    struct afi_t *nafi = (void *)o;
+
+    /* entries in offset order are entries in directory order (checked) */
+    size_t pos = AFI_DATA_START;
+    for(int i = 0; i < AFI_ENTRIES; i++)
+    {
+        struct afi_entry_t *entry = &nafi->entry[i];
+        if(entry->name[0] == 0)
+        {
+            continue;
+        }
+        const uint8_t *src = buf + entry->offset;
+        size_t len = entry->size;
+        size_t padded = len;
+        if(i == found)
+        {
+            src = data;
+            len = data_size;
+            padded = (data_size + AFI_ALIGN - 1) / AFI_ALIGN * AFI_ALIGN;
+        }
+        memcpy(o + pos, src, len);
+        entry->offset = pos;
+        entry->size = padded;
+        entry->checksum = afi_checksum(o + pos, padded);
+        pos += padded;
+    }
+
+    nafi->hdr.afi_size = total;
+    nafi->post.checksum = afi_checksum(o, sizeof(struct afi_t) - 4);
+    *out = o;
+    *out_size = total;
     return 0;
 }
 

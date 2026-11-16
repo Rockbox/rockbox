@@ -33,6 +33,11 @@ enum fwu_mode_t
  * firmware. Return 0 on success. The mode parameter selects how the function guesses between
  * various variants of FWU. */
 int fwu_decrypt(uint8_t *buf, size_t *size, enum fwu_mode_t mode);
+/* Encrypt an AFI as a FWU v3 file with the keys of an original FWU file (ATJ213x
+ * only). On success *out is a malloc'ed buffer of *out_size bytes. Return 0 on
+ * success. */
+int fwu_encrypt(const uint8_t *orig, size_t orig_size, const uint8_t *afi,
+                size_t afi_size, uint8_t **out, size_t *out_size);
 /* Check if a file looks like a FWU file */
 bool fwu_check(uint8_t *buf, size_t size);
 

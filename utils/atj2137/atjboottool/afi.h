@@ -28,6 +28,13 @@ uint32_t afi_checksum(void *ptr, size_t size);
  * that value. Returns 0 on success */
 typedef int (*afi_extract_callback_t)(const char *name, uint8_t *buf, size_t size);
 int afi_unpack(uint8_t *buf, size_t size, afi_extract_callback_t cb);
+/* Replace the file called name (e.g. "FWIMAGE.FW", case ignored) in an AFI
+ * archive with data, padded with zeros to 512 bytes. Offsets, sizes and
+ * checksums are recomputed. On success *out is a malloc'ed buffer of
+ * *out_size bytes. Returns 0 on success */
+int afi_replace(const uint8_t *buf, size_t size, const char *name,
+                const uint8_t *data, size_t data_size, uint8_t **out,
+                size_t *out_size);
 /* Check if a file looks like an AFI file */
 bool afi_check(uint8_t *buf, size_t size);
 

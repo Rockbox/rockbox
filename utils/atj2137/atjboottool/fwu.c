@@ -1044,6 +1044,12 @@ static void atj2127_decrypt(uint8_t *dst, const uint8_t *src, size_t size,
     }
 }
 
+/* session key and crypto block positions of the last decrypted FWU v3, for
+ * fwu_encrypt() */
+static uint8_t g_fwu_keybuf[32];
+static uint8_t g_fwu_blockA, g_fwu_blockB;
+static bool g_fwu_is_atj2127;
+
 static int decrypt_fwu_v3(uint8_t *buf, size_t *size, uint8_t block[512], enum fwu_mode_t mode)
 {
     uint8_t blockA;
@@ -1054,6 +1060,9 @@ static int decrypt_fwu_v3(uint8_t *buf, size_t *size, uint8_t block[512], enum f
     int ret = get_key_fwu_v3(*size, buf, &blockA, &blockB, keybuf, block);
     if(ret != 0)
         return ret;
+    memcpy(g_fwu_keybuf, keybuf, sizeof(g_fwu_keybuf));
+    g_fwu_blockA = blockA;
+    g_fwu_blockB = blockB;
 
     size_t file_size = *size;
     /* the input buffer is reorganized based on two offsets (blockA and blockB),
@@ -1103,6 +1112,7 @@ static int decrypt_fwu_v3(uint8_t *buf, size_t *size, uint8_t block[512], enum f
     else if(mode == FWU_ATJ2127)
         is_atj2127 = true;
 
+    g_fwu_is_atj2127 = is_atj2127;
     if(is_atj2127)
         atj2127_decrypt(buf, tmpbuf, *size, keybuf, rounds_to_perform);
     else
@@ -1224,6 +1234,94 @@ int fwu_decrypt(uint8_t *buf, size_t *size, enum fwu_mode_t mode)
         return 1;
     }
 
+}
+
+/* The FWU v3 session key is derived only from data inside the file (sector 0
+ * and the crypto blocks A and B), and the ATJ213x body is one RC4 stream. A
+ * new firmware is encrypted by reusing the original's sector 0 and blocks A
+ * and B as they are: RC4 over the new AFI, the blocks spliced back in at
+ * their offsets, a new FwuTail with both checksums (the OF updater checks
+ * them before it decrypts anything). */
+int fwu_encrypt(const uint8_t *orig, size_t orig_size, const uint8_t *afi,
+                size_t afi_size, uint8_t **out, size_t *out_size)
+{
+    size_t size = orig_size;
+    uint8_t *tmp = malloc(orig_size);
+    if(tmp == NULL)
+    {
+        return 1;
+    }
+    memcpy(tmp, orig, orig_size);
+    /* checks the original and leaves its key behind */
+    int ret = fwu_decrypt(tmp, &size, FWU_ATJ213X);
+    free(tmp);
+    if(ret != 0)
+    {
+        return ret;
+    }
+    if(g_fwu_is_atj2127)
+    {
+        cprintf(GREY, "ATJ2127 encryption is not supported\n");
+        return 1;
+    }
+
+    const struct fwu_hdr_t *ohdr = (const void *)orig;
+    const struct fwu_tail_t *otail =
+        (const void *)(orig + ohdr->fw_size - sizeof(struct fwu_tail_t));
+    if(otail->flags != 0x55aa55aa || strcmp((const char *)otail->desc, "FwuTail") != 0)
+    {
+        cprintf(GREY, "The original firmware has no FwuTail\n");
+        return 1;
+    }
+
+    size_t offsetA = 512 * (1 + g_fwu_blockA);
+    size_t offsetB = 512 * (1 + g_fwu_blockB);
+    if(afi_size < offsetA + offsetB || afi_size % 4 != 0)
+    {
+        cprintf(GREY, "Unsuitable AFI size\n");
+        return 1;
+    }
+    *out_size = afi_size + 512 + 1024 + 512 + sizeof(struct fwu_tail_t);
+    uint8_t *o = malloc(*out_size);
+    uint8_t *enc = malloc(afi_size);
+    if(o == NULL || enc == NULL)
+    {
+        free(o);
+        free(enc);
+        return 1;
+    }
+
+    memcpy(enc, afi, afi_size);
+    rc4_key_schedule(g_fwu_keybuf, 32, g_rc4_S);
+    rc4_stream_cipher(enc, afi_size, g_rc4_S);
+
+    /* the original's raw sector 0 and crypto blocks, the decryption above
+     * worked on a copy */
+    size_t pos = 0;
+    memcpy(o, orig, 512);
+    pos += 512;
+    memcpy(o + pos, enc, offsetA);
+    pos += offsetA;
+    memcpy(o + pos, orig + 512 + offsetA, 1024);
+    pos += 1024;
+    memcpy(o + pos, enc + offsetA, offsetB);
+    pos += offsetB;
+    memcpy(o + pos, orig + 512 + offsetA + 1024 + offsetB, 512);
+    pos += 512;
+    memcpy(o + pos, enc + offsetA + offsetB, afi_size - offsetA - offsetB);
+    pos += afi_size - offsetA - offsetB;
+    free(enc);
+
+    struct fwu_hdr_t *hdr = (void *)o;
+    hdr->fw_size = *out_size;
+
+    struct fwu_tail_t *tail = (void *)(o + pos);
+    memcpy(tail, otail, sizeof(*tail));
+    tail->fwu_checksum = fwu_checksum(o, pos);
+    tail->fwutail_checksum = fwu_checksum(tail, sizeof(*tail) - 4);
+
+    *out = o;
+    return 0;
 }
 
 bool fwu_check(uint8_t *buf, size_t size)
