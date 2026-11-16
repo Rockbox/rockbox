@@ -1087,7 +1087,7 @@
 #define K_StatusKSU_S        1            /* Supervisor mode in KSU field */
 #define K_StatusKSU_K        0            /* Kernel mode in KSU field */
 
-
+#define C0_INTCTL $12,1
 /*
  ************************************************************************
  *                C A U S E   R E G I S T E R   ( 1 3 )                 *
@@ -1277,6 +1277,8 @@
 #define K_PRIdImp_R5200        0x28
 #define K_PRIdImp_R5400        0x54
 
+#define C0_EBase         $15,1
+#define C0_EBASE         C0_EBase
 /*
  ************************************************************************
  *               C O N F I G   R E G I S T E R   ( 1 6 )                *
