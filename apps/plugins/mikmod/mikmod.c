@@ -584,7 +584,7 @@ static void applysettings(void)
     }
 #endif
 
-    if (inited && (md_mixfreq != sr_nums[settings.sample_rate])) {
+    if (md_mixfreq != sr_nums[settings.sample_rate]) {
         /* validate configured samplerate and set md_mixfreq */
         md_mixfreq = 0;
         const struct pcm_sink_caps* caps = rb->pcm_current_sink_caps();
@@ -606,7 +606,8 @@ static void applysettings(void)
         // MikMod_Reset("");  BROKEN!
         rb->mixer_channel_stop(PCM_MIXER_CHAN_PLAYBACK);
         rb->mixer_set_frequency(md_mixfreq);
-        rb->mixer_channel_play_data(PCM_MIXER_CHAN_PLAYBACK, &mixer_cbs, NULL, 0);
+        if (inited)
+            rb->mixer_channel_play_data(PCM_MIXER_CHAN_PLAYBACK, &mixer_cbs, NULL, 0);
     }
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
@@ -1047,6 +1048,7 @@ enum plugin_status plugin_start(const void* parameter)
         settings.sample_rate = sampr_to_setting_index(caps->samprs[caps->default_freq]);
     }
 
+    md_mixfreq = 0;
     applysettings();
 
     if (MikMod_Init(""))
