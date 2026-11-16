@@ -1760,19 +1760,19 @@ cat <<EOF
  225) NWZ-E580 series      240) Rocker (hosted)
  226) NWZ-A10 series                             ==AIGO==
  227) NW-A20 series        ==iBasso==            245) Eros Q / K (hosted)
- 228) NWZ-A860 series      250) DX50             247) Eros Q / K native
- 229) NWZ-S750 series      251) DX90                  (hw1/hw2 bl, all hw rb)
- 303) PSP (WIP)                                  248) Eros Q / K native
-                           ==xDuoo==                  (hw3 bl only)
- ==FiiO==                  241) X3               249) Eros Q / K native
- 246) M3K                  242) X3II                  (hw4 bl only)
+ 228) NWZ-A860 series      250) DX50             247) Eros Q / K (native)
+ 229) NWZ-S750 series      251) DX90
+ 303) PSP (WIP)
+                           ==xDuoo==
+ ==FiiO==                  241) X3
+ 246) M3K                  242) X3II
                            243) X20
  ==Shanling==                                    ==HiBy==
  260) Q1                   ==Surfans==           300) R3 Pro II
                            280) F28 (WIP)        301) R1
  ==Echo project==                                304) R1 baremetal (WIP)
- 270) Echo R1 (WIP)       ==Nintendo==          ==Hidizs==
-                          290) 3DS (WIP)        302) AP80 Pro Max (WIP)
+ 270) Echo R1 (WIP)        ==Nintendo==          ==Hidizs==
+                           290) 3DS (WIP)        302) AP80 Pro Max (WIP)
 EOF
 
   buildfor=`input`;
@@ -3954,64 +3954,6 @@ fi
     # player version, for bootloader usage
     # versions 1 and 2 both use 1
     extradefines="$extradefines -DEROSQN_VER=1"
-    ;;
-
-   248|erosqnative_v3)
-    target_id=116
-    modelname="erosqnative_v3"
-    bootloader_only="1"
-    target="EROS_QN"
-    memory=32
-    mipsr2elcc
-    appextra=""
-    plugins="yes"
-    tool="$rootdir/tools/scramble -add=erosqnative "
-    boottool="$rootdir/tools/mkspl-x1000 -type=nand -ppb=2 -bpp=2 "
-    output="rockbox.erosq"
-    bootoutput="bootloader.erosq"
-    sysfontbl="16-Terminus"
-    # toolset is the tools within the tools directory that we build for
-    # this particular target.
-    toolset="$x1000tools"
-    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
-    # architecture, manufacturer and model for the target-tree build
-    t_cpu="mips"
-    t_manufacturer="ingenic_x1000"
-    t_soc="ingenic"
-    t_model="erosqnative"
-    # player version, for bootloader usage
-    # version 3
-    extradefines="$extradefines -DEROSQN_VER=3"
-    ;;
-
-    249|erosqnative_v4)
-    target_id=116
-    modelname="erosqnative_v4"
-    bootloader_only="1"
-    target="EROS_QN"
-    memory=32
-    mipsr2elcc
-    appextra=""
-    plugins="yes"
-    tool="$rootdir/tools/scramble -add=erosqnative "
-    boottool="$rootdir/tools/mkspl-x1000 -type=nand -ppb=2 -bpp=2 "
-    output="rockbox.erosq"
-    bootoutput="bootloader.erosq"
-    sysfontbl="16-Terminus"
-    # toolset is the tools within the tools directory that we build for
-    # this particular target.
-    toolset="$x1000tools"
-    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
-    # architecture, manufacturer and model for the target-tree build
-    t_cpu="mips"
-    t_manufacturer="ingenic_x1000"
-    t_soc="ingenic"
-    t_model="erosqnative"
-    # player version, for bootloader usage
-    # version 4
-    extradefines="$extradefines -DEROSQN_VER=4"
     ;;
 
    232|ihifi770c)
