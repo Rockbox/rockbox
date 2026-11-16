@@ -42,6 +42,8 @@
 
 #if defined(EROS_QN)
 #include "eros_qn_codec.h"
+#include "power-erosqnative.h"
+#include "lcd-erosqnative.h"
 #endif
 
 #ifdef INGENIC_CPUIDLE_STATS
