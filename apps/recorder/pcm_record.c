@@ -88,6 +88,13 @@
 #define FLUSH_SECONDS           1
 #define FLUSH_MON_INTERVAL      1/6
 #define STREAM_BUF_SIZE     32768
+#elif MEMORYSIZE <= 4
+/* 512 KiB of PCM (3 s at 44.1 kHz); the defaults below need 2 MiB */
+#define PCM_NUM_CHUNKS        128
+#define PCM_CHUNK_SAMP       1024
+#define PCM_BOOST_SECONDS       1/2
+#define PANIC_SECONDS           1
+#define FLUSH_SECONDS           2
 #elif MEMORYSIZE <= 16
 #define PANIC_SECONDS           5
 #define FLUSH_SECONDS           7
@@ -538,6 +545,15 @@ static void init_rec_buffers(void)
 
     /* PCMBUF */
     pcm_buffer = CACHEALIGN_UP(buf); /* Line align */
+
+    size_t fixed = pcm_buffer - buf + PCM_BUF_SIZE + STREAM_BUF_SIZE +
+                   CHUNK_FILE_COUNT(MAX_PATH)*ENC_HDR_SIZE;
+    if (size <= fixed)
+    {
+        panicf("%s(): %lu bytes, need more than %lu", __func__,
+               (unsigned long)size, (unsigned long)fixed);
+    }
+
     size -= pcm_buffer + PCM_BUF_SIZE - buf;
     buf = pcm_buffer + PCM_BUF_SIZE;
 
