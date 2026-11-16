@@ -149,10 +149,9 @@ void irq_handler(void)
    same GPIO init as the original firmware - this makes it easier to
    investigate what the GPIO pins do.
 */
-
-#ifdef COWON_D2
 static void gpio_init(void)
 {
+#ifdef COWON_D2
     /* Do what the original firmware does */
     GPIOA = 0x07000C83;
     GPIOA_DIR = 0x0F010CE3;
@@ -169,13 +168,29 @@ static void gpio_init(void)
     PORTCFG1 = 0x0566A000;
     PORTCFG2 = 0x000004C0;
     PORTCFG3 = 0x0AA40455;
-}
-#endif
+#elif defined(SAMSUNG_YPP2)
+    /* Initial pin directions and mux selection from Samsung's firmware. */
+    GPIOA = 0x10400C03;
+    GPIOA_DIR = 0x1EE20C17;
+    GPIOB = 0;
+    GPIOB_DIR = 0x280000;
+    GPIOC = 0x20800000;
+    GPIOC_DIR = 0x10000007;
+    GPIOD = 0;
+    GPIOD_DIR = 0;
+    GPIOE = 0x100099;
+    GPIOE_DIR = 0x58009D;
 
+    PORTCFG0 = 0x4000;
+    PORTCFG1 = 0xc06e8000;
+    PORTCFG2 = 0x00000933;
+    PORTCFG3 = 0x0fdff055;
+#endif
+}
 
 /* Second function called in the original firmware's startup code - we just
    set up the clocks in the same way as the original firmware for now. */
-#ifdef COWON_D2
+#if (defined(COWON_D2) || defined(SAMSUNG_YPP2))
 static void clock_init(void)
 {
     int i;
@@ -237,7 +252,7 @@ static void clock_init(void)
 #endif
 
 
-#ifdef COWON_D2
+#if (defined(COWON_D2) || defined(SAMSUNG_YPP2))
 void system_init(void)
 {
     MBCFG = 0x19;
@@ -287,7 +302,9 @@ void system_reboot(void)
 
 void system_exception_wait(void)
 {
-#ifdef COWON_D2
+#if defined(SAMSUNG_YPP2)
+    while ((GPIOC & (1u << 20)) == 0); /* POWER input, active high */
+#elif defined(COWON_D2)
     while ((GPIOA & 0x4) != 0); /* check for power button */
 #else
     #error "system_exception_wait not implemented for this target"
