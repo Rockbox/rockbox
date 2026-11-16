@@ -76,7 +76,10 @@ static inline unsigned int data_level(int quarter_secs)
 /* Number of bytes played per second */
 #define BYTERATE            (mixer_get_frequency() * PCMBUF_SAMPLE_SIZE)
 
-#if MEMORYSIZE > 2
+/* 3 s of PCM need about 520 KiB at 44.1 kHz: with 4 MiB or less that is
+ * missing in the file buffer (and USB mass storage can not get its buffer
+ * from playback) */
+#if MEMORYSIZE > 4
 /* Keep watermark high for large memory target - at least (2s) */
 #define PCMBUF_WATERMARK    (BYTERATE * 2)
 #define MIN_BUFFER_SIZE     (BYTERATE * 3)
