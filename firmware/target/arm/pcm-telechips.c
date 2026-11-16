@@ -62,10 +62,31 @@ struct dma_data dma_play_data SHAREDBSS_ATTR =
     .state = 0
 };
 
+#ifdef SAMSUNG_YPP2
+static void tcc780x_pcm_refill(void) ICODE_ATTR;
+static void tcc780x_pcm_refill(void)
+{
+    uint16_t *p = dma_play_data.p;
+
+    /* Zero-extend each 16-bit sample into its channel register.
+     * Use the same sample width for startup and every FIQ refill. */
+    for (int frame = 0; frame < 4; ++frame)
+    {
+        uint16_t left = *p++;
+        uint16_t right = *p++;
+        DADO_L(frame) = left;
+        DADO_R(frame) = right;
+    }
+
+    dma_play_data.p = p;
+    dma_play_data.size -= 16;
+}
+#endif
+
 static void sink_dma_init(void)
 {
     DAVC = 0x0;         /* Digital Volume = max */
-#ifdef COWON_D2
+#if defined(COWON_D2) || defined(SAMSUNG_YPP2)
     /* Set DAI clock divided from PLL0 (192MHz).
        The best approximation of 256*44.1kHz is 11.291MHz. */
     BCLKCTR &= ~DEV_DAI;
@@ -101,6 +122,9 @@ static void play_start_pcm(void)
 
     if (dma_play_data.size >= 16)
     {
+#ifdef SAMSUNG_YPP2
+        tcc780x_pcm_refill();
+#else
         DADO_L(0) = *dma_play_data.p++;
         DADO_R(0) = *dma_play_data.p++;
         DADO_L(1) = *dma_play_data.p++;
@@ -110,6 +134,7 @@ static void play_start_pcm(void)
         DADO_L(3) = *dma_play_data.p++;
         DADO_R(3) = *dma_play_data.p++;
         dma_play_data.size -= 16;
+#endif
     }
 
     DAMR |= (1<<14);   /* enable tx */
@@ -221,7 +246,27 @@ const void * pcm_rec_dma_get_peak_buffer(void)
 }
 #endif
 
-#if defined(CPU_TCC780X)
+#if defined(SAMSUNG_YPP2)
+/* Retain the YP-P2 C refill path. The shared assembly handler below
+ * maintains stack alignment independently. */
+void fiq_handler(void) ICODE_ATTR __attribute__((interrupt("FIQ")));
+void fiq_handler(void)
+{
+    CREQ = DAI_TX_IRQ_MASK | DAI_RX_IRQ_MASK;
+    bool new_buffer = false;
+
+    if (dma_play_data.size < 16)
+        new_buffer = pcm_play_dma_complete_callback(PCM_DMAST_OK,
+                         &dma_play_data.p_r, &dma_play_data.size);
+
+    if (dma_play_data.size >= 16)
+    {
+        tcc780x_pcm_refill();
+        if (new_buffer)
+            pcm_play_dma_status_callback(PCM_DMAST_STARTED);
+    }
+}
+#elif defined(CPU_TCC780X)
 void fiq_handler(void) ICODE_ATTR __attribute__((naked));
 void fiq_handler(void)
 {
@@ -234,7 +279,8 @@ void fiq_handler(void)
     asm volatile (
         BEGIN_ARM_ASM_SYNTAX_UNIFIED
         "sub     lr, lr, #4          \n"
-        "stmfd   sp!, { r0-r3, lr }  \n" /* stack scratch regs and lr */
+        /* Save r4 as well to keep the stack eight-byte aligned for C calls. */
+        "stmfd   sp!, { r0-r4, lr }  \n"
         "mov     r14, #0             \n" /* Was the callback called? */
 #if defined(CPU_TCC780X)
         "mov     r8, #0xc000         \n" /* DAI_TX_IRQ_MASK | DAI_RX_IRQ_MASK */
@@ -266,14 +312,14 @@ void fiq_handler(void)
         "stmia   r11, { r8-r9 }      \n" /* save p and size */
 
         "cmp     r14, #0             \n" /* Callback called? */
-        "ldmfdeq sp!, { r0-r3, pc }^ \n" /* no? -> exit */
+        "ldmfdeq sp!, { r0-r4, pc }^ \n" /* no? -> exit */
 
         "ldr     r1, =pcm_play_status_callback \n"
         "ldr     r1, [r1]            \n"
         "cmp     r1, #0              \n"
         "movne   r0, %1              \n"
         "blxne   r1                  \n"
-        "ldmfd   sp!, { r0-r3, pc }^ \n" /* exit */
+        "ldmfd   sp!, { r0-r4, pc }^ \n" /* exit */
 
     ".more_data:                     \n"
         "mov     r14, #1             \n" /* Remember we got more data in this FIQ */
@@ -286,7 +332,7 @@ void fiq_handler(void)
         "ldmiane r11, { r8-r9 }      \n" /* load new p and size */
         "cmpne   r9, #0x0f           \n" /* did we actually get enough data? */
         "bhi     .fill_fifo          \n" /* not stop and enough? refill */
-        "ldmfd   sp!, { r0-r3, pc }^ \n" /* exit */
+        "ldmfd   sp!, { r0-r4, pc }^ \n" /* exit */
         ".ltorg                      \n"
         END_ARM_ASM_SYNTAX_UNIFIED
         : : "i"(PCM_DMAST_OK), "i"(PCM_DMAST_STARTED)

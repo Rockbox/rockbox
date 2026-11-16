@@ -39,9 +39,6 @@ static int dbg_level = 0x00;
 static int global_ep_irq_mask = 0x1;
 #define DEBUG(level, fmt, args...) do { if (dbg_level & (level)) printf(fmt, ## args); } while (0)
 
-#include <inttypes.h>
-
-
 #include "power.h"
 
 #ifndef BOOTLOADER
@@ -64,7 +61,7 @@ int printf(const char *fmt, ...);
 
 struct tcc_ep {
     unsigned char dir;      /* endpoint direction */
-    volatile uint16_t  *ep; /* hw ep buffer */
+    volatile TCC7xx_USB_FIFO_TYPE *ep; /* hw ep buffer */
     int id;       /* Endpoint id */
     int mask;     /* Endpoint bit mask */
     char *buf;    /* user buffer to store data */
@@ -100,9 +97,54 @@ static bool usb_drv_write_ep(struct tcc_ep *ep);
 static void usb_set_speed(int);
 
 static bool address_status;
+static bool ep0_expect_status_out;
+static bool ep0_tx_pending;
+static bool ep0_tx_notify;
+static bool ep0_tx_zlp;
+static unsigned short ep0_request_length;
+static int ep0_tx_result;
+static struct semaphore ep0_tx_complete;
 static bool handle_set_address(struct usb_ctrlrequest *req);
+static void ep0_tx_ack(void);
 
-/* SET_ADDRESS status belongs to this driver, not the core EP0 machine. */
+static void ep0_cancel_tx(void)
+{
+    if (ep0_tx_pending) {
+        ep0_tx_pending = false;
+        ep0_tx_result = -1;
+        semaphore_release(&ep0_tx_complete);
+    }
+    ep0_tx_zlp = false;
+    tcc_endpoints[0].buf = NULL;
+}
+
+#ifdef CPU_TCC780X
+static struct usb_ctrlrequest ep0_last_setup;
+
+/* An OUT status event can retain BRCR=4. Accept a fresh standard SETUP
+ * from its FIFO and reject repeats of the preceding request. */
+static bool ep0_is_new_standard_setup(const struct usb_ctrlrequest *req)
+{
+    if (req->bRequestType == ep0_last_setup.bRequestType &&
+        req->bRequest == ep0_last_setup.bRequest &&
+        req->wValue == ep0_last_setup.wValue &&
+        req->wIndex == ep0_last_setup.wIndex &&
+        req->wLength == ep0_last_setup.wLength)
+        return false;
+
+    if (req->bRequestType == USB_DIR_IN &&
+        req->bRequest == USB_REQ_GET_DESCRIPTOR)
+        return req->wValue >> 8 && req->wLength > 0 &&
+               req->wLength <= 256;
+
+    if (req->bRequestType == 0 && req->bRequest == USB_REQ_SET_CONFIGURATION)
+        return req->wLength == 0;
+
+    return false;
+}
+#endif
+
+/* This driver handles the SET_ADDRESS status phase. */
 static void complete_transfer(int ep, int dir, int status, int length)
 {
     if(ep == EP_CONTROL && address_status)
@@ -133,6 +175,35 @@ static inline void pullup_off(void)
     TCC7xx_USB_PHY_CFG = 0x3e4c;
 }
 
+/* On TCC7801, an indexed-register read completes the FIFO pop and makes
+ * the next data-port entry visible. */
+static inline unsigned int usb_fifo_read_word(
+    volatile TCC7xx_USB_FIFO_TYPE *fifo)
+{
+    unsigned int value = *fifo;
+#ifdef CPU_TCC780X
+    unsigned int remaining = TCC7xx_USB_EP_BRCR;
+    (void)remaining;
+#endif
+    return value;
+}
+
+/* SETUP and class buffers support byte alignment. Unpack the controller's
+ * word-sized FIFO reads into bytes to handle odd addresses and short tails
+ * on ARM926. */
+static void usb_fifo_read_packet(volatile TCC7xx_USB_FIFO_TYPE *fifo,
+                                unsigned char *buf, unsigned int count)
+{
+    unsigned int i = 0;
+
+    while (i < count) {
+        unsigned int word = usb_fifo_read_word(fifo);
+        buf[i++] = word;
+        if (i < count)
+            buf[i++] = word >> 8;
+    }
+}
+
 #if 0
 static
 char *dump_data(char *data, int count)
@@ -156,11 +227,13 @@ void handle_control(void)
         (struct usb_ctrlrequest *) ep_control;
     unsigned short stat;
     unsigned short count = 0;
-    int i;
-    int type;
+    bool possible_status_out;
 
     /* select control endpoint */
     TCC7xx_USB_INDEX = 0x00;
+    /* Clear the IRQ latch before servicing the packet. A new event during
+     * the handler must remain pending when we return. */
+    TCC7xx_USB_EPIF = 1;
     stat = TCC7xx_USB_EP0_STAT;
 
     if (stat & 0x10) {
@@ -169,54 +242,88 @@ void handle_control(void)
     }
 
     if (TCC7xx_USB_EP0_STAT & 0x01) { /* RX */
-        uint16_t *ptr = (uint16_t *) ep_control;
-
         count = TCC7xx_USB_EP_BRCR;
+        possible_status_out = ep0_expect_status_out && (stat & 0x20);
 
-        if (TCC7xx_USB_EP0_STAT & 0x2)
+        /* An empty RX indication can follow SETUP. Complete the status
+         * phase when the core has armed it. */
+        if (count == 0) {
+            bool complete_status = ep0_expect_status_out;
+
+            ep0_expect_status_out = false;
+            if (stat & 0x2) {
+                TCC7xx_USB_EP0_STAT = 0x02;
+                ep0_tx_ack();
+            }
+            TCC7xx_USB_EP0_STAT = 0x01;
+            if (complete_status) {
+                complete_transfer(EP_CONTROL, USB_DIR_OUT, 0, 0);
+            }
+            return;
+        }
+
+        /* Samsung's TCC7801 handler clears bit 1 of EP0_CTRL before
+         * draining every nonempty EP0 RX event. */
+#ifdef CPU_TCC780X
+        TCC7xx_USB_EP0_CTRL &= ~0x2;
+#endif
+
+        /* Acknowledge the preceding TX completion before handling SETUP,
+         * matching Samsung's EP0 interrupt path. Queue the response later. */
+        if (stat & 0x2)
             TCC7xx_USB_EP0_STAT = 0x02;
 
         if (count != 4) { /* bad control? */
             unsigned short dummy;
 
-            while (count--)
-                dummy = TCC7xx_USB_EP0_BUF;
-                DEBUG(1, "WTF: count = %d", count);
-            } else {
-                /* simply read control packet */
-                for (i = 0; i < count; i++)
-                    ptr[i] = TCC7xx_USB_EP0_BUF;
+            while (count > 0) {
+                dummy = usb_fifo_read_word(&TCC7xx_USB_EP0_BUF);
+                count--;
             }
+            (void)dummy;
+            DEBUG(1, "WTF: count = %d", count);
+        } else {
+            usb_fifo_read_packet(&TCC7xx_USB_EP0_BUF, ep_control, count * 2);
+        }
 
-            count *= 2;
-            TCC7xx_USB_EP0_STAT = 0x01;
-            DEBUG(1, "CTRL: len = %d %04x", count, stat);
+        count *= 2;
+        TCC7xx_USB_EP0_STAT = 0x01;
+        DEBUG(1, "CTRL: len = %d %04x", count, stat);
+
+#ifdef CPU_TCC780X
+        if (possible_status_out) {
+            if (count != 8 || !ep0_is_new_standard_setup(req)) {
+                ep0_expect_status_out = false;
+                if (stat & 0x2)
+                    ep0_tx_ack();
+                complete_transfer(EP_CONTROL, USB_DIR_OUT, 0, 0);
+                return;
+            }
+        }
+#else
+        (void)possible_status_out;
+#endif
+        /* A new SETUP supersedes an uncompleted status phase. */
+        ep0_expect_status_out = false;
     } else if (TCC7xx_USB_EP0_STAT & 0x02) { /* TX */
         TCC7xx_USB_EP0_STAT = 0x02;
+        ep0_tx_ack();
         DEBUG(2, "TX Done\n");
     } else {
         DEBUG(1, "stat: %04x", stat);
     }
 
-    TCC7xx_USB_EPIF = 1;
-
     if (0 == (stat & 0x1) || count != 8)
         return ;
-#if 1 /* TODO: remove me someday */
-    {
-        int i;
-        uint16_t *ptr = (uint16_t *) ep_control;
-        for (i = 1; i < (count>>1); i++) {
-            if (ptr[i] != ptr[0])
-                break;
-        }
-        if (i == (count>>1)) {
-            /*DEBUG(2, */panicf_my("sanity failed");
-            return ;
-        }
-    }
+#ifdef CPU_TCC780X
+    ep0_last_setup = *req;
 #endif
-    type = req->bRequestType;
+    ep0_cancel_tx();
+    ep0_request_length = req->wLength;
+
+    /* Cancel the preceding data/status phase so the core can process
+     * the new SETUP immediately. */
+    usb_core_control_cancelled();
 
     /* TODO: don't pass some kinds of requests to upper level */
     switch (req->bRequest) {
@@ -247,16 +354,16 @@ static
 void handle_ep_in(struct tcc_ep *tcc_ep, uint16_t stat)
 {
     uint8_t *buf = tcc_ep->buf;
-    uint16_t *wbuf = (uint16_t *) buf;
     int wcount;
     int count;
-    int i;
+    int max_packet;
 
     if (tcc_ep->dir != USB_DIR_OUT) {
         panicf_my("ep%d: is input only", tcc_ep->id);
     }
 
     wcount = TCC7xx_USB_EP_BRCR;
+    max_packet = TCC7xx_USB_EP_MAXP;
 
     DEBUG(2, "ep%d: %04x %04x", tcc_ep->id, stat, wcount);
 
@@ -264,7 +371,6 @@ void handle_ep_in(struct tcc_ep *tcc_ep, uint16_t stat)
     count = wcount * 2;
     if (stat & TCC7xx_USP_EP_STAT_LWO) {
         count--;
-        wcount--;
     }
 
     if (buf == NULL)
@@ -272,27 +378,27 @@ void handle_ep_in(struct tcc_ep *tcc_ep, uint16_t stat)
     if (tcc_ep->max_len < count)
         panicf_my("Too big packet: %d excepted %d %x", count, tcc_ep->max_len, TCC7xx_USB_EP_CTRL);
 
-    for (i = 0; i < wcount; i++)
-        wbuf[i] = *tcc_ep->ep;
+    usb_fifo_read_packet(tcc_ep->ep, buf, count);
 
-    if (count & 1) { /* lwo */
-        uint16_t tmp = *tcc_ep->ep;
-        buf[count - 1] = tmp & 0xff;
-    }
-
-    tcc_ep->buf = NULL;
+    tcc_ep->buf += count;
+    tcc_ep->count += count;
+    tcc_ep->max_len -= count;
 
     TCC7xx_USB_EP_STAT = TCC7xx_USB_EP_STAT;
     TCC7xx_USB_EPIF = tcc_ep->mask;
-    TCC7xx_USB_EPIE &= ~tcc_ep->mask; /* TODO: use INGLD? */
+
+    /* A CBW ends with a short packet, but a WRITE(10) data stage may span
+     * many full-size packets. Report the whole receive to the storage class
+     * only when the requested length or a short packet ends it. */
+    if (tcc_ep->max_len > 0 && count == max_packet)
+        return;
+
+    tcc_ep->buf = NULL;
+    TCC7xx_USB_EPIE &= ~tcc_ep->mask;
     global_ep_irq_mask &= ~tcc_ep->mask;
-
-    if (TCC7xx_USB_EP_STAT & 0x1)
-        panicf_my("One more packet?");
-
     TCC7xx_USB_EP_CTRL |= TCC7xx_USB_EP_CTRL_OUTHD;
 
-    complete_transfer(tcc_ep->id, USB_DIR_OUT, 0, count);
+    complete_transfer(tcc_ep->id, USB_DIR_OUT, 0, tcc_ep->count);
 }
 
 static
@@ -406,12 +512,24 @@ static void usb_reset(void)
 
     TCC7xx_USB_DELAY_CTRL |= 0x81;
 
+#ifdef CPU_TCC780X
+    /* Matches the controller setup in Samsung YP-P2 firmware 5.10. */
+    TCC7xx_USB_SYS_CTRL = 0xa000 |
+        TCC7xx_USB_SYS_CTRL_RESET   |
+        TCC7xx_USB_SYS_CTRL_SUSPEND |
+        TCC7xx_USB_SYS_CTRL_RFRE    |
+        TCC7xx_USB_SYS_CTRL_SPDEN   |
+        TCC7xx_USB_SYS_CTRL_EIEN    |
+        TCC7xx_USB_SYS_CTRL_DUAL    |
+        TCC7xx_USB_SYS_CTRL_DMAZ;
+#else
     TCC7xx_USB_SYS_CTRL = 0xa000 |
         TCC7xx_USB_SYS_CTRL_RESET |
         TCC7xx_USB_SYS_CTRL_RFRE  |
         TCC7xx_USB_SYS_CTRL_SPDEN |
         TCC7xx_USB_SYS_CTRL_VBONE |
         TCC7xx_USB_SYS_CTRL_VBOFE;
+#endif
 
     usb_set_speed(1);
     pullup_on();
@@ -421,7 +539,9 @@ static void usb_reset(void)
     TCC7xx_USB_EPIE = global_ep_irq_mask;
 
     address_status = false;
-        usb_core_bus_reset();
+    ep0_expect_status_out = false;
+    ep0_cancel_tx();
+    usb_core_bus_reset();
 }
 
 /* IRQ handler */
@@ -464,13 +584,10 @@ void USB_DEVICE(void)
 
     ep_irq = TCC7xx_USB_EPIF & global_ep_irq_mask;
 
-    while (ep_irq & TCC7xx_USB_EPIF_IRQ_MASK) {
+    /* Service the current endpoint flags, then return so the USB thread
+     * can prepare deferred SETUP responses. Pending flags assert another IRQ. */
+    if (ep_irq & TCC7xx_USB_EPIF_IRQ_MASK)
         handle_ep(ep_irq);
-
-        /* is that really needed, btw not a problem for rockbox */
-        udelay(50);
-        ep_irq = TCC7xx_USB_EPIF & global_ep_irq_mask;
-    }
 
     TCC7xx_USB_INDEX = index_save;
 }
@@ -480,9 +597,9 @@ int usb_drv_port_speed(void)
     return (TCC7xx_USB_SYS_STAT & 0x10) ? 1 : 0;
 }
 
-static int usb_drv_write_packet(volatile unsigned short *buf, unsigned char *data, int len, int max)
+static int usb_drv_write_packet(volatile TCC7xx_USB_FIFO_TYPE *buf,
+                                unsigned char *data, int len, int max)
 {
-    uint16_t  *wbuf = (uint16_t *) data;
     int count, i;
 
     len = MIN(len, max);
@@ -490,8 +607,12 @@ static int usb_drv_write_packet(volatile unsigned short *buf, unsigned char *dat
 
     TCC7xx_USB_EP_BWCR = len;
 
-    for (i = 0; i < count; i++)
-        *buf = *wbuf++;
+    for (i = 0; i < count; i++) {
+        unsigned int word = data[2 * i];
+        if (2 * i + 1 < len)
+            word |= data[2 * i + 1] << 8;
+        *buf = word;
+    }
 
     return len;
 }
@@ -500,8 +621,17 @@ static bool usb_drv_write_ep(struct tcc_ep *ep)
 {
     int count;
 
-    if (ep->max_len == 0)
+    if (ep->max_len == 0) {
+#ifdef CPU_TCC780X
+        /* Complete the transfer after the final packet's TX interrupt.
+         * BOT retains its CSW buffer until this host ACK. */
+        if (ep->buf != NULL) {
+            ep->buf = NULL;
+            complete_transfer(ep->id, USB_DIR_IN, 0, ep->count);
+        }
+#endif
         return true;
+    }
 
     count = usb_drv_write_packet(ep->ep, ep->buf, ep->max_len, 512);
     TCC7xx_USB_EP_STAT = 0x2; /* Clear TX stat */
@@ -510,50 +640,106 @@ static bool usb_drv_write_ep(struct tcc_ep *ep)
     ep->count += count;
     ep->max_len -= count;
 
+#ifndef CPU_TCC780X
     if (ep->max_len == 0) {
         complete_transfer(ep->id, USB_DIR_IN, 0, ep->count);
         ep->buf = NULL;
 //        return true;
     }
+#endif
 
     return false;
 }
 
-int usb_drv_send(int endpoint, void *ptr, int length)
+static void ep0_tx_packet(void)
 {
-    int flags = disable_irq_save();
-    int rc = 0;
-    char *data = (unsigned char*) ptr;
-
-    DEBUG(2, "%s(%d,%d)" , __func__, endpoint, length);
-
-    if (endpoint != 0)
-        panicf_my("%s(%d,%d)", __func__, endpoint, length);
+    struct tcc_ep *ep = &tcc_endpoints[EP_CONTROL];
 
     TCC7xx_USB_INDEX = 0;
-    while (length > 0) {
-        int ret;
-
-        ret = usb_drv_write_packet(&TCC7xx_USB_EP0_BUF, data, length, 64);
-        length -= ret;
-        data += ret;
-
-        while (0 == (TCC7xx_USB_EP0_STAT & 0x2))
-            ;
-        TCC7xx_USB_EP0_STAT = 0x2;
+    if (ep->max_len == 0) {
+        ep0_tx_zlp = false;
+        /* Samsung's EP0 writer uses indexed FLUSH for an empty packet. */
+        TCC7xx_USB_EP_CTRL |= TCC7xx_USB_EP_CTRL_FLUSH;
+    } else {
+        int count = usb_drv_write_packet(&TCC7xx_USB_EP0_BUF,
+                                         ep->buf, ep->max_len, 64);
+        ep->buf += count;
+        ep->count += count;
+        ep->max_len -= count;
     }
-
-    restore_irq(flags);
-    return rc;
 }
 
+/* Advance the transfer when the controller reports a transmitted packet. */
+static void ep0_tx_ack(void)
+{
+    struct tcc_ep *ep = &tcc_endpoints[EP_CONTROL];
+
+    if (!ep0_tx_pending)
+        return;
+    if (ep->max_len > 0 || ep0_tx_zlp) {
+        ep0_tx_packet();
+        return;
+    }
+
+    bool notify = ep0_tx_notify;
+    int count = ep->count;
+    ep->buf = NULL;
+    ep0_tx_pending = false;
+    ep0_tx_result = 0;
+    semaphore_release(&ep0_tx_complete);
+    if (notify)
+        complete_transfer(EP_CONTROL, USB_DIR_IN, 0, count);
+}
+
+static int ep0_start_tx(void *ptr, int length, bool notify)
+{
+    int flags = disable_irq_save();
+    struct tcc_ep *ep = &tcc_endpoints[EP_CONTROL];
+
+    if (ep0_tx_pending || length < 0 || (length && !ptr)) {
+        restore_irq(flags);
+        return -1;
+    }
+    /* Discard the semaphore token from the preceding asynchronous send. */
+    semaphore_wait(&ep0_tx_complete, TIMEOUT_NOBLOCK);
+    ep->buf = ptr;
+    ep->count = 0;
+    ep->max_len = length;
+    ep0_tx_pending = true;
+    ep0_tx_notify = notify;
+    ep0_tx_result = -1;
+    ep0_tx_zlp = length > 0 && (length % 64) == 0 &&
+                 length < ep0_request_length;
+    ep0_tx_packet();
+    restore_irq(flags);
+    return 0;
+}
+
+int usb_drv_send(int endpoint, void *ptr, int length)
+{
+    if ((endpoint & 0x7f) != EP_CONTROL)
+        panicf_my("%s(%d,%d)", __func__, endpoint, length);
+    int result = ep0_start_tx(ptr, length, false);
+    if (result != 0)
+        return result;
+    if (semaphore_wait(&ep0_tx_complete, HZ) != OBJ_WAIT_SUCCEEDED) {
+        int flags = disable_irq_save();
+        ep0_cancel_tx();
+        restore_irq(flags);
+        return -1;
+    }
+    return ep0_tx_result;
+}
 
 int usb_drv_send_nonblocking(int endpoint, void *ptr, int length)
 {
     int flags;
-    int rc = 0, count = length;
+    int rc = 0;
     char *data = (unsigned char*) ptr;
     struct tcc_ep *ep = &tcc_endpoints[endpoint & 0x7f];
+
+    if ((endpoint & 0x7f) == EP_CONTROL)
+        return ep0_start_tx(ptr, length, true);
 
     if (ep->dir != USB_DIR_IN || length == 0)
         panicf_my("%s(%d,%d): Not supported", __func__, endpoint, length);
@@ -568,10 +754,10 @@ int usb_drv_send_nonblocking(int endpoint, void *ptr, int length)
 
     ep->buf = data;
     ep->max_len = length;
-    ep->count = count;
+    ep->count = 0;
 
     TCC7xx_USB_INDEX = ep->id;
-#if 1
+#ifndef CPU_TCC780X
     TCC7xx_USB_EP_STAT = 0x2;
     /* TODO: use interrupts instead */
     while (!usb_drv_write_ep(ep)) {
@@ -579,6 +765,9 @@ int usb_drv_send_nonblocking(int endpoint, void *ptr, int length)
             ;
     }
 #else
+    /* Use interrupt-driven bulk IN on TCC780X. A host can defer
+     * reading CSW until its OUT data stage finishes. Returning here keeps
+     * EP0, reset and bulk OUT serviceable while awaiting the ACK. */
     if (!usb_drv_write_ep(ep)) {
         TCC7xx_USB_EPIE |= ep->mask;
         global_ep_irq_mask |= ep->mask;
@@ -599,6 +788,7 @@ int usb_drv_recv_nonblocking(int endpoint, void* ptr, int length)
     if (length == 0) {
         if (endpoint != 0)
             panicf_my("%s(%d,%d) zero length?", __func__, endpoint, length);
+        ep0_expect_status_out = true;
         return 0;
     }
     // TODO: check ep
@@ -637,6 +827,7 @@ void usb_drv_cancel_all_transfers(void)
     DEBUG(2, "%s", __func__);
 
     flags = disable_irq_save();
+    ep0_cancel_tx();
     for (endpoint = 0; endpoint < 4; endpoint++) {
         if (tcc_endpoints[endpoint].buf) {
 /*            complete_transfer(tcc_endpoints[endpoint].id,
@@ -646,6 +837,7 @@ void usb_drv_cancel_all_transfers(void)
     }
 
     global_ep_irq_mask = 1;
+    ep0_expect_status_out = false;
     TCC7xx_USB_EPIE = global_ep_irq_mask;
     TCC7xx_USB_EPIF = TCC7xx_USB_EPIF_IRQ_MASK;
     restore_irq(flags);
@@ -673,6 +865,7 @@ void usb_drv_stall(int endpoint, bool stall,bool in)
 void usb_drv_init(void)
 {
     size_t i;
+    semaphore_init(&ep0_tx_complete, 1, 0);
 
     DEBUG(2, "%s", __func__);
 
@@ -771,7 +964,12 @@ static bool handle_set_address(struct usb_ctrlrequest *req)
     const uint8_t address = req->wValue & 0x7f;
     address_status = true;
     usb_drv_cancel_all_transfers();
+#ifdef CPU_TCC780X
+    /* TCC7801 handles the SET_ADDRESS status phase in hardware.
+     * FUNC reports the captured address; update the software state below. */
+#else
     usb_drv_send_nonblocking(EP_CONTROL, NULL, 0);
+#endif
     usb_core_notify_set_address(address);
     return true;
 }

@@ -148,17 +148,18 @@ int i2c_getack(void)
 int i2c_write(int device, const unsigned char* buf, int count )
 {
     int i = 0;
+    int nack;
     
     i2c_start();
     i2c_outb(device & 0xfe);
     
-    while (!i2c_getack() && i < count)
+    while (!(nack = i2c_getack()) && i < count)
     {
         i2c_outb(buf[i++]);
     }
     
     i2c_stop();
-    return 0;
+    return nack ? -1 : 0;
 }
 
 

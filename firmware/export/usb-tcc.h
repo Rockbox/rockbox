@@ -20,7 +20,19 @@
 #ifndef USB_TCC7XX_H
 #define USB_TCC7XX_H
 
-#define MMR_REG16(base, x)  (*(volatile unsigned short *) ((base) + (x)))
+#define MMR_REG32(base, x)  (*(volatile unsigned int *) ((base) + (x)))
+
+/* Samsung's TCC7801 firmware accesses the entire USB register bank with
+ * 32-bit LDR/STR instructions.  TCC77x uses the original 16-bit mapping. */
+#ifdef CPU_TCC780X
+#define MMR_REG16(base, x) MMR_REG32(base, x)
+#define TCC7xx_USB_FIFO_REG(base, x) MMR_REG32(base, x)
+#define TCC7xx_USB_FIFO_TYPE unsigned int
+#else
+#define MMR_REG16(base, x) (*(volatile unsigned short *) ((base) + (x)))
+#define TCC7xx_USB_FIFO_REG(base, x) MMR_REG16(base, x)
+#define TCC7xx_USB_FIFO_TYPE unsigned short
+#endif
 
 /* USB PHY registers */
 #define TCC7xx_USB_PHY_CFG       MMR_REG16(USB_BASE, 0xc4)
@@ -37,13 +49,21 @@
 #define TCC7xx_USB_EPIE     MMR_REG16(USB_BASE, 0x08) /* Endpoint interrupt enable register */
 #define TCC7xx_USB_FUNC     MMR_REG16(USB_BASE, 0x0c) /* Function address register */
 #define TCC7xx_USB_EP_DIR   MMR_REG16(USB_BASE, 0x14) /* Endpoint direction register */
-#define TCC7xx_USB_TST      MMR_REG16(USB_BASE, 0x14) /* Test registerregister */
+#ifdef CPU_TCC780X
+#define TCC7xx_USB_TST      MMR_REG16(USB_BASE, 0x18) /* Test register */
+#else
+#define TCC7xx_USB_TST      MMR_REG16(USB_BASE, 0x14)
+#endif
 #define TCC7xx_USB_SYS_STAT MMR_REG16(USB_BASE, 0x1c) /* System status register */
     #define TCC7xx_USB_SYS_STAT_RESET   (1<<0) /* Host forced reced */
     #define TCC7xx_USB_SYS_STAT_SUSPEND (1<<1) /* Host forced suspend */
     #define TCC7xx_USB_SYS_STAT_RESUME  (1<<2) /* Host forced resume */
     #define TCC7xx_USB_SYS_STAT_HIGH    (1<<4) /* High speed */
-    #define TCC7xx_USB_SYS_STAT_SPD_END (1<<6) /* Speed detection end */
+#ifdef CPU_TCC780X
+    #define TCC7xx_USB_SYS_STAT_SPD_END (1<<3) /* Speed detection end */
+#else
+    #define TCC7xx_USB_SYS_STAT_SPD_END (1<<6)
+#endif
     #define TCC7xx_USB_SYS_STAT_VBON    (1<<8)
     #define TCC7xx_USB_SYS_STAT_VBOF    (1<<9)
     #define TCC7xx_USB_SYS_STAT_EOERR   (1<<10) /* overrun error */
@@ -78,10 +98,10 @@
 #define TCC7xx_USB_EP0_STAT MMR_REG16(USB_BASE, 0x24) /* EP0 status register */
 #define TCC7xx_USB_EP0_CTRL MMR_REG16(USB_BASE, 0x28) /* EP0 control register */
 
-#define TCC7xx_USB_EP0_BUF  MMR_REG16(USB_BASE, 0x60) /* EP0 buffer register */
-#define TCC7xx_USB_EP1_BUF  MMR_REG16(USB_BASE, 0x64) /* EP1 buffer register */
-#define TCC7xx_USB_EP2_BUF  MMR_REG16(USB_BASE, 0x68) /* EP2 buffer register */
-#define TCC7xx_USB_EP3_BUF  MMR_REG16(USB_BASE, 0x6c) /* EP3 buffer register */
+#define TCC7xx_USB_EP0_BUF  TCC7xx_USB_FIFO_REG(USB_BASE, 0x60) /* EP0 buffer register */
+#define TCC7xx_USB_EP1_BUF  TCC7xx_USB_FIFO_REG(USB_BASE, 0x64) /* EP1 buffer register */
+#define TCC7xx_USB_EP2_BUF  TCC7xx_USB_FIFO_REG(USB_BASE, 0x68) /* EP2 buffer register */
+#define TCC7xx_USB_EP3_BUF  TCC7xx_USB_FIFO_REG(USB_BASE, 0x6c) /* EP3 buffer register */
 
 /* Indexed registers,  write endpoint number to TCC7xx_USB_INDEX */
 #define TCC7xx_USB_EP_STAT  MMR_REG16(USB_BASE, 0x2c) /* EP status register */

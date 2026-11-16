@@ -44,7 +44,10 @@ SECTIONS
 
     .stack (NOLOAD) :
     {
+         /* ARM EABI requires eight-byte stack alignment at C entry points. */
+         . = ALIGN(8);
          *(.stack)
+         . = ALIGN(8);
          _stackbegin = .;
          stackbegin = .;
          . += 0x2000;

@@ -30,8 +30,8 @@
 #include "i2c.h"
 #include "wmcodec.h"
 
-#if defined(COWON_D2)
-/* The D2's audio codec uses an I2C address of 0x34 */
+#if defined(COWON_D2) || defined(SAMSUNG_YPP2)
+/* D2 and YP-P2 codec wire address (seven-bit address 0x1a). */
 #define I2C_AUDIO_ADDRESS 0x34
 #else
 #error wmcodec not implemented for this target!

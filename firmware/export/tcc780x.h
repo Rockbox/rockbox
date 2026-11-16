@@ -229,11 +229,15 @@
 #define NFC_SADDR  (*(volatile unsigned long *)0xF005300C)
 #define NFC_SDATA  (*(volatile unsigned long *)0xF0053040)
 #define NFC_WDATA  (*(volatile unsigned long *)0xF0053010)
+/* DMA data port used by the stock NAND writer and MLC ECC encoder. */
+#define NFC_DDATA  (*(volatile unsigned long *)0xF0053020)
 #define NFC_CTRL   (*(volatile unsigned long *)0xF0053050)
     #define NFC_16BIT (1<<26)
     #define NFC_CS0   (1<<23)
     #define NFC_CS1   (1<<22)
     #define NFC_READY (1<<20)
+#define NFC_DMACTRL (*(volatile unsigned long *)0xF0053054)
+#define NFC_DMASIZE (*(volatile unsigned long *)0xF005305C)
 #define NFC_IREQ   (*(volatile unsigned long *)0xF0053060)
 #define NFC_RST    (*(volatile unsigned long *)0xF0053064)
 
@@ -248,6 +252,9 @@
 #define MLC_ECC0W      (*(volatile unsigned long *)0xF005B030)
 #define MLC_ECC1W      (*(volatile unsigned long *)0xF005B034)
 #define MLC_ECC2W      (*(volatile unsigned long *)0xF005B038)
+#define MLC_ECC0R      (*(volatile unsigned long *)0xF005B040)
+#define MLC_ECC1R      (*(volatile unsigned long *)0xF005B044)
+#define MLC_ECC2R      (*(volatile unsigned long *)0xF005B048)
 #define ECC_ERRADDR(x) (*(volatile unsigned long *)(0xF005B050+4*(x)))
 #define ECC_ERRDATA(x) (*(volatile unsigned long *)(0xF005B060+4*(x)))
 #define ECC_ERR_NUM    (*(volatile unsigned long *)0xF005B070)
@@ -289,7 +296,13 @@
 #define USB_BASE 0xf0010000
 
 #define USB_NUM_ENDPOINTS 3
+#ifdef SAMSUNG_YPP2
+/* CPU-driven FIFO transfers allow the large mass-storage buffers to reside
+ * in DRAM, preserving the YP-P2's small SRAM for other uses. */
+#define USB_DEVBSS_ATTR
+#else
 #define USB_DEVBSS_ATTR   IBSS_ATTR
+#endif
 
 /* Timer frequency */
 /* Timer is based on PCK_TCT (set to 2Mhz in system.c) */
