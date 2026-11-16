@@ -31,6 +31,7 @@
 
 #define RETRY_MAX 5
 #define USB_TIMEOUT 512
+#define USB_DATA_TIMEOUT 10000 /* large payloads take more than USB_TIMEOUT */
 #define VENDORID  0x10d6
 #define PRODUCTID 0xff96
 
@@ -98,7 +99,7 @@ static int send_msc_cmd(libusb_device_handle *hdev, void *cbwcb, uint32_t data_l
 
     if (ret != LIBUSB_SUCCESS)
     {
-        printf("error: command transfer error\n");
+        printf("error: command transfer error: %s\n", libusb_error_name(ret));
         return -1;
     }
 
@@ -124,7 +125,7 @@ static int get_msc_csw(libusb_device_handle *hdev, uint32_t reftag)
 
     if (ret != LIBUSB_SUCCESS)
     {
-        printf("error reading CSW\n");
+        printf("error reading CSW: %s\n", libusb_error_name(ret));
         return -3;
     }
 
@@ -181,15 +182,17 @@ static void adfu_upload(libusb_device_handle *hdev, unsigned char *buf, int size
 
     send_msc_cmd(hdev, (void *)cmdbuf, size, &reftag);
 
-    libusb_bulk_transfer(hdev, OUT_EP, buf, size, &transferred, USB_TIMEOUT);
+    int ret = libusb_bulk_transfer(hdev, OUT_EP, buf, size, &transferred, USB_DATA_TIMEOUT);
+    if (ret != LIBUSB_SUCCESS)
+    {
+        fprintf(stderr, "[error]: data transfer: %s\n", libusb_error_name(ret));
+    }
     fprintf(stderr, "[info]: actual xfered data: %d bytes\n", transferred);
 
     /* get CSW from device*/
     fprintf(stderr, "[info]: CSW status: %d\n", get_msc_csw(hdev, reftag));
 }
 
-#if 0
-/* unused, I'll leve it here for reference */
 static void adfu_download(libusb_device_handle *hdev, unsigned char *buf, int size, uint32_t address)
 {
     uint8_t cmdbuf[16];
@@ -215,7 +218,7 @@ static void adfu_download(libusb_device_handle *hdev, unsigned char *buf, int si
 
     send_msc_cmd(hdev, (void *)cmdbuf, size, &reftag);
 
-    memset(buf, 0, sizeof(buf));
+    memset(buf, 0, size);
 
     /* get data from device */
     repeat = 0;
@@ -234,7 +237,111 @@ static void adfu_download(libusb_device_handle *hdev, unsigned char *buf, int si
     /* get CSW from device*/
     fprintf(stderr, "[info]: CSW status: %d\n", get_msc_csw(hdev, reftag));
 }
-#endif
+
+#define MAX_READS 8
+#define MAX_WRITES 8
+
+struct mem_write_t
+{
+    uint32_t address;
+    uint32_t value;
+};
+
+/* parse addr:value */
+static int parse_write_arg(char *arg, struct mem_write_t *wr)
+{
+    char *end;
+
+    wr->address = strtoul(arg, &end, 0);
+    if (*end != ':')
+    {
+        return -1;
+    }
+
+    wr->value = strtoul(end + 1, &end, 0);
+    if (*end != '\0')
+    {
+        return -1;
+    }
+
+    return 0;
+}
+
+static void do_mem_write(libusb_device_handle *hdev, struct mem_write_t *wr)
+{
+    uint8_t buf[4];
+
+    buf[0] = wr->value & 0xff;
+    buf[1] = (wr->value >> 8) & 0xff;
+    buf[2] = (wr->value >> 16) & 0xff;
+    buf[3] = (wr->value >> 24) & 0xff;
+
+    fprintf(stderr, "[info]: write 0x%08x to 0x%08x\n", wr->value, wr->address);
+    adfu_upload(hdev, buf, sizeof(buf), wr->address);
+}
+
+struct mem_read_t
+{
+    uint32_t address;
+    uint32_t size;
+    char *filename;
+};
+
+/* parse addr:len:file */
+static int parse_read_arg(char *arg, struct mem_read_t *rd)
+{
+    char *end;
+
+    rd->address = strtoul(arg, &end, 0);
+    if (*end != ':')
+    {
+        return -1;
+    }
+
+    rd->size = strtoul(end + 1, &end, 0);
+    if (*end != ':' || rd->size == 0)
+    {
+        return -1;
+    }
+
+    rd->filename = end + 1;
+    return 0;
+}
+
+static int do_mem_read(libusb_device_handle *hdev, struct mem_read_t *rd)
+{
+    uint8_t *rbuf = malloc(rd->size);
+    FILE *f;
+    uint32_t i;
+
+    if (rbuf == NULL)
+    {
+        return -1;
+    }
+
+    adfu_download(hdev, rbuf, rd->size, rd->address);
+
+    f = fopen(rd->filename, "wb");
+    if (f == NULL)
+    {
+        fprintf(stderr, "[error]: could not open file \"%s\"\n", rd->filename);
+        free(rbuf);
+        return -1;
+    }
+
+    fwrite(rbuf, 1, rd->size, f);
+    fclose(f);
+
+    /* short reads are most likely status words, show them */
+    for (i = 0; i + 4 <= rd->size && i < 64; i += 4)
+    {
+        fprintf(stderr, "[info]: 0x%08x: 0x%08x\n", rd->address + i,
+                rbuf[i] | rbuf[i+1] << 8 | rbuf[i+2] << 16 | (uint32_t)rbuf[i+3] << 24);
+    }
+
+    free(rbuf);
+    return 0;
+}
 
 static void adfu_execute(libusb_device_handle *hdev, uint32_t address)
 {
@@ -259,7 +366,7 @@ static void adfu_execute(libusb_device_handle *hdev, uint32_t address)
 
 static void usage(char *name)
 {
-    printf("usage: (sudo) %s [-u vid:pid] [-e] -s1 stage1.bin -s2 stage2.bin\n", name);
+    printf("usage: (sudo) %s [-u vid:pid] [-r addr:len:file]... [-R] [-e] [-s1 stage1.bin [-s2 stage2.bin]]\n", name);
     printf("stage1.bin          Binary of the stage1 (ADEC_N63.BIN for example)\n");
     printf("stage2.bin          Binary of the custom user code\n");
     printf("\n");
@@ -267,6 +374,11 @@ static void usage(char *name)
     printf("-u|--usb vid:pid    Override device PID and PID (default 0x%04x:0x%04x)\n",
            VENDORID, PRODUCTID);
     printf("-e                  Encode stage1 binary as needed by brom adfu mode\n");
+    printf("-r addr:len:file    Read device memory to file before loading any stage\n");
+    printf("                    (e.g. -r 0xb40487fc:4:status.bin reads boot status word)\n");
+    printf("-R                  Perform -r reads after stage1 instead of before\n");
+    printf("-w addr:value       Write 32bit value after stage1, before stage2\n");
+    printf("                    (e.g. -w 0xb0070000:0xc0130 sets 8MB SDRAM on E150)\n");
 }
 
 int main (int argc, char **argv)
@@ -282,12 +394,46 @@ int main (int argc, char **argv)
     char *s1_filename = NULL, *s2_filename = NULL;
     bool encode = false;
     FILE *fp = NULL;
+    struct mem_read_t reads[MAX_READS];
+    int nreads = 0;
+    struct mem_write_t writes[MAX_WRITES];
+    int nwrites = 0;
+    bool reads_after_s1 = false;
 
     while (i < argc)
     {
         if (strcmp(argv[i],"-e") == 0)
         {
             encode = true;
+            i++;
+        }
+        else if (strcmp(argv[i],"-R") == 0)
+        {
+            reads_after_s1 = true;
+            i++;
+        }
+        else if (strcmp(argv[i],"-w") == 0)
+        {
+            i++;
+            if (i == argc || nwrites == MAX_WRITES ||
+                parse_write_arg(argv[i], &writes[nwrites]))
+            {
+                usage(argv[0]);
+                return -1;
+            }
+            nwrites++;
+            i++;
+        }
+        else if (strcmp(argv[i],"-r") == 0)
+        {
+            i++;
+            if (i == argc || nreads == MAX_READS ||
+                parse_read_arg(argv[i], &reads[nreads]))
+            {
+                usage(argv[0]);
+                return -1;
+            }
+            nreads++;
             i++;
         }
         else if (strcmp(argv[i],"-s1") == 0)
@@ -349,7 +495,7 @@ int main (int argc, char **argv)
         }
     }
 
-    if (!s1_filename)
+    if (!s1_filename && nreads == 0)
     {
         usage(argv[0]);
         return -3;
@@ -410,6 +556,23 @@ int main (int argc, char **argv)
         goto end;
     }
 
+    if (!reads_after_s1 || !s1_filename)
+    {
+        for (i = 0; i < nreads; i++)
+        {
+            if (do_mem_read(hdev, &reads[i]))
+            {
+                ret = -9;
+                goto end;
+            }
+        }
+    }
+
+    if (!s1_filename)
+    {
+        goto end;
+    }
+
     fp = fopen(s1_filename, "rb");
 
     if (fp == NULL)
@@ -460,6 +623,23 @@ int main (int argc, char **argv)
     adfu_upload(hdev, buf, filesize_round, 0xb4040000);
     adfu_execute(hdev, 0xb4040000);
     /* Now ADEC_N63.BIN should be operational */
+
+    for (i = 0; i < nwrites; i++)
+    {
+        do_mem_write(hdev, &writes[i]);
+    }
+
+    if (reads_after_s1)
+    {
+        for (i = 0; i < nreads; i++)
+        {
+            if (do_mem_read(hdev, &reads[i]))
+            {
+                ret = -9;
+                goto end_free;
+            }
+        }
+    }
 
     if (s2_filename)
     {

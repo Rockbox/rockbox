@@ -1,0 +1,71 @@
+Tools for Actions ATJ213x (ATJ2135/ATJ2137) based players
+==========================================================
+
+Host tools and target helpers used to bring up and maintain Rockbox on
+ATJ213x devices, mainly the iriver E150. Unless noted otherwise they
+build with "make" in their directory; the USB tools need libusb-1.0 and
+usually root (or a udev rule) to open the device.
+
+The boot ROM's recovery mode (ADFU, USB 10d6:ff96) is the entry point of
+most of them. The E150 enters it when Vol+ and Vol- are held while the USB
+cable is plugged in (with the Rockbox bootloader installed), or when no
+firmware boots.
+
+
+adfuload/
+    Loads and runs code over the boot ROM's ADFU protocol: a stage 1 (a
+    first stage from the vendor tools, e.g. ADEC_N63.BIN, -e encodes it the
+    way the boot ROM wants) and optionally a stage 2 binary of your own,
+    e.g. a Rockbox build. It also reads memory and registers to files (-r,
+    before or with -R after stage 1) and writes registers (-w), which helps
+    to compare the hardware state of different boot paths.
+
+    test_binary/ holds small bare metal test programs to load with it.
+
+atjboottool/
+    Unpacks and builds firmware update files. Decrypts FWU files to AFI
+    archives and encrypts them back (--fwu-encrypt, with the keys of an
+    existing FWU), unpacks AFI and FW archives, replaces files in an AFI or
+    in the LFI firmware image (FWIMAGE.FW) with the checksums the boot
+    code checks recomputed.
+
+    --e150-patch builds the Rockbox installer for the E150: it puts the
+    Rockbox bootloader (bootloader.e150 as built or downloaded, or the plain
+    bootloader.bin) into an original E150.HEX update so that it starts in
+    place of WELCOME.BIN. Copy the result to the player's root and let
+    the original firmware's updater install it. With the bootloader:
+    Rockbox starts from the internal flash, from the SD card when it is not
+    there (Vol+ held: the SD card first), Vol- boots the original firmware,
+    Vol+ and Vol- with the USB cable plugged in the ADFU recovery mode.
+
+atjflash/
+    Recovery: replays an ADFU flashing session recorded from the vendor's
+    ProductTool, comparing every response of the device with the recording
+    and stopping on the first difference. usbmon_adfu.py turns a Linux
+    usbmon capture (pcap) of such a session into the replay script, and
+    lists the commands of a capture. The recording is the user's own, of
+    their own device and firmware.
+
+nanddump/
+    Raw dump of the NAND (data and spare, no ECC processing) over hwstub:
+    atjnanddump loads helper.bin (built with a mipsel cross compiler,
+    CROSS=mipsel-elf-) into SDRAM and reads pages with it; only read
+    commands are sent to the flash. atjftl.py rebuilds the original
+    firmware's logical disks from such a dump (-l lists zones and disks,
+    -d N extracts one, -e applies the ECC with atjbch.py).
+
+ftltest/
+    Host test harness for the Rockbox NAND FTL
+    (firmware/target/mips/atj213x/ftl-atj213x.c) against a raw NAND dump,
+    with power cuts and NAND failures injected. See ftltest/README.
+
+sdboot/
+    Booting from an SD card: a boot sector and a second stage that do what
+    the original second stage boot loader does (SDRAM and cache setup) and
+    then load a payload from the card. The boot ROM tries the card when the
+    internal flash does not boot. mksdboot.py builds the card image (sd) or
+    a stage 2 for adfuload (adfu). Needs a mipsel cross compiler.
+
+
+Related: the ATJ modules of hwstub (utils/hwstub/tools/lua/atj*), the
+register descriptions in utils/regtools/desc/regs-atj213x.xml.
