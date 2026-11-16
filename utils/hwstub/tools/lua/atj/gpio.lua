@@ -2,33 +2,38 @@ ATJ.gpio = {}
 
 function ATJ.gpio.muxsel(dev)
     if type(dev) == "string" then
-        if dev == "LCM" then dev = 0
-        elseif dev == "SD" then dev = 1
-        elseif dev == "NAND" then dev = 2
-        else error("Invalid mux string " .. dev)
+        local mfctl0 = HW.GPIO.MFCTL0.read()
+        local mfctl1 = HW.GPIO.MFCTL1.read()
+
+        if dev == "LCM" then
+            -- LCM (taken from WELCOME.BIN)
+            mfctl0 = bit32.band(mfctl0, 0xfe3f3f00)
+            mfctl0 = bit32.bor(mfctl0,  0x00808092)
+        elseif dev == "SD" then
+            -- SD (taken from CARD.DRV)
+            mfctl0 = bit32.band(mfctl0, 0xff3ffffc)
+            mfctl0 = bit32.bor(mfctl0,  0x01300004)
+        elseif dev == "NAND" then
+            -- NAND (taken from BROM dump)
+            mfctl0 = bit32.band(mfctl0, 0xfe3ff300)
+            mfctl0 = bit32.bor(mfctl0,  0x00400449)
+        elseif dev == "I2C1" then
+            -- I2C1 interface
+            mfctl1 = bit32.band(mfctl1, 0xffffffcf)
+        elseif dev == "I2C2" then
+            -- I2C2 interface
+            mfctl1 = bit32.band(mfctl1, 0xffffffbf)
+        else
+            error("Invalid mux string " .. dev)
         end
+
+        -- enable multifunction mux
+        mfctl1 = bit32.bor(mfctl1, 0x80000000)
+        HW.GPIO.MFCTL1.write(mfctl1)
+
+        -- write multifunction mux selection
+        HW.GPIO.MFCTL0.write(mfctl0)
     end
-
-    local mfctl0 = HW.GPIO.MFCTL0.read()
-    if dev == 0 then
-        -- LCM (taken from WELCOME.BIN)
-        mfctl0 = bit32.band(mfctl0, 0xfe3f3f00)
-        mfctl0 = bit32.bor(mfctl0,  0x00808092)
-    elseif dev == 1 then
-        -- SD (taken from CARD.DRV)
-        mfctl0 = bit32.band(mfctl0, 0xff3ffffc)
-        mfctl0 = bit32.bor(mfctl0,  0x01300004)
-    elseif dev == 2 then
-        -- NAND (taken from BROM dump)
-        mfctl0 = bit32.band(mfctl0, 0xfe3ff300)
-        mfctl0 = bit32.bor(mfctl0,  0x00400449)
-    end
-
-    -- enable multifunction mux
-    HW.GPIO.MFCTL1.write(0x80000000)
-
-    -- write multifunction mux selection
-    HW.GPIO.MFCTL0.write(mfctl0)
 end
 
 function ATJ.gpio.outen(port, pin, en)
