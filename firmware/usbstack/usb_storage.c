@@ -89,6 +89,14 @@
 
 #define ALLOCATE_BUFFER_SIZE (2*MAX(READ_BUFFER_SIZE,WRITE_BUFFER_SIZE))
 
+/* Written data can sit in RAM after GOOD status (a storage driver that
+ * needs storage_flush()): MODE SENSE reports a write cache (caching page,
+ * WCE) so the host sends SYNCHRONIZE CACHE before it considers the data
+ * safe, which flushes it. */
+#ifdef HAVE_STORAGE_FLUSH
+#define USB_STORAGE_WRITE_CACHE
+#endif
+
 /* bulk-only class specific requests */
 #define USB_BULK_RESET_REQUEST   0xff
 #define USB_BULK_GET_MAX_LUN     0xfe
@@ -119,6 +127,8 @@
 
 #define SCSI_READ_16              0x88
 #define SCSI_WRITE_16             0x8a
+#define SCSI_SYNCHRONIZE_CACHE_10 0x35
+#define SCSI_SYNCHRONIZE_CACHE_16 0x91
 
 #define UMS_STATUS_GOOD            0x00
 #define UMS_STATUS_FAIL            0x01
@@ -844,6 +854,24 @@ static void send_and_read_next(void)
 }
 /****************************************************************************/
 
+/* caching mode page (SBC), returned with "all pages" and on its own:
+ * WCE when written data can wait in RAM for SYNCHRONIZE CACHE */
+#define CACHING_PAGE_SIZE 20
+static unsigned int put_caching_page(unsigned char *p, unsigned int lun)
+{
+    (void)lun;  /* LUN_READONLY() may not use it */
+    memset(p, 0, CACHING_PAGE_SIZE);
+    p[0] = 0x08;                        /* page code */
+    p[1] = CACHING_PAGE_SIZE - 2;       /* page length */
+#ifdef USB_STORAGE_WRITE_CACHE
+    if (!LUN_READONLY(lun))
+    {
+        p[2] = 0x04;                    /* WCE */
+    }
+#endif
+    return CACHING_PAGE_SIZE;
+}
+
 static void handle_scsi_ready(struct command_block_wrapper* cbw)
 {
     struct storage_info info;
@@ -983,8 +1011,11 @@ static void handle_scsi_ready(struct command_block_wrapper* cbw)
             logf("scsi mode_sense_10 %d %X",lun,page_code);
             switch(page_code) {
                 case 0x3f:
-                    tb.ms_data_10->mode_data_length =
-                        htobe16(sizeof(struct mode_sense_data_10)-2);
+                case 0x08: {
+                    unsigned int total = sizeof(struct mode_sense_data_10) +
+                        put_caching_page((unsigned char *)tb.ms_data_10 +
+                                         sizeof(struct mode_sense_data_10), lun);
+                    tb.ms_data_10->mode_data_length = htobe16(total-2);
                     tb.ms_data_10->medium_type = 0;
                     tb.ms_data_10->device_specific =
                         LUN_READONLY(lun) ? 0x80 : 0;
@@ -1021,9 +1052,9 @@ static void handle_scsi_ready(struct command_block_wrapper* cbw)
                         (bsize & 0x0000ff00)>>8;
                     tb.ms_data_10->block_descriptor.block_size[3] =
                         (bsize & 0x000000ff);
-                    send_command_result(tb.ms_data_10,
-                            MIN(sizeof(struct mode_sense_data_10), length));
+                    send_command_result(tb.ms_data_10, MIN(total, length));
                     break;
+                }
                 default:
                     send_command_failed_result();
                     cur_sense_data.sense_key=SENSE_ILLEGAL_REQUEST;
@@ -1047,9 +1078,12 @@ static void handle_scsi_ready(struct command_block_wrapper* cbw)
             logf("scsi mode_sense_6 %d %X",lun,page_code);
             switch(page_code) {
                 case 0x3f:
-                    /* All supported pages. */
-                    tb.ms_data_6->mode_data_length =
-                        sizeof(struct mode_sense_data_6)-1;
+                case 0x08: {
+                    /* All supported pages: the caching page. */
+                    unsigned int total = sizeof(struct mode_sense_data_6) +
+                        put_caching_page((unsigned char *)tb.ms_data_6 +
+                                         sizeof(struct mode_sense_data_6), lun);
+                    tb.ms_data_6->mode_data_length = total-1;
                     tb.ms_data_6->medium_type = 0;
                     tb.ms_data_6->device_specific =
                         LUN_READONLY(lun) ? 0x80 : 0;
@@ -1075,9 +1109,9 @@ static void handle_scsi_ready(struct command_block_wrapper* cbw)
                         (bsize & 0x00ff00)>>8;
                     tb.ms_data_6->block_descriptor.block_size[2] =
                         (bsize & 0x0000ff);
-                    send_command_result(tb.ms_data_6,
-                        MIN(sizeof(struct mode_sense_data_6), length));
+                    send_command_result(tb.ms_data_6, MIN(total, length));
                     break;
+                }
                 default:
                     send_command_failed_result();
                     cur_sense_data.sense_key=SENSE_ILLEGAL_REQUEST;
@@ -1087,6 +1121,30 @@ static void handle_scsi_ready(struct command_block_wrapper* cbw)
             }
             break;
         }
+
+#ifdef USB_STORAGE_WRITE_CACHE
+        case SCSI_SYNCHRONIZE_CACHE_10:
+        case SCSI_SYNCHRONIZE_CACHE_16: {
+            /* the driver's cache */
+            logf("scsi synchronize cache %d",lun);
+            int rc = 0;
+#ifdef HAVE_STORAGE_FLUSH
+            rc = storage_flush();
+#endif
+            if (rc < 0)
+            {
+                send_csw(UMS_STATUS_FAIL);
+                cur_sense_data.sense_key=SENSE_MEDIUM_ERROR;
+                cur_sense_data.asc=ASC_WRITE_ERROR;
+                cur_sense_data.ascq=0;
+            }
+            else
+            {
+                send_csw(UMS_STATUS_GOOD);
+            }
+            break;
+        }
+#endif
 
         case SCSI_START_STOP_UNIT:
             logf("scsi start_stop unit %d",lun);
