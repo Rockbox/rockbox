@@ -413,17 +413,8 @@ void lcd_tgt_enable(bool enable)
 {
     if(enable)
     {
-        /* TODO: remove this after more testing */
-        int device_ver;
-#ifdef BOOTLOADER
-        device_ver = EROSQN_VER;
-#else
-        device_ver = device_data.hw_rev;
-#endif
-
         /* HW1 through HW3 units use the AXP192 and have an LCD power pin */
-        if (eros_qn_pmu_type == EROS_QN_PMU_AXP192 ||
-            (eros_qn_pmu_type < 0 && device_ver <= 3))
+        if (eros_qn_pmu_type == EROS_QN_PMU_AXP192)
         {
             gpio_set_function(GPIO_LCD_PWR_HW1, GPIOF_OUTPUT(1));
             mdelay(20);
@@ -451,13 +442,20 @@ void lcd_tgt_enable(bool enable)
                 eros_qn_lcd_autodetected = true;
                 break;
 
+#ifndef BOOTLOADER
             /* fall back to hw_rev based method */
             default:
-                if (device_ver >= 3)
+                if (device_data.hw_rev >= 3)
                     eros_qn_lcd_type = EROS_QN_LCDTYPE_GC9308;
                 else
                     eros_qn_lcd_type = EROS_QN_LCDTYPE_ILI9342C;
                 break;
+#else
+            default:
+                /* randomly chosen, stands some chance of working */
+                eros_qn_lcd_type = EROS_QN_LCDTYPE_ILI9342C;
+                break;
+#endif
             }
 
             stop_bitbang();

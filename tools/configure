@@ -3950,9 +3950,6 @@ fi
     t_manufacturer="ingenic_x1000"
     t_soc="ingenic"
     t_model="erosqnative"
-    # player version, for bootloader usage
-    # versions 1 and 2 both use 1
-    extradefines="$extradefines -DEROSQN_VER=1"
     ;;
 
    232|ihifi770c)
