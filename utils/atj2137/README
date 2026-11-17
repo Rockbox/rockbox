@@ -54,11 +54,6 @@ nanddump/
     firmware's logical disks from such a dump (-l lists zones and disks,
     -d N extracts one, -e applies the ECC with atjbch.py).
 
-ftltest/
-    Host test harness for the Rockbox NAND FTL
-    (firmware/target/mips/atj213x/ftl-atj213x.c) against a raw NAND dump,
-    with power cuts and NAND failures injected. See ftltest/README.
-
 sdboot/
     Booting from an SD card: a boot sector and a second stage that do what
     the original second stage boot loader does (SDRAM and cache setup) and
