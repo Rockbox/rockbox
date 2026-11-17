@@ -26,6 +26,10 @@ extern void init_tick(void) INIT_ATTR;
 
 #define HZ      100 /* number of ticks per second */
 
+/* Convert milliseconds to ticks, rounding up, suitable for calculating delays */
+#define MS_TO_TICKS(x) \
+    (((x) + ((1000 / HZ) - 1)) / (1000 / HZ))
+
 #define MAX_NUM_TICK_TASKS 8
 
 /* global tick variable */

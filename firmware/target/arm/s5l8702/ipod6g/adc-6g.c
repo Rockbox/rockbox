@@ -27,14 +27,6 @@
 #include "pmu-target.h"
 #include "kernel.h"
 
-
-/* MS_TO_TICKS converts a milisecond time period into the
- * corresponding amount of ticks. If the time period cannot
- * be accurately measured in ticks it will round up.
- */
-#define MS_PER_HZ (1000/HZ)
-#define MS_TO_TICKS(x) (((x)+MS_PER_HZ-1)/MS_PER_HZ)
-
 static const struct pmu_adc_channel adc_channels[] =
 {
     [ADC_BATTERY] =

@@ -49,16 +49,6 @@
 #include "ipod_remote_tuner.h"
 #endif
 
-
-/* MS_TO_TICKS converts a milisecond time period into the
- * corresponding amount of ticks. If the time period cannot
- * be accurately measured in ticks it will round up.
- */
-#if (HZ>1000)
-#error "HZ is >1000, please fix MS_TO_TICKS"
-#endif
-#define MS_PER_HZ (1000/HZ)
-#define MS_TO_TICKS(x) (((x)+MS_PER_HZ-1)/MS_PER_HZ)
 /* IAP specifies a timeout of 25ms for traffic from a device to the iPod.
  * Depending on HZ this cannot be accurately measured. Find out the next
  * best thing.

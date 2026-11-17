@@ -31,9 +31,6 @@
 #include "regs/stm32h743/ltdc.h"
 #include <string.h>
 
-#define MS_TO_TICKS(x) \
-    (((x) + (1000 / HZ - 1)) / (1000 / HZ))
-
 /* ILI9342C specifies 10 MHz max */
 #define LCD_SPI_FREQ 10000000
 
