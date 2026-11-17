@@ -263,12 +263,6 @@ static const uint32_t erosqnative_lcd_cmd_enable_gc9308[] = {
     /* Lock EXTC? */
     LCD_INSTR_CMD,      0xfe, // Inter Register Enable1
     LCD_INSTR_CMD,      0xee,
-
-    /* Exit Sleep */
-    LCD_INSTR_CMD,      0x11,
-    LCD_INSTR_SLEEP,    MS_TO_TICKS(5),
-    /* Display On */
-    LCD_INSTR_CMD,      0x29,
     LCD_INSTR_END,
 };
 
@@ -340,11 +334,12 @@ static const uint32_t erosqnative_lcd_cmd_enable_ili9342c[] = {
     LCD_INSTR_DAT,      0x32,
     LCD_INSTR_DAT,      0x35,
     LCD_INSTR_DAT,      0x0f,
-    /* Exit Sleep */
-    LCD_INSTR_CMD,      0x11,
-    LCD_INSTR_SLEEP,    MS_TO_TICKS(5),
-    /* Display On */
-    LCD_INSTR_CMD,      0x29,
+    LCD_INSTR_END,
+};
+
+static const uint32_t erosqnative_lcd_cmd_enable_color_invert[] = {
+    /* Enable color inversion - for Surfans v3.6 units */
+    LCD_INSTR_CMD,      0x21,
     LCD_INSTR_END,
 };
 
@@ -430,7 +425,16 @@ void lcd_tgt_enable(bool enable)
             switch (eros_qn_lcd_id)
             {
             case 0xE30000:
-                eros_qn_lcd_type = EROS_QN_LCDTYPE_ILI9342C;
+                /*
+                 * ILI9342 is used by HW1, HW2, and Surfans v3.6 "HW5" units
+                 * which otherwise look like HW4 units. So key off the PMU
+                 * type to decide if we need to enable color inversion or not.
+                 */
+                if (eros_qn_pmu_type == EROS_QN_PMU_AXP2101)
+                    eros_qn_lcd_type = EROS_QN_LCDTYPE_ILI9342C_INV;
+                else
+                    eros_qn_lcd_type = EROS_QN_LCDTYPE_ILI9342C;
+
                 eros_qn_lcd_autodetected = true;
                 break;
 
@@ -473,10 +477,17 @@ void lcd_tgt_enable(bool enable)
             lcd_exec_commands(&erosqnative_lcd_cmd_enable_ili9342c[0]);
             break;
 
+        case EROS_QN_LCDTYPE_ILI9342C_INV:
+            lcd_exec_commands(&erosqnative_lcd_cmd_enable_ili9342c[0]);
+            lcd_exec_commands(&erosqnative_lcd_cmd_enable_color_invert[0]);
+            break;
+
         case EROS_QN_LCDTYPE_GC9308:
             lcd_exec_commands(&erosqnative_lcd_cmd_enable_gc9308[0]);
             break;
         }
+
+        lcd_exec_commands(&erosqnative_lcd_cmd_wake[0]);
     } else {
         /* doesn't flash white if we don't do anything... */
 #if 0

@@ -32,8 +32,9 @@ extern uint32_t eros_qn_lcd_type;
 extern int eros_qn_lcd_autodetected;
 
 /* supported LCD types */
-#define EROS_QN_LCDTYPE_UNKNOWN   0
-#define EROS_QN_LCDTYPE_ILI9342C  1
-#define EROS_QN_LCDTYPE_GC9308    2
+#define EROS_QN_LCDTYPE_UNKNOWN         0
+#define EROS_QN_LCDTYPE_ILI9342C        1
+#define EROS_QN_LCDTYPE_GC9308          2
+#define EROS_QN_LCDTYPE_ILI9342C_INV    3       /* color inverted version */
 
 #endif /* __LCD_EROSQNATIVE_H__ */
