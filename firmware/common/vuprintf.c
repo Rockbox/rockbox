@@ -46,6 +46,7 @@
 #ifndef FMT_RADIX
 #define FMT_RADIX       (FMT_RADIX_c | \
                          FMT_RADIX_d | \
+                         FMT_RADIX_n | \
                          FMT_RADIX_p | \
                          FMT_RADIX_s | \
                          FMT_RADIX_u | \
