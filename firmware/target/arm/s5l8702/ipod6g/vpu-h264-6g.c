@@ -209,12 +209,18 @@ static void parse_sps(struct sps *sps, struct bs *b)
 
     sps->log2_max_frame_num_minus4 = bs_ue(b);
     sps->pic_order_cnt_type = bs_ue(b);
-    if (sps->pic_order_cnt_type != 0)
+    /* POC type 0 (POC LSB) and type 2 (delta always zero, no POC in the
+     * slice headers) are both supported; the VPU does not consume POC,
+     * and playback timing comes from the container. */
+    if (sps->pic_order_cnt_type != 0 && sps->pic_order_cnt_type != 2)
     {
         b->error = 1;
         return;
     }
-    sps->log2_max_pic_order_cnt_lsb_minus4 = bs_ue(b);
+    if (sps->pic_order_cnt_type == 0)
+        sps->log2_max_pic_order_cnt_lsb_minus4 = bs_ue(b);
+    else
+        sps->log2_max_pic_order_cnt_lsb_minus4 = 0;
     sps->max_num_ref_frames = bs_ue(b);
     sps->gaps_allowed = bs_u1(b);
     sps->pic_width_in_mbs_minus1 = bs_ue(b);
@@ -622,7 +628,7 @@ static int apply_sps_dimensions(struct vpu_h264 *v)
     int vertical_crop;
 
     if (v->sps.profile_idc != 66 || v->sps.level_idc > 30 ||
-        v->sps.pic_order_cnt_type != 0 ||
+        v->sps.pic_order_cnt_type > 2 ||
         v->sps.log2_max_frame_num_minus4 < 0 ||
         v->sps.log2_max_frame_num_minus4 > 12 ||
         v->sps.log2_max_pic_order_cnt_lsb_minus4 < 0 ||
