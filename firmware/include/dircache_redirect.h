@@ -26,6 +26,8 @@
 #include "file.h"
 
 #if defined(HAVE_MULTIBOOT) && !defined(SIMULATOR) && !defined(BOOTLOADER)
+#include <stdio.h>
+#include "string-extra.h"
 #include "rb-loader.h"
 #include "multiboot.h"
 #include "bootdata.h"
@@ -190,11 +192,29 @@ static inline void volume_onmount_internal(IF_MV_NONVOID(int volume))
             int rtlen = get_redirect_dir(rtpath, sizeof(rtpath),
                                          volume, BOOTDIR, BOOTFILE);
 
+            /* No redirect file on a volume outside drive 0: the bootloader
+             * picked it by itself (e.g. a key held at boot), the firmware
+             * is in the volume's own root. Bootloaders that search for
+             * redirect files never boot such a volume without one. */
+            bool volume_root = rtlen <= 0 && volume_drive(volume) != 0;
+            if (volume_root)
+            {
+                rtlen = snprintf(rtpath, sizeof(rtpath), "%s" BOOTDIR "/" BOOTFILE,
+                                 path);
+            }
+
             if (rtlen <= 0 || rtlen >= (int) sizeof(rtpath))
                 rtlen = 0; /* path too long or sprintf error */
             else if (rbfs_file_exists(rtpath))
             {
-                rtlen = get_redirect_dir(rtpath, sizeof(rtpath), volume, "", "");
+                if (volume_root)
+                {
+                    rtlen = strlcpy(rtpath, path, sizeof(rtpath));
+                }
+                else
+                {
+                    rtlen = get_redirect_dir(rtpath, sizeof(rtpath), volume, "", "");
+                }
                 while (rtlen > 0 && rtpath[--rtlen] == PATH_SEPCH)
                     rtpath[rtlen] = '\0'; /* remove separators */
             }
