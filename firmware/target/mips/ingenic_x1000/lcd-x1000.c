@@ -423,10 +423,15 @@ void lcd_exec_commands(const uint32_t* cmdseq)
             udelay(*cmdseq++);
             break;
 
+        case LCD_INSTR_SLEEP:
+            sleep(*cmdseq++);
+            break;
+
         default:
             break;
         }
     }
+
     lcd_wait(LCD_SEND1);
 }
 

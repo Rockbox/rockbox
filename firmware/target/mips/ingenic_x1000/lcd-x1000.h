@@ -33,7 +33,8 @@
 #define LCD_INSTR_CMD       0
 #define LCD_INSTR_DAT       1
 #define LCD_INSTR_UDELAY    2
-#define LCD_INSTR_END       3
+#define LCD_INSTR_SLEEP     3
+#define LCD_INSTR_END       4
 
 struct lcd_tgt_config {
     /* Data bus width, in bits */
@@ -95,6 +96,7 @@ extern void lcd_set_clock(x1000_clk_t clksrc, uint32_t freq);
  * - LCD_INSTR_CMD, cmd: issue command write of 'cmd'
  * - LCD_INSTR_DAT, dat: issue data write of 'dat'
  * - LCD_INSTR_UDELAY, us: call udelay(us)
+ * - LCD_INSTR_SLEEP, ticks: call sleep(ticks)
  */
 extern void lcd_exec_commands(const uint32_t* cmdseq);
 
