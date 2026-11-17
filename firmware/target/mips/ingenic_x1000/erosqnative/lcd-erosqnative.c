@@ -266,10 +266,9 @@ static const uint32_t erosqnative_lcd_cmd_enable_gc9308[] = {
 
     /* Exit Sleep */
     LCD_INSTR_CMD,      0x11,
-    LCD_INSTR_UDELAY,   120000,
+    LCD_INSTR_SLEEP,    MS_TO_TICKS(5),
     /* Display On */
     LCD_INSTR_CMD,      0x29,
-    LCD_INSTR_UDELAY,   20000,
     LCD_INSTR_END,
 };
 
@@ -343,10 +342,9 @@ static const uint32_t erosqnative_lcd_cmd_enable_ili9342c[] = {
     LCD_INSTR_DAT,      0x0f,
     /* Exit Sleep */
     LCD_INSTR_CMD,      0x11,
-    LCD_INSTR_UDELAY,   120000,
+    LCD_INSTR_SLEEP,    MS_TO_TICKS(5),
     /* Display On */
     LCD_INSTR_CMD,      0x29,
-    LCD_INSTR_UDELAY,   20000,
     LCD_INSTR_END,
 };
 
@@ -356,10 +354,9 @@ static const uint32_t erosqnative_lcd_of_compat_cmd[] = {
     LCD_INSTR_DAT,      0x66, /* 18 bpp */
     /* Exit Sleep */
     LCD_INSTR_CMD,      0x11,
-    LCD_INSTR_UDELAY,   120000,
+    LCD_INSTR_SLEEP,    MS_TO_TICKS(120),
     /* Display On */
     LCD_INSTR_CMD,      0x29,
-    LCD_INSTR_UDELAY,   20000,
     LCD_INSTR_END,
 };
 
@@ -369,14 +366,14 @@ static const uint32_t erosqnative_lcd_cmd_sleep[] = {
     LCD_INSTR_CMD,      0x28,
     /* Sleep IN */
     LCD_INSTR_CMD,      0x10,
-    LCD_INSTR_UDELAY,   5000,
+    LCD_INSTR_SLEEP,    MS_TO_TICKS(120),
     LCD_INSTR_END,
 };
 
 static const uint32_t erosqnative_lcd_cmd_wake[] = {
     /* Sleep OUT */
     LCD_INSTR_CMD,      0x11,
-    LCD_INSTR_UDELAY,   5000,
+    LCD_INSTR_SLEEP,    MS_TO_TICKS(5),
     /* Display ON */
     LCD_INSTR_CMD,      0x29,
     LCD_INSTR_END,
