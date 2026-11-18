@@ -36,6 +36,7 @@
 
 #define PSP_SLICE_SIZE  (32)
 #define PSP_LINE_SIZE   (512)
+#define PSP_VRAM_UNCACHED 0x40000000  /* uncached alias of VRAM */
 #define SCREEN_WIDTH    (480)
 #define SCREEN_HEIGHT   (272)
 
@@ -53,6 +54,15 @@ struct display_context {
 } display_ctx;
 
 static const struct rect fullscreen_rect = { 0, 0, 480, 272 };
+
+/* VRAM is written through the uncached alias: faster than cached stores plus
+ * a cache writeback, and nothing is left behind for the display to miss */
+static void *frame_uncached(int frame)
+{
+    struct display_context *ctx = &display_ctx;
+    return (void *) (((uint32_t) ctx->vram_base | PSP_VRAM_UNCACHED) +
+                     ctx->frame_offset * frame);
+}
 
 /* sceGu* display list */
 static unsigned int list[4096] __attribute__((aligned(16)));
@@ -136,13 +146,18 @@ void sys_set_video_mode(int bpp)
     ctx->frame = 1;
 
     /* set current screen pointer */
-    ctx->pixels = (void *) ((uint32_t) ctx->vram_base + ctx->frame_offset);
+    ctx->pixels = frame_uncached(ctx->frame);
 
     /* DEBUGF("vram_base_alloc0: %p\n", ctx->vram_base); */
     /* DEBUGF("vram_base_alloc1: %p\n", ctx->pixels); */
     /* DEBUGF("vram_base_nonalloc: %p\n", (void *) ((uint32_t) ctx->pixels + ctx->frame_offset)); */
 
     gu_init(bpp);
+
+    /* Retire cached aliases before writing only through uncached ones */
+    sceKernelDcacheWritebackInvalidateAll();
+    memset(frame_uncached(0), 0, 2 * ctx->frame_offset);
+    __asm__ volatile("sync" : : : "memory");
 }
 
 static void argb_to_abgr_row(const uint8_t* src_argb, uint8_t* dst_abgr, int width)
@@ -177,15 +192,19 @@ int hw_accel_blit_abgr(const uint8_t *src_argb, const struct rect *srcrect, int 
     return 0;
 }
 
+/* A partial update goes to the visible frame, without a flip. Its rows are
+ * always the latest, while the other frame is one update behind, so copying
+ * there and flipping would bring back old pixels outside the rectangle. */
 void sys_blit_surface_rect(void *src, int x, int y, int width, int height)
 {
     struct display_context *ctx = &display_ctx;
     const struct rect rect = { x, y, width, height };
 
-   	size_t element = (y * 512) + x;
-    fb_data *dst = (fb_data *) ctx->pixels + element;
+    size_t element = (y * PSP_LINE_SIZE) + x;
+    fb_data *dst = (fb_data *) frame_uncached(ctx->frame ^ 1) + element;
     hw_accel_blit_abgr(src, &rect, LCD_WIDTH * FB_DATA_SZ,
         (void *) dst, ctx->pitch);
+    __asm__ volatile("sync" : : : "memory");
 }
 
 void sys_blit_surface(void *src)
@@ -200,10 +219,9 @@ int sys_flip_screen(void)
     void *new_pixels;
     struct display_context *ctx = &display_ctx;
 
-    sceKernelDcacheWritebackAll();
+    __asm__ volatile("sync" : : : "memory");
     ctx->frame ^= 1;
-    new_pixels = (void *) ((uint32_t) ctx->vram_base +
-            (ctx->frame_offset * ctx->frame));
+    new_pixels = frame_uncached(ctx->frame);
     ctx->pixels = new_pixels;
     sceGuSwapBuffers();
 

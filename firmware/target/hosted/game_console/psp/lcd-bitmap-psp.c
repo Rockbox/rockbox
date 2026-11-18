@@ -63,7 +63,6 @@ void lcd_update_rect(int x, int y, int width, int height)
     src = FBADDR(x,y);
 
     sys_blit_surface_rect(src, x, y, width, height);
-    sys_flip_screen();
 }
 
 void lcd_update(void)
