@@ -4411,6 +4411,7 @@ fi
       debug=""
       if [ "$bootloader_only" = "1" ]; then
         do_bootloader
+        btype="B" # set it explicitly since RET only gets here as well
         echo "Bootloader build selected"
       else
         btype="N" # set it explicitly since RET only gets here as well
