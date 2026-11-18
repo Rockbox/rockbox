@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: ipod_remote_tuner.h
+ *
  * Tuner header for the ipod remote tuner and others remote tuners
  *
  * Copyright (C) 2009 Laurent Gautier
