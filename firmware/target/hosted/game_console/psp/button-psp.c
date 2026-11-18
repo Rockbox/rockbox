@@ -60,11 +60,16 @@ static double map_values(double n, double source_start, double source_end, doubl
 
 void update_sound_slider_level(void)
 {
+    /* A kernel call: the slider doesn't need checking on every tick */
+    static int skip = 0;
+    if (++skip < HZ/10)
+        return;
+    skip = 0;
+
     /* update global volume based on sound slider level */
     int level = sys_impose_get_param(PSP_IMPOSE_MAIN_VOLUME);
-    if (level < 0) {
-        /* logf("sys_impose_get_param: error (0x%x)\n", level); */
-    }
+    if (level < 0)
+        return;
 
     if (level != old_slider_level) {
         int volume = (int) map_values((double) level,
@@ -73,8 +78,11 @@ void update_sound_slider_level(void)
                                     (double) sound_min(SOUND_VOLUME),
                                     (double) sound_max(SOUND_VOLUME),
                                     0);
+        /* The slider sets the hardware volume, this only follows it. Called
+         * from the tick, so no setvol(): that can write the status file,
+         * which must not happen in an interrupt. */
         global_status.volume = volume;
-        setvol();
+        global_status.last_volume_change = current_tick;
         old_slider_level = level;
     }
 }

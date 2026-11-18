@@ -29,6 +29,8 @@
 #include "lcd-target.h"
 
 #include "sys_display.h"
+#include "appevents.h"
+#include "events.h"
 #include "sys_kernel_hook.h"
 
 /*#define LOGF_ENABLE*/
@@ -109,6 +111,7 @@ void lcd_enable(bool on)
     {
         sys_display_enable();
         lcd_on = true;
+        send_event(LCD_EVENT_ACTIVATION, NULL);
     }
 }
 #endif

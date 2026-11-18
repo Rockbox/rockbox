@@ -110,7 +110,7 @@ int sys_display_disable(void)
 {
     if (_sceDisplayDisable) {
         struct KernelCallArg args;
-        kuKernelCall(_sceDisplayEnable, &args);
+        kuKernelCall(_sceDisplayDisable, &args);
         return args.ret1;
     }
 

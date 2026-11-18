@@ -97,19 +97,23 @@ void system_init(void)
     return;
     }
 
+#ifdef DEBUG
     SceKernelThreadInfo status;
     status.size = sizeof(SceKernelThreadInfo);
     if (sceKernelReferThreadStatus(sceKernelGetThreadId(), &status) == 0) {
         int priority = status.currentPriority;
         DEBUGF("main thread priority: %d\n", priority);
     }
+#endif
 
     cpu_frequency = scePowerGetCpuClockFrequencyInt();
     DEBUGF("cpu running at %ld Mhz\n", cpu_frequency);
 
+#ifdef DEBUG
     SceSize am = sceKernelTotalFreeMemSize();
     DEBUGF("\nMemory available for plugins: %d bytes (%dKB or %dMB)\n",
         am, am / 1024, am / 1024 / 1024 );
+#endif
 
     sys_timer_init();
     sys_init_kernel_hook();

@@ -29,7 +29,9 @@
 #include "sys_file.h"
 #include <pspkernel.h>
 
+#ifdef DEBUG
 #define DEBUG_PRX_MEMORY
+#endif
 
 /* Define LOGF_ENABLE to enable logf output in this file */
 #define LOGF_ENABLE
@@ -81,6 +83,7 @@ void * lc_open(const char *filename, unsigned char *buf, size_t buf_size)
 
     if (handle->id <= 0) {
         DEBUGF("sceKernelLoadModule: error 0x%x\n", handle->id);
+        free(handle);
         return NULL;
     }
 

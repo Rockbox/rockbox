@@ -95,7 +95,13 @@ unsigned int power_input_status(void)
  */
 int _battery_level(void)
 {
-    return scePowerGetBatteryLifePercent();
+    /* An error is negative: without this check it would look like an empty
+     * battery, and Rockbox shuts down at battery_level_shutoff */
+    static int last_level = 100;
+    int level = scePowerGetBatteryLifePercent();
+    if (level >= 0 && level <= 100)
+        last_level = level;
+    return last_level;
 }
 
 bool charging_state(void)
