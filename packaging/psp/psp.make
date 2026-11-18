@@ -42,7 +42,6 @@ CFLAGS += -D_PSP_FW_VERSION=$(PSP_FW_VERSION)
 LDFLAGS  += -specs=$(PSPSDK)/lib/prxspecs -Wl,-q,-T$(PSPSDK)/lib/linkfile.prx
 
 # do not forget to clean these
-CLEANOBJS += $(ROOTDIR)/apps/plugins/imageviewer/plugin_crt0.o
 CLEANOBJS += $(FIRMDIR)/target/hosted/game_console/psp/module/plugin_exports.o
 
 ifeq ($(NO_FIXUP_IMPORTS), 1)
@@ -65,6 +64,10 @@ $(BINARY_LIB): $(OBJS)
 	psp-build-exports -b $< > $@
 
 .SECONDEXPANSION: # $$(OBJ) is not populated until after this
+
+# TLSF prints with libc printf in DEBUG builds; PSP codecs and plugins are
+# separate modules without libc's stdio and exit support
+$(TLSFLIB_OBJ): TLSFLIBFLAGS += -UDEBUG
 
 # main binary
 $(BUILDDIR)/$(BINARY): $$(OBJ) $(FIRMLIB) $(VOICESPEEXLIB) $(CORE_LIBS)

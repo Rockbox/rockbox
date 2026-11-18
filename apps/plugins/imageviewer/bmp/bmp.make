@@ -9,10 +9,6 @@
 BMPSRCDIR := $(IMGVSRCDIR)/bmp
 BMPBUILDDIR := $(IMGVBUILDDIR)/bmp
 
-ifeq ($(APP_TYPE),psp-homebrew)
-IMGV_PLUGIN_CRT0 := $(ROOTDIR)/apps/plugins/imageviewer/plugin_crt0_psp.o
-endif
-
 BMP_SRC := $(call preprocess, $(BMPSRCDIR)/SOURCES)
 BMP_OBJ := $(call c2obj, $(BMP_SRC)) $(IMGV_PLUGIN_CRT0)
 

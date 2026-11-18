@@ -21,6 +21,12 @@ $(IMGVBUILDDIR)/imageviewer.rock: $(IMGV_OBJ)
 
 IMGDECFLAGS = $(PLUGINFLAGS) -DIMGDEC
 
+# the PSP links each decoder overlay with its own entry point
+ifeq ($(APP_TYPE),psp-homebrew)
+IMGV_PLUGIN_CRT0 := $(IMGVBUILDDIR)/plugin_crt0_psp.o
+OTHER_SRC += $(IMGVSRCDIR)/plugin_crt0_psp.c
+endif
+
 # include decoder's make from each subdir
 IMGVSUBDIRS := $(call preprocess, $(IMGVSRCDIR)/SUBDIRS)
 $(foreach dir,$(IMGVSUBDIRS),$(eval include $(dir)/$(notdir $(dir)).make))
