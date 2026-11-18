@@ -25,8 +25,8 @@
 #include "lcd.h"
 
 void sys_set_video_mode(int bpp);
-void sys_blit_surface_rect(void *src, int x, int y, int width, int height);
-void sys_blit_surface(void *src);
-int sys_flip_screen(void);
+void sys_update_rect(const fb_data *fb, int x, int y, int width, int height);
+void sys_update(const fb_data *fb);
+void sys_display_quit(void);
 
 #endif /* __SYSDISPLAY_H__ */

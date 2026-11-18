@@ -46,6 +46,7 @@
 
 #include "sys_timer.h"
 #include "sys_kernel_hook.h"
+#include "sys_display.h"
 
 PSP_MODULE_INFO("rockbox", PSP_MODULE_USER, 1, 0);
 PSP_MAIN_THREAD_ATTR(THREAD_ATTR_USER | THREAD_ATTR_VFPU);
@@ -126,6 +127,7 @@ void power_off(void)
 void sim_do_exit()
 {
     sys_storage_reattach();     /* give the card back to Sony's driver */
+    sys_display_quit();
     clock_thread_quit();
     sim_kernel_shutdown();
     sys_timer_quit();

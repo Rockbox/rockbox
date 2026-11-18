@@ -44,8 +44,6 @@ extern struct frame_buffer_t lcd_framebuffer_default;
 
 void lcd_update_rect(int x, int y, int width, int height)
 {
-    fb_data *src;
-
     if (x + width > LCD_WIDTH)
         width = LCD_WIDTH - x; /* Clip right */
     if (x < 0)
@@ -60,16 +58,13 @@ void lcd_update_rect(int x, int y, int width, int height)
     if (height <= 0)
         return; /* nothing left to do */
 
-    src = FBADDR(x,y);
-
-    sys_blit_surface_rect(src, x, y, width, height);
+    sys_update_rect(FBADDR(0,0), x, y, width, height);
 }
 
 void lcd_update(void)
 {
     /* update a full screen rect */
-    sys_blit_surface(FBADDR(0,0));
-    sys_flip_screen();
+    sys_update(FBADDR(0,0));
 }
 
 void lcd_init_device(void)
