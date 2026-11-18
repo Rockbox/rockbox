@@ -64,6 +64,59 @@ void psp_sys_quit(void)
 
 void sim_do_exit(void);
 
+/* scePowerSetClockFrequency() blocks its caller for about 150 ms. Every
+ * Rockbox thread runs in the main OS thread, so an OS thread of its own
+ * applies the changes; a burst of requests collapses to the last one. */
+#define CLOCK_THREAD_PRIORITY  23  /* it only waits: run it right away */
+
+static SceUID clock_thread = -1;
+static SceUID clock_event;
+static volatile long clock_wanted;
+static volatile bool clock_quit = false;
+
+static int clock_thread_run(SceSize args, void *argp)
+{
+    (void)args; (void)argp;
+    long applied = scePowerGetCpuClockFrequencyInt();
+    while (1)
+    {
+        sceKernelWaitSema(clock_event, 1, NULL);
+        if (clock_quit)
+            break;
+        long frequency = clock_wanted;
+        if (frequency != applied)
+        {
+            scePowerSetClockFrequency(frequency, frequency, frequency / 2);
+            applied = frequency;
+        }
+    }
+    return 0;
+}
+
+static void clock_thread_init(void)
+{
+    clock_event = sceKernelCreateSema("rb_clock", 0, 0, 1, NULL);
+    SceUID thread = sceKernelCreateThread("rb_clock", clock_thread_run,
+                                          CLOCK_THREAD_PRIORITY, 16 * 1024,
+                                          PSP_THREAD_ATTR_USER, NULL);
+    if (clock_event < 0 || thread < 0)
+        return; /* clock changes stay synchronous */
+    sceKernelStartThread(thread, 0, NULL);
+    clock_thread = thread;
+}
+
+static void clock_thread_quit(void)
+{
+    if (clock_thread < 0)
+        return;
+    clock_quit = true;
+    sceKernelSignalSema(clock_event, 1);
+    sceKernelWaitThreadEnd(clock_thread, NULL);
+    sceKernelDeleteThread(clock_thread);
+    sceKernelDeleteSema(clock_event);
+    clock_thread = -1;
+}
+
 void power_off(void)
 {
     /* Every Rockbox thread lives in this OS thread: none to join */
@@ -73,6 +126,7 @@ void power_off(void)
 void sim_do_exit()
 {
     sys_storage_reattach();     /* give the card back to Sony's driver */
+    clock_thread_quit();
     sim_kernel_shutdown();
     sys_timer_quit();
     exit(0);
@@ -171,6 +225,7 @@ void system_init(void)
 
     sys_timer_init();
     sys_init_kernel_hook();
+    clock_thread_init();
 
     /* filesystem: filesystem_init() in apps/main.c */
 }
@@ -213,7 +268,13 @@ void set_cpu_frequency(long frequency)
         return;
 
     /* DEBUGF("set_cpu_frequency: %ld Mhz\n", frequency); */
-   	scePowerSetClockFrequency(frequency, frequency, frequency / 2);
+    if (clock_thread >= 0)
+    {
+        clock_wanted = frequency;
+        sceKernelSignalSema(clock_event, 1);
+    }
+    else
+        scePowerSetClockFrequency(frequency, frequency, frequency / 2);
     cpu_frequency = frequency;
 }
 
