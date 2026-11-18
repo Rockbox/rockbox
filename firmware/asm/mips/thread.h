@@ -24,7 +24,13 @@ struct regs
     uint32_t sp;    /*   36 - Stack pointer */
     uint32_t ra;    /*   40 - Return address */
     uint32_t start; /*   44 - Thread start address, or NULL when started */
+#ifdef SONY_PSP
+    uint32_t f[12]; /* 48-92 - f20-f31: callee-saved with psp-gcc's
+                     *         single-float ABI, odd registers included */
+#endif
 };
 
+#ifndef SONY_PSP /* the PSP sets it in system-console.h */
 #define DEFAULT_STACK_SIZE 0x400 /* Bytes */
+#endif
 

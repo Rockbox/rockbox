@@ -71,7 +71,7 @@ typedef uint32_t dc_serial_t;
 #define IF_DIRCACHE(...) __VA_ARGS__
 #define IFN_DIRCACHE(...)
 
-#if CONFIG_PLATFORM & PLATFORM_NATIVE
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE) || defined(HOSTED_USES_STORAGEAPI)
 /* native dircache is lower-level than on a hosted target */
 #define DIRCACHE_NATIVE
 #endif

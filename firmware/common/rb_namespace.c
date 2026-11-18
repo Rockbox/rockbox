@@ -273,7 +273,7 @@ int ns_open_root(IF_MV(int volume,) unsigned int *callflagsp,
 
         if (!devpath && !state)
             return -ENOENT; /* regular open requires having been mounted */
-#if CONFIG_PLATFORM & PLATFORM_NATIVE
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE) || defined(HOSTED_USES_STORAGEAPI)
         if (fat_open_rootdir(IF_MV(volume,) &infop->fatfile) < 0)
         {
             logf("%s: DevPath Vol:%d St:%d NOT mounted", __func__, item, state);

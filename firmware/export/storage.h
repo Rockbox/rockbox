@@ -48,6 +48,9 @@
 #if (CONFIG_STORAGE & STORAGE_RAMDISK)
 #include "ramdisk.h"
 #endif
+#if (CONFIG_STORAGE & STORAGE_MS)
+#include "ms.h"
+#endif
 
 enum
 {
@@ -102,6 +105,9 @@ int nand_event(long id, intptr_t data);
 #endif
 #if (CONFIG_STORAGE & STORAGE_RAMDISK)
 int ramdisk_event(long id, intptr_t data);
+#endif
+#if (CONFIG_STORAGE & STORAGE_MS)
+int ms_event(long id, intptr_t data);
 #endif
 #if (CONFIG_STORAGE & STORAGE_USB)
 // int usb_event(long id, intptr_t data); // TODO: Implement
@@ -294,6 +300,29 @@ static inline void storage_sleep(void) {};
             #define storage_present(drive) ramdisk_present(IF_MD(drive))
         #endif
         #define storage_driver_type(drive) (STORAGE_RAMDISK_NUM)
+    #elif (CONFIG_STORAGE & STORAGE_MS)
+        #define STORAGE_FUNCTION(NAME) (ms_## NAME)
+        #define storage_spindown(sec) ms_spindown(sec)
+        #define storage_spin() ms_spin()
+
+        #define storage_enable(on) (void)0
+        #define storage_sleepnow() ms_sleepnow()
+        #define storage_disk_is_active() 0
+        #define storage_soft_reset() (void)0
+        #ifdef HAVE_STORAGE_FLUSH
+            #define storage_flush() (void)0
+        #endif
+        #define storage_last_disk_activity() ms_last_disk_activity()
+        #define storage_spinup_time() 0
+
+        #ifdef STORAGE_GET_INFO
+            #define storage_get_info(drive, info) ms_get_info(IF_MD(drive,) info)
+        #endif
+        #ifdef HAVE_HOTSWAP
+            #define storage_removable(drive) ms_removable(IF_MD(drive))
+            #define storage_present(drive) ms_present(IF_MD(drive))
+        #endif
+        #define storage_driver_type(drive) (STORAGE_MS_NUM)
     #elif (CONFIG_STORAGE & STORAGE_USB)
         // TODO:  Eventually fix me
     #else

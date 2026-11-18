@@ -52,9 +52,9 @@
    should be defined as well. */
 //#define HAVE_LCD_SLEEP
 
-#ifndef SIMULATOR
-#define PIVOT_ROOT "ms0:"
-#endif
+/* Rockbox's own FAT file stack on raw storage instead of the host's
+ * file API; here the Memory Stick (firmware/target/hosted/game_console/psp/) */
+#define HOSTED_USES_STORAGEAPI
 
 /* The PSP supports 44 kHz and 48 kHz natively
  */
@@ -106,6 +106,9 @@
 /* Define this if a programmable hotkey is mapped */
 #define HAVE_HOTKEY
 
-/* No special storage */
-#define CONFIG_STORAGE STORAGE_HOSTFS
-#define HAVE_STORAGE_FLUSH
+/* Rockbox's own FAT driver on the raw Memory Stick (msstor0:), see
+ * psp/ms-psp.c. */
+#define CONFIG_STORAGE STORAGE_MS
+/* FAT16 (cards up to 2 GB) and FAT32. FAT12 (sticks of about 32 MB and
+ * less) is not supported: fat.c refuses it. */
+#define HAVE_FAT16SUPPORT

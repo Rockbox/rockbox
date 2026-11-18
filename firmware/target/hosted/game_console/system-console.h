@@ -62,18 +62,20 @@ int set_irq_level(int level);
 #define restore_irq(level) \
     ((void)set_irq_level(level))
 
-#ifdef N3DS
 /* Idle until an emulated interrupt handler has run (or a short timeout) */
 void wait_for_interrupt(void);
-#else
-#define wait_for_interrupt()
-#endif
 
 #include "system-hosted.h"
 
 void sim_enter_irq_handler(void);
 void sim_exit_irq_handler(void);
 void sim_kernel_shutdown(void);
+
+#ifdef SONY_PSP
+/* HOME-button exit request, polled by the button driver (system-psp.c) */
+void psp_exit_poll(void);
+#endif
+
 void sys_poweroff(void);
 void sys_handle_argv(int argc, char *argv[]);
 void gui_message_loop(void);

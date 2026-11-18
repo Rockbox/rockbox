@@ -27,7 +27,9 @@
 #include "fs_attr.h"
 #include "fs_defines.h"
 
-#if (CONFIG_PLATFORM & PLATFORM_GAME_CONSOLE) && !defined(SIMULATOR)
+#if defined(HOSTED_USES_STORAGEAPI) && !defined(SIMULATOR)
+#include "filesystem-native.h"
+#elif (CONFIG_PLATFORM & PLATFORM_GAME_CONSOLE) && !defined(SIMULATOR)
 #include "filesystem-console.h"
 #elif defined (APPLICATION) || defined(CHECKWPS)
 #include "filesystem-app.h"

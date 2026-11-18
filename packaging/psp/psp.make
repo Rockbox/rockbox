@@ -69,9 +69,13 @@ $(BINARY_LIB): $(OBJS)
 # separate modules without libc's stdio and exit support
 $(TLSFLIB_OBJ): TLSFLIBFLAGS += -UDEBUG
 
+# native scheduler: thread stacks go inside the main OS stack,
+# see firmware/target/hosted/game_console/psp/thread-stack-psp.c
+PSP_STACK_LDOPTS = -Wl,--wrap=create_thread
+
 # main binary
 $(BUILDDIR)/$(BINARY): $$(OBJ) $(FIRMLIB) $(VOICESPEEXLIB) $(CORE_LIBS)
-	$(call PRINTS,LD $(BINARY))$(CC) -o $@ -Wl,--start-group $^ -Wl,--end-group $(LDOPTS) $(GLOBAL_LDOPTS) \
+	$(call PRINTS,LD $(BINARY))$(CC) -o $@ -Wl,--start-group $^ -Wl,--end-group $(LDOPTS) $(GLOBAL_LDOPTS) $(PSP_STACK_LDOPTS) \
 		-Wl,$(LDMAP_OPT),$(BUILDDIR)/rockbox.map
 	psp-fixup-imports $@
 	@mv $(BINARY) $(BINARY).elf

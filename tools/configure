@@ -953,8 +953,10 @@ pspsdkcc () {
         exit
     fi
 
-    # since no mips asm is required in the PSP port, set architecture to none
-    arch="none"
+    # Allegrex is a 32-bit MIPS CPU. GCC reports __mips=2 (its ISA baseline),
+    # but Rockbox uses ARCH_VERSION for the register width.
+    arch="mips"
+    arch_version="32"
 
     CC=$PSPDEV/bin/psp-gcc
     CPP=$PSPDEV/bin/psp-cpp
@@ -978,7 +980,8 @@ pspsdkcc () {
 
     GCCOPTS="$GCCOPTS -fno-builtin -g -Wno-unused-result"
     GCCOPTS="$GCCOPTS -I$PSPDEV/psp/include -I$PSPSDK/include"
-    GCCOPTS="$GCCOPTS -G0"
+    # mips is predefined, but we want it for paths. use __mips instead
+    GCCOPTS="$GCCOPTS -G0 -Umips"
     GCCOPTS="$GCCOPTS -D_GNU_SOURCE=1 -D_REENTRANT"
 
     SHARED_LDFLAGS="-L$PSPDEV/psp/lib -lpspmodinfo -Wl,-zmax-page-size=128 -nostartfiles"

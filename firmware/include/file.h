@@ -39,7 +39,11 @@ enum relate_result
     RELATE_PREFIX,        /* the path2 contains path1 as a prefix */
 };
 
-#if (CONFIG_PLATFORM & PLATFORM_GAME_CONSOLE) && !defined(SIMULATOR)
+#if defined(HOSTED_USES_STORAGEAPI) && !defined(SIMULATOR)
+/* SEEK_SET et al and getcwd(); native targets get them from Rockbox */
+#include <unistd.h>
+#include "filesystem-native.h"
+#elif (CONFIG_PLATFORM & PLATFORM_GAME_CONSOLE) && !defined(SIMULATOR)
 #include "filesystem-console.h"
 #elif defined(APPLICATION) || defined(CHECKWPS)
 #include "filesystem-app.h"

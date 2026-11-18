@@ -112,7 +112,7 @@ struct file_base_info
 #ifdef HAVE_MULTIVOLUME
     int                  volume;  /* file's volume (overlaps fatfile.volume) */
 #endif
-#if CONFIG_PLATFORM & PLATFORM_NATIVE
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE) || defined(HOSTED_USES_STORAGEAPI)
     struct fat_file      fatfile; /* FS driver file info */
 #endif
     };
@@ -137,7 +137,7 @@ struct file_base_binding
 /* directory scanning position info */
 struct dirscan_info
 {
-#if CONFIG_PLATFORM & PLATFORM_NATIVE
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE) || defined(HOSTED_USES_STORAGEAPI)
     struct fat_dirscan_info fatscan; /* FS driver scan info */
 #endif
 #ifdef HAVE_DIRCACHE

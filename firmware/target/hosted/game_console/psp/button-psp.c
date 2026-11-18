@@ -91,6 +91,8 @@ int button_read_device(void)
 {
     int key = BUTTON_NONE;
 
+    psp_exit_poll();        /* HOME menu "Quit": normal shutdown */
+
     /* TODO: implement Home Screen button support */
     /* if (!aptMainLoop()) {
         return true;

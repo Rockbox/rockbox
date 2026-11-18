@@ -402,7 +402,10 @@ static void init(void)
     system_init();
     core_allocator_init();
     kernel_init();
-#ifdef APPLICATION
+#ifdef HOSTED_USES_STORAGEAPI
+    filesystem_init(); /* Rockbox's own file stack, as on native targets */
+#endif
+#if defined(APPLICATION) && !defined(HOSTED_USES_STORAGEAPI)
     paths_init();
 #endif
     enable_irq();
@@ -445,6 +448,10 @@ static void init(void)
     viewportmanager_init();
 
     storage_init();
+#ifdef HOSTED_USES_STORAGEAPI
+    if (disk_mount_all() <= 0)
+        panicf("No usable FAT16/FAT32 partition found");
+#endif
     pcm_init();
     dsp_init();
     settings_reset();

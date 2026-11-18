@@ -76,6 +76,20 @@ static inline void store_context(void* addr)
         "sw    $30, 32($8)     \n" /* fp */
         "sw    $29, 36($8)     \n" /* sp */
         "sw    $31, 40($8)     \n" /* ra */
+#ifdef SONY_PSP
+        "swc1  $f20, 48($8)    \n" /* f20-f31 */
+        "swc1  $f21, 52($8)    \n"
+        "swc1  $f22, 56($8)    \n"
+        "swc1  $f23, 60($8)    \n"
+        "swc1  $f24, 64($8)    \n"
+        "swc1  $f25, 68($8)    \n"
+        "swc1  $f26, 72($8)    \n"
+        "swc1  $f27, 76($8)    \n"
+        "swc1  $f28, 80($8)    \n"
+        "swc1  $f29, 84($8)    \n"
+        "swc1  $f30, 88($8)    \n"
+        "swc1  $f31, 92($8)    \n"
+#endif
         ".set pop              \n"
         : : "r" (addr) : "t0"
     );
@@ -113,6 +127,20 @@ static inline void load_context(const void* addr)
         "lw    $30, 32($8)     \n" /* fp */
         "lw    $29, 36($8)     \n" /* sp */
         "lw    $31, 40($8)     \n" /* ra */
+#ifdef SONY_PSP
+        "lwc1  $f20, 48($8)    \n" /* f20-f31 */
+        "lwc1  $f21, 52($8)    \n"
+        "lwc1  $f22, 56($8)    \n"
+        "lwc1  $f23, 60($8)    \n"
+        "lwc1  $f24, 64($8)    \n"
+        "lwc1  $f25, 68($8)    \n"
+        "lwc1  $f26, 72($8)    \n"
+        "lwc1  $f27, 76($8)    \n"
+        "lwc1  $f28, 80($8)    \n"
+        "lwc1  $f29, 84($8)    \n"
+        "lwc1  $f30, 88($8)    \n"
+        "lwc1  $f31, 92($8)    \n"
+#endif
         ".set pop              \n"
         : : "r" (addr) : "t0", "t1"
     );

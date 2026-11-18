@@ -21,12 +21,13 @@
 #define RB_FILESYSTEM_OS
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 #include "system.h"
 #include "load_code.h"
 #include "debug.h"
 #include "codecs.h"
 #include "fs_defines.h"
-#include "sys_file.h"
+#include "sys_storage_psp.h"
 #include <pspkernel.h>
 
 #ifdef DEBUG
@@ -69,10 +70,14 @@ void * lc_open(const char *filename, unsigned char *buf, size_t buf_size)
 #endif
 
     char realpath[1024];
-    const char *fpath = handle_special_dirs(filename, 0x0, realpath,
-                                            sizeof (realpath));
+    /* Rockbox paths are card-relative; the OS loader reads through ms0: */
+    snprintf(realpath, sizeof(realpath), "ms0:%s", filename);
+    const char *fpath = realpath;
 
+    /* ms0: is only attached for the load itself */
+    sys_storage_window_open();
     handle->id = sceKernelLoadModule(fpath, 0, &option);
+    sys_storage_window_close();
 
 #ifdef DEBUG_PRX_MEMORY
     am = sceKernelTotalFreeMemSize();

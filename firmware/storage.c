@@ -66,6 +66,11 @@ static unsigned int num_drives;
   #define RAMDISK_THREAD_STACK_SIZE (0) /* not used on its own */
  #endif
 #endif
+#if (CONFIG_STORAGE & STORAGE_MS)
+ #ifndef MS_THREAD_STACK_SIZE
+  #define MS_THREAD_STACK_SIZE      (DEFAULT_STACK_SIZE*2)
+ #endif
+#endif
 
 static struct event_queue storage_queue SHAREDBSS_ATTR;
 static unsigned int storage_thread_id = 0;
@@ -86,6 +91,9 @@ static union {
 #if (CONFIG_STORAGE & STORAGE_RAMDISK)
     long stk_ramdisk[RAMDISK_THREAD_STACK_SIZE / sizeof (long)];
 #endif
+#if (CONFIG_STORAGE & STORAGE_MS)
+    long stk_ms[MS_THREAD_STACK_SIZE / sizeof (long)];
+#endif
 } storage_thread_stack;
 
 static const char storage_thread_name[] =
@@ -103,6 +111,9 @@ static const char storage_thread_name[] =
 #endif
 #if (CONFIG_STORAGE & STORAGE_RAMDISK)
     "/ramdisk"
+#endif
+#if (CONFIG_STORAGE & STORAGE_MS)
+    "/ms"
 #endif
     ;
 

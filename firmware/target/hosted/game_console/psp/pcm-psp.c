@@ -33,9 +33,15 @@
 #include <pspaudio.h>
 #include "sys_thread.h"
 #include "sys_kernel_hook.h"
+#include "system.h"     /* sim_enter_irq_handler() */
 
 
 /* This driver is based on rockbox pcm-ibasso.c */
+
+/* The PCM thread is an OS thread. With the native scheduler it must enter
+ * Rockbox like an interrupt handler when it calls the mixer. */
+#define PCM_IRQ_ENTER() sim_enter_irq_handler()
+#define PCM_IRQ_EXIT()  sim_exit_irq_handler()
 
 
 /* Audio channel handle */
@@ -89,7 +95,10 @@ static int pcm_thread_run(SceSize args, void *argp)
         if(_pcm_buffer_size == 0)
         {
             /* Retrive a new PCM buffer from Rockbox. */
-            if(! pcm_play_dma_complete_callback(PCM_DMAST_OK, &_pcm_buffer, &_pcm_buffer_size))
+            PCM_IRQ_ENTER();
+            bool got = pcm_play_dma_complete_callback(PCM_DMAST_OK, &_pcm_buffer, &_pcm_buffer_size);
+            PCM_IRQ_EXIT();
+            if(!got)
             {
                 DEBUGF("DEBUG %s: No new buffer.\n", __func__);
 
@@ -97,7 +106,9 @@ static int pcm_thread_run(SceSize args, void *argp)
                 continue;
             }
         }
+        PCM_IRQ_ENTER();
         pcm_play_dma_status_callback(PCM_DMAST_STARTED);
+        PCM_IRQ_EXIT();
 
         /* This relies on Rockbox PCM frame buffer size == ALSA PCM frame buffer size. */
         int result = sceAudioOutputPannedBlocking(_audio_handle, PSP_AUDIO_VOLUME_MAX, PSP_AUDIO_VOLUME_MAX, (void *) _pcm_buffer);

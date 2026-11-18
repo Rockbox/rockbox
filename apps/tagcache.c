@@ -4856,7 +4856,7 @@ static bool search_root_exists(const char *path)
     return false;
 }
 
-#ifdef APPLICATION
+#if defined(APPLICATION) && !defined(HOSTED_USES_STORAGEAPI)
 /*
  * This adds a path to the search roots, possibly during traveling through
  * the filesystem. It only adds if the path is not inside an already existing

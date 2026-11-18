@@ -302,7 +302,7 @@ common/loader_strerror.c
 #ifdef RKW_FORMAT
 common/crc32-rkw.c
 #endif
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE) || defined(HOSTED_USES_STORAGEAPI)
 common/dir.c
 common/disk_cache.c
 common/fat.c
@@ -317,7 +317,7 @@ common/dircache.c
 common/pathfuncs.c
 common/fdprintf.c
 common/linked_list.c
-#if (!(CONFIG_PLATFORM & PLATFORM_HOSTED))
+#if (!(CONFIG_PLATFORM & PLATFORM_HOSTED)) || defined(HOSTED_USES_STORAGEAPI)
 common/rb_namespace.c
 #endif
 common/rectangle.c
@@ -2147,15 +2147,14 @@ target/hosted/tinyalsa/pcm.c
 asm/arm/lcd-as-memframe.S
 #endif
 #ifndef N3DS
-target/hosted/game_console/kernel-console.c
-target/hosted/game_console/thread-console.c
-target/hosted/game_console/timer-console.c
+/* the PSP runs Rockbox's native scheduler and file stack (psp/) */
 target/hosted/game_console/lib/sys_timer_common.c
-target/hosted/game_console/lib/bfile/bfile-rwmutex.c
 target/hosted/game_console/lib/sys_cond_generic.c
 #endif
 target/hosted/game_console/lib/sys_atomic.c
+#ifdef N3DS
 target/hosted/game_console/lib/sys_file_common.c
+#endif
 
 #ifdef N3DS
 target/hosted/game_console/lib/sys_file_3ds.c
@@ -2179,16 +2178,20 @@ target/hosted/game_console/3ds/system-3ds.c
 #endif /* N3DS */
 
 #ifdef SONY_PSP
-target/hosted/game_console/lib/sys_file_psp.c
-target/hosted/game_console/lib/sys_dir_psp.c
+/* native scheduler */
+target/hosted/game_console/psp/kernel-psp.c
+target/hosted/game_console/psp/thread-stack-psp.c
+/* native file stack on the raw Memory Stick */
+target/hosted/game_console/psp/ms-psp.c
+storage.c
 target/hosted/game_console/lib/sys_display_psp.c
+target/hosted/game_console/lib/sys_irq_psp.c
 target/hosted/game_console/lib/sys_kernel_hook.c
+target/hosted/game_console/lib/sys_storage_psp.c
 target/hosted/game_console/lib/sys_thread_psp.c
 target/hosted/game_console/lib/sys_timer_psp.c
-target/hosted/game_console/lib/bfile/bfile-psp.c
 target/hosted/game_console/psp/backlight-psp.c
 target/hosted/game_console/psp/button-psp.c
-target/hosted/game_console/psp/filesystem-psp.c
 target/hosted/game_console/psp/lc-psp.c
 target/hosted/game_console/psp/lcd-bitmap-psp.c
 target/hosted/game_console/psp/pcm-psp.c
@@ -2256,7 +2259,7 @@ kernel/semaphore.c
 #endif
 #ifdef HAVE_SDL_THREADS
 target/hosted/sdl/thread-sdl.c
-#elif !(CONFIG_PLATFORM & PLATFORM_GAME_CONSOLE) || defined(N3DS)
+#else
 kernel/thread.c
 #endif
 kernel/thread-common.c
