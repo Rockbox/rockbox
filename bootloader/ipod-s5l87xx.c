@@ -45,7 +45,7 @@
 #include "version.h"
 #include "powermgmt.h"
 #include "usb.h"
-#ifdef IPOD_NANO3G
+#if defined(IPOD_NANO3G) || defined(IPOD_NANO4G)
 #include "nand-target.h"
 #endif
 #ifdef NAND_CHECK
