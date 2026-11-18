@@ -31,28 +31,18 @@
 #include "pcm_sink.h"
 
 #include <pspaudio.h>
+#include <pspkernel.h>
 #include "sys_thread.h"
 #include "sys_kernel_hook.h"
 #include "system.h"     /* sim_enter_irq_handler() */
 
-
-/* This driver is based on rockbox pcm-ibasso.c */
-
-/* The PCM thread is an OS thread. With the native scheduler it must enter
- * Rockbox like an interrupt handler when it calls the mixer. */
+/* The PCM thread is an OS thread outside the Rockbox scheduler: it calls
+ * back into Rockbox as an interrupt handler, the way a DMA interrupt would. */
 #define PCM_IRQ_ENTER() sim_enter_irq_handler()
 #define PCM_IRQ_EXIT()  sim_exit_irq_handler()
 
-
-/* Audio channel handle */
 static int _audio_handle = 1;
-
-
-/* Bytes left in the Rockbox PCM frame buffer. */
 static size_t _pcm_buffer_size = 0;
-
-
-/* Rockbox PCM frame buffer. */
 static const void  *_pcm_buffer = NULL;
 
 /*
@@ -60,19 +50,29 @@ static const void  *_pcm_buffer = NULL;
     0: PCM thread running.
     These are used by pcm_play_[lock|unlock] or pcm_play_dma_[start|stop|pause]. These need to be
     separated because of nested calls for locking and stopping.
+    Like a masked DMA interrupt, the thread doesn't call back into Rockbox
+    while either is set.
 */
 static volatile int _dma_stopped = 1;
 static volatile int _dma_locked  = 1;
 static volatile int _dma_shutdown  = 0;
 
+/* Wakes the PCM thread when it is suspended. A semaphore stays signalled
+   until it is consumed, so a wakeup between checking the flags and waiting
+   is not lost. */
+static SceUID _dma_wakeup;
 
-/* Mutex for PCM thread suspend/unsuspend. */
-static sysMutex _dma_suspended_mtx;
+/* PCM_DMAST_STARTED makes the mixer fill its other buffer, so it is reported
+   only once the output has accepted a buffer fetched by this thread: then
+   the buffer before it has been played. Not for the first buffer, which
+   comes from sink_dma_start(): its caller has already prepared the next one.
+   While masked, it waits like a pending interrupt. */
+static bool _started_pending = false;
 
-
-/* Signal condition for PCM thread suspend/unsuspend. */
-static sysCond _dma_suspended_cond;
-
+static inline bool dma_suspended(void)
+{
+    return AtomicGet(&_dma_stopped) == 1 || AtomicGet(&_dma_locked) == 1;
+}
 
 static int pcm_thread_run(SceSize args, void *argp)
 {
@@ -83,69 +83,79 @@ static int pcm_thread_run(SceSize args, void *argp)
 
     while(!AtomicGet(&_dma_shutdown))
     {
-        sys_mutex_lock(&_dma_suspended_mtx);
-        while((AtomicGet(&_dma_stopped) == 1) || (AtomicGet(&_dma_locked) == 1))
+        while(dma_suspended() && !AtomicGet(&_dma_shutdown))
         {
             DEBUGF("DEBUG %s: Playback suspended.\n", __func__);
-            sys_cond_wait(&_dma_suspended_cond, &_dma_suspended_mtx);
+            sceKernelWaitSema(_dma_wakeup, 1, NULL);
             DEBUGF("DEBUG %s: Playback resumed.\n", __func__);
         }
-        sys_mutex_unlock(&_dma_suspended_mtx);
+        if(AtomicGet(&_dma_shutdown))
+            break;
 
+        PCM_IRQ_ENTER();
+        /* Locked or stopped while entering: the interrupt would have been
+           masked, so don't call back into Rockbox now */
+        if(dma_suspended())
+        {
+            PCM_IRQ_EXIT();
+            continue;
+        }
+
+        if(_started_pending)
+        {
+            _started_pending = false;
+            pcm_play_dma_status_callback(PCM_DMAST_STARTED);
+        }
+
+        bool fetched = false;
         if(_pcm_buffer_size == 0)
         {
             /* Retrive a new PCM buffer from Rockbox. */
-            PCM_IRQ_ENTER();
-            bool got = pcm_play_dma_complete_callback(PCM_DMAST_OK, &_pcm_buffer, &_pcm_buffer_size);
-            PCM_IRQ_EXIT();
-            if(!got)
+            if(!pcm_play_dma_complete_callback(PCM_DMAST_OK, &_pcm_buffer, &_pcm_buffer_size))
             {
+                PCM_IRQ_EXIT();
                 DEBUGF("DEBUG %s: No new buffer.\n", __func__);
-
                 sceKernelDelayThread( 10000 );
                 continue;
             }
+            fetched = true;
         }
-        PCM_IRQ_ENTER();
-        pcm_play_dma_status_callback(PCM_DMAST_STARTED);
+
+        /* Take the buffer now: playback may restart with a new one while
+           this thread is blocked below */
+        const void *buffer = _pcm_buffer;
+        _pcm_buffer_size = 0;
         PCM_IRQ_EXIT();
 
         /* This relies on Rockbox PCM frame buffer size == ALSA PCM frame buffer size. */
-        int result = sceAudioOutputPannedBlocking(_audio_handle, PSP_AUDIO_VOLUME_MAX, PSP_AUDIO_VOLUME_MAX, (void *) _pcm_buffer);
+        int result = sceAudioOutputPannedBlocking(_audio_handle, PSP_AUDIO_VOLUME_MAX, PSP_AUDIO_VOLUME_MAX, (void *) buffer);
         if( result < 0)
         {
             DEBUGF("sceAudioOutputPannedBlocking: error 0x%x\n", result);
-
             sceKernelDelayThread( 10000 );
             continue;
         }
 
-        _pcm_buffer_size = 0;
-
-        /*DEBUGF("DEBUG %s: Thread running.\n", __func__);*/
+        if(fetched)
+            _started_pending = true;
     }
 
     DEBUGF("DEBUG %s: Thread end.\n", __func__);
-
     return 0;
 }
 
-
-/* Thread that copies the Rockbox PCM buffer to PSP audio channel. */
+/* Thread that copies the Rockbox PCM buffer to the PSP audio channel. */
 static SceUID _pcm_thread;
-
 
 static void sink_dma_init(void)
 {
     /* sys_audio_set_frequency(pcm_sampr); */
-    sys_mutex_init(&_dma_suspended_mtx);
-    sys_cond_init(&_dma_suspended_cond);
+    _dma_wakeup = sceKernelCreateSema("pcm_wakeup", 0, 0, 1, NULL);
 
     _audio_handle = sceAudioChReserve(PSP_AUDIO_NEXT_CHANNEL,
                                       MIX_FRAME_SAMPLES,
                                       PSP_AUDIO_FORMAT_STEREO);
 
-    sys_mutex_lock(&_dma_suspended_mtx);
     AtomicSet(&_dma_stopped, 1);
     AtomicSet(&_dma_locked, 1);
     AtomicSet(&_dma_shutdown, 0);
@@ -153,30 +163,28 @@ static void sink_dma_init(void)
     /* Create pcm thread in the suspended state. */
     _pcm_thread = sceKernelCreateThread("pcm",
                                         pcm_thread_run,
-                                        17,					/* high priority */
-                                        32 * 1024, 	/* 32 Kb */
+                                        17,         /* high priority */
+                                        32 * 1024,  /* 32 Kb */
                                         PSP_THREAD_ATTR_USER | PSP_THREAD_ATTR_VFPU,
                                         NULL);
     sceKernelStartThread(_pcm_thread, 0, 0);
-    sys_mutex_unlock(&_dma_suspended_mtx);
 }
 
+/* Rockbox calls these with the PCM "interrupt" masked (pcm_play_lock()), so
+ * the thread never sees a half-written buffer */
 static void sink_dma_start(const void *addr, size_t size)
 {
     _pcm_buffer      = addr;
     _pcm_buffer_size = size;
+    _started_pending = false;
 
-    sys_mutex_lock(&_dma_suspended_mtx);
     AtomicSet(&_dma_stopped, 0);
-    sys_cond_signal(&_dma_suspended_cond);
-    sys_mutex_unlock(&_dma_suspended_mtx);
+    sceKernelSignalSema(_dma_wakeup, 1);
 }
 
 static void sink_dma_stop(void)
 {
-    sys_mutex_lock(&_dma_suspended_mtx);
     AtomicSet(&_dma_stopped, 1);
-    sys_mutex_unlock(&_dma_suspended_mtx);
 }
 
 static void sink_dma_postinit(void)
@@ -185,17 +193,13 @@ static void sink_dma_postinit(void)
 
 static void sink_lock(void)
 {
-    sys_mutex_lock(&_dma_suspended_mtx);
     AtomicSet(&_dma_locked, 1);
-    sys_mutex_unlock(&_dma_suspended_mtx);
 }
 
 static void sink_unlock(void)
 {
-    sys_mutex_lock(&_dma_suspended_mtx);
     AtomicSet(&_dma_locked, 0);
-    sys_cond_signal(&_dma_suspended_cond);
-    sys_mutex_unlock(&_dma_suspended_mtx);
+    sceKernelSignalSema(_dma_wakeup, 1);
 }
 
 static void sink_set_freq_nolock(uint16_t freq)
@@ -216,17 +220,14 @@ static void sink_set_freq(uint16_t freq)
 
 void pcm_close_device(void)
 {
-    sys_mutex_lock(&_dma_suspended_mtx);
-    AtomicSet(&_dma_stopped, 0);
     AtomicSet(&_dma_shutdown, 1);
-
-    /* another thread could have the lock and prevent shutdown */
-    AtomicSet(&_dma_locked, 0);
-    sys_cond_signal(&_dma_suspended_cond);
-    sys_mutex_unlock(&_dma_suspended_mtx);
+    sceKernelSignalSema(_dma_wakeup, 1);
 
     /* wait thread to finish */
     sceKernelWaitThreadEnd(_pcm_thread, NULL);
+    sceKernelDeleteThread(_pcm_thread);
+    sceKernelDeleteSema(_dma_wakeup);
+
     sceAudioChRelease(_audio_handle);
 
     /* reset audio frequency to default */
@@ -236,7 +237,6 @@ void pcm_close_device(void)
     }
 }
 
-/* moved from drivers/audio/psp.c */
 void audiohw_close(void)
 {
     pcm_close_device();
