@@ -259,7 +259,16 @@ int _battery_level(void)
     switch (eros_qn_pmu_type)
     {
     case EROS_QN_PMU_AXP2101:
-        return axp2101_egauge_read();
+    {
+        /* Rockbox never enables the AXP2101 fuel gauge, so on some hw4
+         * units it reads 0% regardless of charge. Treat 0 or
+         * out-of-range readings as unavailable; powermgmt then derives
+         * the level from the battery voltage via percent_to_volt_*. */
+        int level = axp2101_egauge_read();
+        if (level <= 0 || level > 100)
+            return -1;
+        return level;
+    }
     default:
         return -1;
     }
