@@ -583,10 +583,11 @@ static void clamp_band(struct band *b)
 /* Solve M y = c for symmetric positive definite M with unit diagonal and
  * |entries| <= 1, Q30 (row stride MAXP).  c and y are Q24.  Returns 0 if a
  * pivot is too small. */
+/* Factorises M in place (lower triangle), so M must be rebuilt before the
+   next call. */
 static int cholesky_solve(int32_t (*M)[MAXP], const int64_t *c, int64_t *y,
                           int n)
 {
-    static int32_t L[MAXP][MAXP];
     static uint32_t inv[MAXP];
     static int ish[MAXP];
     const int64_t lim = 1LL << 52;
@@ -595,11 +596,11 @@ static int cholesky_solve(int32_t (*M)[MAXP], const int64_t *c, int64_t *y,
     {
         int64_t s = (int64_t)M[j][j] << 30;                         /* Q60 */
         for (int k = 0; k < j; k++)
-            s -= (int64_t)L[j][k] * L[j][k];
+            s -= (int64_t)M[j][k] * M[j][k];
         if (s < (1LL << 40))   /* pivot below 2^-20 */
             return 0;
         int32_t ljj = (int32_t)isqrt64((uint64_t)s);                 /* Q30 */
-        L[j][j] = ljj;
+        M[j][j] = ljj;
         /* x * 2^30 / ljj = mul_shr(x, inv, 32 - n) */
         inv[j] = recip((uint32_t)ljj, &ish[j]);
         ish[j] = 32 - ish[j];
@@ -607,9 +608,9 @@ static int cholesky_solve(int32_t (*M)[MAXP], const int64_t *c, int64_t *y,
         {
             int64_t t = (int64_t)M[i][j] << 30;
             for (int k = 0; k < j; k++)
-                t -= (int64_t)L[i][k] * L[j][k];
+                t -= (int64_t)M[i][k] * M[j][k];
             t = mul_shr(clamp64(t >> 30, INT32_MAX), inv[j], ish[j]);
-            L[i][j] = (int32_t)clamp64(t, 1 << 30);
+            M[i][j] = (int32_t)clamp64(t, 1 << 30);
         }
     }
 
@@ -617,14 +618,14 @@ static int cholesky_solve(int32_t (*M)[MAXP], const int64_t *c, int64_t *y,
     {
         int64_t s = c[i];
         for (int k = 0; k < i; k++)
-            s -= mul_q30(y[k], L[i][k]);
+            s -= mul_q30(y[k], M[i][k]);
         y[i] = clamp64(mul_shr(clamp64(s, lim), inv[i], ish[i]), lim);
     }
     for (int i = n - 1; i >= 0; i--)
     {
         int64_t s = y[i];
         for (int k = i + 1; k < n; k++)
-            s -= mul_q30(y[k], L[k][i]);
+            s -= mul_q30(y[k], M[k][i]);
         y[i] = clamp64(mul_shr(clamp64(s, lim), inv[i], ish[i]), lim);
     }
     return 1;
@@ -1038,8 +1039,18 @@ static int fit_precut(const struct fit *f, int orig_precut)
 static struct eq_band_setting saved_eq[EQ_NUM_BANDS];
 static int saved_precut;
 
-static int32_t disp_l[LCD_WIDTH], disp_orig[LCD_WIDTH];
-static int32_t disp_fit[LCD_WIDTH], disp_tmp[LCD_WIDTH];
+/* The display curves are only needed after optimise() has finished, so
+   they share the Jacobian's memory; this keeps the plugin within the
+   64 KB plugin buffer of the smallest targets. */
+#define DISP_WORDS (4 * LCD_WIDTH)
+#if DISP_WORDS <= MAXP * NGRID
+#define disp_l    (&jac[0][0])
+#else
+static int32_t disp_l[DISP_WORDS];
+#endif
+#define disp_orig (disp_l + LCD_WIDTH)
+#define disp_fit  (disp_l + 2 * LCD_WIDTH)
+#define disp_tmp  (disp_l + 3 * LCD_WIDTH)
 static int disp_n = -1;
 
 static const struct button_mapping *plugin_contexts[] = { pla_main_ctx };
