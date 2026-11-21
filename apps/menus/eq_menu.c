@@ -38,6 +38,7 @@
 #include "talk.h"
 #include "misc.h"
 #include "sound.h"
+#include "plugin.h"
 #include "dsp_proc_settings.h"
 #include "tree.h"
 #include "screen_access.h"
@@ -815,6 +816,12 @@ static void eq_reset_defaults(void)
     eq_apply();
 }
 
+static int eq_optimizer(void)
+{
+    plugin_load(PLUGIN_APPS_DIR "/eq_optimizer.rock", NULL);
+    return 0;
+}
+
 MENUITEM_FUNCTION(eq_graphical, 0, ID2P(LANG_EQUALIZER_GRAPHICAL),
                   eq_menu_graphical, lowlatency_callback, Icon_EQ);
 MENUITEM_FUNCTION(eq_save, 0, ID2P(LANG_EQUALIZER_SAVE),
@@ -824,7 +831,9 @@ MENUITEM_FUNCTION(eq_reset, 0, ID2P(LANG_RESET_EQUALIZER),
 MENUITEM_FUNCTION_W_PARAM(eq_browse, 0, ID2P(LANG_EQUALIZER_BROWSE),
                           browse_folder, (void*)&eqs,
                           lowlatency_callback, Icon_NOICON);
+MENUITEM_FUNCTION(eq_optimize, 0, ID2P(LANG_EQUALIZER_OPTIMIZER),
+                  eq_optimizer, NULL, Icon_NOICON);
 
 MAKE_MENU(equalizer_menu, ID2P(LANG_EQUALIZER), NULL, Icon_EQ,
         &eq_enable, &eq_graphical, &eq_precut, &gain_menu,
-        &advanced_menu, &eq_save, &eq_browse, &eq_reset);
+        &advanced_menu, &eq_save, &eq_browse, &eq_optimize, &eq_reset);

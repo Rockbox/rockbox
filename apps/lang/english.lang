@@ -17299,3 +17299,17 @@
     *: "Edit Menus"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_EQUALIZER_OPTIMIZER
+  desc: in the equalizer settings menu, runs the EQ Optimizer plugin
+  user: core
+  <source>
+    *: "EQ Optimizer"
+  </source>
+  <dest>
+    *: "EQ Optimizer"
+  </dest>
+  <voice>
+    *: "Equalizer optimizer"
+  </voice>
+</phrase>
