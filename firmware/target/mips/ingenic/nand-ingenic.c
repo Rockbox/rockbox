@@ -116,6 +116,7 @@ static const struct nand_chip chip_xt26g01cwsiga = {
 
 #define chip_ds35x1gaxxx chip_gd5f1gq4xexx
 #define chip_gd5f1gq5xexxg chip_gd5f1gq4xexx
+#define chip_gd5f1gm7uexxg chip_gd5f1gq4xexx
 
 const struct nand_chip_id supported_nand_chips[] = {
     NAND_CHIP_ID(&chip_ato25d1ga, NAND_READID_ADDR, 0x9b, 0x12),
@@ -127,6 +128,8 @@ const struct nand_chip_id supported_nand_chips[] = {
     NAND_CHIP_ID(&chip_gd5f1gq5xexxg, NAND_READID_ADDR, 0xc8, 0x51), /* 3.3 V */
     NAND_CHIP_ID(&chip_gd5f1gq5xexxg, NAND_READID_ADDR, 0xc8, 0x41), /* 1.8 V */
     NAND_CHIP_ID(&chip_xt26g01cwsiga, NAND_READID_ADDR, 0x0b, 0x11),
+    NAND_CHIP_ID(&chip_gd5f1gm7xexxg, NAND_READID_ADDR, 0xc8, 0x91), /* 3.3 V */
+    NAND_CHIP_ID(&chip_gd5f1gm7xexxg, NAND_READID_ADDR, 0xc8, 0x81), /* 1.8 V */
 };
 
 const size_t nr_supported_nand_chips = ARRAYLEN(supported_nand_chips);
