@@ -336,7 +336,13 @@ change to customise your listening experience.
 
   \note{A maximum of 10 EQ bands are possible on most devices, but using more
         than are required will waste battery and introduce additional rounding
-        noise.  For best results, use the fewest number of bands required.}
+        noise.  For best results, use the fewest number of bands required.
+        The \setting{EQ Optimizer} plugin, found under
+        \setting{Plugins $\rightarrow$ Applications}, can be used to reduce
+        the CPU usage of complex EQ settings.  It finds settings with fewer
+        bands that closely match the frequency response of the current EQ,
+        plots the original and new curves, and can apply the new settings.
+        See \reference{ref:eq_optimizer}.}
 
   Rockbox's parametric EQ is composed of up to ten EQ bands consisting of any combination of three different filter types:
 

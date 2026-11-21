@@ -14,6 +14,7 @@ cube.c
 cue_playlist.c
 dart_scorer.c
 dict.c
+eq_optimizer.c
 file_picker.c
 jackpot.c
 keybox.c

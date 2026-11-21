@@ -34,6 +34,7 @@ dict,apps
 disktidy,apps
 doom,games
 duke3d,games
+eq_optimizer,apps
 euroconverter,apps
 fft,demos
 file_picker,viewers
