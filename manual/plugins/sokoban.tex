@@ -12,7 +12,11 @@ information about the level format, see
 \url{http://sokobano.de/wiki/index.php?title=Level_format}
 
 \begin{btnmap}
-\multicolumn{2}{c}{\textbf{In game}} \\
+\opt{HAVEREMOTEKEYMAP}{
+  \multicolumn{3}{c}{\textbf{In game}}}
+\nopt{HAVEREMOTEKEYMAP}{
+  \multicolumn{2}{c}{\textbf{In game}}}
+\\
 \hline
 \opt{IRIVER_H100_PAD,IRIVER_H300_PAD%
     ,IAUDIO_X5_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD,SANSA_E200_PAD%
@@ -124,8 +128,13 @@ information about the level format, see
 \opt{RG_NANO_PAD}{\ButtonY}
        \opt{HAVEREMOTEKEYMAP}{& }
     & Redo previously undone move \\
+%
 \hline
-\multicolumn{2}{c}{\textbf{Solution playback}} \\
+\opt{HAVEREMOTEKEYMAP}{
+  \multicolumn{3}{c}{\textbf{Solution playback}}}
+\nopt{HAVEREMOTEKEYMAP}{
+  \multicolumn{2}{c}{\textbf{Solution playback}}}
+\\
 \hline
 \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD%
     ,MPIO_HD300_PAD,SANSA_FUZEPLUS_PAD,PBELL_VIBE500_PAD,SAMSUNG_YH92X_PAD%
