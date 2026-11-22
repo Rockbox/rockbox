@@ -2092,7 +2092,15 @@ static int ftl_commit(void)
             c->lblock = 0xffff;
         }
     }
-    ftl_run_add(sb, cxtv, &ftl_cxt, usn, 0xffffffff, SPARE_FTL_CXT);
+    /* The context fills 0x800 bytes of its page; the rest of the page is
+     * programmed as 0xff */
+    {
+        uint8_t *buf = ftl_copybuf + (cxtv - v0) * NAND_PAGE_SIZE;
+
+        memset(buf, 0xff, NAND_PAGE_SIZE);
+        memcpy(buf, &ftl_cxt, sizeof(ftl_cxt));
+        ftl_run_add(sb, cxtv, buf, usn, 0xffffffff, SPARE_FTL_CXT);
+    }
     if (ftl_run_write(false))
         return -1;
 
