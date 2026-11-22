@@ -117,7 +117,7 @@
 /* The number of bytes reserved for loadable plugins */
 #define PLUGIN_BUFFER_SIZE 0x100000
 
-#define AB_REPEAT_ENABLE
+/*#define AB_REPEAT_ENABLE*/
 
 /* Define this for LCD backlight available */
 #define HAVE_BACKLIGHT
