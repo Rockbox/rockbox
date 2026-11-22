@@ -15781,20 +15781,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_WPS
-  desc: in Settings
-  user: core
-  <source>
-    *: "What's Playing Screen"
-  </source>
-  <dest>
-    *: "正在播放屏幕"
-  </dest>
-  <voice>
-    *: "正在播放屏幕"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_DEFAULT_BROWSER
   desc: deprecated
   user: core
@@ -17234,5 +17220,33 @@
   <voice>
     *: none
     recording_remote: "线控录音界面皮肤"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGNAVI_EDIT_MENUS
+  desc: Database menu, opens the menu editor
+  user: core
+  <source>
+    *: "Edit Menus"
+  </source>
+  <dest>
+    *: "编辑菜单项"
+  </dest>
+  <voice>
+    *: "编辑菜单项"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_OPTIMIZER
+  desc: in the equalizer settings menu, runs the EQ Optimizer plugin
+  user: core
+  <source>
+    *: "EQ Optimizer"
+  </source>
+  <dest>
+    *: "均衡器优化器"
+  </dest>
+  <voice>
+    *: "均衡器优化器"
   </voice>
 </phrase>
