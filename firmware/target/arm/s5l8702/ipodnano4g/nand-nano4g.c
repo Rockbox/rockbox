@@ -383,7 +383,45 @@ static int nand_fifo_read(void *buf, unsigned int len)
 #define NAND_KICK_DATA16    0x005
 
 static unsigned int nand_ecclen = 13;
+static bool nand_ecclen_fixed;
 #define NAND_KICK_BCH16 (nand_ecclen == 26 ? 4 : 0)
+
+/* Apple's chip table for this model gives the spare size of each part,
+ * which the ID does not encode: 218 bytes (10 metadata + 8 x 26 parity)
+ * on the Toshiba, Intel and Micron parts, which Apple then reads with
+ * 16-bit BCH, and 128 bytes on the Samsung and Hynix parts (8-bit BCH).
+ * The ID is the first four ID bytes, little endian. */
+static const uint32_t nand_bch16_ids[] =
+{
+    0xba94d598, 0xba95d798,                 /* Toshiba */
+    0x3e94d589, 0x3ed5d789,                 /* Intel */
+    0x3e94d52c, 0x3ed5d72c, 0x3e94d72c,     /* Micron */
+};
+static const uint32_t nand_bch8_ids[] =
+{
+    0xb614d5ec, 0xb655d7ec,                 /* Samsung */
+    0xb614d5ad, 0xb655d7ad,                 /* Hynix */
+};
+
+static bool nand_id_listed(uint32_t id, const uint32_t *ids, unsigned int n)
+{
+    unsigned int i;
+
+    for (i = 0; i < n; i++)
+        if (ids[i] == id)
+            return true;
+    return false;
+}
+
+static void nand_select_ecc(uint32_t id)
+{
+    nand_ecclen = 13;
+    nand_ecclen_fixed = true;
+    if (nand_id_listed(id, nand_bch16_ids, ARRAYLEN(nand_bch16_ids)))
+        nand_ecclen = 26;
+    else if (!nand_id_listed(id, nand_bch8_ids, ARRAYLEN(nand_bch8_ids)))
+        nand_ecclen_fixed = false;
+}
 
 /* The first len bytes (a multiple of 4) of a page, no ECC. Diagnostic. */
 int nand_read_raw(uint32_t bank, uint32_t page, void *buf, unsigned int len)
@@ -640,14 +678,15 @@ static int nand_read_page_fmt(uint32_t bank, uint32_t page, void *databuf,
     return (r6 & FMISS_R6_CORRECTED) ? NAND_ECC_CORRECTED : NAND_ECC_CLEAN;
 }
 
-/* Erased pages cannot select the ECC strength. Retry an uncorrectable
- * programmed page with BCH16 and retain that format only after success. */
+/* For a part outside Apple's table the strength is unknown, and erased
+ * pages cannot select it. Retry an uncorrectable programmed page with
+ * BCH16 and retain that format only after success. */
 int nand_read_page(uint32_t bank, uint32_t page, void *databuf,
                    uint32_t *meta)
 {
     int rc = nand_read_page_fmt(bank, page, databuf, meta);
 
-    if (nand_ecclen == 26 || rc != NAND_ECC_FAILED)
+    if (nand_ecclen_fixed || nand_ecclen == 26 || rc != NAND_ECC_FAILED)
         return rc;
     nand_ecclen = 26;
     rc = nand_read_page_fmt(bank, page, databuf, meta);
@@ -991,6 +1030,7 @@ int nand_init(void)
     /* Keep the ID even for an unknown chip, so the storage error on screen
      * can show which chip it is. */
     nand_id = id;
+    nand_select_ecc(id);
     if (!nand_decode(id, &nand_chip_decoded))
         nand_chip = &nand_chip_decoded;
 
