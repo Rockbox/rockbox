@@ -559,6 +559,7 @@ static int shortcut_menu_speak_item(int selected_item, void * data)
     switch (sc->type)
     {
     case SHORTCUT_BROWSER:
+        ; /* semicolon necessary here */
         DIR* dir;
         struct dirent* entry;
         char* slash = strrchr(sc->u.path, PATH_SEPCH);
