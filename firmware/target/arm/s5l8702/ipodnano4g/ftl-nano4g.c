@@ -41,9 +41,9 @@
  *    virtual bank vb is way vb / banks of chip enable vb % banks. Block b
  *    of a virtual bank is the physical block Apple's address conversion
  *    gives (ftl_vfl_c2p()), unless that chip enable's context lists it in
- *    its pool map: slot i stands in for poolmap[i]. Apple checks its
- *    factory bad block table first; that table is not read here, so a
- *    listed block is taken as remapped.
+ *    its pool map: slot i stands in for poolmap[i]. Apple's VSVFL_Open
+ *    builds its good-block bitmap from the same pool map, so a listed
+ *    block is exactly a block Apple takes as remapped.
  *  - Superblocks: superblock s is block s of every virtual bank. Its pages
  *    are numbered v = page * vbanks + vbank.
  *  - FTL: logical page lpn is at index lpn % sbpages of logical block
@@ -59,9 +59,10 @@
  * FTL_Flush does. Nothing else commits, so a mount that finds writes after
  * the last commit rebuilds the tables from the medium as _FTLRestore does.
  * Pages go to the flash in runs, as VFL_WriteMultiplePagesInVb sends them.
- * Replacing a block that will not take a write or an erase from the VFL's
- * reserved spares is not done yet: such a block ends writing until the next
- * boot (ftl_write_failed()).
+ * A block that fails a program goes on its chip enable's scrub list and is
+ * replaced from the VFL's reserved spares when it is next erased; one that
+ * fails an erase is replaced at once. Either way the VFL context is stored
+ * as Apple's VSVFL stores it, and the FTL carries on in another superblock.
  */
 
 #include "config.h"
@@ -172,17 +173,18 @@ struct ftl_vfl_cxt
     uint32_t ftltype;
     uint16_t usnblock;              /* ring index of the active block */
     uint16_t usnpage;               /* pages of it used */
-    uint16_t field_10[3];
-    uint8_t replaced[4];            /* pool entries used */
-    uint16_t field_1a[6];
+    uint16_t badcount;              /* blocks the format found bad */
+    uint16_t field_12;
+    uint16_t erasefail;             /* erases that failed */
+    uint16_t cursor[8];             /* per way: next pool slot to try */
     uint16_t poolmap[820];          /* block each pool slot stands in for */
     uint16_t vflcxtblocks[4];       /* physical blocks of the context ring */
     uint16_t usableblocks;          /* virtual blocks per bank */
     uint16_t poolstart;             /* first reserved block */
     uint16_t ftlctrlblocks[3];      /* virtual blocks of the FTL control */
-    uint16_t scrubcount;
+    uint16_t scrubcount;            /* blocks to replace at their next erase */
     uint16_t scrub[20];
-    uint16_t field_6ca[8];
+    uint16_t field_6ca[8];          /* a pending FTL geometry change */
     uint16_t vendortype[2];
     uint8_t field_6de[0x116];
     uint32_t version;
@@ -190,8 +192,13 @@ struct ftl_vfl_cxt
     uint32_t checksum2;
 };
 
+/* Pool map entries other than the block a slot stands in for */
+#define FTL_POOL_FREE       0xfff0
+#define FTL_POOL_BAD        0xffff
+
 #define FTL_CHECK(name, cond) typedef char name[(cond) ? 1 : -1]
 FTL_CHECK(ftl_vfl_cxt_size, sizeof(struct ftl_vfl_cxt) == 0x800);
+FTL_CHECK(ftl_vfl_cxt_cursor, offsetof(struct ftl_vfl_cxt, cursor) == 0x16);
 FTL_CHECK(ftl_vfl_cxt_pool, offsetof(struct ftl_vfl_cxt, poolmap) == 0x26);
 FTL_CHECK(ftl_vfl_cxt_blocks,
           offsetof(struct ftl_vfl_cxt, vflcxtblocks) == 0x68e);
@@ -199,6 +206,8 @@ FTL_CHECK(ftl_vfl_cxt_start,
           offsetof(struct ftl_vfl_cxt, poolstart) == 0x698);
 FTL_CHECK(ftl_vfl_cxt_ctrl,
           offsetof(struct ftl_vfl_cxt, ftlctrlblocks) == 0x69a);
+FTL_CHECK(ftl_vfl_cxt_scrub,
+          offsetof(struct ftl_vfl_cxt, scrubcount) == 0x6a0);
 FTL_CHECK(ftl_vfl_cxt_vendor,
           offsetof(struct ftl_vfl_cxt, vendortype) == 0x6da);
 FTL_CHECK(ftl_vfl_cxt_cks, offsetof(struct ftl_vfl_cxt, checksum1) == 0x7f8);
@@ -264,14 +273,21 @@ static uint16_t ftl_erasectr[FTL_SIDE_PAGES * (NAND_PAGE_SIZE / 2)];
 static uint16_t ftl_readcount[FTL_SIDE_PAGES * (NAND_PAGE_SIZE / 2)];
 static uint8_t ftl_stats[NAND_PAGE_SIZE] STORAGE_ALIGN_ATTR;
 static uint32_t ftl_vfl_usn;    /* cross-bank VFL context update counter */
+static uint8_t ftl_vfl_page[NAND_PAGE_SIZE] STORAGE_ALIGN_ATTR;
 static uint32_t ftl_ctrl_idx;   /* which of ftl_ctrl[] is being written */
 static uint32_t ftl_ctrl_v;     /* next free page in it */
+static uint32_t ftl_ctrl_good;  /* which of ftl_ctrl[] has the newest context */
 static uint32_t ftl_necpages, ftl_nrcpages, ftl_nmappages, ftl_nlogpages;
 
 /* The run of pages being gathered for one program call (see ftl_run_add) */
 static struct nand_write ftl_run[FTL_MAX_SBPAGES];
 static uint32_t ftl_run_meta[FTL_MAX_SBPAGES][NAND_META_WORDS];
 static uint32_t ftl_run_sb, ftl_run_v, ftl_run_n;
+/* The pages ftl_log_append() queued for a log, which ftl_log_flush()
+ * enters into the log once they are programmed */
+static uint16_t ftl_queued_idx[FTL_MAX_SBPAGES];
+static uint32_t ftl_queued_n, ftl_queued_current;
+static bool ftl_queued_sequential;
 /* Merges read a batch of pages, then write it: an eighth of a superblock
  * at a time, as Apple's _DoSimpleMerge, _DoCopyMerge and _DoMoveMerge do */
 #define FTL_COPY_PAGES      (FTL_MAX_SBPAGES / 8)
@@ -519,6 +535,7 @@ static int ftl_load_cxt(void)
     ftl_cxt.usn = ftl_meta[0];
     ftl_ctrl_idx = ctrl;
     ftl_ctrl_v = used[ctrl];
+    ftl_ctrl_good = ctrl;
     return clean;
 }
 
@@ -1147,12 +1164,190 @@ static int ftl_open_write_state(void)
 }
 
 /* ---- VFL write side: blocks that have gone bad --------------------- */
-/* TODO: VSVFL's remap and context commit (pool map, replaced counts, the
- * bad block table in DEVICEINFOBBT) are not derived yet. Until they are, a
- * block that will not take a program or an erase ends writing for this
- * session: the FTL and the NAND driver refuse further writes, nothing is
- * committed, and the next mount rebuilds from the medium as after a power
- * cut. The UI is told with SYS_STORAGE_WRITE_FAILED. */
+/* What Apple's VSVFL does when a block goes bad (_ReplaceBadBlock,
+ * the scrub list, VSVFL_Erase, VSVFL_MarkWriteFailBlock, _StoreVFLCxt):
+ *  - a block that fails a program may still hold pages the FTL needs, so it
+ *    only goes on its chip enable's scrub list; the FTL writes elsewhere
+ *    and the block is replaced the next time its virtual block is erased.
+ *  - a block that fails an erase is replaced at once and the erase retried
+ *    on the replacement, three times in all.
+ *  - every change is stored as a new VFL context of that chip enable.
+ * A replacement takes the next free slot of the pool from the block's own
+ * way, then from the other ways, least used first. Only a failure the chip
+ * reports (NAND_OP_FAILED) is treated as a bad block; anything else from
+ * the driver, an empty pool or a context that will not store ends writing
+ * for this session (ftl_write_failed()). */
+
+static void ftl_vfl_update_checksum(struct ftl_vfl_cxt *cxt)
+{
+    uint32_t sum, x;
+
+    ftl_vfl_calculate_checksum(cxt, &sum, &x);
+    cxt->checksum1 = sum;
+    cxt->checksum2 = x;
+}
+
+/* Program the context as the next 8-page group of its active ring block
+ * and read the copies back, as _WriteVFLCxtToFlash does: the update counts
+ * move first, so a group that fails is never reused, and at least five
+ * copies must read back intact. */
+static int ftl_vfl_write_cxt(uint32_t bank)
+{
+    struct ftl_vfl_cxt *cxt = &ftl_vfl_cxt[bank];
+    struct nand_write w[8];
+    uint32_t meta[NAND_META_WORDS], page, i, bad = 0;
+    int rc;
+
+    if (cxt->vflcxtblocks[cxt->usnblock] >= geo->blocks)
+        return -1;
+    cxt->updatecount--;
+    cxt->usn = ++ftl_vfl_usn;
+    page = cxt->vflcxtblocks[cxt->usnblock] * geo->pagesperblock
+         + cxt->usnpage;
+    cxt->usnpage += 8;
+    ftl_vfl_update_checksum(cxt);
+
+    memset(ftl_vfl_page, 0xff, sizeof(ftl_vfl_page));
+    memcpy(ftl_vfl_page, cxt, sizeof(*cxt));
+    meta[0] = cxt->updatecount;
+    meta[1] = 0xffffffff;
+    meta[2] = 0xffff0000 | (SPARE_VFL_CXT << 8);
+    for (i = 0; i < 8; i++)
+    {
+        w[i].bank = bank;
+        w[i].page = page + i;
+        w[i].buf = ftl_vfl_page;
+        w[i].meta = meta;
+    }
+    if (nand_write_pages(w, 8, false, NULL))
+        return -1;
+
+    for (i = 0; i < 8; i++)
+    {
+        rc = nand_read_page(bank, page + i, ftl_buffer, ftl_meta);
+        if (rc < 0 || rc == NAND_ECC_FAILED
+            || memcmp(ftl_buffer, cxt, sizeof(*cxt))
+            || ftl_meta[0] != cxt->updatecount
+            || (ftl_meta[2] & 0xffff) != (SPARE_VFL_CXT << 8))
+            bad++;
+    }
+    return bad < 4 ? 0 : -1;
+}
+
+/* Store a bank's context, as _StoreVFLCxt does: in the active ring block
+ * while it has a group left, else (or if that fails) in the next ring
+ * block that erases, from its first page. */
+static int ftl_vfl_store_cxt(uint32_t bank)
+{
+    struct ftl_vfl_cxt *cxt = &ftl_vfl_cxt[bank];
+    uint32_t i, t, start = cxt->usnblock;
+
+    if (start >= 4)
+        return -1;
+    if (cxt->usnpage + 8u <= geo->pagesperblock && !ftl_vfl_write_cxt(bank))
+        return 0;
+    for (i = (start + 1) & 3; i != start; i = (i + 1) & 3)
+    {
+        if (cxt->vflcxtblocks[i] >= geo->blocks)
+            continue;
+        for (t = 0; t < 4; t++)
+            if (!nand_erase_block(bank, cxt->vflcxtblocks[i]))
+                break;
+        if (t == 4)
+            continue;
+        cxt->usnblock = i;
+        cxt->usnpage = 0;
+        if (!ftl_vfl_write_cxt(bank))
+            return 0;
+    }
+    logf("ftl: VFL context of bank %lu not stored", (unsigned long)bank);
+    return -1;
+}
+
+/* Take a free pool slot of a bank to stand in for block, which belongs to
+ * way way, as _ReplaceBadBlock does. A slot that already stood in for it
+ * has gone bad itself and is retired. Does not store the context. */
+static bool ftl_vfl_replace(uint32_t bank, uint32_t way, uint32_t block)
+{
+    struct ftl_vfl_cxt *cxt = &ftl_vfl_cxt[bank];
+    uint32_t per = geo->blocks / ftl_ways - ftl_vfl_cxt[0].poolstart;
+    uint32_t order[4], i, k, w, t;
+
+    for (i = 0; i < pool_slots; i++)
+        if (cxt->poolmap[i] == block)
+            cxt->poolmap[i] = FTL_POOL_BAD;
+
+    /* Its own way first, then every way by how little of it is used */
+    order[0] = way;
+    for (k = 0; k <= ftl_ways; k++)
+    {
+        if (k == 1)
+        {
+            for (i = 0; i < ftl_ways; i++)
+                order[i] = i;
+            for (i = 0; i + 1 < ftl_ways; i++)
+                for (t = i + 1; t < ftl_ways; t++)
+                    if (cxt->cursor[order[t]] < cxt->cursor[order[i]])
+                    {
+                        w = order[t];
+                        order[t] = order[i];
+                        order[i] = w;
+                    }
+        }
+        w = order[k ? k - 1 : 0];
+        for (; cxt->cursor[w] < per; cxt->cursor[w]++)
+            if (cxt->poolmap[w * per + cxt->cursor[w]] == FTL_POOL_FREE)
+            {
+                cxt->poolmap[w * per + cxt->cursor[w]++] = block;
+                logf("ftl: bank %lu block %lu replaced by pool slot %lu",
+                     (unsigned long)bank, (unsigned long)block,
+                     (unsigned long)(w * per + cxt->cursor[w] - 1));
+                return true;
+            }
+    }
+    logf("ftl: bank %lu has no free pool slot", (unsigned long)bank);
+    return false;
+}
+
+static int ftl_vfl_scrub_index(uint32_t bank, uint32_t block)
+{
+    const struct ftl_vfl_cxt *cxt = &ftl_vfl_cxt[bank];
+    int i;
+
+    for (i = 0; i < cxt->scrubcount && i < 20; i++)
+        if (cxt->scrub[i] == block)
+            return i;
+    return -1;
+}
+
+/* A program on bank failed in superblock sb: put that bank's blocks of it
+ * on the scrub list, as VSVFL_MarkWriteFailBlock and _AddBlockToScrubList
+ * do, storing the context for each block added. */
+static int ftl_vfl_mark_write_fail(uint32_t bank, uint32_t sb)
+{
+    struct ftl_vfl_cxt *cxt = &ftl_vfl_cxt[bank];
+    uint32_t vb, block;
+
+    for (vb = bank; vb < ftl_vbanks; vb += geo->banks)
+    {
+        block = ftl_vfl_c2p(vb, sb);
+        if (ftl_vfl_scrub_index(bank, block) >= 0)
+            continue;
+        if (cxt->scrubcount >= 20)
+            return -1;
+        cxt->scrub[cxt->scrubcount++] = block;
+        if (ftl_vfl_store_cxt(bank))
+            return -1;
+        logf("ftl: bank %lu block %lu failed a program, scrubbing",
+             (unsigned long)bank, (unsigned long)block);
+    }
+    return 0;
+}
+
+/* A block that has failed is no use for writing any more: stop writing for
+ * this session. Nothing is committed, and the next mount rebuilds from the
+ * medium as after a power cut. The UI is told with
+ * SYS_STORAGE_WRITE_FAILED. */
 static void ftl_write_failed(const char *what, uint32_t bank, uint32_t block)
 {
     (void)what;
@@ -1169,16 +1364,40 @@ static void ftl_write_failed(const char *what, uint32_t bank, uint32_t block)
 #endif
 }
 
-/* Erase one virtual block. nano2g tries three times before giving up on a
- * block. */
+/* Erase one virtual block, as VSVFL_Erase does it a bank at a time: a
+ * block on the scrub list is replaced first, and a block that fails is
+ * replaced and the erase tried again, three times in all. */
 static int ftl_vfl_erase(uint32_t vb, uint32_t vblock)
 {
-    uint32_t i, bank = vb % geo->banks;
-    uint32_t block = ftl_vfl_phys_block(vb, vblock);
+    uint32_t t, bank = vb % geo->banks, way = vb / geo->banks;
+    uint32_t block = ftl_vfl_c2p(vb, vblock);
+    struct ftl_vfl_cxt *cxt = &ftl_vfl_cxt[bank];
+    int i = ftl_vfl_scrub_index(bank, block), rc = 0;
 
-    for (i = 0; i < 3; i++)
-        if (!nand_erase_block(bank, block))
+    if (i >= 0)
+    {
+        if (!ftl_vfl_replace(bank, way, block))
+            goto failed;
+        /* _RemoveBlockFromScrubList, which leaves the old last entry */
+        cxt->scrub[i] = 0;
+        if (cxt->scrubcount != 1)
+            cxt->scrub[i] = cxt->scrub[cxt->scrubcount - 1];
+        cxt->scrubcount--;
+        if (ftl_vfl_store_cxt(bank))
+            goto failed;
+    }
+    for (t = 0; t < 3; t++)
+    {
+        rc = nand_erase_block(bank, ftl_vfl_phys_block(vb, vblock));
+        if (!rc)
             return 0;
+        if (rc != NAND_OP_FAILED)
+            break;
+        cxt->erasefail++;
+        if (!ftl_vfl_replace(bank, way, block) || ftl_vfl_store_cxt(bank))
+            break;
+    }
+failed:
     ftl_write_failed("erase", bank, block);
     return -1;
 }
@@ -1296,8 +1515,12 @@ static int ftl_run_program(uint32_t first, uint32_t n, bool rows,
 
 /* Program the queued run: pages up to the next row boundary on their own,
  * whole rows together while more than one row remains, and the rest on
- * their own, exactly as VFL_WriteMultiplePagesInVb splits it. */
-static int ftl_run_write(bool remap_on_fail)
+ * their own, exactly as VFL_WriteMultiplePagesInVb splits it. If the chip
+ * refuses a page, its bank's blocks of the superblock go on the scrub list
+ * and -1 is returned with the FTL still writable: the caller writes the
+ * pages somewhere else, as Apple's FTL does, and the superblock's next
+ * erase replaces the block. */
+static int ftl_run_write(void)
 {
     uint32_t perrow = ftl_vbanks * geo->planes;
     uint32_t n = ftl_run_n, done = 0, len, bank = 0, planes = 0, plane;
@@ -1322,11 +1545,8 @@ static int ftl_run_write(bool remap_on_fail)
         rc = ftl_run_program(done, n - done, false, &bank, &planes);
     if (rc)
     {
-        /* Only a fresh merge destination (remap_on_fail) could be dropped
-         * and rebuilt in another superblock once failed blocks can be
-         * replaced; live logs and control blocks keep their earlier pages.
-         * Until then every failure ends writing. */
-        (void)remap_on_fail;
+        if (rc == NAND_OP_FAILED && !ftl_vfl_mark_write_fail(bank, ftl_run_sb))
+            return -1;
         for (plane = 0; plane + 1 < geo->planes; plane++)
             if (planes & (1 << plane))
                 break;
@@ -1340,11 +1560,10 @@ static int ftl_run_write(bool remap_on_fail)
 
 /* Program one page on its own */
 static int ftl_write_vpage(uint32_t sb, uint32_t v, const void *buf,
-                           uint32_t word0, uint32_t word1, uint32_t type,
-                           bool remap_on_fail)
+                           uint32_t word0, uint32_t word1, uint32_t type)
 {
     ftl_run_add(sb, v, buf, word0, word1, type);
-    return ftl_run_write(remap_on_fail);
+    return ftl_run_write();
 }
 
 /* Take a block off the free ring, least-worn first. Apple's _GetFreeVb picks
@@ -1483,9 +1702,10 @@ static int ftl_read_prepared(uint32_t first, uint32_t n,
             ftl_read_dbg.meta0 = meta[0];
         }
         /* Corrected data is safe to return: the controller has repaired it.
-         * TODO: Implement Apple's refresh list so persistently corrected
-         * blocks are proactively rewritten. This is media maintenance, not
-         * a loss of ECC protection compared with the earlier read path. */
+         * Apple's FTL also queues the block on its refresh list (context
+         * 0x3b4) to be copied; that is maintenance, not needed to read the
+         * data. A commit keeps Apple's list as it was, and Apple's
+         * _HandleRefreshBlock drops entries whose block has moved since. */
         if (meta_type(meta) == SPARE_ERASED)
             memset(r->buf, 0xff, NAND_PAGE_SIZE);
         else if (!meta_is_data(meta) || meta[0] != lpns[i])
@@ -1619,12 +1839,12 @@ static int ftl_fill_block(uint32_t lblock, uint32_t sb, ftl_write_src src,
                     v == sbpages - 1 ? SPARE_DATA_LAST : SPARE_DATA);
         if (!whole && ++n == sbpages / 8)
         {
-            if (ftl_run_write(true))
+            if (ftl_run_write())
                 return -1;
             n = 0;
         }
     }
-    return ftl_run_write(true);
+    return ftl_run_write();
 }
 
 static int ftl_merge(uint32_t lblock, ftl_write_src src, void *ctx,
@@ -1637,10 +1857,9 @@ static int ftl_merge(uint32_t lblock, ftl_write_src src, void *ctx,
         return -1;
     old = ftl_map[lblock];
 
-    /* Up to four attempts, each in a different superblock, as
-     * ftl_commit_scattered() in ftl-nano2g.c retries. A block that refused
-     * a program is not remapped yet (ftl_write_failed()), so after one the
-     * FTL is read-only and there is nothing to retry. */
+    /* Up to four attempts, each in a different superblock, as Apple's
+     * _DoSimpleMerge retries. Releasing a superblock that refused a program
+     * erases it, which replaces the failed block. */
     for (attempt = 0; attempt < 4; attempt++)
     {
         if (ftl_pool_alloc(&sb, worn_first))
@@ -1746,7 +1965,7 @@ static int ftl_commit_sequential(struct ftl_log *log)
                         ftl_data_usn(v + i),
                         v + i == sbpages - 1 ? SPARE_DATA_LAST : SPARE_DATA);
         }
-        if (ftl_run_write(false))
+        if (ftl_run_write())
             return ftl_commit_scattered(log);
         for (i = 0; i < n; i++)
             log->offsets[v + i] = v + i;
@@ -1808,7 +2027,7 @@ static int ftl_compact_scattered(struct ftl_log *log)
                             SPARE_DATA);
                 v++;
             }
-            if (ftl_run_write(true))
+            if (ftl_run_write())
                 break;
             n = 0;
         }
@@ -1894,26 +2113,67 @@ used:
     return log;
 }
 
+/* Pages of a log, counting those queued but not yet programmed */
+static uint32_t ftl_log_used(const struct ftl_log *log)
+{
+    return log->pagesused + ftl_queued_n;
+}
+
 /* Append one page to a log, as ftl_write() in ftl-nano2g.c does. The page
  * is only queued: FTL_Write hands everything it appends to a log to the VFL
- * in one run, and ftl_run_write() must be called before anything else
- * touches the flash. */
+ * in one run, and ftl_log_flush() must be called before anything else
+ * touches the flash. The log itself is updated only when the run has been
+ * programmed, as FTL_Write does. */
 static void ftl_log_append(struct ftl_log *log, uint32_t idx,
                           const void *data)
 {
-    uint32_t v = log->pagesused;
+    uint32_t v = ftl_log_used(log);
     uint32_t lpn = log->lblock * sbpages + idx;
     uint32_t type = SPARE_DATA;
 
-    if (v == sbpages - 1 && log->issequential)
+    if (!ftl_queued_n)
+    {
+        ftl_queued_current = log->pagescurrent;
+        ftl_queued_sequential = log->issequential;
+    }
+    if (v == sbpages - 1 && ftl_queued_sequential)
         type = SPARE_DATA_LAST;
     ftl_run_add(log->sb, v, data, lpn, ftl_data_usn(v), type);
-    log->pagesused++;
+    ftl_queued_idx[ftl_queued_n++] = idx;
     if (log->offsets[idx] == FTL_NO_PAGE)
-        log->pagescurrent++;
-    log->offsets[idx] = v;
-    if (log->pagesused != log->pagescurrent || log->offsets[idx] != idx)
+        ftl_queued_current++;
+    if (v + 1 != ftl_queued_current || v != idx)
+        ftl_queued_sequential = false;
+}
+
+/* Program what ftl_log_append() queued for a log and enter the pages into
+ * it. If the chip refuses a page, the log is closed without them, as
+ * FTL_Write closes a log whose program failed: nothing is appended after a
+ * page that may be half programmed, and the retry folds the log away, which
+ * erases and so replaces the failed block. */
+static int ftl_log_flush(struct ftl_log *log)
+{
+    int rc = ftl_run_write();
+    uint32_t i;
+
+    if (rc)
+    {
+        log->pagesused = sbpages;
         log->issequential = 0;
+    }
+    else
+    {
+        for (i = 0; i < ftl_queued_n; i++)
+            log->offsets[ftl_queued_idx[i]] = log->pagesused + i;
+        log->pagesused += ftl_queued_n;
+        if (ftl_queued_n)
+        {
+            log->pagescurrent = ftl_queued_current;
+            log->issequential = ftl_queued_sequential;
+        }
+    }
+    ftl_queued_n = 0;
+    return rc;
 }
 
 /* Static wear levelling. Allocation alone only spreads wear over blocks that
@@ -1962,6 +2222,13 @@ static int ftl_ctrl_reserve(uint32_t n, uint32_t *sb, uint32_t *v)
     {
         uint32_t next = (ftl_ctrl_idx + 1) % 3;
 
+        /* Only after failed programs can the ring come round to the block
+         * holding the newest context; erasing it would leave none */
+        if (next == ftl_ctrl_good)
+        {
+            logf("ftl: no control block left to write");
+            return -1;
+        }
         if (ftl_ctrl[next] >= nsuperblocks || ftl_erase_sb(ftl_ctrl[next]))
             return -1;
         ftl_ctrl_idx = next;
@@ -1981,23 +2248,36 @@ static int ftl_mark_dirty(void)
 {
     uint32_t sb, v;
 
+    int tries;
+
     if (!ftl_cxt.cleanflag)
         return 0;                       /* already marked */
-    if (ftl_ctrl_reserve(1, &sb, &v))
-        return -1;
-    memset(ftl_buffer, 0xff, NAND_PAGE_SIZE);
-    if (ftl_write_vpage(sb, v, ftl_buffer, ftl_cxt.usn - 1, 0xffffffff,
-                        SPARE_FTL_MOUNT, false))
-        return -1;
-    ftl_cxt.cleanflag = 0;
-    return 0;
+    /* Three tries; after a failed program the rest of that control block
+     * is skipped, as _FTLMarkCxtNotValid does */
+    for (tries = 0; tries < 3; tries++)
+    {
+        if (ftl_ctrl_reserve(1, &sb, &v))
+            return -1;
+        memset(ftl_buffer, 0xff, NAND_PAGE_SIZE);
+        if (!ftl_write_vpage(sb, v, ftl_buffer, ftl_cxt.usn - 1, 0xffffffff,
+                             SPARE_FTL_MOUNT))
+        {
+            ftl_cxt.cleanflag = 0;
+            return 0;
+        }
+        if (!ftl_writable)
+            return -1;
+        ftl_ctrl_v = sbpages;
+    }
+    return -1;
 }
 
 /* Write the 25-page commit: erase counters, read counters, map, log tables,
  * stats, then the context, all carrying the same usn, in Apple's order, as
  * _StoreFTLCxt does. The open logs are recorded in the context's log slots
- * and the offset tables, so a commit need not fold them. */
-static int ftl_commit(void)
+ * and the offset tables, so a commit need not fold them. Returns -2 when
+ * the chip refused a page. */
+static int ftl_commit_once(void)
 {
     static uint16_t table[FTL_LOG_PAGES * (NAND_PAGE_SIZE / 2)];
     uint32_t per = NAND_PAGE_SIZE / 2;
@@ -2101,11 +2381,36 @@ static int ftl_commit(void)
         memcpy(buf, &ftl_cxt, sizeof(ftl_cxt));
         ftl_run_add(sb, cxtv, buf, usn, 0xffffffff, SPARE_FTL_CXT);
     }
-    if (ftl_run_write(false))
-        return -1;
+    if (ftl_run_write())
+    {
+        ftl_cxt.cleanflag = 0;
+        return -2;
+    }
 
     ftl_cxt.usn = usn;
     return 0;
+}
+
+/* Up to five tries, each failed one skipping the rest of its control
+ * block, as FTL_Flush stores the context */
+static int ftl_commit(void)
+{
+    int tries, rc = -1;
+
+    for (tries = 0; tries < 5; tries++)
+    {
+        rc = ftl_commit_once();
+        if (!rc)
+        {
+            ftl_ctrl_good = ftl_ctrl_idx;
+            return 0;
+        }
+        if (rc != -2 || !ftl_writable)
+            break;
+        logf("ftl: commit did not take, trying the next control block");
+        ftl_ctrl_v = sbpages;
+    }
+    return -1;
 }
 
 /* src for a plain contiguous write */
@@ -2125,13 +2430,50 @@ static const void *ftl_range_src(uint32_t lpn, void *ctx)
     return r->buf + (size_t)(lpn - r->first) * NAND_PAGE_SIZE;
 }
 
+/* Append the pages src() has for lblock to its log, folding the log away
+ * whenever it fills. Returns 0, -6 or -7 when no log could be had (writing
+ * then ends), or -8 when the chip refused a page and the log was closed
+ * (ftl_log_flush()). */
+static int ftl_write_log(uint32_t lblock, ftl_write_src src, void *ctx)
+{
+    struct ftl_log *log = ftl_allocate_log_entry(lblock);
+    uint32_t idx;
+
+    if (!log)
+        return -6;
+    for (idx = 0; idx < sbpages; idx++)
+    {
+        const void *data = src(lblock * sbpages + idx, ctx);
+
+        if (!data)
+            continue;
+        if (ftl_log_used(log) == sbpages)
+        {
+            /* Full: fold it away and start another */
+            if (ftl_log_flush(log))
+                return -8;
+            if (ftl_remove_scattered_block(log))
+                return -7;
+            log = ftl_allocate_log_entry(lblock);
+            if (!log)
+                return -6;
+        }
+        ftl_log_append(log, idx, data);
+    }
+    if (ftl_log_flush(log))
+        return -8;
+    if (log->pagesused == sbpages && ftl_remove_scattered_block(log))
+        return -7;
+    return 0;
+}
+
 /* Write the pages src() has new contents for, in every logical block
  * between first and last. Blocks it has nothing for are left alone. */
 static int ftl_write_merge(uint32_t first, uint32_t last, ftl_write_src src,
                            void *ctx)
 {
     uint32_t lblock;
-    int ret = 0;
+    int attempt, ret = 0;
 
     if (!ftl_mounted || !ftl_writable || !src)
         return -1;
@@ -2141,9 +2483,6 @@ static int ftl_write_merge(uint32_t first, uint32_t last, ftl_write_src src,
     mutex_lock(&ftl_mtx);
     for (lblock = first / sbpages; lblock <= last / sbpages; lblock++)
     {
-        struct ftl_log *log;
-        uint32_t idx;
-
         if (!ftl_block_dirty(lblock, src, ctx))
             continue;
 
@@ -2173,54 +2512,19 @@ static int ftl_write_merge(uint32_t first, uint32_t last, ftl_write_src src,
             continue;
         }
 
-        log = ftl_allocate_log_entry(lblock);
-        if (!log)
+        /* A program the chip refused closed the log; the next attempt
+         * folds it away and writes the pages again in a fresh one */
+        for (attempt = 0; attempt < 4; attempt++)
         {
-            ftl_writable = false;
-            ret = -6;
-            break;
+            ret = ftl_write_log(lblock, src, ctx);
+            if (ret != -8 || !ftl_writable)
+                break;
+            logf("ftl: lblock %lu log did not take, retrying",
+                 (unsigned long)lblock);
         }
-        for (idx = 0; idx < sbpages && !ret; idx++)
-        {
-            const void *data = src(lblock * sbpages + idx, ctx);
-
-            if (!data)
-                continue;
-            if (log->pagesused == sbpages)
-            {
-                /* Full: fold it away and start another */
-                if (ftl_run_write(false))
-                {
-                    ret = -8;
-                    break;
-                }
-                if (ftl_remove_scattered_block(log))
-                {
-                    ftl_writable = false;
-                    ret = -7;
-                    break;
-                }
-                log = ftl_allocate_log_entry(lblock);
-                if (!log)
-                {
-                    ftl_writable = false;
-                    ret = -6;
-                    break;
-                }
-            }
-            ftl_log_append(log, idx, data);
-        }
-        /* A failed program ends writing (ftl_write_failed()): the log's
-         * earlier pages cannot be rebuilt, as for a single page in
-         * ftl-nano2g.c */
-        if (ftl_run_write(false) && !ret)
-            ret = -8;
         if (ret)
-            break;
-        if (log->pagesused == sbpages && ftl_remove_scattered_block(log))
         {
             ftl_writable = false;
-            ret = -7;
             break;
         }
     }
@@ -2615,6 +2919,7 @@ int ftl_init(void)
 {
     const struct nand_geometry *g;
     const struct ftl_vfl_cxt *c0;
+    struct ftl_vfl_cxt *newest;
     uint32_t bank;
     bool restored;
     int rc;
@@ -2633,12 +2938,37 @@ int ftl_init(void)
     ftl_geo.twoplane = false;
     geo = &ftl_geo;
 
+    ftl_vfl_usn = 0;
+    newest = &ftl_vfl_cxt[0];
     for (bank = 0; bank < geo->banks; bank++)
+    {
         if (ftl_vfl_open_bank(bank))
         {
             logf("ftl: no VFL context on bank %lu", (unsigned long)bank);
             return -3;
         }
+        if (ftl_vfl_cxt[bank].usn >= ftl_vfl_usn)
+        {
+            ftl_vfl_usn = ftl_vfl_cxt[bank].usn;
+            newest = &ftl_vfl_cxt[bank];
+        }
+    }
+    /* As VSVFL_Open: every bank takes the FTL's fields from the newest
+     * context, so that a context stored later on any bank carries them */
+    for (bank = 0; bank < geo->banks; bank++)
+    {
+        struct ftl_vfl_cxt *c = &ftl_vfl_cxt[bank];
+
+        if (c == newest)
+            continue;
+        memcpy(c->ftlctrlblocks, newest->ftlctrlblocks,
+               sizeof(c->ftlctrlblocks));
+        c->poolstart = newest->poolstart;
+        c->usableblocks = newest->usableblocks;
+        c->ftltype = newest->ftltype;
+        memcpy(c->field_6ca, newest->field_6ca, sizeof(c->field_6ca));
+        ftl_vfl_update_checksum(c);
+    }
     ftl_vfl_ok = true;
 
     /* Apple's FTL takes VFL info 0x70 (usable blocks) less 23 as its
@@ -2680,10 +3010,6 @@ int ftl_init(void)
     if (nsuperblocks > FTL_MAX_SB || usersb > FTL_MAX_USERSB
         || sbpages > FTL_MAX_SBPAGES)
         return -2;
-
-    for (bank = 0; bank < geo->banks; bank++)
-        if (ftl_vfl_cxt[bank].usn > ftl_vfl_usn)
-            ftl_vfl_usn = ftl_vfl_cxt[bank].usn;
 
     /* Apple's FTL_Open: the context if it describes the medium, else
      * _FTLRestore */
