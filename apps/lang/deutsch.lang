@@ -17234,3 +17234,31 @@
     recording_remote: "Skin für Remote Aufnahmebildschirm"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_TAGNAVI_EDIT_MENUS
+  desc: Database menu, opens the menu editor
+  user: core
+  <source>
+    *: "Edit Menus"
+  </source>
+  <dest>
+    *: "Menüs bearbeiten"
+  </dest>
+  <voice>
+    *: "Menüs bearbeiten"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_OPTIMIZER
+  desc: in the equalizer settings menu, runs the EQ Optimizer plugin
+  user: core
+  <source>
+    *: "EQ Optimizer"
+  </source>
+  <dest>
+    *: "EQ-Optimierer"
+  </dest>
+  <voice>
+    *: "EQ-Optimierer"
+  </voice>
+</phrase>
