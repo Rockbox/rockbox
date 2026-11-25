@@ -740,7 +740,7 @@
     *: "Peak Filter"
   </source>
   <dest>
-    *: "Peak Filter"
+    *: "Piekfilter"
   </dest>
   <voice>
     *: "Piekfilter"
@@ -9077,15 +9077,15 @@
   user: core
   <source>
     *: none
-    gigabeatfx,ipod6g,ipodnano3g,ipodnano4g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Bass Cutoff"
+    gigabeatfx,ipod6g,ipodnano3g,ipodnano4g,ipodvideo,mpiohd200,mpiohd300,mrobe100,samsungypcp3: "Bass Cutoff"
   </source>
   <dest>
     *: none
-    gigabeatfx,ipod6g,ipodnano3g,ipodnano4g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Bas-afsnijfrequentie"
+    gigabeatfx,ipod6g,ipodnano3g,ipodnano4g,ipodvideo,mpiohd200,mpiohd300,mrobe100,samsungypcp3: "Bas-afsnijfrequentie"
   </dest>
   <voice>
     *: none
-    gigabeatfx,ipod6g,ipodnano3g,ipodnano4g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Bas-afsnijfrequentie"
+    gigabeatfx,ipod6g,ipodnano3g,ipodnano4g,ipodvideo,mpiohd200,mpiohd300,mrobe100,samsungypcp3: "Bas-afsnijfrequentie"
   </voice>
 </phrase>
 <phrase>
@@ -9094,15 +9094,15 @@
   user: core
   <source>
     *: none
-    gigabeatfx,ipod6g,ipodnano3g,ipodnano4g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Treble Cutoff"
+    gigabeatfx,ipod6g,ipodnano3g,ipodnano4g,ipodvideo,mpiohd200,mpiohd300,mrobe100,samsungypcp3: "Treble Cutoff"
   </source>
   <dest>
     *: none
-    gigabeatfx,ipod6g,ipodnano3g,ipodnano4g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Treble-afsnijfrequentie"
+    gigabeatfx,ipod6g,ipodnano3g,ipodnano4g,ipodvideo,mpiohd200,mpiohd300,mrobe100,samsungypcp3: "Treble-afsnijfrequentie"
   </dest>
   <voice>
     *: none
-    gigabeatfx,ipod6g,ipodnano3g,ipodnano4g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Treble-afsnijfrequentie"
+    gigabeatfx,ipod6g,ipodnano3g,ipodnano4g,ipodvideo,mpiohd200,mpiohd300,mrobe100,samsungypcp3: "Treble-afsnijfrequentie"
   </voice>
 </phrase>
 <phrase>
@@ -15782,20 +15782,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_WPS
-  desc: in Settings
-  user: core
-  <source>
-    *: "What's Playing Screen"
-  </source>
-  <dest>
-    *: "Wat er nu Speelt Scherm"
-  </dest>
-  <voice>
-    *: "Wat er nu Speelt Scherm"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_DEFAULT_BROWSER
   desc: deprecated
   user: core
@@ -17115,10 +17101,10 @@
     *: "Filter %d"
   </source>
   <dest>
-    *: "Filter %d"
+    *: "~Filter %d"
   </dest>
   <voice>
-    *: "Filter"
+    *: "~Filter"
   </voice>
 </phrase>
 <phrase>
@@ -17129,9 +17115,139 @@
     *: "Filter Type"
   </source>
   <dest>
-    *: "Filter Type"
+    *: "Filtertype"
   </dest>
   <voice>
-    *: "Filter Type"
+    *: "Filtertype"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPOSITE_VIDEO_OUTPUT
+  desc: Enables composite video framebuffer mirroring on supported targets
+  user: core
+  <source>
+    *: none
+    videoout: "Composite Video Output"
+  </source>
+  <dest>
+    *: none
+    videoout: "Composiet video uitgang"
+  </dest>
+  <voice>
+    *: none
+    videoout: "Composiet video uitgang"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_FLICK_SHORTCUTS
+  desc: in settings menu
+  user: core
+  <source>
+    *: none
+    touchscreen: "Touchscreen Flick Shortcuts"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "Touchscreen veegbeweging snelkoppelingen"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "Touchscreen veegbeweging snelkoppelingen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_SCREEN
+  desc: in the theme menu: browse recording screen skins
+  user: core
+  <source>
+    *: none
+    recording: "Recording Screen"
+  </source>
+  <dest>
+    *: none
+    recording: "Opnamescherm"
+  </dest>
+  <voice>
+    *: none
+    recording: "Opnamescherm"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_WRS
+  desc: spoken only, for file extension
+  user: core
+  <source>
+    *: none
+    recording: ""
+  </source>
+  <dest>
+    *: none
+    recording: ""
+  </dest>
+  <voice>
+    *: none
+    recording: "opnamescherm thema"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_RECORDING_SCREEN
+  desc: in the theme menu: browse remote recording screen skins
+  user: core
+  <source>
+    *: none
+    recording_remote: "Remote Recording Screen"
+  </source>
+  <dest>
+    *: none
+    recording_remote: "Extern opnamescherm"
+  </dest>
+  <voice>
+    *: none
+    recording_remote: "Extern opnamescherm"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_RWRS
+  desc: spoken only, for file extension
+  user: core
+  <source>
+    *: none
+    recording_remote: ""
+  </source>
+  <dest>
+    *: none
+    recording_remote: ""
+  </dest>
+  <voice>
+    *: none
+    recording_remote: "Extern opnamescherm thema"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGNAVI_EDIT_MENUS
+  desc: Database menu, opens the menu editor
+  user: core
+  <source>
+    *: "Edit Menus"
+  </source>
+  <dest>
+    *: "Menus bewerken"
+  </dest>
+  <voice>
+    *: "Menus bewerken"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_OPTIMIZER
+  desc: in the equalizer settings menu, runs the EQ Optimizer plugin
+  user: core
+  <source>
+    *: "EQ Optimizer"
+  </source>
+  <dest>
+    *: "EQ-optimalisatie"
+  </dest>
+  <voice>
+    *: "Equalizer optimalisatie"
   </voice>
 </phrase>
