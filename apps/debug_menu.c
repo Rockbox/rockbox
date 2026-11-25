@@ -2707,6 +2707,7 @@ static bool dbg_device_data(void)
 
 #if defined(EROS_QN)
     simplelist_addline("Hardware Revision: %d", (int)device_data.hw_rev);
+#ifndef SIMULATOR /* hardware probes do not exist in the simulator */
     simplelist_addline("DAC type: %s", es9018k2m_present_flag ? "ES9018K2M" : "PCM5102A");
     simplelist_addline("PMU Type: %s",
                        (eros_qn_pmu_type == EROS_QN_PMU_AXP192 ? "AXP192" :
@@ -2723,6 +2724,7 @@ static bool dbg_device_data(void)
                                                          REG_GPIO_MSK(i) &
                                                          ~REG_GPIO_INT(i)));
     }
+#endif /* !SIMULATOR */
 #endif
     simplelist_addline("Struct Ver: %d", (int)device_data.version);
 
