@@ -62,6 +62,8 @@
 #define CEATA_DAT_NONBUSY_TIMEOUT 5000000
 #define CEATA_MMC_RCA 1
 
+#define ATA_TRANSFER_TIMEOUT 2000000 /* 2 seconds */
+
 /** static, private data **/
 static uint8_t ceata_taskfile[16] STORAGE_ALIGN_ATTR;
 static bool ceata;
@@ -850,7 +852,7 @@ static int ata_rw_chunk_internal(uint64_t sector, uint32_t cnt, void* buffer, bo
 #ifdef HAVE_ATA_DMA
         if (ata_dma)
         {
-            PASS_RC(ata_wait_for_start_of_transfer(500000), 2, 1);
+            PASS_RC(ata_wait_for_start_of_transfer(ATA_TRANSFER_TIMEOUT), 2, 1);
             if (write)
             {
                 ATA_SBUF_START = buffer;
@@ -870,7 +872,7 @@ static int ata_rw_chunk_internal(uint64_t sector, uint32_t cnt, void* buffer, bo
             ATA_IRQ = BITRANGE(0, 4);
             ATA_IRQ_MASK = BIT(0);
             ATA_COMMAND = BIT(0);
-            if (semaphore_wait(&ata_wakeup, 500000 * HZ / 1000000) == OBJ_WAIT_TIMEDOUT)
+            if (semaphore_wait(&ata_wakeup, ATA_TRANSFER_TIMEOUT * HZ / 1000000) == OBJ_WAIT_TIMEDOUT)
             {
                 ATA_COMMAND = BIT(1);
                 ATA_CFG &= ~(BITRANGE(2, 3) | BIT(12));
@@ -885,7 +887,7 @@ static int ata_rw_chunk_internal(uint64_t sector, uint32_t cnt, void* buffer, bo
             while (cnt--)
             {
                 uint16_t i;
-                PASS_RC(ata_wait_for_start_of_transfer(500000), 2, 1);
+                PASS_RC(ata_wait_for_start_of_transfer(ATA_TRANSFER_TIMEOUT), 2, 1);
                 if (write)
                     for (i = 0; i < log_sector_size/2; i++)
                         ata_write_cbr(&ATA_PIO_DTR, ((uint16_t*)buffer)[i]);
