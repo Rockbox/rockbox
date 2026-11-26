@@ -4746,8 +4746,15 @@ fi
 
 # We generally want utf8proc.  Exceptions are:
 #   Bootloaders, checkwps, warble, <4MB RAM
-#   and (temporarily) imx233
+#   and (temporarily) as3525 and the Sansa Fuze+
 if [ "$apps" = "bootloader" -o "$app_type" = "checkwps" -o "$app_type" = "warble" -o "$memory" -lt "4" ]; then
+    no_utf8proc=1
+fi
+
+# AMS bootloaders older than 44e7c009ae and imx233 bootloaders older than
+# 6ee85ce61a only reserve 1MB for rockbox.sansa, and utf8proc's ~340K pushes
+# the e200v2/Fuze/Fuzev2/Fuze+ past it.  Drop this once utf8proc is compacted.
+if [ "$t_manufacturer" = "as3525" -o "$modelname" = "sansafuzeplus" ] && [ "$simulator" != "yes" ]; then
     no_utf8proc=1
 fi
 
