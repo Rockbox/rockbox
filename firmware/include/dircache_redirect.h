@@ -327,7 +327,7 @@ static inline struct fat_direntry *get_dir_fatent_dircache(void)
 #ifdef HAVE_DIRCACHE
     return get_dir_fatent();
 #else
-#if !defined(HAVE_RTC)
+#if !defined(CONFIG_RTC)
 #warning "FIXME:  !HAVE_DIRCACHE && !HAVE_RTC will produce wonky timestamps!"
 #endif
     return NULL;
