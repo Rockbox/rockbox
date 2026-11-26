@@ -247,14 +247,6 @@ void uncached_rewinddir_internal(struct file_base_info *infop);
 
 int test_dir_empty_internal(struct filestr_base *stream);
 
-struct dirinfo_internal
-{
-    unsigned int attr;
-    file_size_t  size;
-    uint16_t     wrtdate;
-    uint16_t     wrttime;
-};
-
 /** Synchronization used throughout **/
 
 /* acquire the filesystem lock as READER */

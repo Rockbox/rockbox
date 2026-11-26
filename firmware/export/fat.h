@@ -130,7 +130,6 @@ int fat_create_file(struct fat_file *parent, const char *name,
                     struct fat_direntry *fatent);
 bool fat_dir_is_parent(const struct fat_file *dir, const struct fat_file *file);
 bool fat_file_is_same(const struct fat_file *file1, const struct fat_file *file2);
-int fat_fstat(struct fat_file *file, struct fat_direntry *entry);
 int fat_open(const struct fat_file *parent, long startcluster,
              struct fat_file *file);
 int fat_open_rootdir(IF_MV(int volume,) struct fat_file *dir);
