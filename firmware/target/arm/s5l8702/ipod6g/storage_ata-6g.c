@@ -897,7 +897,7 @@ static int ata_rw_chunk_internal(uint64_t sector, uint32_t cnt, void* buffer, bo
                 buffer += log_sector_size;
             }
         }
-        PASS_RC(ata_wait_for_end_of_transfer(100000), 2, 3);
+        PASS_RC(ata_wait_for_end_of_transfer(ATA_TRANSFER_TIMEOUT), 2, 3);
         return 0;
     }
 }
