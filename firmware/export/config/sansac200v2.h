@@ -98,6 +98,7 @@
 /* define this if you have a real-time clock */
 #ifndef BOOTLOADER
 #define CONFIG_RTC RTC_AS3514
+#define HAVE_RTC_IRQ
 #endif
 
 /* Define this if you have a software controlled poweroff */

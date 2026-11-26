@@ -75,6 +75,7 @@
 
 /* define this if you have a real-time clock */
 #define CONFIG_RTC RTC_AS3514
+#define HAVE_RTC_IRQ
 
 /* There is no hardware tone control */
 #define HAVE_SW_TONE_CONTROLS

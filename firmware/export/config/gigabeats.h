@@ -59,11 +59,9 @@
 /* Define this to enable morse code input */
 #define HAVE_MORSE_INPUT
 
-
-
-
 /* define this if you have a real-time clock */
 #define CONFIG_RTC RTC_MC13783
+#define HAVE_RTC_IRQ
 
 /* Define if the device can wake from an RTC alarm */
 #define HAVE_RTC_ALARM
