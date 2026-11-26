@@ -21,6 +21,6 @@
 #define RTC_TARGET_H
 
 bool rtc_mc13783_dirty(void);
-#define rtc_dirty rtc_mc13783_dirty
+#define target_rtc_dirty rtc_mc13783_dirty
 
 #endif /* RTC_TARGET_H */

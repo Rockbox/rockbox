@@ -21,6 +21,6 @@
 #define RTC_TARGET_H
 
 bool ascodec_rtc_dirty(void);
-#define rtc_dirty ascodec_rtc_dirty
+#define target_rtc_dirty ascodec_rtc_dirty
 
 #endif /* RTC_TARGET_H */

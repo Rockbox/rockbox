@@ -86,7 +86,7 @@ static inline int rtc_read_datetime(struct tm *tm)
 bool valid_time(const struct tm *tm)
 {
     if (!tm || (tm->tm_hour < 0 || tm->tm_hour > 23 ||
-        tm->tm_sec < 0 || tm->tm_sec > 59 || 
+        tm->tm_sec < 0 || tm->tm_sec > 59 ||
         tm->tm_min < 0 || tm->tm_min > 59 ||
         tm->tm_year < 100 || tm->tm_year > 199 ||
         tm->tm_mon < 0 || tm->tm_mon > 11 ||
@@ -101,7 +101,10 @@ bool valid_time(const struct tm *tm)
  * returns true if the rtc needs to be read
  * targets may override with their own implementation
  */
-#ifndef HAVE_RTC_IRQ
+
+#if !defined(SIMULATOR) && defined(target_rtc_dirty)
+#define rtc_dirty target_rtc_dirty
+#elif !defined(HAVE_RTC_IRQ) || defined(SIMULATOR)
 static inline bool rtc_dirty(void)
 {
     static long timeout = 0;
@@ -117,6 +120,7 @@ static inline bool rtc_dirty(void)
     return false;
 }
 #endif /* HAVE_RTC_IRQ */
+
 #endif /* CONFIG_RTC */
 
 struct tm *get_time(void)
@@ -182,4 +186,3 @@ void set_day_of_year(struct tm *tm)
     tm->tm_yday = d + ((m+1) /2);
 }
 #endif /* CONFIG_RTC */
-
