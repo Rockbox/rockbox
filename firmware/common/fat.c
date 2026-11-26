@@ -1946,8 +1946,8 @@ static int update_short_entry(struct bpb *fat_bpb, struct fat_file *file,
     uint16_t date = 0;
 #else
     /* get old time to increment from */
-    uint16_t time = letoh16(fatent->wrttime);
-    uint16_t date = letoh16(fatent->wrtdate);
+    uint16_t time = fatent ? letoh16(fatent->wrttime) : 0;
+    uint16_t date = fatent ? letoh16(fatent->wrtdate) : 0
 #endif
     fat_time(&date, &time, NULL);
     date = htole16(date);
