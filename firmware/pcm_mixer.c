@@ -266,7 +266,16 @@ fill_frame:
 static void mixer_start_pcm(void)
 {
     if (pcm_is_playing())
-        return;
+    {
+        /* Still playing out the idle frames? */
+        if (next_size != 0)
+            return;
+
+        /* The idle period has run out: the frame queued next is the empty
+           one that stops playback, so a channel started now would never be
+           heard. Stop now and start again below. */
+        pcm_play_stop_int();
+    }
 
 #if defined(HAVE_RECORDING)
     if (pcm_is_recording())
