@@ -2028,6 +2028,12 @@ static int audio_load_albumart(struct track_info *infop,
 static bool audio_buffer_codec(struct track_info *track_infop,
                                struct mp3entry *track_id3)
 {
+    /* A retried load (after the buffer was full) already has the codec:
+       opening another would leave the first handle on the buffer with
+       nothing referencing it, never read and never closed */
+    if (track_infop->codec_hid >= 0)
+        return true;
+
     /* This will not be the current track -> it cannot be the first and the
        current track cannot be ahead of buffering -> there is a previous
        track entry which is either current or ahead of the current */
