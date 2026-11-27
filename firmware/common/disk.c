@@ -197,13 +197,13 @@ bool disk_init(IF_MD_NONVOID(int drive))
 
     bool init = false;
 
+    /* For each drive, start at a different position */
+    struct partinfo *pinfo = &part[IF_MD_DRV(drive)*MAX_PARTITIONS_PER_DRIVE];
+    memset(pinfo, 0, sizeof(*pinfo)*MAX_PARTITIONS_PER_DRIVE);
+
     /* check that the boot sector is initialized */
     if (BYTES2INT16(sector, 510) == 0xaa55)
     {
-        /* For each drive, start at a different position, in order not to
-           destroy the first entry of drive 0. That one is needed to calculate
-           config sector position. */
-        struct partinfo *pinfo = &part[IF_MD_DRV(drive)*MAX_PARTITIONS_PER_DRIVE];
 	uint8_t is_gpt = 0;
 
         disk_writer_lock();
