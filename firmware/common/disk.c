@@ -200,6 +200,9 @@ bool disk_init(IF_MD_NONVOID(int drive))
     /* For each drive, start at a different position */
     struct partinfo *pinfo = &part[IF_MD_DRV(drive)*MAX_PARTITIONS_PER_DRIVE];
     memset(pinfo, 0, sizeof(*pinfo)*MAX_PARTITIONS_PER_DRIVE);
+#ifdef MAX_VIRT_SECTOR_SIZE
+    disk_sector_multiplier[IF_MD_DRV(drive)] = 1;
+#endif
 
     /* check that the boot sector is initialized */
     if (BYTES2INT16(sector, 510) == 0xaa55)
@@ -299,7 +302,6 @@ bool disk_init(IF_MD_NONVOID(int drive))
 #ifdef DEFAULT_VIRT_SECTOR_SIZE
             part_lba *= disk_sector_multiplier[IF_MD_DRV(drive)];
 #endif
-
 
 	    int part = 0;
 reload:
@@ -428,9 +430,6 @@ int disk_mount(int drive)
     }
 
     struct partinfo *pinfo = &part[IF_MD_DRV(drive)*MAX_PARTITIONS_PER_DRIVE];
-#ifdef MAX_VIRT_SECTOR_SIZE
-    disk_sector_multiplier[IF_MD_DRV(drive)] = 1;
-#endif
 
     /* try "superfloppy" mode */
     DEBUGF("Trying to mount sector 0.\n");
